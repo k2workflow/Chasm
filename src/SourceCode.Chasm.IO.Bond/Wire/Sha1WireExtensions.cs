@@ -1,5 +1,4 @@
-﻿using SourceCode.Clay;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace SourceCode.Chasm.IO.Bond.Wire
 {

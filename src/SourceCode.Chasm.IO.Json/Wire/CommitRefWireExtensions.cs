@@ -1,5 +1,4 @@
-﻿using SourceCode.Clay;
-using SourceCode.Clay.Json;
+﻿using SourceCode.Clay.Json;
 using System.Json;
 
 namespace SourceCode.Chasm.IO.Json.Wire

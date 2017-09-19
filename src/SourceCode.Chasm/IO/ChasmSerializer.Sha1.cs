@@ -1,5 +1,4 @@
-﻿using SourceCode.Clay;
-using SourceCode.Clay.Buffers;
+﻿using SourceCode.Clay.Buffers;
 using System;
 
 namespace SourceCode.Chasm.IO

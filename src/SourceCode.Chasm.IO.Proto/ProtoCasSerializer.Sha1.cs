@@ -1,6 +1,5 @@
 ﻿using Google.Protobuf;
 using SourceCode.Chasm.IO.Proto.Wire;
-using SourceCode.Clay;
 using SourceCode.Clay.Buffers;
 using System;
 

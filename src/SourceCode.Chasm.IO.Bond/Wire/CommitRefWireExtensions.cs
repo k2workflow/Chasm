@@ -1,6 +1,4 @@
-﻿using SourceCode.Clay;
-
-namespace SourceCode.Chasm.IO.Bond.Wire
+﻿namespace SourceCode.Chasm.IO.Bond.Wire
 {
     internal static class CommitRefWireExtensions
     {

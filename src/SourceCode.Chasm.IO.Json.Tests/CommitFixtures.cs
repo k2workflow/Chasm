@@ -1,5 +1,4 @@
-﻿using SourceCode.Clay;
-using System;
+﻿using System;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Json.Tests

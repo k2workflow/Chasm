@@ -2,7 +2,6 @@
 using Bond.IO.Safe;
 using Bond.Protocols;
 using SourceCode.Chasm.IO.Bond.Wire;
-using SourceCode.Clay;
 using SourceCode.Clay.Buffers;
 using System;
 
