@@ -1,5 +1,7 @@
 ## Chasm
 
+[![Build status](https://ci.appveyor.com/api/projects/status/993h43mvva8iqb7u/branch/master?svg=true)](https://ci.appveyor.com/project/jcdickinson/chasm/branch/master)
+
 Tools and extensions to the .Net framework.
 
 ### Getting started
