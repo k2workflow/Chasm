@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <Description>CAS - Content Addressable Storage (Json).</Description>
+    <PackageTags>cas content storage sha1 git json</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <NoWarn>1701;1702;1705;S3242</NoWarn>
@@ -20,7 +25,7 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.0.3347">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00124" />
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00127" />
   </ItemGroup>
 
   <ItemGroup>
