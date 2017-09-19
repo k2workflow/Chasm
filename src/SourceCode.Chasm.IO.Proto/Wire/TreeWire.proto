@@ -1,0 +1,29 @@
+syntax = "proto3";
+import "Sha1Wire.proto";
+option csharp_namespace = "SourceCode.Mamba.CasRepo.IO.Proto.Wire";
+
+	// NodeKindWire
+	enum NodeKindWire 
+	{
+		None = 0; // Default
+
+		Commit = 1;
+		Tree = 2;
+		Blob = 3;
+	}
+
+	// TreeWireNode
+	message TreeWireNode
+	{
+		string Name = 1;
+
+		NodeKindWire Kind = 2;
+
+		Sha1Wire NodeId = 3;
+	}
+
+	// TreeWire
+	message TreeWire 
+	{
+		repeated TreeWireNode Nodes = 1;
+	}

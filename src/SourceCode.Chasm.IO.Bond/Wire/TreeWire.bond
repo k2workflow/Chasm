@@ -1,0 +1,27 @@
+﻿import "Sha1Wire.bond"
+
+namespace SourceCode.Chasm.IO.Bond.Wire
+
+	// Exact mirror of NodeKind
+	enum NodeKindWire
+	{
+		None = 0, // Default
+
+		Commit = 1,
+		Tree = 2,
+		Blob = 3
+	}
+
+	struct TreeWireNode
+	{
+		1: string Name;
+
+		2: NodeKindWire Kind = None;
+
+		3: Sha1Wire NodeId;
+	}
+	
+	struct TreeWire 
+	{
+		1: vector<TreeWireNode> Nodes;
+	}

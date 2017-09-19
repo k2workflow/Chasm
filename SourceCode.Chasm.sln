@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Json", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Json.Tests", "src\SourceCode.Chasm.IO.Json.Tests\SourceCode.Chasm.IO.Json.Tests.csproj", "{15175969-02BF-4156-B4E4-EADC6E0074A7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Bond", "src\SourceCode.Chasm.IO.Bond\SourceCode.Chasm.IO.Bond.csproj", "{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Bond.Tests", "src\SourceCode.Chasm.IO.Bond.Tests\SourceCode.Chasm.IO.Bond.Tests.csproj", "{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{15175969-02BF-4156-B4E4-EADC6E0074A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15175969-02BF-4156-B4E4-EADC6E0074A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15175969-02BF-4156-B4E4-EADC6E0074A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

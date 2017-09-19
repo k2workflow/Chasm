@@ -1,0 +1,10 @@
+syntax = "proto3";
+option csharp_namespace = "SourceCode.Mamba.CasRepo.IO.Proto.Wire";
+
+	// 20 bytes
+	message Sha1Wire
+	{
+		uint64 Blit0 = 1; // 0..7
+		uint64 Blit1 = 2; // 8..15
+		uint32 Blit2 = 3; // 16..19
+	}

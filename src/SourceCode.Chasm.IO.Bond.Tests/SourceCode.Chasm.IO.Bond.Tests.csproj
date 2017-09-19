@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <VersionPrefix>1.0.0</VersionPrefix>
     <Company>SourceCode Technology Holdings Inc.</Company>
-    <Product>SourceCode.WW</Product>
+    <Product>SourceCode.Chasm</Product>
     <Copyright>Copyright © 2017 SourceCode Technology Holdings Inc.</Copyright>
   </PropertyGroup>
 
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.IO.Bond\SourceCode.Chasm.IO.Bond.csproj" />
   </ItemGroup>
 
   <ItemGroup>

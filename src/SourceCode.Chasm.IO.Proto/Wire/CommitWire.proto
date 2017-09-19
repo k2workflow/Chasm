@@ -1,0 +1,15 @@
+syntax = "proto3";
+import "timestamp.proto";
+import "Sha1Wire.proto";
+option csharp_namespace = "SourceCode.Mamba.CasRepo.IO.Proto.Wire";
+
+	message CommitWire
+	{
+		repeated Sha1Wire Parents = 1;
+
+		Sha1Wire TreeId = 2;
+		
+		google.protobuf.Timestamp CommitUtc = 3;
+		
+		string CommitMessage = 4;
+	}
