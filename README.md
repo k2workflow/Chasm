@@ -4,11 +4,11 @@
 
 ### CAS = Content Addressable Storage
 
-https://en.wikipedia.org/wiki/Content-addressable_storage
-"CAS, is a mechanism for storing information that can be retrieved based on its content, not its storage location. 
-It is typically used for high-speed storage and retrieval of fixed content"
+[Wikipedia](https://en.wikipedia.org/wiki/Content-addressable_storage)
+>"CAS, is a mechanism for storing information that can be retrieved based on its content, not its storage location. 
+>It is typically used for high-speed storage and retrieval of fixed content"
 
-Git is a well-known example of a product that uses CAS.
+[Git](https://en.wikipedia.org/wiki/Git) is a well-known example of a product that uses CAS.
 
 ### Getting started
 
