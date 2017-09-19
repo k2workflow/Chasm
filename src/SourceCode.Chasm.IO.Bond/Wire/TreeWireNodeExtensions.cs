@@ -2,6 +2,22 @@
 {
     internal static class TreeWireNodeExtensions
     {
+        public static int EstimateBytes(this TreeWireNode wire)
+        {
+            if (wire == null) return 0;
+
+            // Name
+            var len = 2 * (wire.Name?.Length ?? 0); // utf8
+
+            // Kind
+            len += 4;
+
+            // Sha1
+            len += wire.NodeId.EstimateBytes();
+
+            return len;
+        }
+
         public static TreeNode Convert(this TreeWireNode wire)
         {
             if (wire == null) return TreeNode.Empty;

@@ -11,6 +11,6 @@ namespace SourceCode.Chasm.IO.Bond.Wire
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DateTime Convert(long value, DateTime unused)
-            => new DateTime(value);
+            => new DateTime(value, DateTimeKind.Utc);
     }
 }

@@ -4,6 +4,18 @@ namespace SourceCode.Chasm.IO.Bond.Wire
 {
     internal static class TreeWireExtensions
     {
+        public static int EstimateBytes(this TreeWire wire)
+        {
+            if (wire == null || wire.Nodes == null || wire.Nodes.Count == 0)
+                return 0;
+
+            var len = 0;
+            for (var i = 0; i < wire.Nodes.Count; i++)
+                len += wire.Nodes[i].EstimateBytes();
+
+            return len;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static NodeKind Convert(this NodeKindWire wire)
             => (NodeKind)(int)wire;
@@ -11,21 +23,6 @@ namespace SourceCode.Chasm.IO.Bond.Wire
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static NodeKindWire Convert(this NodeKind model)
             => (NodeKindWire)(int)model;
-
-        public static int EstimateBytes(this TreeWire wire)
-        {
-            if (wire == null || wire.Nodes == null || wire.Nodes.Count == 0)
-                return 0;
-
-            // Value
-            var len = wire.Nodes.Count * TreeWireNode.EstimateBytes;
-
-            // Key
-            foreach (var node in wire.Nodes)
-                len += node.Name.Length * 2; // utf8
-
-            return len;
-        }
 
         public static TreeWire Convert(this TreeNodeList model)
         {
