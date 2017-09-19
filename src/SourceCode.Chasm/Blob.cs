@@ -16,11 +16,16 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Constructors
+        #region De/Constructors
 
         public Blob(byte[] data)
         {
             Data = data ?? throw new ArgumentNullException(nameof(data));
+        }
+
+        public void Deconstruct(out byte[] data)
+        {
+            data = Data;
         }
 
         #endregion

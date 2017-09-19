@@ -2,7 +2,13 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/993h43mvva8iqb7u/branch/master?svg=true)](https://ci.appveyor.com/project/jcdickinson/chasm/branch/master)
 
-Tools and extensions to the .Net framework.
+### CAS = Content Addressable Storage
+
+https://en.wikipedia.org/wiki/Content-addressable_storage
+"CAS, is a mechanism for storing information that can be retrieved based on its content, not its storage location. 
+It is typically used for high-speed storage and retrieval of fixed content"
+
+Git is a well-known example of a product that uses CAS.
 
 ### Getting started
 

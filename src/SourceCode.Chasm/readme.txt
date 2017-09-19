@@ -11,26 +11,14 @@ Git is a well-known example of a product that uses CAS.
 
 Requirements
 ------------
-* CAS: Self-versioned, immutable store. So that versioning is intrinsic, deployment (P&D) is self-describing and functional benefits of immutable code is realized.
-* Single-instance storage of data: If you and I both describe the same Northwind db, our 'repos' should differ only in Ref data, not Object data.
+* CAS: Self-versioned, immutable store. 
+* Single-instance storage of data: If you and I both author the exact same document, our 'repos' should differ only in Ref data, not Object data.
 * Efficient network/disk operations: XML is bad, JSON is better, Bond/Protobuf/etc are best
 * Simple: Avoid the need to reinvent graph semantics, etc 
 
 
-Existing tech
--------------
-So why not just use Git/VSTS/etc
-The problem is that we don't need a working tree, and in fact a working tree will make concurrent work challenging.
-For example, you and I describe Northwind at the same time on same worker. Implies two working trees, two commits and thus possible conflicts.
-Conflict resolution in a headless environment is challenging.
-
-What we need is a single, shared, ODB (back end store for git objects) so that we can optimize CRUD and caching.
-The latest git client has just started supporting multiple working trees, but it's early code and it would also result in duplicate data locally.
-Git also has some backend support for 'remote branches' but the client support is mostly missing.
-
-
-Azure Blob
-----------
+Azure Blobs
+-----------
 After several iterations on Page & Block blobs, it looks like we need to use Append Blobs.
 
 BlockBlobs would intermittently fail to write with "InvalidBlockList". 
@@ -44,16 +32,14 @@ The client-libs, however, call out their lack of support for multiple-writer sce
 Only a couple of methods can work in this manner: http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
 
 
+Azure Tables
+------------
+Tables have a benefit over Blobs in that the Azure api supports bulk operations.
+On the negative side, single columns are limited to 64 KB of binary data and single rows are limited to 1 MB of data.
+
+
 Disk Cache
 ----------
 Obviously, fetching each item across the wire would be expensive, so a Disk Cache is used to mitigate the IO.
 The cache uses a simple MRU mechanism to scavenge any files older than a specified timespan.
 Note that the CAS design guarantees that (bugs withstanding) cache items are never stale - if present they are 'correct'
-
-
-Naming
-------
-Why is CommitRef not called Branch? 
-Because it is just one kind of Ref. Git happens to call this kind of Ref a 'branch', but that's not its only use.
-In other words, that can be considered an implementation detail of Git.
-

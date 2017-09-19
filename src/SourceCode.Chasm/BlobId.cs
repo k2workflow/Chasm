@@ -17,11 +17,16 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Constructors
+        #region De/Constructors
 
         public BlobId(Sha1 sha1)
         {
             Sha1 = sha1;
+        }
+
+        public void Deconstruct(out Sha1 sha1)
+        {
+            sha1 = Sha1;
         }
 
         #endregion
