@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Bond", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Bond.Tests", "src\SourceCode.Chasm.IO.Bond.Tests\SourceCode.Chasm.IO.Bond.Tests.csproj", "{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Proto", "src\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj", "{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Proto.Tests", "src\SourceCode.Chasm.IO.Proto.Tests\SourceCode.Chasm.IO.Proto.Tests.csproj", "{25C55825-AD35-499D-81C8-761FAA78D5B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25C55825-AD35-499D-81C8-761FAA78D5B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25C55825-AD35-499D-81C8-761FAA78D5B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25C55825-AD35-499D-81C8-761FAA78D5B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25C55825-AD35-499D-81C8-761FAA78D5B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

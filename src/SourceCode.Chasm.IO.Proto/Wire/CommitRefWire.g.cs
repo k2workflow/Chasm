@@ -7,7 +7,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
+namespace SourceCode.Chasm.IO.Proto.Wire {
 
   /// <summary>Holder for reflection information generated from CommitRefWire.proto</summary>
   public static partial class CommitRefWireReflection {
@@ -23,12 +23,12 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChNDb21taXRSZWZXaXJlLnByb3RvGg5TaGExV2lyZS5wcm90byIsCg1Db21t",
-            "aXRSZWZXaXJlEhsKCENvbW1pdElkGAEgASgLMgkuU2hhMVdpcmVCKaoCJlNv",
-            "dXJjZUNvZGUuTWFtYmEuQ2FzUmVwby5JTy5Qcm90by5XaXJlYgZwcm90bzM="));
+            "aXRSZWZXaXJlEhsKCENvbW1pdElkGAEgASgLMgkuU2hhMVdpcmVCIaoCHlNv",
+            "dXJjZUNvZGUuQ2hhc20uSU8uUHJvdG8uV2lyZWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.CommitRefWire), global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.CommitRefWire.Parser, new[]{ "CommitId" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitRefWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitRefWire.Parser, new[]{ "CommitId" }, null, null, null)
           }));
     }
     #endregion
@@ -42,7 +42,7 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.CommitRefWireReflection.Descriptor.MessageTypes[0]; }
+      get { return global::SourceCode.Chasm.IO.Proto.Wire.CommitRefWireReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -69,9 +69,9 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
 
     /// <summary>Field number for the "CommitId" field.</summary>
     public const int CommitIdFieldNumber = 1;
-    private global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire commitId_;
+    private global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire commitId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire CommitId {
+    public global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire CommitId {
       get { return commitId_; }
       set {
         commitId_ = value;
@@ -131,7 +131,7 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
       }
       if (other.commitId_ != null) {
         if (commitId_ == null) {
-          commitId_ = new global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire();
+          commitId_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
         }
         CommitId.MergeFrom(other.CommitId);
       }
@@ -147,7 +147,7 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
             break;
           case 10: {
             if (commitId_ == null) {
-              commitId_ = new global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire();
+              commitId_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
             }
             input.ReadMessage(commitId_);
             break;

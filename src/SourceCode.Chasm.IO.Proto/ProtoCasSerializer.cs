@@ -1,6 +1,6 @@
-﻿namespace SourceCode.Mamba.CasRepo.IO.Proto
+﻿namespace SourceCode.Chasm.IO.Proto
 {
-    public sealed partial class ProtoCasSerializer : CasSerializerBase
+    public sealed partial class ProtoCasSerializer : ChasmSerializer
     {
     }
 }

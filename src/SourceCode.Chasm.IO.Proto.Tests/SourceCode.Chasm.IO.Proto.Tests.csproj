@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <VersionPrefix>1.0.0</VersionPrefix>
     <Company>SourceCode Technology Holdings Inc.</Company>
-    <Product>Mamba</Product>
+    <Product>SourceCode.Chasm</Product>
     <Copyright>Copyright © 2017 SourceCode Technology Holdings Inc.</Copyright>
   </PropertyGroup>
 
@@ -16,16 +16,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers" Version="3.0.0-dev-61717-03" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170810-02" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170914-09" />
     <PackageReference Include="xunit" Version="2.3.0-beta5-build3769" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Mamba.CasRepo.IO.Proto\SourceCode.Mamba.CasRepo.IO.Proto.csproj" />
-    <ProjectReference Include="..\SourceCode.Mamba.CasRepo\SourceCode.Mamba.CasRepo.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj" />
   </ItemGroup>
 
   <ItemGroup>

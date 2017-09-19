@@ -1,7 +1,8 @@
-﻿using System;
+﻿using SourceCode.Clay;
+using System;
 using Xunit;
 
-namespace SourceCode.Mamba.CasRepo.IO.Proto.Units
+namespace SourceCode.Chasm.IO.Proto.Tests
 {
     public static class CommitFixtures
     {

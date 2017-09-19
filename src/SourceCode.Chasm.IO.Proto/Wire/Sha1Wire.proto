@@ -1,5 +1,5 @@
 syntax = "proto3";
-option csharp_namespace = "SourceCode.Mamba.CasRepo.IO.Proto.Wire";
+option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 
 	// 20 bytes
 	message Sha1Wire

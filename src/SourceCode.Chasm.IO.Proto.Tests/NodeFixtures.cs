@@ -1,13 +1,11 @@
-﻿using SourceCode.Mamba.CasRepo;
-using SourceCode.Mamba.CasRepo.IO;
-using SourceCode.Mamba.CasRepo.IO.Proto;
+﻿using SourceCode.Clay;
 using Xunit;
 
-namespace SourceCode.Mamba.SqlServer.Schema.IO.Proto.Units
+namespace SourceCode.Chasm.IO.Proto.Tests
 {
     public static class NodeFixtures
     {
-        private static readonly ICasSerializer _serializer = new ProtoCasSerializer();
+        private static readonly IChasmSerializer _serializer = new ProtoCasSerializer();
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(ProtoCasSerializer_WriteRead_EmptyTreeNodeList))]

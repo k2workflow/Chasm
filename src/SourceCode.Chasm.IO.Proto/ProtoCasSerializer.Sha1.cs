@@ -1,9 +1,10 @@
 ﻿using Google.Protobuf;
+using SourceCode.Chasm.IO.Proto.Wire;
+using SourceCode.Clay;
 using SourceCode.Clay.Buffers;
-using SourceCode.Mamba.CasRepo.IO.Proto.Wire;
 using System;
 
-namespace SourceCode.Mamba.CasRepo.IO.Proto
+namespace SourceCode.Chasm.IO.Proto
 {
     partial class ProtoCasSerializer // .Sha1
     {

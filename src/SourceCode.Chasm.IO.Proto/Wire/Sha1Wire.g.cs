@@ -7,7 +7,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
+namespace SourceCode.Chasm.IO.Proto.Wire {
 
   /// <summary>Holder for reflection information generated from Sha1Wire.proto</summary>
   public static partial class Sha1WireReflection {
@@ -23,12 +23,12 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "Cg5TaGExV2lyZS5wcm90byI3CghTaGExV2lyZRINCgVCbGl0MBgBIAEoBBIN",
-            "CgVCbGl0MRgCIAEoBBINCgVCbGl0MhgDIAEoDUIpqgImU291cmNlQ29kZS5N",
-            "YW1iYS5DYXNSZXBvLklPLlByb3RvLldpcmViBnByb3RvMw=="));
+            "CgVCbGl0MRgCIAEoBBINCgVCbGl0MhgDIAEoDUIhqgIeU291cmNlQ29kZS5D",
+            "aGFzbS5JTy5Qcm90by5XaXJlYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire), global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire.Parser, new[]{ "Blit0", "Blit1", "Blit2" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire), global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire.Parser, new[]{ "Blit0", "Blit1", "Blit2" }, null, null, null)
           }));
     }
     #endregion
@@ -45,7 +45,7 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1WireReflection.Descriptor.MessageTypes[0]; }
+      get { return global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

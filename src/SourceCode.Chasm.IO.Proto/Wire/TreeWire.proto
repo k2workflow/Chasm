@@ -1,6 +1,6 @@
 syntax = "proto3";
 import "Sha1Wire.proto";
-option csharp_namespace = "SourceCode.Mamba.CasRepo.IO.Proto.Wire";
+option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 
 	// NodeKindWire
 	enum NodeKindWire 

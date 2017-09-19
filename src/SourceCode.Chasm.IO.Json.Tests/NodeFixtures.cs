@@ -1,10 +1,7 @@
-﻿using SourceCode.Chasm;
-using SourceCode.Chasm.IO;
-using SourceCode.Chasm.IO.Json;
-using SourceCode.Clay;
+﻿using SourceCode.Clay;
 using Xunit;
 
-namespace SourceCode.Mamba.SqlServer.Schema.IO.Json.Units
+namespace SourceCode.Chasm.IO.Json.Tests
 {
     public static class NodeFixtures
     {

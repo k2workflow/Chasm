@@ -7,7 +7,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
+namespace SourceCode.Chasm.IO.Proto.Wire {
 
   /// <summary>Holder for reflection information generated from CommitWire.proto</summary>
   public static partial class CommitWireReflection {
@@ -26,12 +26,12 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
             "LnByb3RvIokBCgpDb21taXRXaXJlEhoKB1BhcmVudHMYASADKAsyCS5TaGEx",
             "V2lyZRIZCgZUcmVlSWQYAiABKAsyCS5TaGExV2lyZRItCglDb21taXRVdGMY",
             "AyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhUKDUNvbW1pdE1l",
-            "c3NhZ2UYBCABKAlCKaoCJlNvdXJjZUNvZGUuTWFtYmEuQ2FzUmVwby5JTy5Q",
-            "cm90by5XaXJlYgZwcm90bzM="));
+            "c3NhZ2UYBCABKAlCIaoCHlNvdXJjZUNvZGUuQ2hhc20uSU8uUHJvdG8uV2ly",
+            "ZWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.CommitWire), global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "CommitUtc", "CommitMessage" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "CommitUtc", "CommitMessage" }, null, null, null)
           }));
     }
     #endregion
@@ -45,7 +45,7 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.CommitWireReflection.Descriptor.MessageTypes[0]; }
+      get { return global::SourceCode.Chasm.IO.Proto.Wire.CommitWireReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -75,19 +75,19 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
 
     /// <summary>Field number for the "Parents" field.</summary>
     public const int ParentsFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire> _repeated_parents_codec
-        = pb::FieldCodec.ForMessage(10, global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire.Parser);
-    private readonly pbc::RepeatedField<global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire> parents_ = new pbc::RepeatedField<global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire>();
+    private static readonly pb::FieldCodec<global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire> _repeated_parents_codec
+        = pb::FieldCodec.ForMessage(10, global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire.Parser);
+    private readonly pbc::RepeatedField<global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire> parents_ = new pbc::RepeatedField<global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire> Parents {
+    public pbc::RepeatedField<global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire> Parents {
       get { return parents_; }
     }
 
     /// <summary>Field number for the "TreeId" field.</summary>
     public const int TreeIdFieldNumber = 2;
-    private global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire treeId_;
+    private global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire treeId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire TreeId {
+    public global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire TreeId {
       get { return treeId_; }
       set {
         treeId_ = value;
@@ -192,7 +192,7 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
       parents_.Add(other.parents_);
       if (other.treeId_ != null) {
         if (treeId_ == null) {
-          treeId_ = new global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire();
+          treeId_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
         }
         TreeId.MergeFrom(other.TreeId);
       }
@@ -221,7 +221,7 @@ namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire {
           }
           case 18: {
             if (treeId_ == null) {
-              treeId_ = new global::SourceCode.Mamba.CasRepo.IO.Proto.Wire.Sha1Wire();
+              treeId_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
             }
             input.ReadMessage(treeId_);
             break;

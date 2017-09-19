@@ -1,4 +1,4 @@
-﻿namespace SourceCode.Mamba.CasRepo.IO.Proto.Wire
+﻿namespace SourceCode.Chasm.IO.Proto.Wire
 {
     internal static class TreeWireNodeExtensions
     {
