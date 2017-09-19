@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <Description>CAS - Content Addressable Storage (Bond).</Description>
+    <PackageTags>cas content storage sha1 git bond</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <NoWarn>1701;1702;1705;S3242</NoWarn>
