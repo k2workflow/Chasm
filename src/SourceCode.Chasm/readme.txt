@@ -1,25 +1,7 @@
-Introduction
-------------
-CAS = Content Addressable Storage
-
-https://en.wikipedia.org/wiki/Content-addressable_storage
-"CAS, is a mechanism for storing information that can be retrieved based on its content, not its storage location. 
-It is typically used for high-speed storage and retrieval of fixed content"
-
-Git is a well-known example of a product that uses CAS.
-
-
-Requirements
-------------
-* CAS: Self-versioned, immutable store. 
-* Single-instance storage of data: If you and I both author the exact same document, our 'repos' should differ only in Ref data, not Object data.
-* Efficient network/disk operations: XML is bad, JSON is better, Bond/Protobuf/etc are best
-* Simple: Avoid the need to reinvent graph semantics, etc 
-
 
 Azure Blobs
 -----------
-After several iterations on Page & Block blobs, it looks like we need to use Append Blobs.
+After several iterations on Page & Block blobs, it looks like Append Blobs work best.
 
 BlockBlobs would intermittently fail to write with "InvalidBlockList". 
 A retry would succeed but reading the blob would sometimes prove to be corrupt.
@@ -27,7 +9,7 @@ It looks like parallel operations (esp. in this specific method) are known to be
 
 PageBlobs have a size requirement of being N x 512 bytes, which is wasteful in $ and network.
 
-AppendBlobs are new but look like they are a good fit for immutable write-only.
+AppendBlobs are relatively new but look like they are a good fit for immutable write-only.
 The client-libs, however, call out their lack of support for multiple-writer scenarios. 
 Only a couple of methods can work in this manner: http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
 

@@ -10,6 +10,13 @@
 
 [Git](https://en.wikipedia.org/wiki/Git) is a well-known example of a product that uses CAS.
 
+###Requirements
+
+* CAS: Self-versioned, immutable store. 
+* Single-instance storage of data: If two authors create the exact same documents, their repos should not differ in Object data.
+* Efficient network/disk operations: XML is bad, JSON is better, Bond/Protobuf/etc are best
+* Simple: Avoid the need to reinvent graph semantics, etc
+
 ### Getting started
 
 **Getting started with Git and GitHub**
