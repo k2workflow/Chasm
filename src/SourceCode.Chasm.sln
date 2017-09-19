@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26906.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm", "SourceCode.Chasm\SourceCode.Chasm.csproj", "{430F8C16-427D-4756-B788-80C1F41E2B9A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Units", "SourceCode.Chasm.Units\SourceCode.Chasm.Units.csproj", "{E5C63B7F-51ED-4B85-AE71-375D8F1B0A3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Tests", "SourceCode.Chasm.Tests\SourceCode.Chasm.Tests.csproj", "{E5C63B7F-51ED-4B85-AE71-375D8F1B0A3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

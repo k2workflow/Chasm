@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace SourceCode.Chasm.Units
+namespace SourceCode.Chasm.Tests
 {
     public static class TreeNodeListTests
     {
