@@ -7,19 +7,30 @@ environment:
 init:
 - ps: $Env:LABEL = "preview1-" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:is_not_pr = "true"; }
+
 before_build:
 - appveyor-retry dotnet restore -v Minimal
+
 build_script:
 - dotnet build "src\SourceCode.Chasm\SourceCode.Chasm.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 - dotnet build "src\SourceCode.Chasm.Tests\SourceCode.Chasm.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+
 - dotnet build "src\SourceCode.Chasm.IO.Json\SourceCode.Chasm.IO.Json.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 - dotnet build "src\SourceCode.Chasm.IO.Json.Tests\SourceCode.Chasm.IO.Json.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+
+- dotnet build "src\SourceCode.Chasm.IO.Bond\SourceCode.Chasm.IO.Bond.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "src\SourceCode.Chasm.IO.Bond.Tests\SourceCode.Chasm.IO.Bond.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+
 after_build:
  - dotnet pack "src\SourceCode.Chasm\SourceCode.Chasm.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
  - dotnet pack "src\SourceCode.Chasm.IO.Json\SourceCode.Chasm.IO.Json.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
+ - dotnet pack "src\SourceCode.Chasm.IO.Bond\SourceCode.Chasm.IO.Bond.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
+
 test_script:
 - dotnet test "src\SourceCode.Chasm.Tests\SourceCode.Chasm.Tests.csproj" -c %CONFIGURATION% --no-build
 - dotnet test "src\SourceCode.Chasm.IO.Json.Tests\SourceCode.Chasm.IO.Json.Tests.csproj" -c %CONFIGURATION% --no-build
+- dotnet test "src\SourceCode.Chasm.IO.Bond.Tests\SourceCode.Chasm.IO.Bond.Tests.csproj" -c %CONFIGURATION% --no-build
+
 artifacts:
   - path: '**\*.nupkg'
 deploy:
