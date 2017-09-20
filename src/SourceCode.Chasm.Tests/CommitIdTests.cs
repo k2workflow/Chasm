@@ -9,6 +9,7 @@ namespace SourceCode.Chasm.Tests
         public static void CommitId_has_empty_sha1()
         {
             Assert.Equal(Sha1.Empty, CommitId.Empty.Sha1);
+            Assert.Equal(default, CommitId.Empty);
         }
 
         [Trait("Type", "Unit")]

@@ -9,6 +9,7 @@ namespace SourceCode.Chasm.Tests
         public static void BlobId_has_empty_sha1()
         {
             Assert.Equal(Sha1.Empty, BlobId.Empty.Sha1);
+            Assert.Equal(default, BlobId.Empty);
         }
 
         [Trait("Type", "Unit")]

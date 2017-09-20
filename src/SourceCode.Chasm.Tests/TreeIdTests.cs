@@ -9,6 +9,7 @@ namespace SourceCode.Chasm.Tests
         public static void TreeId_has_empty_sha1()
         {
             Assert.Equal(Sha1.Empty, TreeId.Empty.Sha1);
+            Assert.Equal(default, TreeId.Empty);
         }
 
         [Trait("Type", "Unit")]

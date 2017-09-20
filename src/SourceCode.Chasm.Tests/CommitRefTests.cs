@@ -9,6 +9,7 @@ namespace SourceCode.Chasm.Tests
         public static void CommitRef_has_empty_commitId()
         {
             Assert.Equal(CommitId.Empty, CommitRef.Empty.CommitId);
+            Assert.Equal(default, CommitRef.Empty);
         }
 
         [Trait("Type", "Unit")]

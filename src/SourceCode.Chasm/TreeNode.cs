@@ -40,7 +40,7 @@ namespace SourceCode.Chasm
         public TreeNode(string name, NodeKind kind, Sha1 sha1)
             : this(name, sha1, kind)
         {
-            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (!Enum.IsDefined(typeof(NodeKind), kind)) throw new ArgumentOutOfRangeException(nameof(kind));
         }
 
@@ -70,6 +70,7 @@ namespace SourceCode.Chasm
         public bool Equals(TreeNode other)
         {
             if (!StringComparer.Ordinal.Equals(Name, other.Name)) return false;
+            if (Kind != other.Kind) return false;
             if (Sha1 != other.Sha1) return false;
 
             return true;

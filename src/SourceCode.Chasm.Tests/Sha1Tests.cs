@@ -11,6 +11,7 @@ namespace SourceCode.Chasm.Tests
         public static void When_create_empty_sha1()
         {
             var expected = Sha1.Empty;
+            Assert.Equal(default, expected);
 
             // Null string
             var actual = Sha1.Hash((string)null);
