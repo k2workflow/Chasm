@@ -66,7 +66,7 @@ namespace SourceCode.Chasm
             }
         }
 
-        public TreeNodeList(ICollection<TreeNode> nodes)
+        public TreeNodeList(IReadOnlyList<TreeNode> nodes)
         {
             if (nodes == null || nodes.Count == 0)
             {
@@ -75,10 +75,9 @@ namespace SourceCode.Chasm
             else
             {
                 var array = new TreeNode[nodes.Count];
-
-                var i = 0;
-                foreach (var node in nodes)
-                    array[i++] = node;
+                
+                for (var i = 0; i < nodes.Count; i++)
+                    array[i] = nodes[i];
 
                 Array.Sort(array, (x, y) => StringComparer.Ordinal.Compare(x.Name, y.Name));
 
@@ -124,16 +123,13 @@ namespace SourceCode.Chasm
             if (_nodes == null || _nodes.Length == 0)
                 return nodes;
 
-            var set = new HashSet<TreeNode>();
-
-            set.UnionWith(_nodes);
-            set.UnionWith(nodes._nodes);
+            var set = Merge(_nodes, nodes._nodes);
 
             var tree = new TreeNodeList(set);
             return tree;
         }
 
-        public TreeNodeList Merge(ICollection<TreeNode> nodes)
+        public TreeNodeList Merge(IReadOnlyList<TreeNode> nodes)
         {
             if (nodes == null || nodes.Count == 0)
                 return this;
@@ -141,13 +137,52 @@ namespace SourceCode.Chasm
             if (_nodes == null || _nodes.Length == 0)
                 return new TreeNodeList(nodes);
 
-            var set = new HashSet<TreeNode>();
-
-            set.UnionWith(_nodes);
-            set.UnionWith(nodes);
-
+            var set = Merge(_nodes, new TreeNodeList(nodes));
             var tree = new TreeNodeList(set);
             return tree;
+        }
+
+        private static TreeNode[] Merge(IReadOnlyList<TreeNode> first, IReadOnlyList<TreeNode> second)
+        {
+            var newArray = new TreeNode[first.Count + second.Count];
+
+            var i = 0;
+            var aIndex = 0;
+            var bIndex = 0;
+            for (; aIndex < first.Count || bIndex < second.Count; i++)
+            {
+                if (aIndex >= first.Count)
+                    newArray[i] = second[bIndex++];
+                else if (bIndex >= second.Count)
+                    newArray[i] = first[aIndex++];
+                else
+                {
+                    var a = first[aIndex];
+                    var b = second[bIndex];
+                    var cmp = StringComparer.Ordinal.Compare(a.Name, b.Name);
+
+                    if (cmp == 0)
+                    {
+                        newArray[i] = b;
+                        ++bIndex;
+                        ++aIndex;
+                    }
+                    else if (cmp < 0)
+                    {
+                        newArray[i] = a;
+                        ++aIndex;
+                    }
+                    else
+                    {
+                        newArray[i] = b;
+                        ++bIndex;
+                    }
+                }
+            }
+
+            Array.Resize(ref newArray, i);
+            return newArray;
+
         }
 
         public int IndexOf(string key)
