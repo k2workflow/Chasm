@@ -66,7 +66,7 @@ namespace SourceCode.Chasm
             }
         }
 
-        public TreeNodeList(IReadOnlyList<TreeNode> nodes)
+        public TreeNodeList(ICollection<TreeNode> nodes)
         {
             if (nodes == null || nodes.Count == 0)
             {
@@ -75,12 +75,8 @@ namespace SourceCode.Chasm
             else
             {
                 var array = new TreeNode[nodes.Count];
-                
-                for (var i = 0; i < nodes.Count; i++)
-                    array[i] = nodes[i];
-
+                nodes.CopyTo(array, 0);
                 Array.Sort(array, (x, y) => StringComparer.Ordinal.Compare(x.Name, y.Name));
-
                 _nodes = array;
             }
         }
@@ -123,13 +119,13 @@ namespace SourceCode.Chasm
             if (_nodes == null || _nodes.Length == 0)
                 return nodes;
 
-            var set = Merge(_nodes, nodes._nodes);
+            var set = Merge(this, nodes);
 
             var tree = new TreeNodeList(set);
             return tree;
         }
 
-        public TreeNodeList Merge(IReadOnlyList<TreeNode> nodes)
+        public TreeNodeList Merge(ICollection<TreeNode> nodes)
         {
             if (nodes == null || nodes.Count == 0)
                 return this;
@@ -137,12 +133,12 @@ namespace SourceCode.Chasm
             if (_nodes == null || _nodes.Length == 0)
                 return new TreeNodeList(nodes);
 
-            var set = Merge(_nodes, new TreeNodeList(nodes));
+            var set = Merge(this, new TreeNodeList(nodes));
             var tree = new TreeNodeList(set);
             return tree;
         }
 
-        private static TreeNode[] Merge(IReadOnlyList<TreeNode> first, IReadOnlyList<TreeNode> second)
+        private static TreeNode[] Merge(TreeNodeList first, TreeNodeList second)
         {
             var newArray = new TreeNode[first.Count + second.Count];
 
