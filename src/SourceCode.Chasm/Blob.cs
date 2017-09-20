@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SourceCode.Clay.Buffers;
+using System;
 
 namespace SourceCode.Chasm
 {
@@ -20,7 +21,7 @@ namespace SourceCode.Chasm
 
         public Blob(byte[] data)
         {
-            Data = data ?? throw new ArgumentNullException(nameof(data));
+            Data = data;
         }
 
         public void Deconstruct(out byte[] data)
@@ -33,26 +34,14 @@ namespace SourceCode.Chasm
         #region IEquatable
 
         public bool Equals(Blob other)
-        {
-            if (Data == null ^ other.Data == null) return false;
-            if (Data == null) return true;
-
-            if (Data.Length != other.Data.Length) return false;
-            if (Data.Length == 0) return true;
-
-            for (var i = 0; i < Data.Length; i++)
-                if (Data[i] != other.Data[i])
-                    return false;
-
-            return true;
-        }
+            => BufferComparer.Default.Equals(Data, other.Data); // Callee has null-handling logic
 
         public override bool Equals(object obj)
             => obj is Blob blob
             && Equals(blob);
 
         public override int GetHashCode()
-            => Data.Length.GetHashCode();
+            => Data == null ? 0 : Data.Length.GetHashCode();
 
         public static bool operator ==(Blob x, Blob y) => x.Equals(y);
 

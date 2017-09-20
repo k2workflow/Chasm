@@ -2,7 +2,7 @@
 using System.Text;
 using Xunit;
 
-namespace SourceCode.Chasm.Units
+namespace SourceCode.Chasm.Tests
 {
     public static class Sha1Tests
     {
@@ -11,6 +11,7 @@ namespace SourceCode.Chasm.Units
         public static void When_create_empty_sha1()
         {
             var expected = Sha1.Empty;
+            Assert.Equal(default, expected);
 
             // Null string
             var actual = Sha1.Hash((string)null);

@@ -178,7 +178,6 @@ namespace SourceCode.Chasm
 
             Array.Resize(ref newArray, i);
             return newArray;
-
         }
 
         public int IndexOf(string key)

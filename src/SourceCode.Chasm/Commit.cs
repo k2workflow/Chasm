@@ -10,7 +10,7 @@ namespace SourceCode.Chasm
 
         public static Commit Empty { get; }
 
-        private static readonly CommitId[] _orphan = new[] { CommitId.Empty };
+        public static CommitId[] Orphaned { get; } = new[] { CommitId.Empty };
 
         #endregion
 
@@ -30,9 +30,9 @@ namespace SourceCode.Chasm
 
         public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, DateTime commitUtc, string commitMessage)
         {
-            if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
+            if (commitUtc != default && commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException(nameof(commitUtc));
 
-            Parents = (parents == null || parents.Count == 0) ? _orphan : parents;
+            Parents = parents;
             TreeId = treeId;
             CommitUtc = commitUtc;
             CommitMessage = commitMessage;
@@ -57,8 +57,8 @@ namespace SourceCode.Chasm
         public bool Equals(Commit other)
         {
             if (CommitUtc != other.CommitUtc) return false;
-            if (!StringComparer.Ordinal.Equals(CommitMessage, other.CommitMessage)) return false;
             if (!TreeId.Equals(other.TreeId)) return false;
+            if (!StringComparer.Ordinal.Equals(CommitMessage, other.CommitMessage)) return false;
             if (!Parents.NullableEquals(other.Parents, CommitId.DefaultComparer, true)) return false;
 
             return true;
@@ -77,6 +77,7 @@ namespace SourceCode.Chasm
                 h = h * 7 + TreeId.GetHashCode();
                 h = h * 7 + CommitUtc.GetHashCode();
                 h = h * 7 + (Parents?.Count ?? 0);
+                h = h * 7 + (CommitMessage?.Length ?? 0);
             }
 
             return h;

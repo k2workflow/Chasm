@@ -7,10 +7,24 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         private static readonly IChasmSerializer _serializer = new ProtoCasSerializer();
 
         [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(ProtoCasSerializer_WriteRead_NullTreeNodeList))]
+        public static void ProtoCasSerializer_WriteRead_NullTreeNodeList()
+        {
+            var expected = new TreeNodeList();
+
+            using (var seg = _serializer.Serialize(expected))
+            {
+                var actual = _serializer.DeserializeTree(seg.Result);
+
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(ProtoCasSerializer_WriteRead_EmptyTreeNodeList))]
         public static void ProtoCasSerializer_WriteRead_EmptyTreeNodeList()
         {
-            var expected = new TreeNodeList();
+            var expected = new TreeNodeList(new TreeNode[0]);
 
             using (var seg = _serializer.Serialize(expected))
             {
