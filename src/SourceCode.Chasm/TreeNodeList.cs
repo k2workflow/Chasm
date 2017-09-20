@@ -49,9 +49,13 @@ namespace SourceCode.Chasm
 
         public TreeNodeList(params TreeNode[] nodes)
         {
-            if (nodes == null || nodes.Length == 0)
+            if (nodes == null)
             {
                 _nodes = null;
+            }
+            else if (nodes.Length == 0)
+            {
+                _nodes = Array.Empty<TreeNode>();
             }
             else
             {
@@ -68,9 +72,13 @@ namespace SourceCode.Chasm
 
         public TreeNodeList(ICollection<TreeNode> nodes)
         {
-            if (nodes == null || nodes.Count == 0)
+            if (nodes == null)
             {
                 _nodes = null;
+            }
+            else if (nodes.Count == 0)
+            {
+                _nodes = Array.Empty<TreeNode>();
             }
             else
             {
@@ -178,7 +186,6 @@ namespace SourceCode.Chasm
 
             Array.Resize(ref newArray, i);
             return newArray;
-
         }
 
         public int IndexOf(string key)

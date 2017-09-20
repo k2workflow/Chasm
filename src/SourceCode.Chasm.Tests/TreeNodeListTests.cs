@@ -7,6 +7,30 @@ namespace SourceCode.Chasm.Tests
     public static class TreeNodeListTests
     {
         [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_is_empty))]
+        public static void TreeNodeList_is_empty()
+        {
+            var noData = new TreeNodeList();
+            var nullData = new TreeNodeList(null);
+            var emptyData = new TreeNodeList(Array.Empty<TreeNode>());
+
+            Assert.Equal(0, TreeNodeList.Empty.Count);
+
+            Assert.Equal(noData, nullData);
+            Assert.Equal(noData.GetHashCode(), nullData.GetHashCode());
+
+            Assert.Equal(TreeNodeList.Empty, noData);
+            Assert.Equal(TreeNodeList.Empty.GetHashCode(), noData.GetHashCode());
+
+            Assert.Equal(TreeNodeList.Empty, nullData);
+            Assert.Equal(TreeNodeList.Empty.GetHashCode(), nullData.GetHashCode());
+
+            // null and [] both have same hash
+            Assert.NotEqual(TreeNodeList.Empty, emptyData);
+            Assert.NotEqual(noData, emptyData);
+        }
+
+        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeNodeList_Merge_Single))]
         public static void TreeNodeList_Merge_Single()
         {
