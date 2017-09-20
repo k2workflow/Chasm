@@ -75,13 +75,8 @@ namespace SourceCode.Chasm
             else
             {
                 var array = new TreeNode[nodes.Count];
-
-                var i = 0;
-                foreach (var node in nodes)
-                    array[i++] = node;
-
+                nodes.CopyTo(array, 0);
                 Array.Sort(array, (x, y) => StringComparer.Ordinal.Compare(x.Name, y.Name));
-
                 _nodes = array;
             }
         }
@@ -124,10 +119,7 @@ namespace SourceCode.Chasm
             if (_nodes == null || _nodes.Length == 0)
                 return nodes;
 
-            var set = new HashSet<TreeNode>();
-
-            set.UnionWith(_nodes);
-            set.UnionWith(nodes._nodes);
+            var set = Merge(this, nodes);
 
             var tree = new TreeNodeList(set);
             return tree;
@@ -141,13 +133,52 @@ namespace SourceCode.Chasm
             if (_nodes == null || _nodes.Length == 0)
                 return new TreeNodeList(nodes);
 
-            var set = new HashSet<TreeNode>();
-
-            set.UnionWith(_nodes);
-            set.UnionWith(nodes);
-
+            var set = Merge(this, new TreeNodeList(nodes));
             var tree = new TreeNodeList(set);
             return tree;
+        }
+
+        private static TreeNode[] Merge(TreeNodeList first, TreeNodeList second)
+        {
+            var newArray = new TreeNode[first.Count + second.Count];
+
+            var i = 0;
+            var aIndex = 0;
+            var bIndex = 0;
+            for (; aIndex < first.Count || bIndex < second.Count; i++)
+            {
+                if (aIndex >= first.Count)
+                    newArray[i] = second[bIndex++];
+                else if (bIndex >= second.Count)
+                    newArray[i] = first[aIndex++];
+                else
+                {
+                    var a = first[aIndex];
+                    var b = second[bIndex];
+                    var cmp = StringComparer.Ordinal.Compare(a.Name, b.Name);
+
+                    if (cmp == 0)
+                    {
+                        newArray[i] = b;
+                        ++bIndex;
+                        ++aIndex;
+                    }
+                    else if (cmp < 0)
+                    {
+                        newArray[i] = a;
+                        ++aIndex;
+                    }
+                    else
+                    {
+                        newArray[i] = b;
+                        ++bIndex;
+                    }
+                }
+            }
+
+            Array.Resize(ref newArray, i);
+            return newArray;
+
         }
 
         public int IndexOf(string key)
