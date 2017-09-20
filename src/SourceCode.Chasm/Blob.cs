@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SourceCode.Clay.Buffers;
+using System;
 
 namespace SourceCode.Chasm
 {
@@ -33,25 +34,7 @@ namespace SourceCode.Chasm
         #region IEquatable
 
         public bool Equals(Blob other)
-        {
-            if (Data == null ^ other.Data == null) return false;
-            if (Data == null) return true;
-
-            if (Data.Length != other.Data.Length) return false;
-
-            switch (Data.Length)
-            {
-                case 0: return true;
-                case 1: return Data[0] == other.Data[0];
-                default:
-                    {
-                        for (var i = 0; i < Data.Length; i++)
-                            if (Data[i] != other.Data[i])
-                                return false;
-                        return true;
-                    }
-            }
-        }
+            => BufferComparer.Default.Equals(Data, other.Data); // Has null-handling logic
 
         public override bool Equals(object obj)
             => obj is Blob blob
