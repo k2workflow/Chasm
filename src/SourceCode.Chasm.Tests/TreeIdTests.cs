@@ -21,8 +21,13 @@ namespace SourceCode.Chasm.Tests
             var treeId3 = new TreeId(Sha1.Hash("def"));
 
             Assert.Equal(treeId1, treeId2);
+            Assert.Equal(treeId1.GetHashCode(), treeId2.GetHashCode());
+
             Assert.NotEqual(TreeId.Empty, treeId1);
+            Assert.NotEqual(TreeId.Empty.GetHashCode(), treeId1.GetHashCode());
+
             Assert.NotEqual(treeId3, treeId1);
+            Assert.NotEqual(treeId3.GetHashCode(), treeId1.GetHashCode());
         }
     }
 }

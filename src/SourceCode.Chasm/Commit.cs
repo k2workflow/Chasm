@@ -57,8 +57,8 @@ namespace SourceCode.Chasm
         public bool Equals(Commit other)
         {
             if (CommitUtc != other.CommitUtc) return false;
-            if (!StringComparer.Ordinal.Equals(CommitMessage, other.CommitMessage)) return false;
             if (!TreeId.Equals(other.TreeId)) return false;
+            if (!StringComparer.Ordinal.Equals(CommitMessage, other.CommitMessage)) return false;
             if (!Parents.NullableEquals(other.Parents, CommitId.DefaultComparer, true)) return false;
 
             return true;
@@ -77,6 +77,7 @@ namespace SourceCode.Chasm
                 h = h * 7 + TreeId.GetHashCode();
                 h = h * 7 + CommitUtc.GetHashCode();
                 h = h * 7 + (Parents?.Count ?? 0);
+                h = h * 7 + (CommitMessage?.Length ?? 0);
             }
 
             return h;

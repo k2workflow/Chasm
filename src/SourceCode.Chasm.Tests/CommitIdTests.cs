@@ -21,8 +21,13 @@ namespace SourceCode.Chasm.Tests
             var commitId3 = new CommitId(Sha1.Hash("def"));
 
             Assert.Equal(commitId1, commitId2);
+            Assert.Equal(commitId1.GetHashCode(), commitId2.GetHashCode());
+
             Assert.NotEqual(CommitId.Empty, commitId1);
+            Assert.NotEqual(CommitId.Empty.GetHashCode(), commitId1.GetHashCode());
+
             Assert.NotEqual(commitId3, commitId1);
+            Assert.NotEqual(commitId3.GetHashCode(), commitId1.GetHashCode());
         }
     }
 }

@@ -18,8 +18,15 @@ namespace SourceCode.Chasm.Tests
             Assert.Null(noData.Data);
 
             Assert.Equal(noData, nullData);
+            Assert.Equal(noData.GetHashCode(), nullData.GetHashCode());
+
             Assert.Equal(Blob.Empty, noData);
+            Assert.Equal(Blob.Empty.GetHashCode(), noData.GetHashCode());
+
             Assert.Equal(Blob.Empty, nullData);
+            Assert.Equal(Blob.Empty.GetHashCode(), nullData.GetHashCode());
+
+            // null and [] both have same hash
             Assert.NotEqual(Blob.Empty, emptyData);
             Assert.NotEqual(noData, emptyData);
         }

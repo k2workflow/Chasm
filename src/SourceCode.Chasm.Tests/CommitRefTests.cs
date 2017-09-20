@@ -21,8 +21,13 @@ namespace SourceCode.Chasm.Tests
             var commitRef3 = new CommitRef(new CommitId(Sha1.Hash("def")));
 
             Assert.Equal(commitRef1, commitRef2);
+            Assert.Equal(commitRef1.GetHashCode(), commitRef2.GetHashCode());
+
             Assert.NotEqual(CommitRef.Empty, commitRef1);
+            Assert.NotEqual(CommitRef.Empty.GetHashCode(), commitRef1.GetHashCode());
+
             Assert.NotEqual(commitRef3, commitRef1);
+            Assert.NotEqual(commitRef3.GetHashCode(), commitRef1.GetHashCode());
         }
     }
 }

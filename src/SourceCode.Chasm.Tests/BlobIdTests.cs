@@ -21,8 +21,13 @@ namespace SourceCode.Chasm.Tests
             var blobId3 = new BlobId(Sha1.Hash("def"));
 
             Assert.Equal(blobId1, blobId2);
+            Assert.Equal(blobId1.GetHashCode(), blobId2.GetHashCode());
+
             Assert.NotEqual(BlobId.Empty, blobId1);
+            Assert.NotEqual(BlobId.Empty.GetHashCode(), blobId1.GetHashCode());
+
             Assert.NotEqual(blobId3, blobId1);
+            Assert.NotEqual(blobId3.GetHashCode(), blobId1.GetHashCode());
         }
     }
 }
