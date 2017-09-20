@@ -87,9 +87,9 @@ namespace SourceCode.Chasm.Tests
 
             var list2 = new[]
             {
+                new TreeNode("c", NodeKind.Blob, Sha1.Hash("Test3")),
                 new TreeNode("a", NodeKind.Tree, Sha1.Hash("Test1")),
                 new TreeNode("b", NodeKind.Blob, Sha1.Hash("Test2")),
-                new TreeNode("c", NodeKind.Blob, Sha1.Hash("Test3")),
                 new TreeNode("d", NodeKind.Tree, Sha1.Hash("Test4 Replace")),
                 new TreeNode("g", NodeKind.Blob, Sha1.Hash("Test5 Replace")),
                 new TreeNode("q", NodeKind.Tree, Sha1.Hash("Test8")),
@@ -110,9 +110,9 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal("q", list3[7].Name);
             Assert.Equal("r", list3[8].Name);
 
-            Assert.Equal(list2[0].Sha1, list3[0].Sha1);
-            Assert.Equal(list2[1].Sha1, list3[1].Sha1);
-            Assert.Equal(list2[2].Sha1, list3[2].Sha1);
+            Assert.Equal(list2[1].Sha1, list3[0].Sha1);
+            Assert.Equal(list2[2].Sha1, list3[1].Sha1);
+            Assert.Equal(list2[0].Sha1, list3[2].Sha1);
             Assert.Equal(list2[3].Sha1, list3[3].Sha1);
             Assert.Equal(list1[1].Sha1, list3[4].Sha1);
             Assert.Equal(list1[2].Sha1, list3[5].Sha1);
