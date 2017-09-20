@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.Tests
             var nullData = new TreeNodeList(null);
             var emptyData = new TreeNodeList(Array.Empty<TreeNode>());
 
-            Assert.Equal(0, TreeNodeList.Empty.Count);
+            Assert.Empty(TreeNodeList.Empty);
 
             Assert.Equal(noData, nullData);
             Assert.Equal(noData.GetHashCode(), nullData.GetHashCode());
@@ -25,9 +25,38 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(TreeNodeList.Empty, nullData);
             Assert.Equal(TreeNodeList.Empty.GetHashCode(), nullData.GetHashCode());
 
-            // null and [] both have same hash
-            Assert.NotEqual(TreeNodeList.Empty, emptyData);
-            Assert.NotEqual(noData, emptyData);
+            Assert.Equal(TreeNodeList.Empty, emptyData); // By design; see ctor
+            Assert.Equal(TreeNodeList.Empty.GetHashCode(), emptyData.GetHashCode());
+
+            Assert.Equal(noData, emptyData); // By design; see ctor
+            Assert.Equal(noData.GetHashCode(), emptyData.GetHashCode());
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_equality))]
+        public static void TreeNodeList_equality()
+        {
+            var expected = new TreeNodeList(new[] { new TreeNode("c1", NodeKind.Blob, Sha1.Hash("c1")), new TreeNode("c2", NodeKind.Tree, Sha1.Hash("c2")) });
+            var node3 = new TreeNode("c3", NodeKind.Tree, Sha1.Hash("c3"));
+
+            // Equal
+            var actual = new TreeNodeList().Merge(expected);
+            Assert.Equal(expected, actual);
+            Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+            // Less Nodes
+            actual = new TreeNodeList().Merge(expected[0]);
+            Assert.NotEqual(expected, actual);
+            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+
+            // More Nodes
+            actual = new TreeNodeList().Merge(expected).Merge(node3);
+            Assert.NotEqual(expected, actual);
+            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+
+            // Different Nodes
+            actual = new TreeNodeList().Merge(expected[0]).Merge(node3);
+            Assert.NotEqual(expected, actual); // hashcode is the same (node count)
         }
 
         [Trait("Type", "Unit")]

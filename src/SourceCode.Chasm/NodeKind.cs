@@ -3,8 +3,7 @@
     public enum NodeKind : byte
     {
         None = 0, // Default
-        Commit = 1,
-        Tree = 2,
-        Blob = 3
+        Tree = 1,
+        Blob = 2
     }
 }

@@ -49,13 +49,9 @@ namespace SourceCode.Chasm
 
         public TreeNodeList(params TreeNode[] nodes)
         {
-            if (nodes == null)
+            if (nodes == null || nodes.Length == 0)
             {
                 _nodes = null;
-            }
-            else if (nodes.Length == 0)
-            {
-                _nodes = Array.Empty<TreeNode>();
             }
             else
             {
@@ -72,13 +68,9 @@ namespace SourceCode.Chasm
 
         public TreeNodeList(ICollection<TreeNode> nodes)
         {
-            if (nodes == null)
+            if (nodes == null || nodes.Count == 0)
             {
                 _nodes = null;
-            }
-            else if (nodes.Count == 0)
-            {
-                _nodes = Array.Empty<TreeNode>();
             }
             else
             {
