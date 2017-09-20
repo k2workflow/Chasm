@@ -2,7 +2,7 @@
 using System.Text;
 using Xunit;
 
-namespace SourceCode.Chasm.Units
+namespace SourceCode.Chasm.Tests
 {
     public static class Sha1Tests
     {

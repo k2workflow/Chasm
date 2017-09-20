@@ -10,7 +10,7 @@ namespace SourceCode.Chasm
 
         public static Commit Empty { get; }
 
-        private static readonly CommitId[] _orphan = new[] { CommitId.Empty };
+        public static CommitId[] Orphaned { get; } = new[] { CommitId.Empty };
 
         #endregion
 
@@ -30,9 +30,9 @@ namespace SourceCode.Chasm
 
         public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, DateTime commitUtc, string commitMessage)
         {
-            if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
+            if (commitUtc != default && commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException(nameof(commitUtc));
 
-            Parents = (parents == null || parents.Count == 0) ? _orphan : parents;
+            Parents = parents;
             TreeId = treeId;
             CommitUtc = commitUtc;
             CommitMessage = commitMessage;

@@ -20,7 +20,7 @@ namespace SourceCode.Chasm
 
         public Blob(byte[] data)
         {
-            Data = data ?? throw new ArgumentNullException(nameof(data));
+            Data = data;
         }
 
         public void Deconstruct(out byte[] data)
@@ -38,13 +38,19 @@ namespace SourceCode.Chasm
             if (Data == null) return true;
 
             if (Data.Length != other.Data.Length) return false;
-            if (Data.Length == 0) return true;
 
-            for (var i = 0; i < Data.Length; i++)
-                if (Data[i] != other.Data[i])
-                    return false;
-
-            return true;
+            switch (Data.Length)
+            {
+                case 0: return true;
+                case 1: return Data[0] == other.Data[0];
+                default:
+                    {
+                        for (var i = 0; i < Data.Length; i++)
+                            if (Data[i] != other.Data[i])
+                                return false;
+                        return true;
+                    }
+            }
         }
 
         public override bool Equals(object obj)
