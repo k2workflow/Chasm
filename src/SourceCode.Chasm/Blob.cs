@@ -34,7 +34,7 @@ namespace SourceCode.Chasm
         #region IEquatable
 
         public bool Equals(Blob other)
-            => BufferComparer.Default.Equals(Data, other.Data); // Callee has null-handling logic
+            => BufferComparer.Default.Equals(Data, other.Data); // Callee has necessary null-handling logic
 
         public override bool Equals(object obj)
             => obj is Blob blob

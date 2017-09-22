@@ -37,7 +37,7 @@ namespace SourceCode.Chasm.IO.Bond
 
         #region Deserialize
 
-        public override TreeNodeList DeserializeTree(ReadOnlyBuffer<byte> buffer)
+        public override TreeNodeList DeserializeTree(ReadOnlyMemory<byte> buffer)
         {
             var buf = new InputBuffer(buffer.ToArray()); // TODO: Perf
             var reader = new SimpleBinaryReader<InputBuffer>(buf);

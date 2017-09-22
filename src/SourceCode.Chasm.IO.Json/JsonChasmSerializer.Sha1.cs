@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public override Sha1 DeserializeSha1(ReadOnlyBuffer<byte> buffer)
+        public override Sha1 DeserializeSha1(ReadOnlyMemory<byte> buffer)
         {
             if (buffer.IsEmpty) throw new ArgumentNullException(nameof(buffer));
 

@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public override Commit DeserializeCommit(ReadOnlyBuffer<byte> buffer)
+        public override Commit DeserializeCommit(ReadOnlyMemory<byte> buffer)
         {
             var wire = new CommitWire();
             wire.MergeFrom(buffer.ToArray()); // TODO: Perf

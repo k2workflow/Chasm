@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public override TreeNodeList DeserializeTree(ReadOnlyBuffer<byte> buffer)
+        public override TreeNodeList DeserializeTree(ReadOnlyMemory<byte> buffer)
         {
             var wire = new TreeWire();
             wire.MergeFrom(buffer.ToArray()); // TODO: Perf

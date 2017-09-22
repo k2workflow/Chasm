@@ -64,7 +64,7 @@ namespace SourceCode.Chasm.IO
             return dict;
         }
 
-        private IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTrees(IReadOnlyDictionary<Sha1, System.ReadOnlyBuffer<byte>> kvps)
+        private IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTrees(IReadOnlyDictionary<Sha1, System.ReadOnlyMemory<byte>> kvps)
         {
             var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
 

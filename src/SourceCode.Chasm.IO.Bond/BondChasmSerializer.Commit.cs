@@ -37,7 +37,7 @@ namespace SourceCode.Chasm.IO.Bond
 
         #region Deserialize
 
-        public override Commit DeserializeCommit(ReadOnlyBuffer<byte> buffer)
+        public override Commit DeserializeCommit(ReadOnlyMemory<byte> buffer)
         {
             var buf = new InputBuffer(buffer.ToArray()); // TODO: Perf
             var reader = new SimpleBinaryReader<InputBuffer>(buf);

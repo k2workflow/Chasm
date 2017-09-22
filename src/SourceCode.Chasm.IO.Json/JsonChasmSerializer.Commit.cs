@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public override Commit DeserializeCommit(ReadOnlyBuffer<byte> buffer)
+        public override Commit DeserializeCommit(ReadOnlyMemory<byte> buffer)
         {
             if (buffer.IsEmpty) throw new ArgumentNullException(nameof(buffer));
 

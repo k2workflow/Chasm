@@ -84,33 +84,6 @@ namespace SourceCode.Chasm
         }
 
         /// <summary>
-        /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="Byte[]"/>.
-        /// </summary>
-        /// <param name="buffer">The buffer.</param>
-        /// <exception cref="ArgumentNullException">buffer</exception>
-        /// <exception cref="ArgumentOutOfRangeException">buffer - buffer</exception>
-        [SecuritySafeCritical]
-        public Sha1(byte[] buffer)
-        {
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
-
-            if (buffer.Length < ByteLen)
-                throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)} must have length at least {ByteLen}");
-
-            unsafe
-            {
-                fixed (byte* ptr = buffer)
-                {
-                    // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                    Blit0 = *(ulong*)(&ptr[0]);
-                    Blit1 = *(ulong*)(&ptr[8]);
-                    Blit2 = *(uint*)(&ptr[16]);
-                }
-            }
-        }
-
-        /// <summary>
         /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="Byte[]"/> starting at the specified position.
         /// </summary>
         /// <param name="buffer">The buffer.</param>
@@ -145,66 +118,25 @@ namespace SourceCode.Chasm
             }
         }
 
-        // Commenting out this section until System.Buffers.Primitives is RTM
-#pragma warning disable S125 // Sections of code should not be "commented out"
-
         /// <summary>
-        /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="ReadOnlyBuffer{T}"/>.
+        /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="ReadOnlyMemory{T}"/>.
         /// </summary>
-        /// <param name="buffer">The buffer.</param>
-        /// <exception cref="ArgumentOutOfRangeException">buffer - buffer</exception>
-        //[SecuritySafeCritical]
-        //public Sha1(ReadOnlyBuffer<byte> buffer)
-        //{
-        //    if (buffer.Length < ByteLen)
-        //        throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)} must have length at least {ByteLen}");
-
-        //    unsafe
-        //    {
-        //        fixed (byte* ptr = &buffer.Span.DangerousGetPinnableReference())
-        //        {
-        //            // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-        //            Blit0 = *(ulong*)(&ptr[0]);
-        //            Blit1 = *(ulong*)(&ptr[8]);
-        //            Blit2 = *(uint*)(&ptr[16]);
-        //        }
-        //    }
-        //}
-
-        /// <summary>
-        /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="ReadOnlyBuffer{T}"/> starting at the specified position.
-        /// </summary>
-        /// <param name="buffer">The buffer.</param>
-        /// <param name="offset">The offset.</param>
-        /// <exception cref="ArgumentOutOfRangeException">offset - buffer</exception>
-        //public Sha1(ReadOnlyBuffer<byte> buffer, int offset)
-        //    : this(buffer.Slice(offset, ByteLen))
-        //{
-        //    if (offset < 0 || offset + ByteLen > buffer.Length)
-        //        throw new ArgumentOutOfRangeException(nameof(offset), $"{nameof(buffer)} must have length at least {ByteLen}");
-        //}
-
-#pragma warning restore S125 // Sections of code should not be "commented out"
-
-        /// <summary>
-        /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="ArraySegment{T}"/>.
-        /// </summary>
-        /// <param name="buffer">The buffer.</param>
+        /// <param name="span">The buffer.</param>
         /// <exception cref="ArgumentOutOfRangeException">buffer - buffer</exception>
         [SecuritySafeCritical]
-        public Sha1(ArraySegment<byte> buffer)
+        public Sha1(ReadOnlySpan<byte> span)
         {
-            if (buffer.Count < ByteLen)
-                throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)} must have length at least {ByteLen}");
+            if (span.IsEmpty || span.Length < ByteLen)
+                throw new ArgumentOutOfRangeException(nameof(span), $"{nameof(span)} must have length at least {ByteLen}");
 
             unsafe
             {
-                fixed (byte* ptr = buffer.Array)
+                fixed (byte* ptr = &span.DangerousGetPinnableReference())
                 {
                     // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                    Blit0 = *(ulong*)(&ptr[buffer.Offset + 0]);
-                    Blit1 = *(ulong*)(&ptr[buffer.Offset + 8]);
-                    Blit2 = *(uint*)(&ptr[buffer.Offset + 16]);
+                    Blit0 = *(ulong*)(&ptr[0]);
+                    Blit1 = *(ulong*)(&ptr[8]);
+                    Blit2 = *(uint*)(&ptr[16]);
                 }
             }
         }
@@ -337,37 +269,6 @@ namespace SourceCode.Chasm
             return ByteLen;
         }
 
-        // Commenting out this section until System.Buffers.Primitives is RTM
-#pragma warning disable S125 // Sections of code should not be "commented out"
-
-        /// <summary>
-        /// Copies the <see cref="Sha1"/> value to the provided buffer.
-        /// </summary>
-        /// <param name="buffer">The buffer to copy to.</param>
-        /// <param name="offset">The offset.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException">offset - buffer</exception>
-        //[SecuritySafeCritical]
-        //public int CopyTo(Buffer<byte> buffer, int offset)
-        //{
-        //    if (offset < 0 || offset + ByteLen > buffer.Length)
-        //        throw new ArgumentOutOfRangeException(nameof(offset), $"{nameof(buffer)} must have length at least {ByteLen}");
-
-        //    unsafe
-        //    {
-        //        fixed (byte* ptr = &buffer.Span.DangerousGetPinnableReference())
-        //        {
-        //            // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-        //            *(ulong*)(&ptr[offset + 0]) = Blit0;
-        //            *(ulong*)(&ptr[offset + 8]) = Blit1;
-        //            *(uint*)(&ptr[offset + 16]) = Blit2;
-        //        }
-        //    }
-
-        //    return ByteLen;
-        //}
-#pragma warning restore S125 // Sections of code should not be "commented out"
-
         #endregion
 
         #region ToString
@@ -447,7 +348,8 @@ namespace SourceCode.Chasm
             var key = new string(chars, 0, prefixLength);
             var val = new string(chars, prefixLength, chars.Length - prefixLength);
 
-            return new KeyValuePair<string, string>(key, val);
+            var kvp = new KeyValuePair<string, string>(key, val);
+            return kvp;
         }
 
         [SecuritySafeCritical]

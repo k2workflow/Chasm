@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public override TreeNodeList DeserializeTree(ReadOnlyBuffer<byte> buffer)
+        public override TreeNodeList DeserializeTree(ReadOnlyMemory<byte> buffer)
         {
             if (buffer.IsEmpty) throw new ArgumentNullException(nameof(buffer));
 

@@ -9,13 +9,13 @@ namespace SourceCode.Chasm.IO
     {
         #region Read
 
-        ReadOnlyBuffer<byte> ReadObject(Sha1 objectId);
+        ReadOnlyMemory<byte> ReadObject(Sha1 objectId);
 
-        ValueTask<ReadOnlyBuffer<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
+        ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
-        IReadOnlyDictionary<Sha1, ReadOnlyBuffer<byte>> ReadObjects(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken);
+        IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> ReadObjects(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken);
 
-        ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyBuffer<byte>>> ReadObjectsAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken);
+        ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectsAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken);
 
         #endregion
 

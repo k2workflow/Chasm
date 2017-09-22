@@ -7,7 +7,7 @@ namespace SourceCode.Chasm.IO
     {
         BufferSession Serialize(Sha1 model);
 
-        Sha1 DeserializeSha1(ReadOnlyBuffer<byte> buffer);
+        Sha1 DeserializeSha1(ReadOnlyMemory<byte> buffer);
 
         Sha1 DeserializeSha1(ArraySegment<byte> segment);
     }
