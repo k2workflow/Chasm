@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SourceCode.Clay.Buffers;
+using System;
 using System.Text;
 using Xunit;
 
@@ -17,43 +18,52 @@ namespace SourceCode.Chasm.Tests
             var actual = Sha1.Hash((string)null);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Null bytes
             actual = Sha1.Hash((byte[])null);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             actual = Sha1.Hash(null, 0, 0);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Null segment
             actual = Sha1.Hash(default(ArraySegment<byte>));
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Roundtrip string
             actual = Sha1.Parse(expected.ToString());
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Roundtrip formatted
             actual = Sha1.Parse(expected.ToString("D"));
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             actual = Sha1.Parse(expected.ToString("S"));
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // With hex specifier
             actual = Sha1.Parse("0x" + expected.ToString("D"));
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             actual = Sha1.Parse("0x" + expected.ToString("S"));
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
         }
 
         [Trait("Type", "Unit")]
@@ -68,18 +78,21 @@ namespace SourceCode.Chasm.Tests
             var actual = new Sha1(buffer);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Byte[] with offset 0
             expected.CopyTo(buffer, 0);
             actual = new Sha1(buffer, 0);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Byte[] with offset N
             expected.CopyTo(buffer, 5);
             actual = new Sha1(buffer, 5);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
         }
 
         [Trait("Type", "Unit")]
@@ -94,6 +107,7 @@ namespace SourceCode.Chasm.Tests
             var actual = new Sha1(buffer, 5);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Segment
             expected.CopyTo(buffer, 0);
@@ -101,6 +115,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(seg);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Segment with offset 0
             expected.CopyTo(buffer, 0);
@@ -108,6 +123,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(seg);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Segment with offset N
             expected.CopyTo(buffer, 5);
@@ -115,6 +131,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(seg);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
         }
 
         [Trait("Type", "Unit")]
@@ -130,6 +147,7 @@ namespace SourceCode.Chasm.Tests
             var actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Memory with offset 0
             expected.CopyTo(buffer, 0);
@@ -137,6 +155,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Memory with offset N
             expected.CopyTo(buffer, 5);
@@ -144,6 +163,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
         }
 
         [Trait("Type", "Unit")]
@@ -159,6 +179,7 @@ namespace SourceCode.Chasm.Tests
             var actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct ReadOnlyMemory with offset 0
             expected.CopyTo(buffer, 0);
@@ -166,6 +187,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct ReadOnlyMemory with offset N
             expected.CopyTo(buffer, 5);
@@ -173,6 +195,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
         }
 
         [Trait("Type", "Unit")]
@@ -188,6 +211,7 @@ namespace SourceCode.Chasm.Tests
             var actual = new Sha1(span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Span with offset 0
             expected.CopyTo(buffer, 0);
@@ -195,6 +219,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct Span with offset N
             expected.CopyTo(buffer, 5);
@@ -202,6 +227,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
         }
 
         [Trait("Type", "Unit")]
@@ -217,6 +243,7 @@ namespace SourceCode.Chasm.Tests
             var actual = new Sha1(span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct ReadOnlySpan with offset 0
             expected.CopyTo(buffer, 0);
@@ -224,6 +251,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
 
             // Construct ReadOnlySpan with offset N
             expected.CopyTo(buffer, 5);
@@ -231,6 +259,7 @@ namespace SourceCode.Chasm.Tests
             actual = new Sha1(span);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.ToArray(), actual.Memory.ToArray(), BufferComparer.Default);
         }
 
         [Trait("Type", "Unit")]
@@ -247,50 +276,40 @@ namespace SourceCode.Chasm.Tests
                 // String
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Empty array
                 actual = Sha1.Hash(Array.Empty<byte>()).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Hash(Array.Empty<byte>(), 0, 0).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Empty segment
                 actual = Sha1.Hash(new ArraySegment<byte>(Array.Empty<byte>())).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
                 actual = Sha1.Hash(bytes).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip string
                 actual = sha1.ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip formatted
                 actual = Sha1.Parse(sha1.ToString("D")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Parse(sha1.ToString("S")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // With hex specifier
                 actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Get Byte[]
                 var buffer = new byte[Sha1.ByteLen];
@@ -299,12 +318,10 @@ namespace SourceCode.Chasm.Tests
                 // Roundtrip Byte[]
                 actual = new Sha1(buffer).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip Segment
                 actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip Buffer
                 //actual = new Sha1(new ReadOnlyMemory<byte>(buffer)).ToString();
@@ -374,11 +391,6 @@ namespace SourceCode.Chasm.Tests
                 actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
                 Assert.Equal(expected, actual);
                 Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // Roundtrip Buffer
-                //actual = new Sha1(new ReadOnlyMemory<byte>(buffer)).ToString();
-                //Assert.Equal(expected, actual);
-                //Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             }
         }
 
@@ -395,40 +407,32 @@ namespace SourceCode.Chasm.Tests
                 // String
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
                 actual = Sha1.Hash(bytes).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip string
                 actual = sha1.ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip formatted
                 actual = Sha1.Parse(sha1.ToString("D")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Parse(sha1.ToString("S")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // With hex specifier
                 actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Get Byte[]
                 var buffer = new byte[Sha1.ByteLen];
@@ -437,17 +441,10 @@ namespace SourceCode.Chasm.Tests
                 // Roundtrip Byte[]
                 actual = new Sha1(buffer).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip Segment
                 actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // Roundtrip Buffer
-                //    actual = new Sha1(new ReadOnlyMemory<byte>(buffer)).ToString();
-                //    Assert.Equal(expected, actual);
-                //    Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             }
         }
 
@@ -464,31 +461,25 @@ namespace SourceCode.Chasm.Tests
                 // String
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
                 actual = Sha1.Hash(bytes).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip string
                 actual = sha1.ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip formatted
                 actual = Sha1.Parse(sha1.ToString("D")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Parse(sha1.ToString("S")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // With hex specifier
                 actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
@@ -496,7 +487,6 @@ namespace SourceCode.Chasm.Tests
 
                 actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Get Byte[]
                 var buffer = new byte[Sha1.ByteLen];
@@ -505,17 +495,10 @@ namespace SourceCode.Chasm.Tests
                 // Roundtrip Byte[]
                 actual = new Sha1(buffer).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip Segment
                 actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // Roundtrip Buffer
-                //actual = new Sha1(new ReadOnlyMemory<byte>(buffer)).ToString();
-                //Assert.Equal(expected, actual);
-                //Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             }
         }
 
@@ -532,40 +515,32 @@ namespace SourceCode.Chasm.Tests
 
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
                 actual = Sha1.Hash(bytes).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip string
                 actual = sha1.ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip formatted
                 actual = Sha1.Parse(sha1.ToString("D")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Parse(sha1.ToString("S")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // With hex specifier
                 actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Get Byte[]
                 var buffer = new byte[Sha1.ByteLen];
@@ -574,17 +549,10 @@ namespace SourceCode.Chasm.Tests
                 // Roundtrip Byte[]
                 actual = new Sha1(buffer).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
                 // Roundtrip Segment
                 actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
                 Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // Roundtrip Buffer
-                //actual = new Sha1(new ReadOnlyMemory<byte>(buffer)).ToString();
-                //Assert.Equal(expected, actual);
-                //Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             }
         }
 
