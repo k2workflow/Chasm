@@ -6,8 +6,8 @@ namespace SourceCode.Chasm.IO.Json.Tests
     public static class CommitFixtures
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonCasSerializer_WriteRead_Commit))]
-        public static void JsonCasSerializer_WriteRead_Commit()
+        [Fact(DisplayName = nameof(JsonChasmSerializer_WriteRead_Commit))]
+        public static void JsonChasmSerializer_WriteRead_Commit()
         {
             var ser = new JsonChasmSerializer();
 

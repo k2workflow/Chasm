@@ -5,7 +5,7 @@ using System;
 
 namespace SourceCode.Chasm.IO.Proto
 {
-    partial class ProtoCasSerializer // .Tree
+    partial class ProtoChasmSerializer // .Tree
     {
         #region Serialize
 
