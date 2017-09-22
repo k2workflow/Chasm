@@ -53,6 +53,31 @@ namespace SourceCode.Chasm
 
         public uint Blit2 { get; }
 
+        /// <summary>
+        /// Returns a <see cref="Memory{T}"/> from the <see cref="Sha1"/>.
+        /// </summary>
+        public Memory<byte> Memory
+        {
+            get
+            {
+                var buffer = new byte[ByteLen];
+
+                unsafe
+                {
+                    fixed (byte* ptr = buffer)
+                    {
+                        // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
+                        *(ulong*)(&ptr[0 + 0]) = Blit0;
+                        *(ulong*)(&ptr[0 + 8]) = Blit1;
+                        *(uint*)(&ptr[0 + 16]) = Blit2;
+                    }
+                }
+
+                var mem = new Memory<byte>(buffer);
+                return mem;
+            }
+        }
+
         #endregion
 
         #region De/Constructors
