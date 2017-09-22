@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.IO
                 return TreeNodeList.Empty;
 
             // Deserialize
-            var tree = Serializer.DeserializeTree(buffer);
+            var tree = Serializer.DeserializeTree(buffer.Span);
             return tree;
         }
 
@@ -34,7 +34,7 @@ namespace SourceCode.Chasm.IO
                 return TreeNodeList.Empty;
 
             // Deserialize
-            var tree = Serializer.DeserializeTree(buffer);
+            var tree = Serializer.DeserializeTree(buffer.Span);
             return tree;
         }
 
@@ -70,7 +70,7 @@ namespace SourceCode.Chasm.IO
 
             foreach (var kvp in kvps)
             {
-                var tree = Serializer.DeserializeTree(kvp.Value);
+                var tree = Serializer.DeserializeTree(kvp.Value.Span);
 
                 var treeId = new TreeId(kvp.Key);
                 dict[treeId] = tree;

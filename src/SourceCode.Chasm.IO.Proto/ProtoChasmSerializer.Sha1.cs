@@ -31,19 +31,10 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public unsafe override Sha1 DeserializeSha1(ReadOnlyMemory<byte> buffer)
+        public unsafe override Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
         {
             var wire = new Sha1Wire();
-            wire.MergeFrom(buffer.ToArray()); // TODO: Perf
-
-            var model = wire.Convert();
-            return model;
-        }
-
-        public unsafe override Sha1 DeserializeSha1(ArraySegment<byte> segment)
-        {
-            var wire = new Sha1Wire();
-            wire.MergeFrom(segment.ToArray()); // TODO: Perf
+            wire.MergeFrom(span.ToArray()); // TODO: Perf
 
             var model = wire.Convert();
             return model;

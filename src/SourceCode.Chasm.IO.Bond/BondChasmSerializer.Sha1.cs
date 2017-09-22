@@ -37,20 +37,9 @@ namespace SourceCode.Chasm.IO.Bond
 
         #region Deserialize
 
-        public override Sha1 DeserializeSha1(ReadOnlyMemory<byte> buffer)
+        public override Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
         {
-            var buf = new InputBuffer(buffer.ToArray()); // TODO: Perf
-            var reader = new SimpleBinaryReader<InputBuffer>(buf);
-
-            var wire = _sha1Deserializer.Deserialize<Sha1Wire>(reader);
-
-            var model = wire.Convert();
-            return model;
-        }
-
-        public override Sha1 DeserializeSha1(ArraySegment<byte> segment)
-        {
-            var buf = new InputBuffer(segment);
+            var buf = new InputBuffer(span.ToArray()); // TODO: Perf
             var reader = new SimpleBinaryReader<InputBuffer>(buf);
 
             var wire = _sha1Deserializer.Deserialize<Sha1Wire>(reader);

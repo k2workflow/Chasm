@@ -7,8 +7,6 @@ namespace SourceCode.Chasm.IO
     {
         public abstract BufferSession Serialize(TreeNodeList model);
 
-        public abstract TreeNodeList DeserializeTree(ReadOnlyMemory<byte> buffer);
-
-        public abstract TreeNodeList DeserializeTree(ArraySegment<byte> segment);
+        public abstract TreeNodeList DeserializeTree(ReadOnlySpan<byte> span);
     }
 }

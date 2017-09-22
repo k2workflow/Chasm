@@ -24,26 +24,18 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public override TreeNodeList DeserializeTree(ReadOnlyMemory<byte> buffer)
+        public override TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
         {
-            if (buffer.IsEmpty) throw new ArgumentNullException(nameof(buffer));
+            if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
 
             string json;
             unsafe
             {
-                fixed (byte* ptr = &buffer.Span.DangerousGetPinnableReference())
+                fixed (byte* ptr = &span.DangerousGetPinnableReference())
                 {
-                    json = Encoding.UTF8.GetString(ptr, buffer.Length);
+                    json = Encoding.UTF8.GetString(ptr, span.Length);
                 }
             }
-
-            var model = json.ParseTree();
-            return model;
-        }
-
-        public override TreeNodeList DeserializeTree(ArraySegment<byte> segment)
-        {
-            var json = Encoding.UTF8.GetString(segment.Array, segment.Offset, segment.Count);
 
             var model = json.ParseTree();
             return model;

@@ -31,19 +31,10 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public override Commit DeserializeCommit(ReadOnlyMemory<byte> buffer)
+        public override Commit DeserializeCommit(ReadOnlySpan<byte> span)
         {
             var wire = new CommitWire();
-            wire.MergeFrom(buffer.ToArray()); // TODO: Perf
-
-            var model = wire.Convert();
-            return model;
-        }
-
-        public override Commit DeserializeCommit(ArraySegment<byte> segment)
-        {
-            var wire = new CommitWire();
-            wire.MergeFrom(segment.ToArray()); // TODO: Perf
+            wire.MergeFrom(span.ToArray()); // TODO: Perf
 
             var model = wire.Convert();
             return model;

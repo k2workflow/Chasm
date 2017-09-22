@@ -21,26 +21,18 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public override Sha1 DeserializeSha1(ReadOnlyMemory<byte> buffer)
+        public override Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
         {
-            if (buffer.IsEmpty) throw new ArgumentNullException(nameof(buffer));
+            if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
 
             string json;
             unsafe
             {
-                fixed (byte* ptr = &buffer.Span.DangerousGetPinnableReference())
+                fixed (byte* ptr = &span.DangerousGetPinnableReference())
                 {
-                    json = Encoding.UTF8.GetString(ptr, buffer.Length);
+                    json = Encoding.UTF8.GetString(ptr, span.Length);
                 }
             }
-
-            var model = Sha1.Parse(json);
-            return model;
-        }
-
-        public override Sha1 DeserializeSha1(ArraySegment<byte> segment)
-        {
-            var json = Encoding.UTF8.GetString(segment.Array, segment.Offset, segment.Count);
 
             var model = Sha1.Parse(json);
             return model;

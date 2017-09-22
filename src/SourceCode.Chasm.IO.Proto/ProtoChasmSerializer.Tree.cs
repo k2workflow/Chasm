@@ -31,19 +31,10 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public override TreeNodeList DeserializeTree(ReadOnlyMemory<byte> buffer)
+        public override TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
         {
             var wire = new TreeWire();
-            wire.MergeFrom(buffer.ToArray()); // TODO: Perf
-
-            var model = wire.Convert();
-            return model;
-        }
-
-        public override TreeNodeList DeserializeTree(ArraySegment<byte> segment)
-        {
-            var wire = new TreeWire();
-            wire.MergeFrom(segment.ToArray()); // TODO: Perf
+            wire.MergeFrom(span.ToArray()); // TODO: Perf
 
             var model = wire.Convert();
             return model;

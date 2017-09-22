@@ -24,26 +24,18 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public override Commit DeserializeCommit(ReadOnlyMemory<byte> buffer)
+        public override Commit DeserializeCommit(ReadOnlySpan<byte> span)
         {
-            if (buffer.IsEmpty) throw new ArgumentNullException(nameof(buffer));
+            if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
 
             string json;
             unsafe
             {
-                fixed (byte* ptr = &buffer.Span.DangerousGetPinnableReference())
+                fixed (byte* ptr = &span.DangerousGetPinnableReference())
                 {
-                    json = Encoding.UTF8.GetString(ptr, buffer.Length);
+                    json = Encoding.UTF8.GetString(ptr, span.Length);
                 }
             }
-
-            var model = json.ParseCommit();
-            return model;
-        }
-
-        public override Commit DeserializeCommit(ArraySegment<byte> segment)
-        {
-            var json = Encoding.UTF8.GetString(segment.Array, segment.Offset, segment.Count);
 
             var model = json.ParseCommit();
             return model;
