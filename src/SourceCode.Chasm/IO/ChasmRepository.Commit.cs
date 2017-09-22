@@ -13,7 +13,7 @@ namespace SourceCode.Chasm.IO
             if (buffer.IsEmpty)
                 return Commit.Empty;
 
-            var model = Serializer.DeserializeCommit(buffer);
+            var model = Serializer.DeserializeCommit(buffer.Span);
             return model;
         }
 
@@ -23,7 +23,7 @@ namespace SourceCode.Chasm.IO
             if (buffer.IsEmpty)
                 return Commit.Empty;
 
-            var model = Serializer.DeserializeCommit(buffer);
+            var model = Serializer.DeserializeCommit(buffer.Span);
             return model;
         }
 

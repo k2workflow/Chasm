@@ -7,8 +7,8 @@ namespace SourceCode.Chasm.IO.Bond.Tests
         private static readonly IChasmSerializer _serializer = new BondChasmSerializer();
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(BondCasSerializer_WriteRead_NullTreeNodeList))]
-        public static void BondCasSerializer_WriteRead_NullTreeNodeList()
+        [Fact(DisplayName = nameof(BondChasmSerializer_WriteRead_NullTreeNodeList))]
+        public static void BondChasmSerializer_WriteRead_NullTreeNodeList()
         {
             var expected = new TreeNodeList();
 
@@ -21,8 +21,8 @@ namespace SourceCode.Chasm.IO.Bond.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(BondCasSerializer_WriteRead_EmptyTreeNodeList))]
-        public static void BondCasSerializer_WriteRead_EmptyTreeNodeList()
+        [Fact(DisplayName = nameof(BondChasmSerializer_WriteRead_EmptyTreeNodeList))]
+        public static void BondChasmSerializer_WriteRead_EmptyTreeNodeList()
         {
             var expected = new TreeNodeList(new TreeNode[0]);
 
@@ -35,8 +35,8 @@ namespace SourceCode.Chasm.IO.Bond.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(BondCasSerializer_WriteRead_TreeNodeList))]
-        public static void BondCasSerializer_WriteRead_TreeNodeList()
+        [Fact(DisplayName = nameof(BondChasmSerializer_WriteRead_TreeNodeList))]
+        public static void BondChasmSerializer_WriteRead_TreeNodeList()
         {
             var expected = new TreeNodeList(new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc")));
 

@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.IO
                 return TreeNodeList.Empty;
 
             // Deserialize
-            var tree = Serializer.DeserializeTree(buffer);
+            var tree = Serializer.DeserializeTree(buffer.Span);
             return tree;
         }
 
@@ -34,7 +34,7 @@ namespace SourceCode.Chasm.IO
                 return TreeNodeList.Empty;
 
             // Deserialize
-            var tree = Serializer.DeserializeTree(buffer);
+            var tree = Serializer.DeserializeTree(buffer.Span);
             return tree;
         }
 
@@ -64,13 +64,13 @@ namespace SourceCode.Chasm.IO
             return dict;
         }
 
-        private IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTrees(IReadOnlyDictionary<Sha1, System.ReadOnlyBuffer<byte>> kvps)
+        private IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTrees(IReadOnlyDictionary<Sha1, System.ReadOnlyMemory<byte>> kvps)
         {
             var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
 
             foreach (var kvp in kvps)
             {
-                var tree = Serializer.DeserializeTree(kvp.Value);
+                var tree = Serializer.DeserializeTree(kvp.Value.Span);
 
                 var treeId = new TreeId(kvp.Key);
                 dict[treeId] = tree;

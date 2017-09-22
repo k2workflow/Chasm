@@ -6,8 +6,8 @@ namespace SourceCode.Chasm.IO.Bond.Units
     public static class CommitFixtures
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(BondCasSerializer_WriteRead_Commit))]
-        public static void BondCasSerializer_WriteRead_Commit()
+        [Fact(DisplayName = nameof(BondChasmSerializer_WriteRead_Commit))]
+        public static void BondChasmSerializer_WriteRead_Commit()
         {
             var ser = new BondChasmSerializer();
 

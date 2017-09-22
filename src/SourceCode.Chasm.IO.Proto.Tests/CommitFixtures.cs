@@ -6,10 +6,10 @@ namespace SourceCode.Chasm.IO.Proto.Tests
     public static class CommitFixtures
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoCasSerializer_WriteRead_Commit))]
-        public static void ProtoCasSerializer_WriteRead_Commit()
+        [Fact(DisplayName = nameof(ProtoChasmSerializer_WriteRead_Commit))]
+        public static void ProtoChasmSerializer_WriteRead_Commit()
         {
-            var ser = new ProtoCasSerializer();
+            var ser = new ProtoChasmSerializer();
 
             var parent = new CommitId(Sha1.Hash("abc"));
             var treeId = new TreeId(Sha1.Hash("def"));

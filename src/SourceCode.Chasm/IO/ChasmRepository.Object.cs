@@ -17,22 +17,22 @@ namespace SourceCode.Chasm.IO
 
         #region Read
 
-        public abstract ReadOnlyBuffer<byte> ReadObject(Sha1 objectId);
+        public abstract ReadOnlyMemory<byte> ReadObject(Sha1 objectId);
 
-        public abstract ValueTask<ReadOnlyBuffer<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
+        public abstract ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
-        public virtual IReadOnlyDictionary<Sha1, ReadOnlyBuffer<byte>> ReadObjects(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public virtual IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> ReadObjects(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
-            if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyBuffer<byte>>();
+            if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
             if (objectIds is ICollection<Sha1> sha1s)
             {
-                if (sha1s.Count == 0) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyBuffer<byte>>();
+                if (sha1s.Count == 0) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
                 // For small count, run non-concurrent
                 if (sha1s.Count <= ConcurrentThreshold)
                 {
-                    var dict = new Dictionary<Sha1, ReadOnlyBuffer<byte>>(sha1s.Count);
+                    var dict = new Dictionary<Sha1, ReadOnlyMemory<byte>>(sha1s.Count);
 
                     foreach (var sha1 in sha1s)
                     {
@@ -49,18 +49,18 @@ namespace SourceCode.Chasm.IO
             return result;
         }
 
-        public virtual async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyBuffer<byte>>> ReadObjectsAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public virtual async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectsAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
-            if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyBuffer<byte>>();
+            if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
             if (objectIds is ICollection<Sha1> sha1s)
             {
-                if (sha1s.Count == 0) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyBuffer<byte>>();
+                if (sha1s.Count == 0) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
                 // For small count, run non-concurrent
                 if (sha1s.Count <= ConcurrentThreshold)
                 {
-                    var dict = new Dictionary<Sha1, ReadOnlyBuffer<byte>>(sha1s.Count);
+                    var dict = new Dictionary<Sha1, ReadOnlyMemory<byte>>(sha1s.Count);
 
                     foreach (var sha1 in sha1s)
                     {
@@ -78,7 +78,7 @@ namespace SourceCode.Chasm.IO
             return result;
         }
 
-        private IReadOnlyDictionary<Sha1, ReadOnlyBuffer<byte>> ReadConcurrent(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        private IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> ReadConcurrent(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             var options = new ParallelOptions
             {
@@ -86,7 +86,7 @@ namespace SourceCode.Chasm.IO
                 MaxDegreeOfParallelism = MaxDop
             };
 
-            var dict = new ConcurrentDictionary<Sha1, ReadOnlyBuffer<byte>>();
+            var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>();
 
             Parallel.ForEach(objectIds, options, sha1 =>
             {

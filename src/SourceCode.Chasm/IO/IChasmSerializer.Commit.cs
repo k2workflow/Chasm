@@ -7,8 +7,6 @@ namespace SourceCode.Chasm.IO
     {
         BufferSession Serialize(Commit model);
 
-        Commit DeserializeCommit(ReadOnlyBuffer<byte> buffer);
-
-        Commit DeserializeCommit(ArraySegment<byte> segment);
+        Commit DeserializeCommit(ReadOnlySpan<byte> span);
     }
 }

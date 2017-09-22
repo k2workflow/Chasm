@@ -4,11 +4,11 @@ namespace SourceCode.Chasm.IO.Proto.Tests
 {
     public static class NodeFixtures
     {
-        private static readonly IChasmSerializer _serializer = new ProtoCasSerializer();
+        private static readonly IChasmSerializer _serializer = new ProtoChasmSerializer();
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoCasSerializer_WriteRead_NullTreeNodeList))]
-        public static void ProtoCasSerializer_WriteRead_NullTreeNodeList()
+        [Fact(DisplayName = nameof(ProtoChasmSerializer_WriteRead_NullTreeNodeList))]
+        public static void ProtoChasmSerializer_WriteRead_NullTreeNodeList()
         {
             var expected = new TreeNodeList();
 
@@ -21,8 +21,8 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoCasSerializer_WriteRead_EmptyTreeNodeList))]
-        public static void ProtoCasSerializer_WriteRead_EmptyTreeNodeList()
+        [Fact(DisplayName = nameof(ProtoChasmSerializer_WriteRead_EmptyTreeNodeList))]
+        public static void ProtoChasmSerializer_WriteRead_EmptyTreeNodeList()
         {
             var expected = new TreeNodeList(new TreeNode[0]);
 
@@ -35,8 +35,8 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoCasSerializer_WriteRead_TreeNodeList))]
-        public static void ProtoCasSerializer_WriteRead_TreeNodeList()
+        [Fact(DisplayName = nameof(ProtoChasmSerializer_WriteRead_TreeNodeList))]
+        public static void ProtoChasmSerializer_WriteRead_TreeNodeList()
         {
             var nodes = new[]
             {

@@ -5,11 +5,11 @@ using System;
 
 namespace SourceCode.Chasm.IO.Proto
 {
-    partial class ProtoCasSerializer // .Tree
+    partial class ProtoChasmSerializer // .Commit
     {
         #region Serialize
 
-        public override BufferSession Serialize(TreeNodeList model)
+        public override BufferSession Serialize(Commit model)
         {
             var wire = model.Convert();
 
@@ -31,19 +31,10 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public override TreeNodeList DeserializeTree(ReadOnlyBuffer<byte> buffer)
+        public override Commit DeserializeCommit(ReadOnlySpan<byte> span)
         {
-            var wire = new TreeWire();
-            wire.MergeFrom(buffer.ToArray()); // TODO: Perf
-
-            var model = wire.Convert();
-            return model;
-        }
-
-        public override TreeNodeList DeserializeTree(ArraySegment<byte> segment)
-        {
-            var wire = new TreeWire();
-            wire.MergeFrom(segment.ToArray()); // TODO: Perf
+            var wire = new CommitWire();
+            wire.MergeFrom(span.ToArray()); // TODO: Perf
 
             var model = wire.Convert();
             return model;
