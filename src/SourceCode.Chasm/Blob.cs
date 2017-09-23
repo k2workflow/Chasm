@@ -41,7 +41,7 @@ namespace SourceCode.Chasm
             && Equals(blob);
 
         public override int GetHashCode()
-            => Data == null ? 0 : Data.Length.GetHashCode();
+            => BufferComparer.Default.GetHashCode(Data);
 
         public static bool operator ==(Blob x, Blob y) => x.Equals(y);
 
