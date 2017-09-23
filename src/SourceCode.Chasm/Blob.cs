@@ -34,14 +34,14 @@ namespace SourceCode.Chasm
         #region IEquatable
 
         public bool Equals(Blob other)
-            => BufferComparer.Default.Equals(Data, other.Data); // Callee has necessary null-handling logic
+            => BufferComparer.Default.Equals(Data, other.Data); // Note use of Default strategy
 
         public override bool Equals(object obj)
             => obj is Blob blob
             && Equals(blob);
 
         public override int GetHashCode()
-            => BufferComparer.Default.GetHashCode(Data);
+            => BufferComparer.Limited.GetHashCode(Data); // Note use of Limited strategy
 
         public static bool operator ==(Blob x, Blob y) => x.Equals(y);
 
