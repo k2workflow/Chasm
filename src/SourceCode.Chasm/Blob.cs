@@ -34,14 +34,14 @@ namespace SourceCode.Chasm
         #region IEquatable
 
         public bool Equals(Blob other)
-            => BufferComparer.Default.Equals(Data, other.Data); // Note use of Default strategy
+            => BufferComparer.Array.Equals(Data, other.Data);
 
         public override bool Equals(object obj)
             => obj is Blob blob
             && Equals(blob);
 
         public override int GetHashCode()
-            => BufferComparer.Limited.GetHashCode(Data); // Note use of Limited strategy
+            => BufferComparer.Array.GetHashCode(Data);
 
         public static bool operator ==(Blob x, Blob y) => x.Equals(y);
 
