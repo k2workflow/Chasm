@@ -7,7 +7,7 @@
             if (wire == null) return 0;
 
             // Name
-            var len = 2 * (wire.Name?.Length ?? 0); // utf8
+            var len = (wire.Name?.Length ?? 0) * 3; // Utf8 is 1-3 bpc
 
             // Kind
             len += 4;

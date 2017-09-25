@@ -37,7 +37,7 @@ namespace SourceCode.Chasm
         public const byte ByteLen = 20;
 
         /// <summary>
-        /// The number of characters required to represent a <see cref="Sha1"/> value.
+        /// The number of hex characters required to represent a <see cref="Sha1"/> value.
         /// </summary>
         public const byte CharLen = ByteLen * 2; // 40
 
