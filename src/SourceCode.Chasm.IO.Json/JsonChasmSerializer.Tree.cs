@@ -14,9 +14,11 @@ namespace SourceCode.Chasm.IO.Json
             var wire = model.Convert();
             var json = wire?.ToString() ?? "null";
 
-            var utf8 = Encoding.UTF8.GetBytes(json);
+            var rented = BufferSession.RentBuffer(json.Length * 3); // Utf8 is 1-3 bpc
+            var count = Encoding.UTF8.GetBytes(json, 0, json.Length, rented, 0);
 
-            var session = new BufferSession(new ArraySegment<byte>(utf8));
+            var seg = new ArraySegment<byte>(rented, 0, count);
+            var session = new BufferSession(seg);
             return session;
         }
 

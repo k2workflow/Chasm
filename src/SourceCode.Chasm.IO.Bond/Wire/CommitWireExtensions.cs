@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.IO.Bond.Wire
             len += sizeof(long);
 
             // CommitMessage
-            len += 2 * (wire.CommitMessage?.Length ?? 0); // utf8
+            len += (wire.CommitMessage?.Length ?? 0) * 3; // Utf8 is 1-3 bpc
 
             return len;
         }

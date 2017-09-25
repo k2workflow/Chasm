@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -37,7 +38,7 @@ namespace SourceCode.Chasm
         public const byte ByteLen = 20;
 
         /// <summary>
-        /// The number of characters required to represent a <see cref="Sha1"/> value.
+        /// The number of hex characters required to represent a <see cref="Sha1"/> value.
         /// </summary>
         public const byte CharLen = ByteLen * 2; // 40
 
@@ -177,13 +178,19 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(string utf8)
         {
-            if (utf8 == null)
-                return Empty;
+            if (utf8 == null) return Empty;
+            // Note that length=0 should not short-circuit
 
-            var bytes = Encoding.UTF8.GetBytes(utf8);
-            var hash = _sha1.Value.ComputeHash(bytes);
+            // Rent buffer
+            var rented = ArrayPool<byte>.Shared.Rent(utf8.Length * 3); // Utf8 is 1-3 bpc
+            var count = Encoding.UTF8.GetBytes(utf8, 0, utf8.Length, rented, 0);
 
+            var hash = _sha1.Value.ComputeHash(rented, 0, count);
             var sha1 = new Sha1(hash);
+
+            // Return buffer
+            ArrayPool<byte>.Shared.Return(rented);
+
             return sha1;
         }
 
@@ -194,8 +201,8 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(byte[] bytes)
         {
-            if (bytes == null) // Note that length=0 should not short-circuit
-                return Empty;
+            if (bytes == null) return Empty;
+            // Note that length=0 should not short-circuit
 
             var hash = _sha1.Value.ComputeHash(bytes);
 
@@ -212,8 +219,8 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(byte[] bytes, int offset, int count)
         {
-            if (bytes == null) // Note that length=0 should not short-circuit
-                return Empty;
+            if (bytes == null) return Empty;
+            // Note that length=0 should not short-circuit
 
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
@@ -234,8 +241,8 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(ArraySegment<byte> bytes)
         {
-            if (bytes.Array == null) // Note that length=0 should not short-circuit
-                return Empty;
+            if (bytes.Array == null) return Empty;
+            // Note that length=0 should not short-circuit
 
             var hash = _sha1.Value.ComputeHash(bytes.Array, bytes.Offset, bytes.Count);
 
@@ -250,8 +257,8 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(Stream stream)
         {
-            if (stream == null)
-                return Empty;
+            if (stream == null) return Empty;
+            // Note that length=0 should not short-circuit
 
             var hash = _sha1.Value.ComputeHash(stream);
 

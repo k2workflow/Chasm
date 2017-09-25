@@ -10,10 +10,13 @@ namespace SourceCode.Chasm.IO.Json
 
         public override BufferSession Serialize(Sha1 model)
         {
-            var wire = model.ToString("N");
-            var utf8 = Encoding.UTF8.GetBytes(wire);
+            var json = model.ToString("N");
 
-            var session = new BufferSession(new ArraySegment<byte>(utf8));
+            var rented = BufferSession.RentBuffer(json.Length * 3); // Utf8 is 1-3 bpc
+            var count = Encoding.UTF8.GetBytes(json, 0, json.Length, rented, 0);
+
+            var seg = new ArraySegment<byte>(rented, 0, count);
+            var session = new BufferSession(seg);
             return session;
         }
 
