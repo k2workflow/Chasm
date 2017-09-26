@@ -333,27 +333,27 @@ namespace SourceCode.Chasm
             if (format.Length != 1)
                 throw new FormatException($"Invalid format specification length {format.Length}");
 
-            switch (format)
+            switch (format[0])
             {
                 // a9993e364706816aba3e25717850c26c9cd0d89d
-                case "n":
-                case "N":
+                case 'n':
+                case 'N':
                     {
                         var chars = ToChars('\0');
                         return new string(chars);
                     }
 
                 // a9993e36-4706816a-ba3e2571-7850c26c-9cd0d89d
-                case "d":
-                case "D":
+                case 'd':
+                case 'D':
                     {
                         var chars = ToChars('-');
                         return new string(chars);
                     }
 
                 // a9993e36 4706816a ba3e2571 7850c26c 9cd0d89d
-                case "s":
-                case "S":
+                case 's':
+                case 'S':
                     {
                         var chars = ToChars(' ');
                         return new string(chars);
@@ -407,7 +407,7 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                var bytes = stackalloc byte[ByteLen];
+                var bytes = stackalloc byte[ByteLen]; // TODO: https://github.com/dotnet/corefx/pull/24212
                 {
                     // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
                     *(ulong*)(&bytes[0]) = Blit0;
@@ -419,6 +419,7 @@ namespace SourceCode.Chasm
                 for (var i = 0; i < ByteLen; i++) // 20
                 {
                     // Each byte is two hexits (convention is lowercase)
+
                     var b = bytes[i] >> 4; // == b / 16
                     chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
 
@@ -519,7 +520,7 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                var bytes = stackalloc byte[ByteLen];
+                var bytes = stackalloc byte[ByteLen]; // TODO: https://github.com/dotnet/corefx/pull/24212
 
                 // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
                 // "34aa973c-d4c4daa4-f61eeb2b-dbad2731-6534016f"
