@@ -15,13 +15,14 @@ namespace SourceCode.Chasm
     /// Represents a <see cref="Sha1"/> value.
     /// </summary>
     /// <seealso cref="SHA1" />
-    /// <seealso cref="System.IEquatable{SourceCode.Acacia.Sha1}" />
-    /// <seealso cref="System.IComparable{SourceCode.Acacia.Sha1}" />
+    /// <seealso cref="System.IEquatable{T}" />
+    /// <seealso cref="System.IComparable{T}" />
     [DebuggerDisplay("{" + nameof(ToString) + "(\"N\")}")]
     public struct Sha1 : IEquatable<Sha1>, IComparable<Sha1>
     {
         #region Constants
 
+        // Use a thread-local instance of the underlying crypto algorithm.
         private static readonly ThreadLocal<SHA1> _sha1 = new ThreadLocal<SHA1>(SHA1.Create);
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace SourceCode.Chasm
         #region Properties
 
         // We choose to use value types for primary storage so that we can live on the stack
-        // Using byte[] or even string means a dereference to the heap (& fixed byte would require unsafe)
+        // Using byte[] or String means a dereference to the heap (& fixed byte would require unsafe)
 
         public ulong Blit0 { get; }
 
