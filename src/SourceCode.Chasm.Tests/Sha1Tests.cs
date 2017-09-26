@@ -67,20 +67,6 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_create_empty_sha1))]
-        public static void When_create_empty_sha1()
-        {
-            const string expected = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-            var sha1 = Sha1.Parse(expected);
-
-            // Empty bytes
-            var actual = Sha1.Hash(Array.Empty<byte>());
-            Assert.Equal(sha1, actual);
-            Assert.Equal(sha1.GetHashCode(), actual.GetHashCode());
-            Assert.Equal(sha1.Memory.Span, actual.Memory.Span, BufferComparer.Span);
-        }
-
-        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(When_construct_sha1_from_Bytes))]
         public static void When_construct_sha1_from_Bytes()
         {
@@ -567,6 +553,32 @@ namespace SourceCode.Chasm.Tests
                 // Roundtrip Segment
                 actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
                 Assert.Equal(expected, actual);
+            }
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_create_sha_from_narrow_string))]
+        public static void When_create_sha_from_narrow_string()
+        {
+            for (var i = 1; i < 200; i++)
+            {
+                var str = new string(Char.MinValue, i);
+                var sha1 = Sha1.Hash(str);
+
+                Assert.NotEqual(Sha1.Empty, sha1);
+            }
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_create_sha_from_wide_string))]
+        public static void When_create_sha_from_wide_string()
+        {
+            for (var i = 1; i < 200; i++)
+            {
+                var str = new string(Char.MaxValue, i);
+                var sha1 = Sha1.Hash(str);
+
+                Assert.NotEqual(Sha1.Empty, sha1);
             }
         }
 

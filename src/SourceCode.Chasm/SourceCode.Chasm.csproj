@@ -29,7 +29,7 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00144" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00144" />
+    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00151" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00151" />
   </ItemGroup>
 </Project>

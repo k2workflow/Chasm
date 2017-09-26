@@ -15,13 +15,14 @@ namespace SourceCode.Chasm
     /// Represents a <see cref="Sha1"/> value.
     /// </summary>
     /// <seealso cref="SHA1" />
-    /// <seealso cref="System.IEquatable{SourceCode.Acacia.Sha1}" />
-    /// <seealso cref="System.IComparable{SourceCode.Acacia.Sha1}" />
+    /// <seealso cref="System.IEquatable{T}" />
+    /// <seealso cref="System.IComparable{T}" />
     [DebuggerDisplay("{" + nameof(ToString) + "(\"N\")}")]
     public struct Sha1 : IEquatable<Sha1>, IComparable<Sha1>
     {
         #region Constants
 
+        // Use a thread-local instance of the underlying crypto algorithm.
         private static readonly ThreadLocal<SHA1> _sha1 = new ThreadLocal<SHA1>(SHA1.Create);
 
         /// <summary>
@@ -47,7 +48,8 @@ namespace SourceCode.Chasm
         #region Properties
 
         // We choose to use value types for primary storage so that we can live on the stack
-        // Using byte[] or even string means a dereference to the heap
+        // Using byte[] or String means a dereference to the heap (& fixed byte would require unsafe)
+
         public ulong Blit0 { get; }
 
         public ulong Blit1 { get; }
@@ -311,7 +313,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public override string ToString()
         {
-            var chars = ToChars('\0'); // "N"
+            var chars = ToChars((char)0); // "N"
             return new string(chars);
         }
 
@@ -325,33 +327,33 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public string ToString(string format)
         {
-            if (string.IsNullOrEmpty(format))
+            if (string.IsNullOrWhiteSpace(format))
                 throw new FormatException($"Empty format specification");
 
             if (format.Length != 1)
                 throw new FormatException($"Invalid format specification length {format.Length}");
 
-            switch (format)
+            switch (format[0])
             {
                 // a9993e364706816aba3e25717850c26c9cd0d89d
-                case "n":
-                case "N":
+                case 'n':
+                case 'N':
                     {
-                        var chars = ToChars('\0');
+                        var chars = ToChars((char)0);
                         return new string(chars);
                     }
 
                 // a9993e36-4706816a-ba3e2571-7850c26c-9cd0d89d
-                case "d":
-                case "D":
+                case 'd':
+                case 'D':
                     {
                         var chars = ToChars('-');
                         return new string(chars);
                     }
 
                 // a9993e36 4706816a ba3e2571 7850c26c 9cd0d89d
-                case "s":
-                case "S":
+                case 's':
+                case 'S':
                     {
                         var chars = ToChars(' ');
                         return new string(chars);
@@ -369,7 +371,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public KeyValuePair<string, string> Split(int prefixLength)
         {
-            var chars = ToChars('\0'); // "N"
+            var chars = ToChars((char)0); // "N"
 
             if (prefixLength <= 0)
                 return new KeyValuePair<string, string>(string.Empty, new string(chars));
@@ -387,13 +389,13 @@ namespace SourceCode.Chasm
         [SecuritySafeCritical]
         private char[] ToChars(char separator)
         {
-            Debug.Assert(separator == '\0' || separator == '-' || separator == ' ');
+            Debug.Assert(separator == (char)0 || separator == '-' || separator == ' ');
 
             var sep = 0;
             char[] chars;
 
             // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
-            if (separator == '\0')
+            if (separator == (char)0)
             {
                 chars = new char[CharLen];
             }
@@ -405,7 +407,7 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                var bytes = stackalloc byte[ByteLen];
+                var bytes = stackalloc byte[ByteLen]; // TODO: https://github.com/dotnet/corefx/pull/24212
                 {
                     // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
                     *(ulong*)(&bytes[0]) = Blit0;
@@ -417,6 +419,7 @@ namespace SourceCode.Chasm
                 for (var i = 0; i < ByteLen; i++) // 20
                 {
                     // Each byte is two hexits (convention is lowercase)
+
                     var b = bytes[i] >> 4; // == b / 16
                     chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
 
@@ -517,7 +520,7 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                var bytes = stackalloc byte[ByteLen];
+                var bytes = stackalloc byte[ByteLen]; // TODO: https://github.com/dotnet/corefx/pull/24212
 
                 // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
                 // "34aa973c-d4c4daa4-f61eeb2b-dbad2731-6534016f"
