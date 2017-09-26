@@ -86,7 +86,7 @@ namespace SourceCode.Chasm
 
             unchecked
             {
-                h = h * 7 + StringComparer.Ordinal.GetHashCode(Name);
+                h = h * 7 + (Name == null ? 0 : StringComparer.Ordinal.GetHashCode());
                 h = h * 7 + (int)Kind;
                 h = h * 7 + Sha1.GetHashCode();
             }

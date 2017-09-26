@@ -158,7 +158,7 @@ namespace SourceCode.Chasm
                 {
                     var a = first[aIndex];
                     var b = second[bIndex];
-                    var cmp = StringComparer.Ordinal.Compare(a.Name, b.Name);
+                    var cmp = string.CompareOrdinal(a.Name, b.Name);
 
                     if (cmp == 0)
                     {
@@ -196,7 +196,7 @@ namespace SourceCode.Chasm
             {
                 var svc = _nodes[i];
 
-                var cmp = StringComparer.Ordinal.Compare(svc.Name, ks);
+                var cmp = string.CompareOrdinal(svc.Name, ks);
                 if (cmp == 0) return i;
                 else if (cmp > 0) r = i - 1;
                 else l = i + 1;
@@ -226,7 +226,7 @@ namespace SourceCode.Chasm
             {
                 value = _nodes[i];
 
-                var cmp = StringComparer.Ordinal.Compare(value.Name, ks);
+                var cmp = string.CompareOrdinal(value.Name, ks);
                 if (cmp == 0) return true;
 
                 if (cmp > 0) r = i - 1;
@@ -260,7 +260,7 @@ namespace SourceCode.Chasm
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int NameComparison(TreeNode x, TreeNode y)
             // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
-            => StringComparer.Ordinal.Compare(x.Name, y.Name);
+            => string.CompareOrdinal(x.Name, y.Name);
 
         #endregion
 
