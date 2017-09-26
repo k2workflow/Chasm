@@ -327,7 +327,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public string ToString(string format)
         {
-            if (string.IsNullOrEmpty(format))
+            if (string.IsNullOrWhiteSpace(format))
                 throw new FormatException($"Empty format specification");
 
             if (format.Length != 1)
