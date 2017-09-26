@@ -67,20 +67,6 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_create_empty_sha1))]
-        public static void When_create_empty_sha1()
-        {
-            const string expected = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-            var sha1 = Sha1.Parse(expected);
-
-            // Empty bytes
-            var actual = Sha1.Hash(Array.Empty<byte>());
-            Assert.Equal(sha1, actual);
-            Assert.Equal(sha1.GetHashCode(), actual.GetHashCode());
-            Assert.Equal(sha1.Memory.Span, actual.Memory.Span, BufferComparer.Span);
-        }
-
-        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(When_construct_sha1_from_Bytes))]
         public static void When_construct_sha1_from_Bytes()
         {
