@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace SourceCode.Chasm
 {
@@ -60,7 +61,8 @@ namespace SourceCode.Chasm
                 for (var i = 0; i < array.Length; i++)
                     array[i] = nodes[i];
 
-                Array.Sort(array, (x, y) => StringComparer.Ordinal.Compare(x.Name, y.Name));
+                // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
+                Array.Sort(array, NameComparison);
 
                 _nodes = array;
             }
@@ -76,7 +78,10 @@ namespace SourceCode.Chasm
             {
                 var array = new TreeNode[nodes.Count];
                 nodes.CopyTo(array, 0);
-                Array.Sort(array, (x, y) => StringComparer.Ordinal.Compare(x.Name, y.Name));
+
+                // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
+                Array.Sort(array, NameComparison);
+
                 _nodes = array;
             }
         }
@@ -249,6 +254,14 @@ namespace SourceCode.Chasm
             value = node;
             return true;
         }
+
+        #endregion
+
+        #region Helpers
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int NameComparison(TreeNode x, TreeNode y)
+           => StringComparer.Ordinal.Compare(x.Name, y.Name);
 
         #endregion
 

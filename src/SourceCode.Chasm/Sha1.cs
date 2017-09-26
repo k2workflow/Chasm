@@ -47,7 +47,8 @@ namespace SourceCode.Chasm
         #region Properties
 
         // We choose to use value types for primary storage so that we can live on the stack
-        // Using byte[] or even string means a dereference to the heap
+        // Using byte[] or even string means a dereference to the heap (& fixed byte would require unsafe)
+
         public ulong Blit0 { get; }
 
         public ulong Blit1 { get; }
