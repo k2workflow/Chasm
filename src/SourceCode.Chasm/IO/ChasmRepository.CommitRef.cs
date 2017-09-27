@@ -15,9 +15,9 @@ namespace SourceCode.Chasm.IO
 
         #region Write
 
-        public abstract void WriteCommitRef(string repo, string name, CommitId commitId, bool forceOverwrite);
+        public abstract void WriteCommitRef(CommitId? previousCommitId, string repo, string name, CommitId newCommitId);
 
-        public abstract Task WriteCommitRefAsync(string repo, string name, CommitId commitId, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task WriteCommitRefAsync(CommitId? previousCommitId, string repo, string name, CommitId newCommitId, CancellationToken cancellationToken);
 
         #endregion
     }

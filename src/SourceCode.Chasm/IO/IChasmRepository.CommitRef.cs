@@ -15,9 +15,28 @@ namespace SourceCode.Chasm.IO
 
         #region Write
 
-        void WriteCommitRef(string repo, string name, CommitId commitId, bool forceOverwrite);
+        /// <summary>
+        /// Write a <see cref="CommitRef"/> to the repository using the provided values.
+        /// Note that the underlying store should use pessimistic concurrency control to prevent data loss.
+        /// </summary>
+        /// <param name="repo">The repository name.</param>
+        /// <param name="name">The name of the <see cref="CommitRef"/></param>
+        /// <param name="previousCommitId">The previous <see cref="CommitId"/> that the caller used for reading.</param>
+        /// <param name="newCommitId">The new <see cref="CommitId"/> that represents the content being written.</param>
+        /// <returns></returns>
+        void WriteCommitRef(CommitId? previousCommitId, string repo, string name, CommitId newCommitId);
 
-        Task WriteCommitRefAsync(string repo, string name, CommitId commitId, bool forceOverwrite, CancellationToken cancellationToken);
+        /// <summary>
+        /// Write a <see cref="CommitRef"/> to the repository using the provided values.
+        /// Note that the underlying store should use pessimistic concurrency control to prevent data loss.
+        /// </summary>
+        /// <param name="repo">The repository name.</param>
+        /// <param name="name">The name of the <see cref="CommitRef"/></param>
+        /// <param name="previousCommitId">The previous <see cref="CommitId"/> that the caller used for reading.</param>
+        /// <param name="newCommitId">The new <see cref="CommitId"/> that represents the content being written.</param>
+        /// <param name="cancellationToken">Allows the <see cref="Task"/> to be cancelled.</param>
+        /// <returns></returns>
+        Task WriteCommitRefAsync(CommitId? previousCommitId, string repo, string name, CommitId newCommitId, CancellationToken cancellationToken);
 
         #endregion
     }
