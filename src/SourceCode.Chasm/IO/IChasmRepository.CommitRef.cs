@@ -23,6 +23,7 @@ namespace SourceCode.Chasm.IO
         /// <param name="name">The name of the <see cref="CommitRef"/></param>
         /// <param name="previousCommitId">The previous <see cref="CommitId"/> that the caller used for reading.</param>
         /// <param name="newCommitId">The new <see cref="CommitId"/> that represents the content being written.</param>
+        /// <exception cref="ChasmConcurrencyException">Thrown when a concurrency exception is detected.</exception>
         /// <returns></returns>
         void WriteCommitRef(CommitId? previousCommitId, string repo, string name, CommitId newCommitId);
 
@@ -35,6 +36,7 @@ namespace SourceCode.Chasm.IO
         /// <param name="previousCommitId">The previous <see cref="CommitId"/> that the caller used for reading.</param>
         /// <param name="newCommitId">The new <see cref="CommitId"/> that represents the content being written.</param>
         /// <param name="cancellationToken">Allows the <see cref="Task"/> to be cancelled.</param>
+        /// <exception cref="ChasmConcurrencyException">Thrown when a concurrency exception is detected.</exception>
         /// <returns></returns>
         Task WriteCommitRefAsync(CommitId? previousCommitId, string repo, string name, CommitId newCommitId, CancellationToken cancellationToken);
 
