@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SourceCode.Chasm.IO.Bond.Wire
 {
@@ -21,7 +22,7 @@ namespace SourceCode.Chasm.IO.Bond.Wire
             len += sizeof(long);
 
             // CommitMessage
-            len += (wire.CommitMessage?.Length ?? 0) * 3; // Utf8 is 1-3 bpc
+            len += Encoding.UTF8.GetMaxByteCount(wire.CommitMessage?.Length ?? 0); // Utf8 is 1-4 bpc
 
             return len;
         }

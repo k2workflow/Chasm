@@ -7,6 +7,8 @@ namespace SourceCode.Chasm.Tests
 {
     public static class Sha1Tests
     {
+        private const string _surrogatePair = "\uD869\uDE01";
+
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(When_create_null_sha1))]
         public static void When_create_null_sha1()
@@ -570,12 +572,26 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_create_sha_from_wide_string))]
-        public static void When_create_sha_from_wide_string()
+        [Fact(DisplayName = nameof(When_create_sha_from_wide_string_1))]
+        public static void When_create_sha_from_wide_string_1()
         {
             for (var i = 1; i < 200; i++)
             {
                 var str = new string(Char.MaxValue, i);
+                var sha1 = Sha1.Hash(str);
+
+                Assert.NotEqual(Sha1.Empty, sha1);
+            }
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_create_sha_from_wide_string_2))]
+        public static void When_create_sha_from_wide_string_2()
+        {
+            var str = string.Empty;
+            for (var i = 1; i < 200; i++)
+            {
+                str += _surrogatePair;
                 var sha1 = Sha1.Hash(str);
 
                 Assert.NotEqual(Sha1.Empty, sha1);

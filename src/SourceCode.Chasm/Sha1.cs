@@ -174,18 +174,19 @@ namespace SourceCode.Chasm
         #region Factory
 
         /// <summary>
-        /// Hashes the specified utf8 value.
+        /// Hashes the specified value using utf8 encoding.
         /// </summary>
-        /// <param name="utf8">The utf8 string to hash.</param>
+        /// <param name="value">The string to hash.</param>
         /// <returns></returns>
-        public static Sha1 Hash(string utf8)
+        public static Sha1 Hash(string value)
         {
-            if (utf8 == null) return Empty;
+            if (value == null) return Empty;
             // Note that length=0 should not short-circuit
 
             // Rent buffer
-            var rented = ArrayPool<byte>.Shared.Rent(utf8.Length * 3); // Utf8 is 1-3 bpc
-            var count = Encoding.UTF8.GetBytes(utf8, 0, utf8.Length, rented, 0);
+            var maxLen = Encoding.UTF8.GetMaxByteCount(value.Length); // Utf8 is 1-4 bpc
+            var rented = ArrayPool<byte>.Shared.Rent(maxLen);
+            var count = Encoding.UTF8.GetBytes(value, 0, value.Length, rented, 0);
 
             var hash = _sha1.Value.ComputeHash(rented, 0, count);
             var sha1 = new Sha1(hash);

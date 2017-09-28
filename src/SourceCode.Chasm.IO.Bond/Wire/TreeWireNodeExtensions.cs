@@ -1,4 +1,6 @@
-﻿namespace SourceCode.Chasm.IO.Bond.Wire
+﻿using System.Text;
+
+namespace SourceCode.Chasm.IO.Bond.Wire
 {
     internal static class TreeWireNodeExtensions
     {
@@ -7,7 +9,7 @@
             if (wire == null) return 0;
 
             // Name
-            var len = (wire.Name?.Length ?? 0) * 3; // Utf8 is 1-3 bpc
+            var len = Encoding.UTF8.GetMaxByteCount(wire.Name?.Length ?? 0); // Utf8 is 1-4 bpc
 
             // Kind
             len += 4;
