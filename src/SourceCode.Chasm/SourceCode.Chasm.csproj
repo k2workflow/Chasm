@@ -10,7 +10,8 @@
 
   <PropertyGroup>
     <Description>CAS - Content Addressable Storage.</Description>
-    <PackageTags>cas content storage sha1 git</PackageTags>
+    <PackageLicenseUrl>https://github.com/k2workflow/Chasm/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageTags>cas content storage sha1 git model</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,7 +30,7 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00151" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00151" />
+    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00155" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00155" />
   </ItemGroup>
 </Project>
