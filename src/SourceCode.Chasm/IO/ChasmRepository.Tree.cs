@@ -83,13 +83,13 @@ namespace SourceCode.Chasm.IO
 
         #region Read (via CommitRef)
 
-        public virtual TreeNodeList ReadTree(string repo, string commitRefName)
+        public virtual TreeNodeList ReadTree(string branch, string commitRefName)
         {
-            if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(commitRefName)) throw new ArgumentNullException(nameof(commitRefName));
 
             // CommitRef
-            var commitId = ReadCommitRef(repo, commitRefName);
+            var commitId = ReadCommitRef(branch, commitRefName);
             if (commitId == CommitId.Empty)
                 return TreeNodeList.Empty;
 
@@ -98,13 +98,13 @@ namespace SourceCode.Chasm.IO
             return tree;
         }
 
-        public virtual async ValueTask<TreeNodeList> ReadTreeAsync(string repo, string commitRefName, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeNodeList> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(commitRefName)) throw new ArgumentNullException(nameof(commitRefName));
 
             // CommitRef
-            var commitId = await ReadCommitRefAsync(repo, commitRefName, cancellationToken).ConfigureAwait(false);
+            var commitId = await ReadCommitRefAsync(branch, commitRefName, cancellationToken).ConfigureAwait(false);
             if (commitId == CommitId.Empty)
                 return TreeNodeList.Empty;
 
