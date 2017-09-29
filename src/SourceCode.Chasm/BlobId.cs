@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -7,6 +8,8 @@ namespace SourceCode.Chasm
         #region Constants
 
         public static BlobId Empty { get; }
+
+        public static BlobIdComparer Comparer { get; } = new BlobIdComparer();
 
         #endregion
 
@@ -32,26 +35,36 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(BlobId other)
-            => Sha1 == other.Sha1;
+        public bool Equals(BlobId other) => Comparer.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is BlobId blobId
-            && Equals(blobId);
+            && Comparer.Equals(this, blobId);
 
-        public override int GetHashCode()
-            => Sha1.GetHashCode();
-
-        public static bool operator ==(BlobId x, BlobId y) => x.Equals(y);
-
-        public static bool operator !=(BlobId x, BlobId y) => !x.Equals(y);
+        public override int GetHashCode() => Comparer.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString()
-            => $"{nameof(BlobId)}: {Sha1}";
+        public static bool operator ==(BlobId x, BlobId y) => Comparer.Equals(x, y);
+
+        public static bool operator !=(BlobId x, BlobId y) => !Comparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(BlobId)}: {Sha1}";
+
+        #endregion
+
+        #region Nested
+
+        public sealed class BlobIdComparer : IEqualityComparer<BlobId>, IComparer<BlobId>
+        {
+            public int Compare(BlobId x, BlobId y) => Sha1.Comparer.Compare(x.Sha1, y.Sha1);
+
+            public bool Equals(BlobId x, BlobId y) => Sha1.Comparer.Equals(x.Sha1, y.Sha1);
+
+            public int GetHashCode(BlobId obj) => Sha1.Comparer.GetHashCode(obj.Sha1);
+        }
 
         #endregion
     }

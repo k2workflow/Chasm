@@ -1,6 +1,7 @@
 ﻿using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SourceCode.Chasm
 {
@@ -32,10 +33,24 @@ namespace SourceCode.Chasm
         {
             if (commitUtc != default && commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException(nameof(commitUtc));
 
-            Parents = parents;
             TreeId = treeId;
             CommitUtc = commitUtc;
             CommitMessage = commitMessage;
+
+            if (parents == null)
+            {
+                Parents = null;
+            }
+            // Optimize for common 0, 1, 2 and N cases
+            else if (parents.Count == 0)
+            {
+                Parents = Array.Empty<CommitId>();
+            }
+            else
+            {
+                // TODO: Sha1.Comparer
+                Parents = parents.Distinct(CommitId.Comparer).OrderBy(n => n.Sha1, Sha1.Comparer).ToArray();
+            }
         }
 
         public Commit(CommitId parent, TreeId treeId, DateTime commitUtc, string commitMessage)
@@ -59,7 +74,7 @@ namespace SourceCode.Chasm
             if (CommitUtc != other.CommitUtc) return false;
             if (!TreeId.Equals(other.TreeId)) return false;
             if (!StringComparer.Ordinal.Equals(CommitMessage, other.CommitMessage)) return false;
-            if (!Parents.NullableEquals(other.Parents, CommitId.DefaultComparer, true)) return false;
+            if (!Parents.NullableEquals(other.Parents, CommitId.Comparer, true)) return false;
 
             return true;
         }
@@ -85,7 +100,7 @@ namespace SourceCode.Chasm
 
         public static bool operator ==(Commit x, Commit y) => x.Equals(y);
 
-        public static bool operator !=(Commit x, Commit y) => !x.Equals(y);
+        public static bool operator !=(Commit x, Commit y) => !(x == y);
 
         #endregion
 

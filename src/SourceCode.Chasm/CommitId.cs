@@ -9,7 +9,7 @@ namespace SourceCode.Chasm
 
         public static CommitId Empty { get; }
 
-        public static IEqualityComparer<CommitId> DefaultComparer { get; } = new EqualityComparerImpl();
+        public static CommitIdComparer Comparer { get; } = new CommitIdComparer();
 
         #endregion
 
@@ -35,35 +35,35 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(CommitId other)
-            => DefaultComparer.Equals(this, other);
+        public bool Equals(CommitId other) => Comparer.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is CommitId commitId
-            && DefaultComparer.Equals(this, commitId);
+            => obj is CommitId blobId
+            && Comparer.Equals(this, blobId);
 
-        public override int GetHashCode()
-            => DefaultComparer.GetHashCode(this);
-
-        public static bool operator ==(CommitId x, CommitId y) => x.Equals(y);
-
-        public static bool operator !=(CommitId x, CommitId y) => !x.Equals(y);
+        public override int GetHashCode() => Comparer.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString() => $"{Sha1}";
+        public static bool operator ==(CommitId x, CommitId y) => Comparer.Equals(x, y);
+
+        public static bool operator !=(CommitId x, CommitId y) => !Comparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(CommitId)}: {Sha1}";
 
         #endregion
 
         #region Nested
 
-        private sealed class EqualityComparerImpl : IEqualityComparer<CommitId>
+        public sealed class CommitIdComparer : IEqualityComparer<CommitId>, IComparer<CommitId>
         {
-            public bool Equals(CommitId x, CommitId y) => x.Sha1 == y.Sha1;
+            public int Compare(CommitId x, CommitId y) => Sha1.Comparer.Compare(x.Sha1, y.Sha1);
 
-            public int GetHashCode(CommitId obj) => obj.Sha1.GetHashCode();
+            public bool Equals(CommitId x, CommitId y) => Sha1.Comparer.Equals(x.Sha1, y.Sha1);
+
+            public int GetHashCode(CommitId obj) => Sha1.Comparer.GetHashCode(obj.Sha1);
         }
 
         #endregion
