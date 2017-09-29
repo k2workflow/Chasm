@@ -3,18 +3,17 @@ using Xunit;
 
 namespace SourceCode.Chasm.IO.Json.Tests
 {
-    public static class CommitFixtures
+    public static partial class CommitTests // .Utc
     {
+        private static readonly DateTime Utc1 = new DateTime(new DateTime(2000, 1, 1).Ticks, DateTimeKind.Utc);
+
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_WriteRead_Commit))]
-        public static void JsonChasmSerializer_WriteRead_Commit()
+        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Utc))]
+        public static void JsonChasmSerializer_Roundtrip_Commit_Utc()
         {
             var ser = new JsonChasmSerializer();
 
-            var parent = new CommitId(Sha1.Hash("abc"));
-            var treeId = new TreeId(Sha1.Hash("def"));
-            var expected = new Commit(parent, treeId, DateTime.UtcNow, "Updating doc.");
-
+            var expected = new Commit(null, default, Utc1, null);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);

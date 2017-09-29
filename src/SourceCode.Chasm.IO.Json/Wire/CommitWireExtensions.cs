@@ -1,6 +1,7 @@
 ﻿using SourceCode.Clay.Json;
 using System;
 using System.Json;
+using System.Linq;
 using System.Xml;
 
 namespace SourceCode.Chasm.IO.Json.Wire
@@ -17,24 +18,63 @@ namespace SourceCode.Chasm.IO.Json.Wire
             if (model == Commit.Empty) return default;
 
             // Parents
-            var parents = Array.Empty<JsonValue>();
-            if (model.Parents != null && model.Parents.Count > 0)
+            JsonArray parents = null;
+            if (model.Parents != null)
             {
-                parents = new JsonValue[model.Parents.Count];
+                switch (model.Parents.Count)
+                {
+                    case 0:
+                        {
+                            parents = new JsonArray(Array.Empty<JsonValue>());
+                        }
+                        break;
 
-                for (var i = 0; i < parents.Length; i++)
-                    parents[i] = model.Parents[i].Sha1.ToString("N");
+                    case 1:
+                        {
+                            var sha1 = model.Parents[0].Sha1;
+                            parents = new JsonArray(new[] { new JsonPrimitive(sha1.ToString("N")) });
+                        }
+                        break;
+
+                    case 2:
+                        {
+                            var sha0 = model.Parents[0].Sha1;
+                            var sha1 = model.Parents[1].Sha1;
+                            var cmp = sha0.CompareTo(sha1);
+
+                            if (cmp == 0)
+                                parents = new JsonArray(new JsonPrimitive(sha0.ToString("N")));
+                            else
+                                parents = new JsonArray(new JsonPrimitive(sha0.ToString("N")), new JsonPrimitive(sha1.ToString("N")));
+                        }
+                        break;
+
+                    default:
+                        {
+                            var sorted = new Sha1[model.Parents.Count];
+                            for (var i = 0; i < sorted.Length; i++)
+                                sorted[i] = model.Parents[i].Sha1;
+                            Array.Sort(sorted, Sha1.Comparison);
+
+                            var distinct = sorted.Distinct().Select(n => new JsonPrimitive(n.ToString("N")));
+                            parents = new JsonArray(distinct);
+                        }
+                        break;
+                }
             }
 
             // CommitUtc
             var utc = XmlConvert.ToString(model.CommitUtc, XmlDateTimeSerializationMode.Utc);
 
+            // Message
+            var msg = model.CommitMessage == null ? null : new JsonPrimitive(model.CommitMessage);
+
             var wire = new JsonObject
             {
-                [_parents] = new JsonArray(parents),
+                [_parents] = parents,
                 [_treeId] = model.TreeId.Sha1.ToString("N"),
                 [_utc] = utc,
-                [_message] = model.CommitMessage
+                [_message] = msg
             };
 
             return wire;
@@ -50,12 +90,23 @@ namespace SourceCode.Chasm.IO.Json.Wire
             var treeId = new TreeId(sha1);
 
             // Parents
+            CommitId[] parents = null;
             var ja = wire.GetArray(_parents);
-            var parents = new CommitId[ja.Count];
-            for (var i = 0; i < parents.Length; i++)
+            if (ja != null)
             {
-                sha1 = Sha1.Parse(ja[i]);
-                parents[i] = new CommitId(sha1);
+                if (ja.Count == 0)
+                {
+                    parents = Array.Empty<CommitId>();
+                }
+                else
+                {
+                    parents = new CommitId[ja.Count];
+                    for (var i = 0; i < parents.Length; i++)
+                    {
+                        sha1 = Sha1.Parse(ja[i]);
+                        parents[i] = new CommitId(sha1);
+                    }
+                }
             }
 
             // Utc
