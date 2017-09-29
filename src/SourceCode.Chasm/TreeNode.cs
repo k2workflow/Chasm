@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
-    [DebuggerDisplay("{" + nameof(Sha1) + "} ({" + nameof(Name) + "})")]
     public struct TreeNode : IEquatable<TreeNode>
     {
         #region Constants
@@ -13,6 +12,8 @@ namespace SourceCode.Chasm
         public static TreeNode EmptyBlob { get; } = new TreeNode(null, Sha1.Empty, NodeKind.Blob);
 
         public static TreeNode EmptyTree { get; } = new TreeNode(null, Sha1.Empty, NodeKind.Tree);
+
+        public static Comparer DefaultComparer { get; } = new Comparer();
 
         #endregion
 
@@ -67,36 +68,56 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(TreeNode other)
-        {
-            if (!StringComparer.Ordinal.Equals(Name, other.Name)) return false;
-            if (Kind != other.Kind) return false;
-            if (Sha1 != other.Sha1) return false;
-
-            return true;
-        }
+        public bool Equals(TreeNode other) => DefaultComparer.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is TreeNode node
-            && Equals(node);
+            && DefaultComparer.Equals(this, node);
 
-        public override int GetHashCode()
+        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
+
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(TreeNode x, TreeNode y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(TreeNode x, TreeNode y) => !DefaultComparer.Equals(x, y); // not
+
+        public override string ToString() => $"{Kind}: {Name} ({Sha1})";
+
+        #endregion
+
+        #region Nested
+
+        public sealed class Comparer : IEqualityComparer<TreeNode>
         {
-            var h = 11;
+            internal Comparer()
+            { }
 
-            unchecked
+            public bool Equals(TreeNode x, TreeNode y)
             {
-                h = h * 7 + (Name == null ? 0 : StringComparer.Ordinal.GetHashCode());
-                h = h * 7 + (int)Kind;
-                h = h * 7 + Sha1.GetHashCode();
+                if (!StringComparer.Ordinal.Equals(x.Name, y.Name)) return false;
+                if (x.Kind != y.Kind) return false;
+                if (x.Sha1 != y.Sha1) return false;
+
+                return true;
             }
 
-            return h;
+            public int GetHashCode(TreeNode obj)
+            {
+                var h = 11;
+
+                unchecked
+                {
+                    h = h * 7 + (obj.Name == null ? 0 : StringComparer.Ordinal.GetHashCode(obj.Name));
+                    h = h * 7 + (int)obj.Kind;
+                    h = h * 7 + obj.Sha1.GetHashCode();
+                }
+
+                return h;
+            }
         }
-
-        public static bool operator ==(TreeNode x, TreeNode y) => x.Equals(y);
-
-        public static bool operator !=(TreeNode x, TreeNode y) => !x.Equals(y);
 
         #endregion
     }

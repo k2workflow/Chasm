@@ -1,7 +1,6 @@
 ﻿using SourceCode.Clay.Json;
 using System;
 using System.Json;
-using System.Linq;
 using System.Xml;
 
 namespace SourceCode.Chasm.IO.Json.Wire
@@ -24,40 +23,21 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 switch (model.Parents.Count)
                 {
                     case 0:
-                        {
-                            parents = new JsonArray(Array.Empty<JsonValue>());
-                        }
+                        parents = new JsonArray(Array.Empty<JsonValue>());
                         break;
 
                     case 1:
-                        {
-                            var sha1 = model.Parents[0].Sha1;
-                            parents = new JsonArray(new[] { new JsonPrimitive(sha1.ToString("N")) });
-                        }
-                        break;
-
-                    case 2:
-                        {
-                            var sha0 = model.Parents[0].Sha1;
-                            var sha1 = model.Parents[1].Sha1;
-                            var cmp = sha0.CompareTo(sha1);
-
-                            if (cmp == 0)
-                                parents = new JsonArray(new JsonPrimitive(sha0.ToString("N")));
-                            else
-                                parents = new JsonArray(new JsonPrimitive(sha0.ToString("N")), new JsonPrimitive(sha1.ToString("N")));
-                        }
+                        var sha1 = model.Parents[0].Sha1;
+                        parents = new JsonArray(new[] { new JsonPrimitive(sha1.ToString("N")) });
                         break;
 
                     default:
                         {
-                            var sorted = new Sha1[model.Parents.Count];
-                            for (var i = 0; i < sorted.Length; i++)
-                                sorted[i] = model.Parents[i].Sha1;
-                            Array.Sort(sorted, Sha1.Comparison);
+                            var array = new JsonPrimitive[model.Parents.Count];
+                            for (var i = 0; i < array.Length; i++)
+                                array[i] = new JsonPrimitive(model.Parents[i].Sha1.ToString("N"));
 
-                            var distinct = sorted.Distinct().Select(n => new JsonPrimitive(n.ToString("N")));
-                            parents = new JsonArray(distinct);
+                            parents = new JsonArray(array);
                         }
                         break;
                 }

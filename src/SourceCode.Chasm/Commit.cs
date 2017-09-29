@@ -13,6 +13,8 @@ namespace SourceCode.Chasm
 
         public static CommitId[] Orphaned { get; } = new[] { CommitId.Empty };
 
+        public static Comparer DefaultComparer { get; } = new Comparer();
+
         #endregion
 
         #region Properties
@@ -49,7 +51,7 @@ namespace SourceCode.Chasm
             else
             {
                 // TODO: Sha1.Comparer
-                Parents = parents.Distinct(CommitId.Comparer).OrderBy(n => n.Sha1, Sha1.Comparer).ToArray();
+                Parents = parents.Distinct(CommitId.DefaultComparer).OrderBy(n => n.Sha1, Sha1.DefaultComparer).ToArray();
             }
         }
 
@@ -69,45 +71,58 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(Commit other)
-        {
-            if (CommitUtc != other.CommitUtc) return false;
-            if (!TreeId.Equals(other.TreeId)) return false;
-            if (!StringComparer.Ordinal.Equals(CommitMessage, other.CommitMessage)) return false;
-            if (!Parents.NullableEquals(other.Parents, CommitId.Comparer, true)) return false;
-
-            return true;
-        }
+        public bool Equals(Commit other) => DefaultComparer.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is Commit commit
-            && Equals(commit);
+            && DefaultComparer.Equals(this, commit);
 
-        public override int GetHashCode()
-        {
-            var h = 11;
-
-            unchecked
-            {
-                h = h * 7 + TreeId.GetHashCode();
-                h = h * 7 + CommitUtc.GetHashCode();
-                h = h * 7 + (Parents?.Count ?? 0);
-                h = h * 7 + (CommitMessage?.Length ?? 0);
-            }
-
-            return h;
-        }
-
-        public static bool operator ==(Commit x, Commit y) => x.Equals(y);
-
-        public static bool operator !=(Commit x, Commit y) => !(x == y);
+        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString()
-            => $"{nameof(Commit)}: {CommitUtc:o} ({TreeId})";
+        public static bool operator ==(Commit x, Commit y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(Commit x, Commit y) => !DefaultComparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(Commit)}: {CommitUtc:o} ({TreeId})";
+
+        #endregion
+
+        #region Nested
+
+        public sealed class Comparer : IEqualityComparer<Commit>
+        {
+            internal Comparer()
+            { }
+
+            public bool Equals(Commit x, Commit y)
+            {
+                if (x.CommitUtc != y.CommitUtc) return false;
+                if (!x.TreeId.Equals(y.TreeId)) return false;
+                if (!StringComparer.Ordinal.Equals(x.CommitMessage, y.CommitMessage)) return false;
+                if (!x.Parents.NullableEquals(y.Parents, CommitId.DefaultComparer, true)) return false;
+
+                return true;
+            }
+
+            public int GetHashCode(Commit obj)
+            {
+                var h = 11;
+
+                unchecked
+                {
+                    h = h * 7 + obj.TreeId.GetHashCode();
+                    h = h * 7 + obj.CommitUtc.GetHashCode();
+                    h = h * 7 + (obj.Parents?.Count ?? 42);
+                    h = h * 7 + (obj.CommitMessage?.Length ?? 0);
+                }
+
+                return h;
+            }
+        }
 
         #endregion
     }

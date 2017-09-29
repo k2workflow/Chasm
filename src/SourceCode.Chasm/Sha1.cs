@@ -36,7 +36,7 @@ namespace SourceCode.Chasm
         /// <summary>
         /// The default comparer (<see cref="IComparer{T}"/> and <see cref="IEqualityComparer{T}"/>) for <see cref="Sha1"/>.
         /// </summary>
-        public static Sha1Comparer Comparer { get; } = new Sha1Comparer();
+        public static Comparer DefaultComparer { get; } = new Comparer();
 
         /// <summary>
         /// The fixed byte length of a <see cref="Sha1"/> value.
@@ -581,42 +581,45 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(Sha1 other) => Comparer.Equals(this, other);
+        public bool Equals(Sha1 other) => DefaultComparer.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is Sha1 sha1
-            && Comparer.Equals(this, sha1);
+            && DefaultComparer.Equals(this, sha1);
 
-        public override int GetHashCode() => Comparer.GetHashCode(this);
+        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
 
         #endregion
 
         #region IComparable
 
-        public int CompareTo(Sha1 other) => Comparer.Compare(this, other);
+        public int CompareTo(Sha1 other) => DefaultComparer.Compare(this, other);
 
         #endregion
 
         #region Operators
 
-        public static bool operator ==(Sha1 x, Sha1 y) => Comparer.Equals(x, y);
+        public static bool operator ==(Sha1 x, Sha1 y) => DefaultComparer.Equals(x, y);
 
-        public static bool operator !=(Sha1 x, Sha1 y) => !Comparer.Equals(x, y); // not
+        public static bool operator !=(Sha1 x, Sha1 y) => !DefaultComparer.Equals(x, y); // not
 
-        public static bool operator >=(Sha1 x, Sha1 y) => Comparer.Compare(x, y) >= 0;
+        public static bool operator >=(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) >= 0;
 
-        public static bool operator >(Sha1 x, Sha1 y) => Comparer.Compare(x, y) > 0;
+        public static bool operator >(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) > 0;
 
-        public static bool operator <=(Sha1 x, Sha1 y) => Comparer.Compare(x, y) <= 0;
+        public static bool operator <=(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) <= 0;
 
-        public static bool operator <(Sha1 x, Sha1 y) => Comparer.Compare(x, y) < 0;
+        public static bool operator <(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) < 0;
 
         #endregion
 
         #region Nested
 
-        public sealed class Sha1Comparer : IEqualityComparer<Sha1>, IComparer<Sha1>
+        public sealed class Comparer : IEqualityComparer<Sha1>, IComparer<Sha1>
         {
+            internal Comparer()
+            { }
+
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public int Compare(Sha1 x, Sha1 y)
             {

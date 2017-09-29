@@ -50,37 +50,95 @@ namespace SourceCode.Chasm
 
         public TreeNodeList(params TreeNode[] nodes)
         {
-            if (nodes == null || nodes.Length == 0)
+            if (nodes == null)
             {
                 _nodes = null;
+                return;
             }
-            else
+
+            // Optimize for common cases
+            switch (nodes.Length)
             {
-                var array = new TreeNode[nodes.Length];
+                case 0:
+                    _nodes = Array.Empty<TreeNode>();
+                    break;
 
-                for (var i = 0; i < array.Length; i++)
-                    array[i] = nodes[i];
+                case 1:
+                    _nodes = new TreeNode[1] { nodes[0] };
+                    break;
 
-                Array.Sort(array, NameComparison);
+                case 2:
+                    {
+                        // Throw if the Sha1 is duplicated
+                        if (nodes[0].Sha1 == nodes[1].Sha1)
+                            throw BuildDuplicateException(nodes[0]);
 
-                _nodes = array;
+                        // Throw if the Name is duplicated
+                        var cmp = StringComparer.Ordinal.Compare(nodes[0].Name, nodes[1].Name);
+                        if (cmp == 0)
+                            throw BuildDuplicateException(nodes[0]);
+
+                        // Else sort & assign
+                        if (cmp < 0)
+                            _nodes = new TreeNode[2] { nodes[0], nodes[1] };
+                        else
+                            _nodes = new TreeNode[2] { nodes[1], nodes[0] };
+                    }
+                    break;
+
+                default:
+                    {
+                        // Copy
+                        var array = new TreeNode[nodes.Length];
+                        for (var i = 0; i < array.Length; i++)
+                            array[i] = nodes[i];
+
+                        // Sort (and throw for duplicates)
+                        if (!SortByName(ref array, out var duplicate))
+                            throw BuildDuplicateException(duplicate);
+
+                        // Assign (sorted by Name)
+                        _nodes = array;
+                    }
+                    break;
             }
         }
 
         public TreeNodeList(ICollection<TreeNode> nodes)
         {
-            if (nodes == null || nodes.Count == 0)
+            if (nodes == null)
             {
                 _nodes = null;
+                return;
             }
-            else
+
+            // Optimize for common cases
+            switch (nodes.Count)
             {
-                var array = new TreeNode[nodes.Count];
-                nodes.CopyTo(array, 0);
+                case 0:
+                    _nodes = Array.Empty<TreeNode>();
+                    break;
 
-                Array.Sort(array, NameComparison);
+                case 1:
+                    _nodes = new TreeNode[1] { nodes.GetEnumerator().Current };
+                    break;
 
-                _nodes = array;
+                default:
+                    {
+                        // Copy
+                        var i = 0;
+                        var array = new TreeNode[nodes.Count];
+                        foreach (var node in nodes)
+                            array[i++] = node;
+
+                        // Sort (and throw for duplicates)
+                        if (!SortByName(ref array, out var duplicate))
+                            throw BuildDuplicateException(duplicate);
+
+                        // Assign (sorted by Name)
+                        _nodes = array;
+                    }
+                    break;
             }
         }
 
@@ -257,10 +315,50 @@ namespace SourceCode.Chasm
 
         #region Helpers
 
+        private static bool SortByName(ref TreeNode[] nodes, out TreeNode duplicate)
+        {
+            duplicate = default;
+
+            // Sort by Sha1 first (as a short-cut for duplicate detection)
+            Array.Sort(nodes, Sha1Comparison);
+
+            // Throw if any Sha1 is duplicated
+            for (var i = 1; i < nodes.Length; i++)
+            {
+                if (nodes[i].Sha1 == nodes[i - 1].Sha1)
+                {
+                    duplicate = nodes[i];
+                    return false;
+                }
+            }
+
+            // Then sort by Name, since that's the final order we need
+            Array.Sort(nodes, NameComparison);
+
+            // Throw if any Name is duplicated
+            for (var i = 1; i < nodes.Length; i++)
+            {
+                if (StringComparer.Ordinal.Compare(nodes[i].Name, nodes[i - 1].Name) == 0)
+                {
+                    duplicate = nodes[i];
+                    return false;
+                }
+            }
+
+            return true;
+
+            // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
+            int Sha1Comparison(TreeNode x, TreeNode y)
+                => Sha1.DefaultComparer.Compare(x.Sha1, y.Sha1);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int NameComparison(TreeNode x, TreeNode y)
             // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
             => string.CompareOrdinal(x.Name, y.Name);
+
+        private static ArgumentException BuildDuplicateException(TreeNode node)
+            => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeList)}: ({node})");
 
         #endregion
 
