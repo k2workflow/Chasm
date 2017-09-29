@@ -10,6 +10,7 @@
 
   <PropertyGroup>
     <Description>CAS - Content Addressable Storage (Protobuf).</Description>
+    <PackageLicenseUrl>https://github.com/k2workflow/Chasm/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>cas content storage sha1 git proto</PackageTags>
   </PropertyGroup>
 

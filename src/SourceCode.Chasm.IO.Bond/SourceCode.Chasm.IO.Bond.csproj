@@ -10,6 +10,7 @@
 
   <PropertyGroup>
     <Description>CAS - Content Addressable Storage (Bond).</Description>
+    <PackageLicenseUrl>https://github.com/k2workflow/Chasm/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>cas content storage sha1 git bond</PackageTags>
   </PropertyGroup>
 

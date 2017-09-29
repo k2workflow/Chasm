@@ -7,17 +7,17 @@ namespace SourceCode.Chasm.IO
     {
         #region Read
 
-        public abstract CommitId ReadCommitRef(string repo, string name);
+        public abstract CommitId ReadCommitRef(string branch, string name);
 
-        public abstract ValueTask<CommitId> ReadCommitRefAsync(string repo, string name, CancellationToken cancellationToken);
+        public abstract ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
 
         #endregion
 
         #region Write
 
-        public abstract void WriteCommitRef(CommitId? previousCommitId, string repo, string name, CommitId newCommitId);
+        public abstract void WriteCommitRef(CommitId? previousCommitId, string branch, string name, CommitId newCommitId);
 
-        public abstract Task WriteCommitRefAsync(CommitId? previousCommitId, string repo, string name, CommitId newCommitId, CancellationToken cancellationToken);
+        public abstract Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitId newCommitId, CancellationToken cancellationToken);
 
         #endregion
     }
