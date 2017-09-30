@@ -14,19 +14,12 @@ namespace SourceCode.Chasm.Tests
             var nullData = new TreeNodeList(null);
             var emptyData = new TreeNodeList(Array.Empty<TreeNode>());
 
-            Assert.Empty(TreeNodeList.Empty);
-
             Assert.Equal(noData, nullData);
             Assert.Equal(noData.GetHashCode(), nullData.GetHashCode());
 
-            Assert.Equal(TreeNodeList.Empty, noData);
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), noData.GetHashCode());
-
-            Assert.Equal(TreeNodeList.Empty, nullData);
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), nullData.GetHashCode());
-
-            Assert.Equal(TreeNodeList.Empty, emptyData); // By design; see ctor
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), emptyData.GetHashCode());
+            Assert.Empty(noData);
+            Assert.Empty(nullData);
+            Assert.Empty(emptyData);
 
             Assert.Equal(noData, emptyData); // By design; see ctor
             Assert.Equal(noData.GetHashCode(), emptyData.GetHashCode());

@@ -12,12 +12,12 @@ namespace SourceCode.Chasm.IO
 
         public TreeNodeList ReadTree(TreeId treeId)
         {
-            if (treeId == TreeId.Empty) return TreeNodeList.Empty;
+            if (treeId == TreeId.Empty) return new TreeNodeList();
 
             // Read bytes
             var buffer = ReadObject(treeId.Sha1);
             if (buffer.IsEmpty)
-                return TreeNodeList.Empty;
+                return new TreeNodeList();
 
             // Deserialize
             var tree = Serializer.DeserializeTree(buffer.Span);
@@ -26,12 +26,12 @@ namespace SourceCode.Chasm.IO
 
         public async ValueTask<TreeNodeList> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken)
         {
-            if (treeId == TreeId.Empty) return TreeNodeList.Empty;
+            if (treeId == TreeId.Empty) return new TreeNodeList();
 
             // Read bytes
             var buffer = await ReadObjectAsync(treeId.Sha1, cancellationToken).ConfigureAwait(false);
             if (buffer.IsEmpty)
-                return TreeNodeList.Empty;
+                return new TreeNodeList();
 
             // Deserialize
             var tree = Serializer.DeserializeTree(buffer.Span);
@@ -91,7 +91,7 @@ namespace SourceCode.Chasm.IO
             // CommitRef
             var commitId = ReadCommitRef(branch, commitRefName);
             if (commitId == CommitId.Empty)
-                return TreeNodeList.Empty;
+                return new TreeNodeList();
 
             // Tree
             var tree = ReadTree(commitId);
@@ -106,7 +106,7 @@ namespace SourceCode.Chasm.IO
             // CommitRef
             var commitId = await ReadCommitRefAsync(branch, commitRefName, cancellationToken).ConfigureAwait(false);
             if (commitId == CommitId.Empty)
-                return TreeNodeList.Empty;
+                return new TreeNodeList();
 
             // Tree
             var tree = await ReadTreeAsync(commitId, cancellationToken).ConfigureAwait(false);
@@ -119,12 +119,12 @@ namespace SourceCode.Chasm.IO
 
         public virtual TreeNodeList ReadTree(CommitId commitId)
         {
-            if (commitId == CommitId.Empty) return TreeNodeList.Empty;
+            if (commitId == CommitId.Empty) return new TreeNodeList();
 
             // Commit
             var commit = ReadCommit(commitId);
             if (commit == Commit.Empty)
-                return TreeNodeList.Empty;
+                return new TreeNodeList();
 
             // Tree
             var tree = ReadTree(commit.TreeId);
@@ -133,7 +133,7 @@ namespace SourceCode.Chasm.IO
 
         public virtual async ValueTask<TreeNodeList> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken)
         {
-            if (commitId == CommitId.Empty) return TreeNodeList.Empty;
+            if (commitId == CommitId.Empty) return new TreeNodeList();
 
             // Commit
             var commit = await ReadCommitAsync(commitId, cancellationToken).ConfigureAwait(false); ;
@@ -184,7 +184,7 @@ namespace SourceCode.Chasm.IO
             if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
 
             var treeId = TreeId.Empty;
-            if (tree != TreeNodeList.Empty)
+            if (tree != null && tree.Count > 0)
                 treeId = WriteTree(tree, forceOverwrite);
 
             var commit = new Commit(parents, treeId, commitUtc, commitMessage);
@@ -198,7 +198,7 @@ namespace SourceCode.Chasm.IO
             if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
 
             var treeId = TreeId.Empty;
-            if (tree != TreeNodeList.Empty)
+            if (tree != null && tree.Count > 0)
                 treeId = await WriteTreeAsync(tree, forceOverwrite, cancellationToken).ConfigureAwait(false);
 
             var commit = new Commit(parents, treeId, commitUtc, commitMessage);

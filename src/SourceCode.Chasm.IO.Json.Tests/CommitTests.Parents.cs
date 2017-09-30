@@ -88,11 +88,12 @@ namespace SourceCode.Chasm.IO.Json.Tests
             var ser = new JsonChasmSerializer();
 
             var expected = new Commit(new[] { Parent1, Parent1 }, default, default, null);
+            Assert.Equal(1, expected.Parents.Count);
+
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
-                Assert.NotEqual(expected, actual);
-                Assert.Equal(1, actual.Parents.Count);
+                Assert.Equal(expected, actual);
             }
         }
 
@@ -145,20 +146,22 @@ namespace SourceCode.Chasm.IO.Json.Tests
 
             // 3 duplicates
             var expected = new Commit(new[] { Parent1, Parent1, Parent1 }, default, default, null);
+            Assert.Equal(1, expected.Parents.Count);
+
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
-                Assert.NotEqual(expected, actual);
-                Assert.Equal(1, actual.Parents.Count);
+                Assert.Equal(expected, actual);
             }
 
             // 2 duplicates
             expected = new Commit(new[] { Parent1, Parent2, Parent1 }, default, default, null);
+            Assert.Equal(2, expected.Parents.Count);
+
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
-                Assert.NotEqual(expected, actual);
-                Assert.Equal(2, actual.Parents.Count);
+                Assert.Equal(expected, actual);
             }
         }
 

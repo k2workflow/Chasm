@@ -3,16 +3,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
-    public struct TreeNodeList : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeList>
+    public sealed class TreeNodeList : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeList>
     {
         #region Constants
 
-        public static TreeNodeList Empty { get; }
+        public static Comparer DefaultComparer { get; } = new Comparer();
 
         #endregion
 
@@ -48,11 +47,16 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
+        public TreeNodeList()
+        {
+            _nodes = Array.Empty<TreeNode>();
+        }
+
         public TreeNodeList(params TreeNode[] nodes)
         {
             if (nodes == null)
             {
-                _nodes = null;
+                _nodes = Array.Empty<TreeNode>();
                 return;
             }
 
@@ -108,7 +112,7 @@ namespace SourceCode.Chasm
         {
             if (nodes == null)
             {
-                _nodes = null;
+                _nodes = Array.Empty<TreeNode>();
                 return;
             }
 
@@ -120,7 +124,8 @@ namespace SourceCode.Chasm
                     break;
 
                 case 1:
-                    _nodes = new TreeNode[1] { nodes.GetEnumerator().Current };
+                    foreach (var node in nodes) // Will only iterate once
+                        _nodes = new TreeNode[1] { node };
                     break;
 
                 default:
@@ -350,12 +355,11 @@ namespace SourceCode.Chasm
             // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
             int Sha1Comparison(TreeNode x, TreeNode y)
                 => Sha1.DefaultComparer.Compare(x.Sha1, y.Sha1);
-        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int NameComparison(TreeNode x, TreeNode y)
             // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
-            => string.CompareOrdinal(x.Name, y.Name);
+            int NameComparison(TreeNode x, TreeNode y)
+                => string.CompareOrdinal(x.Name, y.Name);
+        }
 
         private static ArgumentException BuildDuplicateException(TreeNode node)
             => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeList)}: ({node})");
@@ -404,19 +408,54 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public override int GetHashCode()
-            => _nodes?.Length ?? 19;
+        public bool Equals(TreeNodeList other) => DefaultComparer.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is TreeNodeList tnl
-            && Equals(tnl);
+            && DefaultComparer.Equals(this, tnl);
 
-        public bool Equals(TreeNodeList other)
-            => _nodes.NullableEquals(other._nodes, true);
+        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
 
-        public static bool operator ==(TreeNodeList left, TreeNodeList right) => left.Equals(right);
+        #endregion
 
-        public static bool operator !=(TreeNodeList left, TreeNodeList right) => !left.Equals(right);
+        #region Operators
+
+        public static bool operator ==(TreeNodeList x, TreeNodeList y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(TreeNodeList x, TreeNodeList y) => !DefaultComparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(TreeNodeList)}: {_nodes?.Length ?? 0}";
+
+        #endregion
+
+        #region Nested
+
+        public sealed class Comparer : IEqualityComparer<TreeNodeList>
+        {
+            internal Comparer()
+            { }
+
+            public bool Equals(TreeNodeList x, TreeNodeList y)
+            {
+                if (ReferenceEquals(x, y)) return true; // (x, x) or (null, null)
+                if (ReferenceEquals(x, null) || ReferenceEquals(y, null)) return false; // (x, null) or (null, y)
+                if (!x._nodes.NullableEquals(y._nodes, true)) return false;
+
+                return true;
+            }
+
+            public int GetHashCode(TreeNodeList obj)
+            {
+                var h = 11;
+
+                unchecked
+                {
+                    h = h * 7 + (obj._nodes?.Length ?? 42);
+                }
+
+                return h;
+            }
+        }
 
         #endregion
     }

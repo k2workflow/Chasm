@@ -30,8 +30,6 @@ namespace SourceCode.Chasm.IO.Tests
             repo.Setup(r => r.ReadCommitRef(string.Empty, string.Empty)).Returns(CommitId.Empty);
 
             repo.Setup(r => r.ReadCommitRef("branch", "name")).Returns(new CommitId(Sha1.Hash("branch-name")));
-
-            var actual = repo.r
         }
     }
 }
