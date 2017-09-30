@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -13,6 +14,8 @@ namespace SourceCode.Chasm
         #region Properties
 
         public CommitId CommitId { get; }
+
+        public static Comparer DefaultComparer { get; } = new Comparer();
 
         #endregion
 
@@ -34,26 +37,52 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(CommitRef other)
-            => CommitId == other.CommitId;
+        public bool Equals(CommitRef other) => DefaultComparer.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is CommitRef commitRef
-            && Equals(commitRef);
+            && DefaultComparer.Equals(this, commitRef);
 
-        public override int GetHashCode()
-            => CommitId.GetHashCode();
+        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
 
-        public static bool operator ==(CommitRef x, CommitRef y) => x.Equals(y);
+        #endregion
 
-        public static bool operator !=(CommitRef x, CommitRef y) => !x.Equals(y);
+        #region Comparer
+
+        public sealed class Comparer : IEqualityComparer<CommitRef>
+        {
+            internal Comparer()
+            { }
+
+            public bool Equals(CommitRef x, CommitRef y)
+            {
+                if (!x.CommitId.Equals(y.CommitId)) return false;
+
+                return true;
+            }
+
+            public int GetHashCode(CommitRef obj)
+            {
+                var h = 11;
+
+                unchecked
+                {
+                    h = h * 7 + obj.CommitId.GetHashCode();
+                }
+
+                return h;
+            }
+        }
 
         #endregion
 
         #region Operators
 
-        public override string ToString()
-            => $"{nameof(CommitRef)}: {CommitId}";
+        public static bool operator ==(CommitRef x, CommitRef y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(CommitRef x, CommitRef y) => !DefaultComparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(CommitRef)}: {CommitId}";
 
         #endregion
     }

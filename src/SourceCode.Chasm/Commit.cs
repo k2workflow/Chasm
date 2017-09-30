@@ -113,17 +113,7 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Operators
-
-        public static bool operator ==(Commit x, Commit y) => DefaultComparer.Equals(x, y);
-
-        public static bool operator !=(Commit x, Commit y) => !DefaultComparer.Equals(x, y); // not
-
-        public override string ToString() => $"{nameof(Commit)}: {CommitUtc:o} ({TreeId})";
-
-        #endregion
-
-        #region Nested
+        #region Comparer
 
         public sealed class Comparer : IEqualityComparer<Commit>
         {
@@ -155,6 +145,16 @@ namespace SourceCode.Chasm
                 return h;
             }
         }
+
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(Commit x, Commit y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(Commit x, Commit y) => !DefaultComparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(Commit)}: {CommitUtc:o} ({TreeId})";
 
         #endregion
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
-    public struct TreeNode : IEquatable<TreeNode>
+    public struct TreeNode : IEquatable<TreeNode>, IComparable<TreeNode>
     {
         #region Constants
 
@@ -78,28 +78,38 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Operators
+        #region IComparable
 
-        public static bool operator ==(TreeNode x, TreeNode y) => DefaultComparer.Equals(x, y);
-
-        public static bool operator !=(TreeNode x, TreeNode y) => !DefaultComparer.Equals(x, y); // not
-
-        public override string ToString() => $"{Kind}: {Name} ({Sha1})";
+        public int CompareTo(TreeNode other) => DefaultComparer.Compare(this, other);
 
         #endregion
 
-        #region Nested
+        #region Comparer
 
-        public sealed class Comparer : IEqualityComparer<TreeNode>
+        public sealed class Comparer : IEqualityComparer<TreeNode>, IComparer<TreeNode>
         {
             internal Comparer()
             { }
 
+            public int Compare(TreeNode x, TreeNode y)
+            {
+                // Nodes are always sorted by Name first (see TreeNodeList)
+                var cmp = StringComparer.Ordinal.Compare(x.Name, y.Name);
+                if (cmp != 0) return cmp;
+
+                // Then by Sha1 (in order to detect duplicate)
+                cmp = Sha1.DefaultComparer.Compare(x.Sha1, y.Sha1);
+                if (cmp != 0) return cmp;
+
+                cmp = ((int)x.Kind).CompareTo((int)y.Kind);
+                return cmp;
+            }
+
             public bool Equals(TreeNode x, TreeNode y)
             {
-                if (!StringComparer.Ordinal.Equals(x.Name, y.Name)) return false;
                 if (x.Kind != y.Kind) return false;
                 if (x.Sha1 != y.Sha1) return false;
+                if (!StringComparer.Ordinal.Equals(x.Name, y.Name)) return false;
 
                 return true;
             }
@@ -117,7 +127,35 @@ namespace SourceCode.Chasm
 
                 return h;
             }
+
+            // TODO: Is this the best place for this method
+            // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
+            public static int NameComparison(TreeNode x, TreeNode y)
+                => string.CompareOrdinal(x.Name, y.Name);
+
+            // TODO: Is this the best place for this method
+            // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
+            public static int Sha1Comparison(TreeNode x, TreeNode y)
+                => Sha1.DefaultComparer.Compare(x.Sha1, y.Sha1);
         }
+
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(TreeNode x, TreeNode y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(TreeNode x, TreeNode y) => !DefaultComparer.Equals(x, y); // not
+
+        public static bool operator >=(TreeNode x, TreeNode y) => DefaultComparer.Compare(x, y) >= 0;
+
+        public static bool operator >(TreeNode x, TreeNode y) => DefaultComparer.Compare(x, y) > 0;
+
+        public static bool operator <=(TreeNode x, TreeNode y) => DefaultComparer.Compare(x, y) <= 0;
+
+        public static bool operator <(TreeNode x, TreeNode y) => DefaultComparer.Compare(x, y) < 0;
+
+        public override string ToString() => $"{Kind}: {Name} ({Sha1})";
 
         #endregion
     }

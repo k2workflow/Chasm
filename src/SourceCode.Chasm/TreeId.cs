@@ -45,17 +45,7 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Operators
-
-        public static bool operator ==(TreeId x, TreeId y) => DefaultComparer.Equals(x, y);
-
-        public static bool operator !=(TreeId x, TreeId y) => !DefaultComparer.Equals(x, y); // not
-
-        public override string ToString() => $"{nameof(TreeId)}: {Sha1}";
-
-        #endregion
-
-        #region Nested
+        #region Comparer
 
         public sealed class Comparer : IEqualityComparer<TreeId>, IComparer<TreeId>
         {
@@ -68,6 +58,16 @@ namespace SourceCode.Chasm
 
             public int GetHashCode(TreeId obj) => Sha1.DefaultComparer.GetHashCode(obj.Sha1);
         }
+
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(TreeId x, TreeId y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(TreeId x, TreeId y) => !DefaultComparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(TreeId)}: {Sha1}";
 
         #endregion
     }

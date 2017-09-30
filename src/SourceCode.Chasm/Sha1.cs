@@ -597,23 +597,7 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Operators
-
-        public static bool operator ==(Sha1 x, Sha1 y) => DefaultComparer.Equals(x, y);
-
-        public static bool operator !=(Sha1 x, Sha1 y) => !DefaultComparer.Equals(x, y); // not
-
-        public static bool operator >=(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) >= 0;
-
-        public static bool operator >(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) > 0;
-
-        public static bool operator <=(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) <= 0;
-
-        public static bool operator <(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) < 0;
-
-        #endregion
-
-        #region Nested
+        #region Comparer
 
         public sealed class Comparer : IEqualityComparer<Sha1>, IComparer<Sha1>
         {
@@ -643,6 +627,22 @@ namespace SourceCode.Chasm
             public int GetHashCode(Sha1 obj)
                 => (int)obj.Blit0;
         }
+
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(Sha1 x, Sha1 y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(Sha1 x, Sha1 y) => !DefaultComparer.Equals(x, y); // not
+
+        public static bool operator >=(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) >= 0;
+
+        public static bool operator >(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) > 0;
+
+        public static bool operator <=(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) <= 0;
+
+        public static bool operator <(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) < 0;
 
         #endregion
     }

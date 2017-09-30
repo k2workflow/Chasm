@@ -45,17 +45,7 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Operators
-
-        public static bool operator ==(CommitId x, CommitId y) => DefaultComparer.Equals(x, y);
-
-        public static bool operator !=(CommitId x, CommitId y) => !DefaultComparer.Equals(x, y); // not
-
-        public override string ToString() => $"{nameof(CommitId)}: {Sha1}";
-
-        #endregion
-
-        #region Nested
+        #region Comparer
 
         public sealed class Comparer : IEqualityComparer<CommitId>, IComparer<CommitId>
         {
@@ -68,6 +58,16 @@ namespace SourceCode.Chasm
 
             public int GetHashCode(CommitId obj) => Sha1.DefaultComparer.GetHashCode(obj.Sha1);
         }
+
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(CommitId x, CommitId y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(CommitId x, CommitId y) => !DefaultComparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(CommitId)}: {Sha1}";
 
         #endregion
     }

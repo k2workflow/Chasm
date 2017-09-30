@@ -113,7 +113,7 @@ namespace SourceCode.Chasm
                             if (sorted && i > 0)
                             {
                                 // Streaming assertion
-                                var cmp = StringComparer.Ordinal.Compare(array[i - 1].Name, array[i].Name);
+                                var cmp = TreeNode.DefaultComparer.Compare(array[i - 1], array[i]);
                                 if (cmp > 0)
                                     sorted = false;
                             }
@@ -122,7 +122,7 @@ namespace SourceCode.Chasm
                         // Sort iff necessary
                         if (!sorted)
                         {
-                            Array.Sort(array, NameComparison);
+                            Array.Sort(array, TreeNode.Comparer.NameComparison);
                         }
 
                         // Assign (sorted by Name)
@@ -207,7 +207,7 @@ namespace SourceCode.Chasm
                             if (sorted && i > 0)
                             {
                                 // Streaming assertion
-                                var cmp = StringComparer.Ordinal.Compare(array[i - 1].Name, array[i].Name);
+                                var cmp = TreeNode.DefaultComparer.Compare(array[i - 1], array[i]);
                                 if (cmp > 0)
                                     sorted = false;
                             }
@@ -218,7 +218,7 @@ namespace SourceCode.Chasm
                         // Sort iff necessary
                         if (!sorted)
                         {
-                            Array.Sort(array, NameComparison);
+                            Array.Sort(array, TreeNode.Comparer.NameComparison);
                         }
 
                         // Assign (sorted by Name)
@@ -405,10 +405,6 @@ namespace SourceCode.Chasm
 
         #region Helpers
 
-        // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
-        private static int NameComparison(TreeNode x, TreeNode y)
-            => string.CompareOrdinal(x.Name, y.Name);
-
         private static ArgumentException CreateDuplicateException(TreeNode node)
             => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeList)}: ({node})");
 
@@ -466,17 +462,7 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Operators
-
-        public static bool operator ==(TreeNodeList x, TreeNodeList y) => DefaultComparer.Equals(x, y);
-
-        public static bool operator !=(TreeNodeList x, TreeNodeList y) => !DefaultComparer.Equals(x, y); // not
-
-        public override string ToString() => $"{nameof(TreeNodeList)}: {_nodes?.Length ?? 0}";
-
-        #endregion
-
-        #region Nested
+        #region Comparer
 
         public sealed class Comparer : IEqualityComparer<TreeNodeList>
         {
@@ -504,6 +490,16 @@ namespace SourceCode.Chasm
                 return h;
             }
         }
+
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(TreeNodeList x, TreeNodeList y) => DefaultComparer.Equals(x, y);
+
+        public static bool operator !=(TreeNodeList x, TreeNodeList y) => !DefaultComparer.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(TreeNodeList)}: {_nodes?.Length ?? 0}";
 
         #endregion
     }
