@@ -13,15 +13,13 @@ before_build:
 
 build_script:
 - dotnet build "src\SourceCode.Chasm\SourceCode.Chasm.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "src\SourceCode.Chasm.Tests\SourceCode.Chasm.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-
 - dotnet build "src\SourceCode.Chasm.IO.Json\SourceCode.Chasm.IO.Json.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "src\SourceCode.Chasm.IO.Json.Tests\SourceCode.Chasm.IO.Json.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-
 - dotnet build "src\SourceCode.Chasm.IO.Bond\SourceCode.Chasm.IO.Bond.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "src\SourceCode.Chasm.IO.Bond.Tests\SourceCode.Chasm.IO.Bond.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-
 - dotnet build "src\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+
+- dotnet build "src\SourceCode.Chasm.Tests\SourceCode.Chasm.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "src\SourceCode.Chasm.IO.Json.Tests\SourceCode.Chasm.IO.Json.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "src\SourceCode.Chasm.IO.Bond.Tests\SourceCode.Chasm.IO.Bond.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 - dotnet build "src\SourceCode.Chasm.IO.Proto.Tests\SourceCode.Chasm.IO.Proto.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 
 after_build:
