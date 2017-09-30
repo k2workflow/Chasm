@@ -2,7 +2,7 @@
 
 namespace SourceCode.Chasm.IO.Json.Tests
 {
-    public static partial class CommitTests // .Parents
+    public static partial class CommitTests
     {
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Default))]

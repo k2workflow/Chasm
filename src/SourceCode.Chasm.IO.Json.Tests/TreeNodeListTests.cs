@@ -92,5 +92,19 @@ namespace SourceCode.Chasm.IO.Json.Tests
                 Assert.Equal(expected, actual);
             }
         }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_TreeNodeList_3_Nodes))]
+        public static void JsonChasmSerializer_Roundtrip_TreeNodeList_3_Nodes()
+        {
+            var ser = new JsonChasmSerializer();
+
+            var expected = new TreeNodeList(Node1, Node2, Node3);
+            using (var buf = ser.Serialize(expected))
+            {
+                var actual = ser.DeserializeTree(buf.Result);
+                Assert.Equal(expected, actual);
+            }
+        }
     }
 }

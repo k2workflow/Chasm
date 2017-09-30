@@ -42,16 +42,48 @@ namespace SourceCode.Chasm
             if (parents == null)
             {
                 Parents = null;
+                return;
             }
-            // Optimize for common 0, 1, 2 and N cases
-            else if (parents.Count == 0)
+
+            // Optimize for common cases 0, 1, 2, N
+            switch (parents.Count)
             {
-                Parents = Array.Empty<CommitId>();
-            }
-            else
-            {
-                // TODO: Sha1.Comparer
-                Parents = parents.Distinct(CommitId.DefaultComparer).OrderBy(n => n.Sha1, Sha1.DefaultComparer).ToArray();
+                case 0:
+                    Parents = Array.Empty<CommitId>();
+                    return;
+
+                case 1:
+                    Parents = new CommitId[1] { parents[0] };
+                    return;
+
+                case 2:
+                    {
+                        if (parents[0].Sha1 == parents[1].Sha1)
+                        {
+                            Parents = new CommitId[1] { parents[0] };
+                            return;
+                        }
+                        else
+                        {
+                            var cmp = Sha1.DefaultComparer.Compare(parents[0].Sha1, parents[1].Sha1);
+
+                            // Sort & assign
+                            if (cmp < 0)
+                                Parents = new CommitId[2] { parents[0], parents[1] };
+                            else
+                                Parents = new CommitId[2] { parents[1], parents[0] };
+                        }
+                    }
+                    return;
+
+                default:
+                    {
+                        Parents = parents
+                            .OrderBy(n => n.Sha1, Sha1.DefaultComparer)
+                            .Distinct(CommitId.DefaultComparer)
+                            .ToArray();
+                    }
+                    return;
             }
         }
 

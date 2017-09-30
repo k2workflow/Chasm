@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Json.Tests
@@ -11,8 +10,8 @@ namespace SourceCode.Chasm.IO.Json.Tests
         private static readonly CommitId Parent3 = new CommitId(Sha1.Hash(nameof(Parent3)));
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_Null_Parent_Array))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_Null_Parent_Array()
+        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_Null))]
+        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_Null()
         {
             var ser = new JsonChasmSerializer();
 
@@ -26,8 +25,8 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_Empty_Parent_Array))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_Empty_Parent_Array()
+        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_Empty))]
+        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_Empty()
         {
             var ser = new JsonChasmSerializer();
 
@@ -40,8 +39,8 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_1_Parent_Empty))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_1_Parent_Empty()
+        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_1_Empty))]
+        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_1_Empty()
         {
             var ser = new JsonChasmSerializer();
 
@@ -54,8 +53,8 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_1_Parent))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_1_Parent()
+        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_1))]
+        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_1()
         {
             var ser = new JsonChasmSerializer();
 
@@ -68,43 +67,12 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_2_Parents_Empty_Duplicated))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_2_Parents_Empty_Duplicated()
+        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_2))]
+        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_2()
         {
             var ser = new JsonChasmSerializer();
 
-            var expected = new Commit(new[] { CommitId.Empty, CommitId.Empty }, default, default, null);
-            using (var buf = ser.Serialize(expected))
-            {
-                var actual = ser.DeserializeCommit(buf.Result);
-                Assert.Equal(1, actual.Parents.Count);
-            }
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_2_Parents_Duplicated))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_2_Parents_Duplicated()
-        {
-            var ser = new JsonChasmSerializer();
-
-            var expected = new Commit(new[] { Parent1, Parent1 }, default, default, null);
-            Assert.Equal(1, expected.Parents.Count);
-
-            using (var buf = ser.Serialize(expected))
-            {
-                var actual = ser.DeserializeCommit(buf.Result);
-                Assert.Equal(expected, actual);
-            }
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_2_Parents_Sorted))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_2_Parents_Sorted()
-        {
-            var ser = new JsonChasmSerializer();
-
-            // Forward
-            var parents = new[] { Parent1, Parent2 }.OrderBy(n => n.Sha1).ToArray();
+            var parents = new[] { Parent1, Parent2 };
 
             var expected = new Commit(parents, default, default, null);
             using (var buf = ser.Serialize(expected))
@@ -112,79 +80,17 @@ namespace SourceCode.Chasm.IO.Json.Tests
                 var actual = ser.DeserializeCommit(buf.Result);
                 Assert.Equal(expected, actual);
             }
-
-            // Reversed
-            Array.Reverse(parents);
-
-            expected = new Commit(parents, default, default, null);
-            using (var buf = ser.Serialize(expected))
-            {
-                var actual = ser.DeserializeCommit(buf.Result);
-                Assert.Equal(expected, actual);
-            }
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_3_Parents_Empty_Duplicated))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_3_Parents_Empty_Duplicated()
+        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_3))]
+        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_3()
         {
             var ser = new JsonChasmSerializer();
 
-            var expected = new Commit(new[] { CommitId.Empty, CommitId.Empty, CommitId.Empty }, default, default, null);
-            using (var buf = ser.Serialize(expected))
-            {
-                var actual = ser.DeserializeCommit(buf.Result);
-                Assert.Equal(1, actual.Parents.Count);
-            }
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_3_Parents_Duplicated))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_3_Parents_Duplicated()
-        {
-            var ser = new JsonChasmSerializer();
-
-            // 3 duplicates
-            var expected = new Commit(new[] { Parent1, Parent1, Parent1 }, default, default, null);
-            Assert.Equal(1, expected.Parents.Count);
-
-            using (var buf = ser.Serialize(expected))
-            {
-                var actual = ser.DeserializeCommit(buf.Result);
-                Assert.Equal(expected, actual);
-            }
-
-            // 2 duplicates
-            expected = new Commit(new[] { Parent1, Parent2, Parent1 }, default, default, null);
-            Assert.Equal(2, expected.Parents.Count);
-
-            using (var buf = ser.Serialize(expected))
-            {
-                var actual = ser.DeserializeCommit(buf.Result);
-                Assert.Equal(expected, actual);
-            }
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_3_Parents_Sorted))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_3_Parents_Sorted()
-        {
-            var ser = new JsonChasmSerializer();
-
-            // Forward
-            var parents = new[] { Parent1, Parent2, Parent3 }.OrderBy(n => n.Sha1).ToArray();
+            var parents = new[] { Parent1, Parent2, Parent3 };
 
             var expected = new Commit(parents, default, default, null);
-            using (var buf = ser.Serialize(expected))
-            {
-                var actual = ser.DeserializeCommit(buf.Result);
-                Assert.Equal(expected, actual);
-            }
-
-            // Reversed
-            Array.Reverse(parents);
-
-            expected = new Commit(parents, default, default, null);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
