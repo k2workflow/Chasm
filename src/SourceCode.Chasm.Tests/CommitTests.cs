@@ -18,9 +18,9 @@ namespace SourceCode.Chasm.Tests
             var nullData = new Commit(null, default, default, null);
 
             // Parents
-            Assert.Null(Commit.Empty.Parents);
-            Assert.Null(noData.Parents);
-            Assert.Null(nullData.Parents);
+            Assert.Empty(Commit.Empty.Parents); // Default ctor (implicit)
+            Assert.Empty(noData.Parents); // Default ctor (explicit)
+            Assert.Empty(nullData.Parents); // Custom ctor (with null)
 
             // TreeId
             Assert.Equal(TreeId.Empty, Commit.Empty.TreeId);
@@ -107,12 +107,12 @@ namespace SourceCode.Chasm.Tests
         public static void Commit_Parents_Null()
         {
             // Force Commit to be non-default
-            var actual = new Commit(null, default, default, null);
-            Assert.Null(actual.Parents);
+            var actual = new Commit(null, default, default, "force");
+            Assert.Empty(actual.Parents);
 
             // Force Commit to be non-default
             actual = new Commit(null, default, default, "force");
-            Assert.Null(actual.Parents);
+            Assert.Empty(actual.Parents);
         }
 
         [Trait("Type", "Unit")]

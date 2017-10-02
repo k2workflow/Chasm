@@ -17,9 +17,15 @@ namespace SourceCode.Chasm
 
         #endregion
 
+        #region Fields
+
+        private readonly IReadOnlyList<CommitId> _parents;
+
+        #endregion
+
         #region Properties
 
-        public IReadOnlyList<CommitId> Parents { get; }
+        public IReadOnlyList<CommitId> Parents => _parents ?? Array.Empty<CommitId>(); // Default ctor will set to null
 
         public TreeId TreeId { get; }
 
@@ -39,9 +45,10 @@ namespace SourceCode.Chasm
             CommitUtc = commitUtc;
             CommitMessage = commitMessage;
 
+            // Coerce null to empty
             if (parents == null)
             {
-                Parents = null;
+                _parents = Array.Empty<CommitId>();
                 return;
             }
 
@@ -49,36 +56,37 @@ namespace SourceCode.Chasm
             switch (parents.Count)
             {
                 case 0:
-                    Parents = Array.Empty<CommitId>();
+                    _parents = Array.Empty<CommitId>();
                     return;
 
                 case 1:
-                    Parents = new CommitId[1] { parents[0] };
+                    _parents = new CommitId[1] { parents[0] };
                     return;
 
                 case 2:
                     {
+                        // Silently de-duplicate
                         if (parents[0].Sha1 == parents[1].Sha1)
                         {
-                            Parents = new CommitId[1] { parents[0] };
+                            _parents = new CommitId[1] { parents[0] };
                             return;
                         }
+                        // Else sort
                         else
                         {
                             var cmp = Sha1.DefaultComparer.Compare(parents[0].Sha1, parents[1].Sha1);
-
-                            // Sort & assign
                             if (cmp < 0)
-                                Parents = new CommitId[2] { parents[0], parents[1] };
+                                _parents = new CommitId[2] { parents[0], parents[1] };
                             else
-                                Parents = new CommitId[2] { parents[1], parents[0] };
+                                _parents = new CommitId[2] { parents[1], parents[0] };
                         }
                     }
                     return;
 
                 default:
                     {
-                        Parents = parents
+                        // Silently de-duplicate & sort
+                        _parents = parents
                             .OrderBy(n => n.Sha1, Sha1.DefaultComparer)
                             .Distinct(CommitId.DefaultComparer)
                             .ToArray();
