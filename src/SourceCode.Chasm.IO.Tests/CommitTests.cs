@@ -1,15 +1,14 @@
 ﻿using Xunit;
 
-namespace SourceCode.Chasm.IO.Json.Tests
+namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitTests
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Default))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Default()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Default))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_Default(IChasmSerializer ser)
         {
-            var ser = new JsonChasmSerializer();
-
             // All default
             var expected = new Commit(null, default, default, null);
             using (var buf = ser.Serialize(expected))

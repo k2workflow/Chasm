@@ -35,6 +35,8 @@ namespace SourceCode.Chasm.IO.Proto
 
         public override Commit DeserializeCommit(ReadOnlySpan<byte> span)
         {
+            if (span.IsEmpty) return default;
+
             var wire = new CommitWire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 

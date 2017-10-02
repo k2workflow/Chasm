@@ -37,6 +37,8 @@ namespace SourceCode.Chasm.IO.Proto
 
         public override TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
         {
+            if (span.IsEmpty) return new TreeNodeList();
+
             var wire = new TreeWire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 

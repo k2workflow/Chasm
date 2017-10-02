@@ -9,11 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Tests", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Json", "src\SourceCode.Chasm.IO.Json\SourceCode.Chasm.IO.Json.csproj", "{26312E66-C152-429B-B455-099A22929772}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Json.Tests", "src\SourceCode.Chasm.IO.Json.Tests\SourceCode.Chasm.IO.Json.Tests.csproj", "{15175969-02BF-4156-B4E4-EADC6E0074A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Tests", "src\SourceCode.Chasm.IO.Tests\SourceCode.Chasm.IO.Tests.csproj", "{15175969-02BF-4156-B4E4-EADC6E0074A7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Proto", "src\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj", "{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Proto.Tests", "src\SourceCode.Chasm.IO.Proto.Tests\SourceCode.Chasm.IO.Proto.Tests.csproj", "{25C55825-AD35-499D-81C8-761FAA78D5B7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2E823422-9C14-40E9-A4E4-FD62EBA208A6}"
 EndProject
@@ -43,10 +41,6 @@ Global
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{25C55825-AD35-499D-81C8-761FAA78D5B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{25C55825-AD35-499D-81C8-761FAA78D5B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{25C55825-AD35-499D-81C8-761FAA78D5B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{25C55825-AD35-499D-81C8-761FAA78D5B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,7 +48,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E5C63B7F-51ED-4B85-AE71-375D8F1B0A3D} = {2E823422-9C14-40E9-A4E4-FD62EBA208A6}
 		{15175969-02BF-4156-B4E4-EADC6E0074A7} = {2E823422-9C14-40E9-A4E4-FD62EBA208A6}
-		{25C55825-AD35-499D-81C8-761FAA78D5B7} = {2E823422-9C14-40E9-A4E4-FD62EBA208A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B964863B-CE37-441D-9B56-0C86B56DAA2F}

@@ -1,17 +1,16 @@
 ﻿using Xunit;
 
-namespace SourceCode.Chasm.IO.Proto.Tests
+namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitTests // .TreeId
     {
         private static readonly TreeId TreeId1 = new TreeId(Sha1.Hash(nameof(TreeId1)));
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_Commit_TreeId_Empty))]
-        public static void ProtoChasmSerializer_Roundtrip_Commit_TreeId_Empty()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_TreeId_Empty))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_TreeId_Empty(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = new Commit(null, default, default, null);
             using (var buf = ser.Serialize(expected))
             {
@@ -21,11 +20,10 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_Commit_TreeId))]
-        public static void ProtoChasmSerializer_Roundtrip_Commit_TreeId()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_TreeId))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_TreeId(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = new Commit(null, TreeId1, default, null);
             using (var buf = ser.Serialize(expected))
             {

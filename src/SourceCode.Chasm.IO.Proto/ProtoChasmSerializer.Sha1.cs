@@ -35,6 +35,8 @@ namespace SourceCode.Chasm.IO.Proto
 
         public unsafe override Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
         {
+            if (span.IsEmpty) return default;
+
             var wire = new Sha1Wire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace SourceCode.Chasm.IO.Proto.Tests
+namespace SourceCode.Chasm.IO.Tests
 {
     public static class TreeNodeListTests
     {
@@ -10,21 +10,19 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), new BlobId(Sha1.Hash(nameof(Node3))));
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_TreeNodeList_Default))]
-        public static void ProtoChasmSerializer_Roundtrip_TreeNodeList_Default()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Default))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_TreeNodeList_Default(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             TreeNodeList expected = default;
             Assert.Throws<ArgumentNullException>(() => ser.Serialize(expected));
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_TreeNodeList_Empty))]
-        public static void ProtoChasmSerializer_Roundtrip_TreeNodeList_Empty()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Empty))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_TreeNodeList_Empty(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = new TreeNodeList();
             using (var buf = ser.Serialize(expected))
             {
@@ -34,11 +32,10 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_TreeNodeList_Null))]
-        public static void ProtoChasmSerializer_Roundtrip_TreeNodeList_Null()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Null))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_TreeNodeList_Null(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = new TreeNodeList(null);
             using (var buf = ser.Serialize(expected))
             {
@@ -48,11 +45,10 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_TreeNodeList_Empty_Array))]
-        public static void ProtoChasmSerializer_Roundtrip_TreeNodeList_Empty_Array()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Empty_Array))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_TreeNodeList_Empty_Array(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = new TreeNodeList(Array.Empty<TreeNode>());
             using (var buf = ser.Serialize(expected))
             {
@@ -62,11 +58,10 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_TreeNodeList_1_Node))]
-        public static void ProtoChasmSerializer_Roundtrip_TreeNodeList_1_Node()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_1_Node))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_TreeNodeList_1_Node(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = new TreeNodeList(Node1);
             using (var buf = ser.Serialize(expected))
             {
@@ -76,11 +71,10 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_TreeNodeList_2_Nodes))]
-        public static void ProtoChasmSerializer_Roundtrip_TreeNodeList_2_Nodes()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_2_Nodes))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_TreeNodeList_2_Nodes(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = new TreeNodeList(Node1, Node2);
             using (var buf = ser.Serialize(expected))
             {
@@ -90,11 +84,10 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_TreeNodeList_3_Nodes))]
-        public static void ProtoChasmSerializer_Roundtrip_TreeNodeList_3_Nodes()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_3_Nodes))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_TreeNodeList_3_Nodes(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = new TreeNodeList(Node1, Node2, Node3);
             using (var buf = ser.Serialize(expected))
             {

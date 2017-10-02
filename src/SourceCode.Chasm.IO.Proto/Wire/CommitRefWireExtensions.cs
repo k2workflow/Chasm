@@ -16,7 +16,7 @@
 
         public static CommitRef Convert(this CommitRefWire wire)
         {
-            if (wire == null) return CommitRef.Empty;
+            if (wire == null) return default;
 
             var sha1 = wire.CommitId.Convert();
             var commitId = new CommitId(sha1);

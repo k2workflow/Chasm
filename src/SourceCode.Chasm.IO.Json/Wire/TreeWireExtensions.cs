@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static TreeNodeList ConvertTree(this JsonArray wire)
         {
-            if (wire == null) return null;
+            if (wire == null) return default;
             if (wire.Count == 0) return new TreeNodeList();
 
             var nodes = new TreeNode[wire.Count];

@@ -1,15 +1,14 @@
 ﻿using Xunit;
 
-namespace SourceCode.Chasm.IO.Proto.Tests
+namespace SourceCode.Chasm.IO.Tests
 {
     public static class Sha1Tests
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_Sha1_Empty))]
-        public static void ProtoChasmSerializer_Roundtrip_Sha1_Empty()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Sha1_Empty))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Sha1_Empty(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = Sha1.Empty;
             using (var buf = ser.Serialize(expected))
             {
@@ -19,11 +18,10 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_Sha1))]
-        public static void ProtoChasmSerializer_Roundtrip_Sha1()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Sha1))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Sha1(IChasmSerializer ser)
         {
-            var ser = new ProtoChasmSerializer();
-
             var expected = Sha1.Hash("a");
             using (var buf = ser.Serialize(expected))
             {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace SourceCode.Chasm.IO.Json.Tests
+namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitTests // .Parents
     {
@@ -10,11 +10,10 @@ namespace SourceCode.Chasm.IO.Json.Tests
         private static readonly CommitId Parent3 = new CommitId(Sha1.Hash(nameof(Parent3)));
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_Null))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_Null()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Parents_Null))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_Parents_Null(IChasmSerializer ser)
         {
-            var ser = new JsonChasmSerializer();
-
             // Force Commit to be non-default
             var expected = new Commit(null, default, default, "force");
             using (var buf = ser.Serialize(expected))
@@ -25,11 +24,10 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_Empty))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_Empty()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Parents_Empty))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_Parents_Empty(IChasmSerializer ser)
         {
-            var ser = new JsonChasmSerializer();
-
             var expected = new Commit(Array.Empty<CommitId>(), default, default, null);
             using (var buf = ser.Serialize(expected))
             {
@@ -39,11 +37,10 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_1_Empty))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_1_Empty()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Parents_1_Empty))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_Parents_1_Empty(IChasmSerializer ser)
         {
-            var ser = new JsonChasmSerializer();
-
             var expected = new Commit(CommitId.Empty, default, default, null);
             using (var buf = ser.Serialize(expected))
             {
@@ -53,11 +50,10 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_1))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_1()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Parents_1))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_Parents_1(IChasmSerializer ser)
         {
-            var ser = new JsonChasmSerializer();
-
             var expected = new Commit(Parent1, default, default, null);
             using (var buf = ser.Serialize(expected))
             {
@@ -67,11 +63,10 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_2))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_2()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Parents_2))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_Parents_2(IChasmSerializer ser)
         {
-            var ser = new JsonChasmSerializer();
-
             var parents = new[] { Parent1, Parent2 };
 
             var expected = new Commit(parents, default, default, null);
@@ -83,11 +78,10 @@ namespace SourceCode.Chasm.IO.Json.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(JsonChasmSerializer_Roundtrip_Commit_Parents_3))]
-        public static void JsonChasmSerializer_Roundtrip_Commit_Parents_3()
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Parents_3))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_Parents_3(IChasmSerializer ser)
         {
-            var ser = new JsonChasmSerializer();
-
             var parents = new[] { Parent1, Parent2, Parent3 };
 
             var expected = new Commit(parents, default, default, null);

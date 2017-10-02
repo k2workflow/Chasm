@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static JsonObject Convert(this Commit model)
         {
-            if (model == Commit.Empty) return default;
+            if (model == Commit.Empty) return default; // null
 
             // Parents
             JsonArray parents = null;
@@ -49,10 +49,13 @@ namespace SourceCode.Chasm.IO.Json.Wire
             // Message
             var msg = model.CommitMessage == null ? null : new JsonPrimitive(model.CommitMessage);
 
+            // TreeId
+            var treeId = model.TreeId.Sha1.ToString("N");
+
             var wire = new JsonObject
             {
                 [_parents] = parents,
-                [_treeId] = model.TreeId.Sha1.ToString("N"),
+                [_treeId] = treeId,
                 [_utc] = utc,
                 [_message] = msg
             };
@@ -70,26 +73,19 @@ namespace SourceCode.Chasm.IO.Json.Wire
             var treeId = new TreeId(sha1);
 
             // Parents
-            CommitId[] parents = null;
+            var parents = Array.Empty<CommitId>();
             var ja = wire.GetArray(_parents);
-            if (ja != null)
+            if (ja != null && ja.Count > 0)
             {
-                if (ja.Count == 0)
+                parents = new CommitId[ja.Count];
+                for (var i = 0; i < parents.Length; i++)
                 {
-                    parents = Array.Empty<CommitId>();
-                }
-                else
-                {
-                    parents = new CommitId[ja.Count];
-                    for (var i = 0; i < parents.Length; i++)
-                    {
-                        sha1 = Sha1.Parse(ja[i]);
-                        parents[i] = new CommitId(sha1);
-                    }
+                    sha1 = Sha1.Parse(ja[i]);
+                    parents[i] = new CommitId(sha1);
                 }
             }
 
-            // Utc
+            // CommitUtc
             jv = wire.GetValue(_utc, JsonType.String, false);
             var utc = XmlConvert.ToDateTime(jv, XmlDateTimeSerializationMode.Utc);
 

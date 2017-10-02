@@ -4,7 +4,7 @@
     {
         public static TreeNode Convert(this TreeWireNode wire)
         {
-            if (wire == null) return TreeNode.Empty;
+            if (wire == null) return default;
 
             var sha1 = wire.NodeId.Convert();
 
@@ -15,7 +15,7 @@
 
         public static TreeWireNode Convert(this TreeNode model)
         {
-            if (model == TreeNode.Empty) return null;
+            if (model == TreeNode.Empty) return default;
 
             var wire = new TreeWireNode
             {

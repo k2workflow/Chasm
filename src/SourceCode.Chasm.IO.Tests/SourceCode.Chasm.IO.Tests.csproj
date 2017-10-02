@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm.IO.Json\SourceCode.Chasm.IO.Json.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj" />
   </ItemGroup>
 
   <ItemGroup>
