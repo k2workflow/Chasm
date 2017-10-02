@@ -34,11 +34,6 @@ namespace SourceCode.Chasm
         public static Sha1 Empty { get; }
 
         /// <summary>
-        /// The default comparer (<see cref="IComparer{T}"/> and <see cref="IEqualityComparer{T}"/>) for <see cref="Sha1"/>.
-        /// </summary>
-        public static Comparer DefaultComparer { get; } = new Comparer();
-
-        /// <summary>
         /// The fixed byte length of a <see cref="Sha1"/> value.
         /// </summary>
         public const byte ByteLen = 20;
@@ -581,68 +576,35 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(Sha1 other) => DefaultComparer.Equals(this, other);
+        public bool Equals(Sha1 other) => Sha1Comparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is Sha1 sha1
-            && DefaultComparer.Equals(this, sha1);
+            && Sha1Comparer.Default.Equals(this, sha1);
 
-        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
+        public override int GetHashCode() => Sha1Comparer.Default.GetHashCode(this);
 
         #endregion
 
         #region IComparable
 
-        public int CompareTo(Sha1 other) => DefaultComparer.Compare(this, other);
-
-        #endregion
-
-        #region Comparer
-
-        public sealed class Comparer : IEqualityComparer<Sha1>, IComparer<Sha1>
-        {
-            internal Comparer()
-            { }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public int Compare(Sha1 x, Sha1 y)
-            {
-                var cmp = x.Blit0.CompareTo(y.Blit0);
-                if (cmp != 0) return cmp;
-
-                cmp = x.Blit1.CompareTo(y.Blit1);
-                if (cmp != 0) return cmp;
-
-                cmp = x.Blit2.CompareTo(y.Blit2);
-                return cmp;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Equals(Sha1 x, Sha1 y)
-                => x.Blit0 == y.Blit0
-                && x.Blit1 == y.Blit1
-                && x.Blit2 == y.Blit2;
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public int GetHashCode(Sha1 obj)
-                => (int)obj.Blit0;
-        }
+        public int CompareTo(Sha1 other) => Sha1Comparer.Default.Compare(this, other);
 
         #endregion
 
         #region Operators
 
-        public static bool operator ==(Sha1 x, Sha1 y) => DefaultComparer.Equals(x, y);
+        public static bool operator ==(Sha1 x, Sha1 y) => Sha1Comparer.Default.Equals(x, y);
 
-        public static bool operator !=(Sha1 x, Sha1 y) => !DefaultComparer.Equals(x, y); // not
+        public static bool operator !=(Sha1 x, Sha1 y) => !Sha1Comparer.Default.Equals(x, y); // not
 
-        public static bool operator >=(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) >= 0;
+        public static bool operator >=(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) >= 0;
 
-        public static bool operator >(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) > 0;
+        public static bool operator >(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) > 0;
 
-        public static bool operator <=(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) <= 0;
+        public static bool operator <=(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) <= 0;
 
-        public static bool operator <(Sha1 x, Sha1 y) => DefaultComparer.Compare(x, y) < 0;
+        public static bool operator <(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) < 0;
 
         #endregion
     }

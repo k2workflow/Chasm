@@ -1,4 +1,3 @@
-using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,13 +10,13 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
-        public static Comparer DefaultComparer { get; } = new Comparer();
+        //
 
         #endregion
 
         #region Fields
 
-        private readonly TreeNode[] _nodes;
+        internal readonly TreeNode[] _nodes;
 
         #endregion
 
@@ -84,7 +83,7 @@ namespace SourceCode.Chasm
                             throw CreateDuplicateException(nodes[0]);
 
                         // Else sort & assign
-                        var cmp = TreeNode.DefaultComparison(nodes[0], nodes[1]);
+                        var cmp = TreeNodeComparer.Default.Compare(nodes[0], nodes[1]);
                         if (cmp < 0)
                             _nodes = new TreeNode[2] { nodes[0], nodes[1] };
                         else
@@ -111,7 +110,7 @@ namespace SourceCode.Chasm
                             if (sorted && i > 0)
                             {
                                 // Streaming assertion
-                                var cmp = TreeNode.DefaultComparer.Compare(array[i - 1], array[i]);
+                                var cmp = TreeNodeComparer.Default.Compare(array[i - 1], array[i]);
                                 if (cmp > 0)
                                     sorted = false;
                             }
@@ -120,7 +119,8 @@ namespace SourceCode.Chasm
                         // Sort iff necessary
                         if (!sorted)
                         {
-                            Array.Sort(array, TreeNode.DefaultComparer);
+                            // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
+                            Array.Sort(array, TreeNodeComparer.Default.Compare);
                         }
 
                         // Assign (sorted by Name)
@@ -169,7 +169,7 @@ namespace SourceCode.Chasm
                             throw CreateDuplicateException(node0);
 
                         // Else sort & assign
-                        var cmp = TreeNode.DefaultComparison(node0, node1);
+                        var cmp = TreeNodeComparer.Default.Compare(node0, node1);
                         if (cmp < 0)
                             _nodes = new TreeNode[2] { node0, node1 };
                         else
@@ -197,7 +197,7 @@ namespace SourceCode.Chasm
                             if (sorted && i > 0)
                             {
                                 // Streaming assertion
-                                var cmp = TreeNode.DefaultComparer.Compare(array[i - 1], array[i]);
+                                var cmp = TreeNodeComparer.Default.Compare(array[i - 1], array[i]);
                                 if (cmp > 0)
                                     sorted = false;
                             }
@@ -208,7 +208,8 @@ namespace SourceCode.Chasm
                         // Sort iff necessary
                         if (!sorted)
                         {
-                            Array.Sort(array, TreeNode.DefaultComparer);
+                            // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
+                            Array.Sort(array, TreeNodeComparer.Default.Compare);
                         }
 
                         // Assign (sorted by Name)
@@ -442,52 +443,21 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(TreeNodeList other) => DefaultComparer.Equals(this, other);
+        public bool Equals(TreeNodeList other) => TreeNodeListComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is TreeNodeList tnl
-            && DefaultComparer.Equals(this, tnl);
+            && TreeNodeListComparer.Default.Equals(this, tnl);
 
-        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
-
-        #endregion
-
-        #region Comparer
-
-        public sealed class Comparer : IEqualityComparer<TreeNodeList>
-        {
-            internal Comparer()
-            { }
-
-            public bool Equals(TreeNodeList x, TreeNodeList y)
-            {
-                if (ReferenceEquals(x, y)) return true; // (x, x) or (null, null)
-                if (ReferenceEquals(x, null) || ReferenceEquals(y, null)) return false; // (x, null) or (null, y)
-                if (!x._nodes.NullableEquals(y._nodes, true)) return false;
-
-                return true;
-            }
-
-            public int GetHashCode(TreeNodeList obj)
-            {
-                var h = 11;
-
-                unchecked
-                {
-                    h = h * 7 + (obj._nodes?.Length ?? 42);
-                }
-
-                return h;
-            }
-        }
+        public override int GetHashCode() => TreeNodeListComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public static bool operator ==(TreeNodeList x, TreeNodeList y) => DefaultComparer.Equals(x, y);
+        public static bool operator ==(TreeNodeList x, TreeNodeList y) => TreeNodeListComparer.Default.Equals(x, y);
 
-        public static bool operator !=(TreeNodeList x, TreeNodeList y) => !DefaultComparer.Equals(x, y); // not
+        public static bool operator !=(TreeNodeList x, TreeNodeList y) => !TreeNodeListComparer.Default.Equals(x, y); // not
 
         public override string ToString() => $"{nameof(TreeNodeList)}: {_nodes?.Length ?? 0}";
 

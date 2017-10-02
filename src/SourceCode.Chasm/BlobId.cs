@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -8,8 +7,6 @@ namespace SourceCode.Chasm
         #region Constants
 
         public static BlobId Empty { get; }
-
-        public static Comparer DefaultComparer { get; } = new Comparer();
 
         #endregion
 
@@ -35,37 +32,21 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(BlobId other) => DefaultComparer.Equals(this, other);
+        public bool Equals(BlobId other) => BlobIdComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is BlobId blobId
-            && DefaultComparer.Equals(this, blobId);
+            && BlobIdComparer.Default.Equals(this, blobId);
 
-        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
-
-        #endregion
-
-        #region Comparer
-
-        public sealed class Comparer : IEqualityComparer<BlobId>, IComparer<BlobId>
-        {
-            internal Comparer()
-            { }
-
-            public int Compare(BlobId x, BlobId y) => Sha1.DefaultComparer.Compare(x.Sha1, y.Sha1);
-
-            public bool Equals(BlobId x, BlobId y) => Sha1.DefaultComparer.Equals(x.Sha1, y.Sha1);
-
-            public int GetHashCode(BlobId obj) => Sha1.DefaultComparer.GetHashCode(obj.Sha1);
-        }
+        public override int GetHashCode() => BlobIdComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public static bool operator ==(BlobId x, BlobId y) => DefaultComparer.Equals(x, y);
+        public static bool operator ==(BlobId x, BlobId y) => BlobIdComparer.Default.Equals(x, y);
 
-        public static bool operator !=(BlobId x, BlobId y) => !DefaultComparer.Equals(x, y); // not
+        public static bool operator !=(BlobId x, BlobId y) => !BlobIdComparer.Default.Equals(x, y); // not
 
         public override string ToString() => $"{nameof(BlobId)}: {Sha1}";
 

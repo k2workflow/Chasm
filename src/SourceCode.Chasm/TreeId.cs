@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -8,8 +7,6 @@ namespace SourceCode.Chasm
         #region Constants
 
         public static TreeId Empty { get; }
-
-        public static Comparer DefaultComparer { get; } = new Comparer();
 
         #endregion
 
@@ -35,37 +32,21 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(TreeId other) => DefaultComparer.Equals(this, other);
+        public bool Equals(TreeId other) => TreeIdComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is TreeId blobId
-            && DefaultComparer.Equals(this, blobId);
+            && TreeIdComparer.Default.Equals(this, blobId);
 
-        public override int GetHashCode() => DefaultComparer.GetHashCode(this);
-
-        #endregion
-
-        #region Comparer
-
-        public sealed class Comparer : IEqualityComparer<TreeId>, IComparer<TreeId>
-        {
-            internal Comparer()
-            { }
-
-            public int Compare(TreeId x, TreeId y) => Sha1.DefaultComparer.Compare(x.Sha1, y.Sha1);
-
-            public bool Equals(TreeId x, TreeId y) => Sha1.DefaultComparer.Equals(x.Sha1, y.Sha1);
-
-            public int GetHashCode(TreeId obj) => Sha1.DefaultComparer.GetHashCode(obj.Sha1);
-        }
+        public override int GetHashCode() => TreeIdComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public static bool operator ==(TreeId x, TreeId y) => DefaultComparer.Equals(x, y);
+        public static bool operator ==(TreeId x, TreeId y) => TreeIdComparer.Default.Equals(x, y);
 
-        public static bool operator !=(TreeId x, TreeId y) => !DefaultComparer.Equals(x, y); // not
+        public static bool operator !=(TreeId x, TreeId y) => !TreeIdComparer.Default.Equals(x, y); // not
 
         public override string ToString() => $"{nameof(TreeId)}: {Sha1}";
 
