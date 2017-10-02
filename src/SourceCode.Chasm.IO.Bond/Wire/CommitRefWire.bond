@@ -1,8 +1,0 @@
-﻿import "Sha1Wire.bond"
-
-namespace SourceCode.Chasm.IO.Bond.Wire
-
-	struct CommitRefWire
-	{
-		1: Sha1Wire CommitId;
-	}

@@ -11,10 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Json", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Json.Tests", "src\SourceCode.Chasm.IO.Json.Tests\SourceCode.Chasm.IO.Json.Tests.csproj", "{15175969-02BF-4156-B4E4-EADC6E0074A7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Bond", "src\SourceCode.Chasm.IO.Bond\SourceCode.Chasm.IO.Bond.csproj", "{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Bond.Tests", "src\SourceCode.Chasm.IO.Bond.Tests\SourceCode.Chasm.IO.Bond.Tests.csproj", "{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Proto", "src\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj", "{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Proto.Tests", "src\SourceCode.Chasm.IO.Proto.Tests\SourceCode.Chasm.IO.Proto.Tests.csproj", "{25C55825-AD35-499D-81C8-761FAA78D5B7}"
@@ -43,14 +39,6 @@ Global
 		{15175969-02BF-4156-B4E4-EADC6E0074A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15175969-02BF-4156-B4E4-EADC6E0074A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15175969-02BF-4156-B4E4-EADC6E0074A7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E4C8C4C-4E86-472F-AA6D-AA55B727A19E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -66,7 +54,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E5C63B7F-51ED-4B85-AE71-375D8F1B0A3D} = {2E823422-9C14-40E9-A4E4-FD62EBA208A6}
 		{15175969-02BF-4156-B4E4-EADC6E0074A7} = {2E823422-9C14-40E9-A4E4-FD62EBA208A6}
-		{D2AB0792-DA9C-4611-AF3B-2D025FE222D6} = {2E823422-9C14-40E9-A4E4-FD62EBA208A6}
 		{25C55825-AD35-499D-81C8-761FAA78D5B7} = {2E823422-9C14-40E9-A4E4-FD62EBA208A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
