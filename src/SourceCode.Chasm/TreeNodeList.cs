@@ -27,7 +27,9 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (_nodes == null) throw new ArgumentOutOfRangeException(nameof(index));
+                if (_nodes == null)
+                    return Array.Empty<TreeNode>()[index]; // Leverage underlying exception
+
                 return _nodes[index];
             }
         }
@@ -36,7 +38,9 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (!TryGetValue(key, out var node)) throw new KeyNotFoundException(nameof(key));
+                if (!TryGetValue(key, out var node))
+                    throw new KeyNotFoundException(nameof(key));
+
                 return node;
             }
         }
@@ -49,11 +53,13 @@ namespace SourceCode.Chasm
 
         public TreeNodeList()
         {
+            // Coerce null to empty
             _nodes = Array.Empty<TreeNode>();
         }
 
         public TreeNodeList(params TreeNode[] nodes)
         {
+            // Coerce null to empty
             if (nodes == null)
             {
                 _nodes = Array.Empty<TreeNode>();

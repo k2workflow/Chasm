@@ -20,18 +20,19 @@ namespace SourceCode.Chasm
         #region Fields
 
         private readonly IReadOnlyList<CommitId> _parents;
+        private readonly string _message;
 
         #endregion
 
         #region Properties
 
-        public IReadOnlyList<CommitId> Parents => _parents ?? Array.Empty<CommitId>(); // Default ctor will set to null
+        public IReadOnlyList<CommitId> Parents => _parents ?? Array.Empty<CommitId>(); // May be null due to default ctor
 
         public TreeId TreeId { get; }
 
         public DateTime CommitUtc { get; }
 
-        public string CommitMessage { get; }
+        public string CommitMessage => _message ?? string.Empty; // May be null due to default ctor
 
         #endregion
 
@@ -43,7 +44,7 @@ namespace SourceCode.Chasm
 
             TreeId = treeId;
             CommitUtc = commitUtc;
-            CommitMessage = commitMessage;
+            _message = commitMessage ?? string.Empty;
 
             // Coerce null to empty
             if (parents == null)

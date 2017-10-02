@@ -11,6 +11,8 @@ namespace SourceCode.Chasm.IO.Proto
 
         public override BufferSession Serialize(TreeNodeList model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             var wire = model.Convert();
             if (wire == null)
                 return new BufferSession(Array.Empty<byte>(), new ArraySegment<byte>(Array.Empty<byte>(), 0, 0));

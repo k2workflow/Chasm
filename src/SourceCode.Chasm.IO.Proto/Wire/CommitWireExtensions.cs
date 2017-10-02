@@ -11,7 +11,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static CommitWire Convert(this Commit model)
         {
-            if (model == Commit.Empty) return null;
+            if (model == Commit.Empty)
+                return new CommitWire() { CommitMessage = string.Empty };
 
             // TreeId
             var treeId = model.TreeId.Sha1.Convert();

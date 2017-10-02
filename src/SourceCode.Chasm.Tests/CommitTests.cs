@@ -34,9 +34,9 @@ namespace SourceCode.Chasm.Tests
             Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(null, TreeId.Empty, DateTime.Now, null)); // Non-Utc
 
             // Message
-            Assert.Null(Commit.Empty.CommitMessage);
-            Assert.Null(noData.CommitMessage);
-            Assert.Null(nullData.CommitMessage);
+            Assert.Equal(string.Empty, Commit.Empty.CommitMessage);
+            Assert.Equal(string.Empty, noData.CommitMessage);
+            Assert.Equal(string.Empty, nullData.CommitMessage);
         }
 
         [Trait("Type", "Unit")]

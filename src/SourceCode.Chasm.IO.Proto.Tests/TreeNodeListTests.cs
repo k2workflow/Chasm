@@ -16,11 +16,7 @@ namespace SourceCode.Chasm.IO.Proto.Tests
             var ser = new ProtoChasmSerializer();
 
             TreeNodeList expected = default;
-            using (var buf = ser.Serialize(expected))
-            {
-                var actual = ser.DeserializeTree(buf.Result);
-                Assert.Equal(expected, actual);
-            }
+            Assert.Throws<ArgumentNullException>(() => ser.Serialize(expected));
         }
 
         [Trait("Type", "Unit")]
