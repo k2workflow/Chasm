@@ -12,8 +12,10 @@ namespace SourceCode.Chasm.IO.Proto
         public override BufferSession Serialize(Commit model)
         {
             var wire = model.Convert();
+            if (wire == null)
+                return new BufferSession(Array.Empty<byte>(), new ArraySegment<byte>(Array.Empty<byte>(), 0, 0));
 
-            var size = wire.CalculateSize();
+            var size = wire?.CalculateSize() ?? 0;
             var buffer = BufferSession.RentBuffer(size);
 
             using (var cos = new CodedOutputStream(buffer))

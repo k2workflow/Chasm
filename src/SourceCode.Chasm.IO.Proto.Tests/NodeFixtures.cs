@@ -4,7 +4,7 @@ namespace SourceCode.Chasm.IO.Proto.Tests
 {
     public static class NodeFixtures
     {
-        private static readonly IChasmSerializer _serializer = new ProtoChasmSerializer();
+        private static readonly ChasmSerializer _serializer = new ProtoChasmSerializer();
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(ProtoChasmSerializer_WriteRead_NullTreeNodeList))]
@@ -38,12 +38,7 @@ namespace SourceCode.Chasm.IO.Proto.Tests
         [Fact(DisplayName = nameof(ProtoChasmSerializer_WriteRead_TreeNodeList))]
         public static void ProtoChasmSerializer_WriteRead_TreeNodeList()
         {
-            var nodes = new[]
-            {
-                new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"))
-            };
-
-            var expected = new TreeNodeList(nodes);
+            var expected = new TreeNodeList(new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc")));
 
             using (var seg = _serializer.Serialize(expected))
             {

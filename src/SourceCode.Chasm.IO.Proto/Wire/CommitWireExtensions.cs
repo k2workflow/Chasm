@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf.WellKnownTypes;
+using System;
 using System.Collections.Generic;
 
 namespace SourceCode.Chasm.IO.Proto.Wire
@@ -70,9 +71,13 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
             // CommitUtc
             // Convert Google.Protobuf.WellKnownTypes.Timestamp to System.DateTime
-            var ticks = (wire.CommitUtc.Seconds + epochOffset) * System.TimeSpan.TicksPerSecond;
-            ticks += wire.CommitUtc.Nanos / 100; // Windows tick is 100 nanoseconds
-            var utc = new System.DateTime(ticks, System.DateTimeKind.Utc);
+            var utc = default(DateTime);
+            if (wire.CommitUtc != null)
+            {
+                var ticks = (wire.CommitUtc.Seconds + epochOffset) * System.TimeSpan.TicksPerSecond;
+                ticks += wire.CommitUtc.Nanos / 100; // Windows tick is 100 nanoseconds
+                utc = new System.DateTime(ticks, System.DateTimeKind.Utc);
+            }
 
             var model = new Commit(parents, treeId, utc, wire.CommitMessage);
             return model;

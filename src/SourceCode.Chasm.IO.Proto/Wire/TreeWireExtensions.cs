@@ -14,6 +14,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static TreeWire Convert(this TreeNodeList model)
         {
+            if (model == null) return null;
             if (model.Count == 0) return new TreeWire();
 
             var wire = new TreeWire();

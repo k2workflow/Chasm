@@ -1,20 +1,17 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 
 namespace SourceCode.Chasm.IO.Proto.Tests
 {
-    public static class CommitTests
+    public static partial class CommitTests
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ProtoChasmSerializer_WriteRead_Commit))]
-        public static void ProtoChasmSerializer_WriteRead_Commit()
+        [Fact(DisplayName = nameof(ProtoChasmSerializer_Roundtrip_Commit_Default))]
+        public static void ProtoChasmSerializer_Roundtrip_Commit_Default()
         {
             var ser = new ProtoChasmSerializer();
 
-            var parent = new CommitId(Sha1.Hash("abc"));
-            var treeId = new TreeId(Sha1.Hash("def"));
-            var expected = new Commit(parent, treeId, DateTime.UtcNow, "Updating Northwind.");
-
+            // All default
+            var expected = new Commit(null, default, default, null);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);

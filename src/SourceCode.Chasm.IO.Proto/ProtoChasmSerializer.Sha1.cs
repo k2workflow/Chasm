@@ -12,6 +12,8 @@ namespace SourceCode.Chasm.IO.Proto
         public override BufferSession Serialize(Sha1 model)
         {
             var wire = model.Convert();
+            if (wire == null)
+                return new BufferSession(Array.Empty<byte>(), new ArraySegment<byte>(Array.Empty<byte>(), 0, 0));
 
             var size = wire.CalculateSize();
             var buffer = BufferSession.RentBuffer(size);
