@@ -11,6 +11,8 @@ namespace SourceCode.Chasm.IO.Json
 
         public override BufferSession Serialize(TreeNodeList model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             var wire = model.Convert();
             var json = wire?.ToString() ?? "null";
 

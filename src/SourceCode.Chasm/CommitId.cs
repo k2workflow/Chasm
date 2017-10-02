@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -8,8 +7,6 @@ namespace SourceCode.Chasm
         #region Constants
 
         public static CommitId Empty { get; }
-
-        public static IEqualityComparer<CommitId> DefaultComparer { get; } = new EqualityComparerImpl();
 
         #endregion
 
@@ -35,36 +32,23 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(CommitId other)
-            => DefaultComparer.Equals(this, other);
+        public bool Equals(CommitId other) => CommitIdComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is CommitId commitId
-            && DefaultComparer.Equals(this, commitId);
+            => obj is CommitId blobId
+            && CommitIdComparer.Default.Equals(this, blobId);
 
-        public override int GetHashCode()
-            => DefaultComparer.GetHashCode(this);
-
-        public static bool operator ==(CommitId x, CommitId y) => x.Equals(y);
-
-        public static bool operator !=(CommitId x, CommitId y) => !x.Equals(y);
+        public override int GetHashCode() => CommitIdComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString() => $"{Sha1}";
+        public static bool operator ==(CommitId x, CommitId y) => CommitIdComparer.Default.Equals(x, y);
 
-        #endregion
+        public static bool operator !=(CommitId x, CommitId y) => !CommitIdComparer.Default.Equals(x, y); // not
 
-        #region Nested
-
-        private sealed class EqualityComparerImpl : IEqualityComparer<CommitId>
-        {
-            public bool Equals(CommitId x, CommitId y) => x.Sha1 == y.Sha1;
-
-            public int GetHashCode(CommitId obj) => obj.Sha1.GetHashCode();
-        }
+        public override string ToString() => $"{nameof(CommitId)}: {Sha1}";
 
         #endregion
     }

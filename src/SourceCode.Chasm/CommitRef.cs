@@ -34,26 +34,23 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(CommitRef other)
-            => CommitId == other.CommitId;
+        public bool Equals(CommitRef other) => CommitRefComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is CommitRef commitRef
-            && Equals(commitRef);
+            && CommitRefComparer.Default.Equals(this, commitRef);
 
-        public override int GetHashCode()
-            => CommitId.GetHashCode();
-
-        public static bool operator ==(CommitRef x, CommitRef y) => x.Equals(y);
-
-        public static bool operator !=(CommitRef x, CommitRef y) => !x.Equals(y);
+        public override int GetHashCode() => CommitRefComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString()
-            => $"{nameof(CommitRef)}: {CommitId}";
+        public static bool operator ==(CommitRef x, CommitRef y) => CommitRefComparer.Default.Equals(x, y);
+
+        public static bool operator !=(CommitRef x, CommitRef y) => !CommitRefComparer.Default.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(CommitRef)}: {CommitId}";
 
         #endregion
     }

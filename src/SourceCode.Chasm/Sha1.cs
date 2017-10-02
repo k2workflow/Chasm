@@ -576,55 +576,35 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(Sha1 other)
-            => Blit0 == other.Blit0
-            && Blit1 == other.Blit1
-            && Blit2 == other.Blit2;
+        public bool Equals(Sha1 other) => Sha1Comparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is Sha1 sha1
-            && Equals(sha1);
+            && Sha1Comparer.Default.Equals(this, sha1);
 
-        public override int GetHashCode()
-            => (int)Blit0;
-
-        public static bool operator ==(Sha1 x, Sha1 y) => x.Equals(y);
-
-        public static bool operator !=(Sha1 x, Sha1 y) => !x.Equals(y);
+        public override int GetHashCode() => Sha1Comparer.Default.GetHashCode(this);
 
         #endregion
 
         #region IComparable
 
-        public int CompareTo(Sha1 other)
-        {
-            var cmp = Blit0.CompareTo(other.Blit0);
-            if (cmp != 0) return cmp;
-
-            cmp = Blit1.CompareTo(other.Blit1);
-            if (cmp != 0) return cmp;
-
-            cmp = Blit2.CompareTo(other.Blit2);
-            return cmp;
-        }
-
-        public static bool operator >=(Sha1 x, Sha1 y) => x.CompareTo(y) >= 0;
-
-        public static bool operator >(Sha1 x, Sha1 y) => x.CompareTo(y) > 0;
-
-        public static bool operator <=(Sha1 x, Sha1 y) => x.CompareTo(y) <= 0;
-
-        public static bool operator <(Sha1 x, Sha1 y) => x.CompareTo(y) < 0;
+        public int CompareTo(Sha1 other) => Sha1Comparer.Default.Compare(this, other);
 
         #endregion
 
-        #region Comparison
+        #region Operators
 
-        /// <summary>
-        /// Returns a <see cref="Comparison{T}"/> delegate for use in methods such as <see cref="Array.Sort{T}(T[], Comparison{T})"/>.
-        /// </summary>
-        public static int Comparison(Sha1 x, Sha1 y)
-            => x.CompareTo(y);
+        public static bool operator ==(Sha1 x, Sha1 y) => Sha1Comparer.Default.Equals(x, y);
+
+        public static bool operator !=(Sha1 x, Sha1 y) => !Sha1Comparer.Default.Equals(x, y); // not
+
+        public static bool operator >=(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) >= 0;
+
+        public static bool operator >(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) > 0;
+
+        public static bool operator <=(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) <= 0;
+
+        public static bool operator <(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) < 0;
 
         #endregion
     }

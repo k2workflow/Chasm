@@ -32,26 +32,23 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(BlobId other)
-            => Sha1 == other.Sha1;
+        public bool Equals(BlobId other) => BlobIdComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is BlobId blobId
-            && Equals(blobId);
+            && BlobIdComparer.Default.Equals(this, blobId);
 
-        public override int GetHashCode()
-            => Sha1.GetHashCode();
-
-        public static bool operator ==(BlobId x, BlobId y) => x.Equals(y);
-
-        public static bool operator !=(BlobId x, BlobId y) => !x.Equals(y);
+        public override int GetHashCode() => BlobIdComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString()
-            => $"{nameof(BlobId)}: {Sha1}";
+        public static bool operator ==(BlobId x, BlobId y) => BlobIdComparer.Default.Equals(x, y);
+
+        public static bool operator !=(BlobId x, BlobId y) => !BlobIdComparer.Default.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(BlobId)}: {Sha1}";
 
         #endregion
     }

@@ -1,5 +1,5 @@
 ﻿using Google.Protobuf.WellKnownTypes;
-using System.Collections.Generic;
+using System;
 
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
@@ -10,69 +10,85 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static CommitWire Convert(this Commit model)
         {
-            if (model == Commit.Empty) return null;
+            if (model == Commit.Empty)
+                return new CommitWire() { CommitMessage = string.Empty };
 
-            // TreeId
-            var treeId = model.TreeId.Sha1.Convert();
-
-            // CommitUtc
-            // Convert System.DateTime to Google.Protobuf.WellKnownTypes.Timestamp
-            var ts = new Timestamp
-            {
-                Seconds = (model.CommitUtc.Ticks / System.TimeSpan.TicksPerSecond) - epochOffset,
-                Nanos = (int)(model.CommitUtc.Ticks % System.TimeSpan.TicksPerSecond) * 100 // Windows tick is 100 nanoseconds
-            };
-
-            var wire = new CommitWire
-            {
-                TreeId = treeId,
-                CommitUtc = ts,
-                CommitMessage = model.CommitMessage
-            };
+            var wire = new CommitWire();
 
             // Parents
             if (model.Parents != null)
             {
-                foreach (var parent in model.Parents)
+                switch (model.Parents.Count)
                 {
-                    var sha1 = new Sha1Wire
-                    {
-                        Blit0 = parent.Sha1.Blit0,
-                        Blit1 = parent.Sha1.Blit1,
-                        Blit2 = parent.Sha1.Blit2
-                    };
+                    case 0:
+                        break;
 
-                    wire.Parents.Add(sha1);
+                    case 1:
+                        {
+                            var sha1 = model.Parents[0].Sha1.Convert();
+                            wire.Parents.Add(sha1);
+                        }
+                        break;
+
+                    default:
+                        {
+                            foreach (var parent in model.Parents)
+                            {
+                                var sha1 = parent.Sha1.Convert();
+                                wire.Parents.Add(sha1);
+                            }
+                        }
+                        break;
                 }
             }
+
+            // CommitUtc
+            wire.CommitUtc = new Timestamp
+            {
+                // Convert System.DateTime to Google.Protobuf.WellKnownTypes.Timestamp
+                Seconds = (model.CommitUtc.Ticks / TimeSpan.TicksPerSecond) - epochOffset,
+                Nanos = (int)(model.CommitUtc.Ticks % TimeSpan.TicksPerSecond) * 100 // Windows tick is 100 nanoseconds
+            };
+
+            // Message
+            wire.CommitMessage = model.CommitMessage;
+
+            // TreeId
+            wire.TreeId = model.TreeId.Sha1.Convert();
 
             return wire;
         }
 
         public static Commit Convert(this CommitWire wire)
         {
-            if (wire == null) return Commit.Empty;
+            if (wire == null) return default;
 
             // TreeId
             var sha1 = wire.TreeId.Convert();
             var treeId = new TreeId(sha1);
 
             // Parents
-            var parents = new List<CommitId>(wire.Parents?.Count ?? 0);
-            if (wire.Parents != null)
+            var parents = Array.Empty<CommitId>();
+            if (wire.Parents != null && wire.Parents.Count > 0)
             {
+                var i = 0;
+                parents = new CommitId[wire.Parents.Count];
                 foreach (var parent in wire.Parents)
                 {
                     sha1 = parent.Convert();
-                    parents.Add(new CommitId(sha1));
+                    parents[i++] = new CommitId(sha1);
                 }
             }
 
             // CommitUtc
-            // Convert Google.Protobuf.WellKnownTypes.Timestamp to System.DateTime
-            var ticks = (wire.CommitUtc.Seconds + epochOffset) * System.TimeSpan.TicksPerSecond;
-            ticks += wire.CommitUtc.Nanos / 100; // Windows tick is 100 nanoseconds
-            var utc = new System.DateTime(ticks, System.DateTimeKind.Utc);
+            var utc = default(DateTime);
+            if (wire.CommitUtc != null)
+            {
+                // Convert Google.Protobuf.WellKnownTypes.Timestamp to System.DateTime
+                var ticks = (wire.CommitUtc.Seconds + epochOffset) * TimeSpan.TicksPerSecond;
+                ticks += wire.CommitUtc.Nanos / 100; // Windows tick is 100 nanoseconds
+                utc = new DateTime(ticks, DateTimeKind.Utc);
+            }
 
             var model = new Commit(parents, treeId, utc, wire.CommitMessage);
             return model;

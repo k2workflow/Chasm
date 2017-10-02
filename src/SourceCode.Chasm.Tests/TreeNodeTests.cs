@@ -50,27 +50,34 @@ namespace SourceCode.Chasm.Tests
             // Equal
             var actual = new TreeNode(expected.Name, expected.Kind, expected.Sha1);
             Assert.Equal(expected, actual);
+            Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
             // Name
             actual = new TreeNode("b", expected.Kind, expected.Sha1);
             Assert.NotEqual(expected, actual);
+            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             actual = new TreeNode("ab", expected.Kind, expected.Sha1);
             Assert.NotEqual(expected, actual);
+            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             actual = new TreeNode(expected.Name.ToUpperInvariant(), expected.Kind, expected.Sha1);
             Assert.NotEqual(expected, actual);
+            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             // Kind
             actual = new TreeNode(expected.Name, default, expected.Sha1);
             Assert.NotEqual(expected, actual);
+            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             actual = new TreeNode(expected.Name, NodeKind.Tree, expected.Sha1);
             Assert.NotEqual(expected, actual);
+            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             // Sha1
             actual = new TreeNode(expected.Name, expected.Kind, Sha1.Hash("def"));
             Assert.NotEqual(expected, actual);
+            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
         }
     }
 }

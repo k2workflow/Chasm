@@ -1,4 +1,5 @@
 ﻿using SourceCode.Clay.Json;
+using System;
 using System.Json;
 
 namespace SourceCode.Chasm.IO.Json.Wire
@@ -7,7 +8,8 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         public static JsonValue Convert(this TreeNodeList model)
         {
-            if (model.Count == 0) return default;
+            if (model == null) return default;
+            if (model.Count == 0) return new JsonArray(Array.Empty<JsonValue>());
 
             var items = new JsonValue[model.Count];
             for (var i = 0; i < items.Length; i++)
@@ -19,7 +21,8 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static TreeNodeList ConvertTree(this JsonArray wire)
         {
-            if (wire == null || wire.Count == 0) return default;
+            if (wire == null) return default;
+            if (wire.Count == 0) return new TreeNodeList();
 
             var nodes = new TreeNode[wire.Count];
             for (var i = 0; i < nodes.Length; i++)

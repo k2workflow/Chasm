@@ -32,26 +32,23 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(TreeId other)
-            => Sha1 == other.Sha1;
+        public bool Equals(TreeId other) => TreeIdComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is TreeId treeId
-            && Equals(treeId);
+            => obj is TreeId blobId
+            && TreeIdComparer.Default.Equals(this, blobId);
 
-        public override int GetHashCode()
-            => Sha1.GetHashCode();
-
-        public static bool operator ==(TreeId x, TreeId y) => x.Equals(y);
-
-        public static bool operator !=(TreeId x, TreeId y) => !x.Equals(y);
+        public override int GetHashCode() => TreeIdComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString()
-            => $"{nameof(TreeId)}: {Sha1}";
+        public static bool operator ==(TreeId x, TreeId y) => TreeIdComparer.Default.Equals(x, y);
+
+        public static bool operator !=(TreeId x, TreeId y) => !TreeIdComparer.Default.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(TreeId)}: {Sha1}";
 
         #endregion
     }

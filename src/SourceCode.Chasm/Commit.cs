@@ -1,6 +1,6 @@
-﻿using SourceCode.Clay.Collections.Generic;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SourceCode.Chasm
 {
@@ -14,15 +14,22 @@ namespace SourceCode.Chasm
 
         #endregion
 
+        #region Fields
+
+        private readonly IReadOnlyList<CommitId> _parents;
+        private readonly string _message;
+
+        #endregion
+
         #region Properties
 
-        public IReadOnlyList<CommitId> Parents { get; }
+        public IReadOnlyList<CommitId> Parents => _parents ?? Array.Empty<CommitId>(); // May be null due to default ctor
 
         public TreeId TreeId { get; }
 
         public DateTime CommitUtc { get; }
 
-        public string CommitMessage { get; }
+        public string CommitMessage => _message ?? string.Empty; // May be null due to default ctor
 
         #endregion
 
@@ -32,10 +39,58 @@ namespace SourceCode.Chasm
         {
             if (commitUtc != default && commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException(nameof(commitUtc));
 
-            Parents = parents;
             TreeId = treeId;
             CommitUtc = commitUtc;
-            CommitMessage = commitMessage;
+            _message = commitMessage ?? string.Empty;
+
+            // Coerce null to empty
+            if (parents == null)
+            {
+                _parents = Array.Empty<CommitId>();
+                return;
+            }
+
+            // Optimize for common cases 0, 1, 2, N
+            switch (parents.Count)
+            {
+                case 0:
+                    _parents = Array.Empty<CommitId>();
+                    return;
+
+                case 1:
+                    _parents = new CommitId[1] { parents[0] };
+                    return;
+
+                case 2:
+                    {
+                        // Silently de-duplicate
+                        if (parents[0].Sha1 == parents[1].Sha1)
+                        {
+                            _parents = new CommitId[1] { parents[0] };
+                            return;
+                        }
+                        // Else sort
+                        else
+                        {
+                            var cmp = Sha1Comparer.Default.Compare(parents[0].Sha1, parents[1].Sha1);
+                            if (cmp < 0)
+                                _parents = new CommitId[2] { parents[0], parents[1] };
+                            else
+                                _parents = new CommitId[2] { parents[1], parents[0] };
+                        }
+                    }
+                    return;
+
+                default:
+                    {
+                        // Silently de-duplicate & sort
+                        _parents = parents
+                            .OrderBy(n => n.Sha1, Sha1Comparer.Default)
+                            .Distinct(CommitIdComparer.Default)
+                            .ToArray();
+                    }
+                    return;
+            }
         }
 
         public Commit(CommitId parent, TreeId treeId, DateTime commitUtc, string commitMessage)
@@ -54,45 +109,23 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(Commit other)
-        {
-            if (CommitUtc != other.CommitUtc) return false;
-            if (!TreeId.Equals(other.TreeId)) return false;
-            if (!StringComparer.Ordinal.Equals(CommitMessage, other.CommitMessage)) return false;
-            if (!Parents.NullableEquals(other.Parents, CommitId.DefaultComparer, true)) return false;
-
-            return true;
-        }
+        public bool Equals(Commit other) => CommitComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is Commit commit
-            && Equals(commit);
+            && CommitComparer.Default.Equals(this, commit);
 
-        public override int GetHashCode()
-        {
-            var h = 11;
-
-            unchecked
-            {
-                h = h * 7 + TreeId.GetHashCode();
-                h = h * 7 + CommitUtc.GetHashCode();
-                h = h * 7 + (Parents?.Count ?? 0);
-                h = h * 7 + (CommitMessage?.Length ?? 0);
-            }
-
-            return h;
-        }
-
-        public static bool operator ==(Commit x, Commit y) => x.Equals(y);
-
-        public static bool operator !=(Commit x, Commit y) => !x.Equals(y);
+        public override int GetHashCode() => CommitComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString()
-            => $"{nameof(Commit)}: {CommitUtc:o} ({TreeId})";
+        public static bool operator ==(Commit x, Commit y) => CommitComparer.Default.Equals(x, y);
+
+        public static bool operator !=(Commit x, Commit y) => !CommitComparer.Default.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(Commit)}: {CommitUtc:o} ({TreeId})";
 
         #endregion
     }

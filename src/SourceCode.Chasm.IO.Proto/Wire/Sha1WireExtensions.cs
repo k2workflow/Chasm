@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Sha1 Convert(this Sha1Wire wire)
         {
-            if (wire == null) return Sha1.Empty;
+            if (wire == null) return default;
 
             var model = new Sha1(wire.Blit0, wire.Blit1, wire.Blit2);
             return model;

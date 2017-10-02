@@ -14,27 +14,50 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static JsonObject Convert(this Commit model)
         {
-            if (model == Commit.Empty) return default;
+            if (model == Commit.Empty) return default; // null
 
             // Parents
-            var parents = Array.Empty<JsonValue>();
-            if (model.Parents != null && model.Parents.Count > 0)
+            JsonArray parents = null;
+            if (model.Parents != null)
             {
-                parents = new JsonValue[model.Parents.Count];
+                switch (model.Parents.Count)
+                {
+                    case 0:
+                        parents = new JsonArray(Array.Empty<JsonValue>());
+                        break;
 
-                for (var i = 0; i < parents.Length; i++)
-                    parents[i] = model.Parents[i].Sha1.ToString("N");
+                    case 1:
+                        var sha1 = model.Parents[0].Sha1;
+                        parents = new JsonArray(new[] { new JsonPrimitive(sha1.ToString("N")) });
+                        break;
+
+                    default:
+                        {
+                            var array = new JsonPrimitive[model.Parents.Count];
+                            for (var i = 0; i < array.Length; i++)
+                                array[i] = new JsonPrimitive(model.Parents[i].Sha1.ToString("N"));
+
+                            parents = new JsonArray(array);
+                        }
+                        break;
+                }
             }
 
             // CommitUtc
             var utc = XmlConvert.ToString(model.CommitUtc, XmlDateTimeSerializationMode.Utc);
 
+            // Message
+            var msg = model.CommitMessage == null ? null : new JsonPrimitive(model.CommitMessage);
+
+            // TreeId
+            var treeId = model.TreeId.Sha1.ToString("N");
+
             var wire = new JsonObject
             {
-                [_parents] = new JsonArray(parents),
-                [_treeId] = model.TreeId.Sha1.ToString("N"),
+                [_parents] = parents,
+                [_treeId] = treeId,
                 [_utc] = utc,
-                [_message] = model.CommitMessage
+                [_message] = msg
             };
 
             return wire;
@@ -50,15 +73,19 @@ namespace SourceCode.Chasm.IO.Json.Wire
             var treeId = new TreeId(sha1);
 
             // Parents
+            var parents = Array.Empty<CommitId>();
             var ja = wire.GetArray(_parents);
-            var parents = new CommitId[ja.Count];
-            for (var i = 0; i < parents.Length; i++)
+            if (ja != null && ja.Count > 0)
             {
-                sha1 = Sha1.Parse(ja[i]);
-                parents[i] = new CommitId(sha1);
+                parents = new CommitId[ja.Count];
+                for (var i = 0; i < parents.Length; i++)
+                {
+                    sha1 = Sha1.Parse(ja[i]);
+                    parents[i] = new CommitId(sha1);
+                }
             }
 
-            // Utc
+            // CommitUtc
             jv = wire.GetValue(_utc, JsonType.String, false);
             var utc = XmlConvert.ToDateTime(jv, XmlDateTimeSerializationMode.Utc);
 

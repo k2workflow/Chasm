@@ -6,35 +6,81 @@ namespace SourceCode.Chasm.Tests
 {
     public static class TreeNodeListTests
     {
+        private static readonly TreeNode Node0 = new TreeNode(nameof(Node0), NodeKind.Tree, Sha1.Hash(nameof(Node0)));
+        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Tree, Sha1.Hash(nameof(Node1)));
+        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), NodeKind.Tree, Sha1.Hash(nameof(Node2)));
+        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.Tree, Sha1.Hash(nameof(Node3)));
+
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_is_empty))]
-        public static void TreeNodeList_is_empty()
+        [Fact(DisplayName = nameof(TreeNodeList_Empty))]
+        public static void TreeNodeList_Empty()
         {
             var noData = new TreeNodeList();
             var nullData = new TreeNodeList(null);
             var emptyData = new TreeNodeList(Array.Empty<TreeNode>());
 
-            Assert.Empty(TreeNodeList.Empty);
-
             Assert.Equal(noData, nullData);
             Assert.Equal(noData.GetHashCode(), nullData.GetHashCode());
 
-            Assert.Equal(TreeNodeList.Empty, noData);
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), noData.GetHashCode());
+            Assert.Empty(noData);
+            Assert.Empty(nullData);
+            Assert.Empty(emptyData);
 
-            Assert.Equal(TreeNodeList.Empty, nullData);
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), nullData.GetHashCode());
-
-            Assert.Equal(TreeNodeList.Empty, emptyData); // By design; see ctor
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), emptyData.GetHashCode());
-
-            Assert.Equal(noData, emptyData); // By design; see ctor
+            Assert.Equal(noData, emptyData); // By design
             Assert.Equal(noData.GetHashCode(), emptyData.GetHashCode());
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_equality))]
-        public static void TreeNodeList_equality()
+        [Fact(DisplayName = nameof(TreeNodeList_Sorting))]
+        public static void TreeNodeList_Sorting()
+        {
+            var nodes = new[] { Node0, Node1 };
+            var tree0 = new TreeNodeList(nodes.OrderBy(n => n.Sha1).ToArray());
+            var tree1 = new TreeNodeList(nodes.OrderByDescending(n => n.Sha1).ToList()); // ICollection<T>
+
+            Assert.Equal(tree0[0], tree1[0]);
+            Assert.Equal(tree0[1], tree1[1]);
+
+            nodes = new[] { Node0, Node1, Node2 };
+            tree0 = new TreeNodeList(nodes.OrderBy(n => n.Sha1).ToArray());
+            tree1 = new TreeNodeList(nodes.OrderByDescending(n => n.Sha1).ToList()); // ICollection<T>
+
+            Assert.Equal(tree0[0], tree1[0]);
+            Assert.Equal(tree0[1], tree1[1]);
+            Assert.Equal(tree0[2], tree1[2]);
+
+            nodes = new[] { Node0, Node1, Node2, Node3 };
+            tree0 = new TreeNodeList(nodes.OrderBy(n => n.Sha1).ToArray());
+            tree1 = new TreeNodeList(nodes.OrderByDescending(n => n.Sha1).ToList()); // ICollection<T>
+
+            Assert.Equal(tree0[0], tree1[0]);
+            Assert.Equal(tree0[1], tree1[1]);
+            Assert.Equal(tree0[2], tree1[2]);
+            Assert.Equal(tree0[3], tree1[3]);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicates))]
+        public static void TreeNodeList_Duplicates()
+        {
+            var nodes = new[] { Node0, Node0 };
+            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
+            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes.ToList())); // ICollection<T>
+
+            nodes = new[] { Node0, Node1, Node0 };
+            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
+            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes.ToList())); // ICollection<T>
+
+            nodes = new[] { Node0, Node1, Node2, Node0 };
+            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
+            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes.ToList())); // ICollection<T>
+
+            Assert.Throws<ArgumentException>(() => new TreeNodeList(Node0, new TreeNode(Node0.Name, NodeKind.Tree, Node1.Sha1))); // Duplicate Name
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Equality))]
+        public static void TreeNodeList_Equality()
         {
             var expected = new TreeNodeList(new[] { new TreeNode("c1", NodeKind.Blob, Sha1.Hash("c1")), new TreeNode("c2", NodeKind.Tree, Sha1.Hash("c2")) });
             var node3 = new TreeNode("c3", NodeKind.Tree, Sha1.Hash("c3"));

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
-    [DebuggerDisplay("{" + nameof(Sha1) + "} ({" + nameof(Name) + "})")]
-    public struct TreeNode : IEquatable<TreeNode>
+    public struct TreeNode : IEquatable<TreeNode>, IComparable<TreeNode>
     {
         #region Constants
 
@@ -67,36 +65,37 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(TreeNode other)
-        {
-            if (!StringComparer.Ordinal.Equals(Name, other.Name)) return false;
-            if (Kind != other.Kind) return false;
-            if (Sha1 != other.Sha1) return false;
-
-            return true;
-        }
+        public bool Equals(TreeNode other) => TreeNodeComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is TreeNode node
-            && Equals(node);
+            && TreeNodeComparer.Default.Equals(this, node);
 
-        public override int GetHashCode()
-        {
-            var h = 11;
+        public override int GetHashCode() => TreeNodeComparer.Default.GetHashCode(this);
 
-            unchecked
-            {
-                h = h * 7 + (Name == null ? 0 : StringComparer.Ordinal.GetHashCode());
-                h = h * 7 + (int)Kind;
-                h = h * 7 + Sha1.GetHashCode();
-            }
+        #endregion
 
-            return h;
-        }
+        #region IComparable
 
-        public static bool operator ==(TreeNode x, TreeNode y) => x.Equals(y);
+        public int CompareTo(TreeNode other) => TreeNodeComparer.Default.Compare(this, other);
 
-        public static bool operator !=(TreeNode x, TreeNode y) => !x.Equals(y);
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Equals(x, y);
+
+        public static bool operator !=(TreeNode x, TreeNode y) => !TreeNodeComparer.Default.Equals(x, y); // not
+
+        public static bool operator >=(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Compare(x, y) >= 0;
+
+        public static bool operator >(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Compare(x, y) > 0;
+
+        public static bool operator <=(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Compare(x, y) <= 0;
+
+        public static bool operator <(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Compare(x, y) < 0;
+
+        public override string ToString() => $"{Kind}: {Name} ({Sha1})";
 
         #endregion
     }

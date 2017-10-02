@@ -11,7 +11,11 @@ namespace SourceCode.Chasm.IO.Proto
 
         public override BufferSession Serialize(TreeNodeList model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             var wire = model.Convert();
+            if (wire == null)
+                return new BufferSession(Array.Empty<byte>(), new ArraySegment<byte>(Array.Empty<byte>(), 0, 0));
 
             var size = wire.CalculateSize();
             var buffer = BufferSession.RentBuffer(size);
@@ -33,6 +37,8 @@ namespace SourceCode.Chasm.IO.Proto
 
         public override TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
         {
+            if (span.IsEmpty) return new TreeNodeList();
+
             var wire = new TreeWire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 

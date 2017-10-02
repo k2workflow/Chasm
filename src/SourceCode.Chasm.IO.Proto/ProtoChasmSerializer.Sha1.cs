@@ -12,6 +12,8 @@ namespace SourceCode.Chasm.IO.Proto
         public override BufferSession Serialize(Sha1 model)
         {
             var wire = model.Convert();
+            if (wire == null)
+                return new BufferSession(Array.Empty<byte>(), new ArraySegment<byte>(Array.Empty<byte>(), 0, 0));
 
             var size = wire.CalculateSize();
             var buffer = BufferSession.RentBuffer(size);
@@ -33,6 +35,8 @@ namespace SourceCode.Chasm.IO.Proto
 
         public unsafe override Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
         {
+            if (span.IsEmpty) return default;
+
             var wire = new Sha1Wire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 
