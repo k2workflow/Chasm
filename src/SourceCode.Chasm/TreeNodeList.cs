@@ -6,11 +6,17 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
-    public sealed class TreeNodeList : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeList>
+    public struct TreeNodeList : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeList>
     {
         #region Constants
 
-        //
+        /// <summary>
+        /// A singleton representing an empty <see cref="TreeNodeList"/> value.
+        /// </summary>
+        /// <value>
+        /// The empty.
+        /// </value>
+        public static TreeNodeList Empty { get; }
 
         #endregion
 

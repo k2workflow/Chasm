@@ -8,6 +8,12 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
+        /// <summary>
+        /// A singleton representing an empty <see cref="Commit"/> value.
+        /// </summary>
+        /// <value>
+        /// The empty.
+        /// </value>
         public static Commit Empty { get; }
 
         public static CommitId[] Orphaned { get; } = new[] { CommitId.Empty };
