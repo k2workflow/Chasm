@@ -73,16 +73,12 @@ namespace SourceCode.Chasm
 
                 case 2:
                     {
-                        // Throw if the Sha1 is duplicated
-                        if (nodes[0].Sha1 == nodes[1].Sha1)
-                            throw CreateDuplicateException(nodes[0]);
-
                         // Throw if the Name is duplicated
-                        var cmp = StringComparer.Ordinal.Compare(nodes[0].Name, nodes[1].Name);
-                        if (cmp == 0)
+                        if (StringComparer.Ordinal.Equals(nodes[0].Name, nodes[1].Name))
                             throw CreateDuplicateException(nodes[0]);
 
                         // Else sort & assign
+                        var cmp = TreeNode.DefaultComparison(nodes[0], nodes[1]);
                         if (cmp < 0)
                             _nodes = new TreeNode[2] { nodes[0], nodes[1] };
                         else
@@ -96,7 +92,6 @@ namespace SourceCode.Chasm
                         var sorted = true;
                         var array = new TreeNode[nodes.Length];
                         var uniqueName = new HashSet<string>(nodes.Length, StringComparer.Ordinal);
-                        var uniqueSha1 = new HashSet<Sha1>(nodes.Length, Sha1.DefaultComparer);
 
                         // Copy
                         for (var i = 0; i < array.Length; i++)
@@ -104,9 +99,6 @@ namespace SourceCode.Chasm
                             array[i] = nodes[i];
 
                             if (!uniqueName.Add(array[i].Name))
-                                throw CreateDuplicateException(array[i]);
-
-                            if (!uniqueSha1.Add(array[i].Sha1))
                                 throw CreateDuplicateException(array[i]);
 
                             // If it's empirically still sorted
@@ -122,7 +114,7 @@ namespace SourceCode.Chasm
                         // Sort iff necessary
                         if (!sorted)
                         {
-                            Array.Sort(array, TreeNode.Comparer.NameComparison);
+                            Array.Sort(array, TreeNode.DefaultComparer);
                         }
 
                         // Assign (sorted by Name)
@@ -166,16 +158,12 @@ namespace SourceCode.Chasm
                         enm.MoveNext();
                         var node1 = enm.Current;
 
-                        // Throw if the Sha1 is duplicated
-                        if (node0.Sha1 == node1.Sha1)
-                            throw CreateDuplicateException(node0);
-
                         // Throw if the Name is duplicated
-                        var cmp = StringComparer.Ordinal.Compare(node0.Name, node1.Name);
-                        if (cmp == 0)
+                        if (StringComparer.Ordinal.Equals(node0.Name, node1.Name))
                             throw CreateDuplicateException(node0);
 
                         // Else sort & assign
+                        var cmp = TreeNode.DefaultComparison(node0, node1);
                         if (cmp < 0)
                             _nodes = new TreeNode[2] { node0, node1 };
                         else
@@ -189,7 +177,6 @@ namespace SourceCode.Chasm
                         var sorted = true;
                         var array = new TreeNode[nodes.Count];
                         var uniqueName = new HashSet<string>(nodes.Count, StringComparer.Ordinal);
-                        var uniqueSha1 = new HashSet<Sha1>(nodes.Count, Sha1.DefaultComparer);
 
                         // Copy
                         var i = 0;
@@ -198,9 +185,6 @@ namespace SourceCode.Chasm
                             array[i] = node;
 
                             if (!uniqueName.Add(array[i].Name))
-                                throw CreateDuplicateException(array[i]);
-
-                            if (!uniqueSha1.Add(array[i].Sha1))
                                 throw CreateDuplicateException(array[i]);
 
                             // If it's empirically still sorted
@@ -218,7 +202,7 @@ namespace SourceCode.Chasm
                         // Sort iff necessary
                         if (!sorted)
                         {
-                            Array.Sort(array, TreeNode.Comparer.NameComparison);
+                            Array.Sort(array, TreeNode.DefaultComparer);
                         }
 
                         // Assign (sorted by Name)

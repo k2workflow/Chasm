@@ -75,8 +75,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
             Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes.ToList())); // ICollection<T>
 
-            Assert.Throws<ArgumentException>(() => new TreeNodeList(Node0, new TreeNode(Node1.Name, NodeKind.Tree, Node0.Sha1))); // Duplicate Name
-            Assert.Throws<ArgumentException>(() => new TreeNodeList(Node0, new TreeNode(Node0.Name, NodeKind.Tree, Node1.Sha1))); // Duplicate Sha1
+            Assert.Throws<ArgumentException>(() => new TreeNodeList(Node0, new TreeNode(Node0.Name, NodeKind.Tree, Node1.Sha1))); // Duplicate Name
         }
 
         [Trait("Type", "Unit")]
