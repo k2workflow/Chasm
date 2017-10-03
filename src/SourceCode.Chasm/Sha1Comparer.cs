@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace SourceCode.Chasm
@@ -51,6 +51,8 @@ namespace SourceCode.Chasm
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override int Compare(Sha1 x, Sha1 y)
             {
+                // CLR returns [-1, 0, +1] for ulong/uint comparisons (vs arbitrary neg/pos values)
+
                 var cmp = x.Blit0.CompareTo(y.Blit0);
                 if (cmp != 0) return cmp;
 
