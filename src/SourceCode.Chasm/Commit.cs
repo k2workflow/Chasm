@@ -68,21 +68,19 @@ namespace SourceCode.Chasm
 
                 case 2:
                     {
-                        // Silently de-duplicate
-                        if (parents[0].Sha1 == parents[1].Sha1)
+                        var cmp = CommitIdComparer.Default.Compare(parents[0], parents[1]);
+                        switch (cmp)
                         {
-                            _parents = new CommitId[1] { parents[0] };
-                            return;
-                        }
+                            // Silently de-duplicate
+                            case 0: _parents = new CommitId[1] { parents[0] }; return;
 
-                        // Else sort
-                        var cmp = Sha1Comparer.Default.Compare(parents[0].Sha1, parents[1].Sha1);
-                        if (cmp < 0)
-                            _parents = new CommitId[2] { parents[0], parents[1] };
-                        else
-                            _parents = new CommitId[2] { parents[1], parents[0] };
+                            // Sort ascending
+                            case -1: _parents = new CommitId[2] { parents[0], parents[1] }; return;
+
+                            // Sort descending
+                            default: _parents = new CommitId[2] { parents[1], parents[0] }; return;
+                        }
                     }
-                    return;
 
                 default:
                     {
