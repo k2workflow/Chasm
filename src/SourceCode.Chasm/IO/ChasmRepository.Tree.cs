@@ -179,7 +179,7 @@ namespace SourceCode.Chasm.IO
             if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
 
             var treeId = TreeId.Empty;
-            if (tree != null && tree.Count > 0)
+            if (tree.Count > 0)
                 treeId = WriteTree(tree, forceOverwrite);
 
             var commit = new Commit(parents, treeId, commitUtc, commitMessage);
@@ -193,7 +193,7 @@ namespace SourceCode.Chasm.IO
             if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
 
             var treeId = TreeId.Empty;
-            if (tree != null && tree.Count > 0)
+            if (tree.Count > 0)
                 treeId = await WriteTreeAsync(tree, forceOverwrite, cancellationToken).ConfigureAwait(false);
 
             var commit = new Commit(parents, treeId, commitUtc, commitMessage);
