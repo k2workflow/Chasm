@@ -275,7 +275,9 @@ namespace SourceCode.Chasm
             // Optimize for common cases 0, 1, 2, N
             switch (array.Length)
             {
-                case 1: return array;
+                case 1:
+                    // Always copy. The callsite may change the array after creating the TreeNodeList.
+                    return new TreeNode[1] { array[0] };
 
                 case 2:
                     {

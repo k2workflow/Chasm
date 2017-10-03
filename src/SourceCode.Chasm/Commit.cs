@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace SourceCode.Chasm
@@ -74,10 +74,10 @@ namespace SourceCode.Chasm
                             // Silently de-duplicate
                             case 0: _parents = new CommitId[1] { parents[0] }; return;
 
-                            // Sort ascending
+                            // Sort forward
                             case -1: _parents = new CommitId[2] { parents[0], parents[1] }; return;
 
-                            // Sort descending
+                            // Sort reverse
                             default: _parents = new CommitId[2] { parents[1], parents[0] }; return;
                         }
                     }
