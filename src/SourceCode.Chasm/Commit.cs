@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SourceCode.Chasm
 {
@@ -49,7 +48,7 @@ namespace SourceCode.Chasm
             CommitUtc = commitUtc;
             _message = commitMessage ?? string.Empty;
 
-            // Coerce null to empty
+            // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (parents == null)
             {
                 _parents = Array.Empty<CommitId>();
@@ -75,25 +74,42 @@ namespace SourceCode.Chasm
                             _parents = new CommitId[1] { parents[0] };
                             return;
                         }
+
                         // Else sort
+                        var cmp = Sha1Comparer.Default.Compare(parents[0].Sha1, parents[1].Sha1);
+                        if (cmp < 0)
+                            _parents = new CommitId[2] { parents[0], parents[1] };
                         else
-                        {
-                            var cmp = Sha1Comparer.Default.Compare(parents[0].Sha1, parents[1].Sha1);
-                            if (cmp < 0)
-                                _parents = new CommitId[2] { parents[0], parents[1] };
-                            else
-                                _parents = new CommitId[2] { parents[1], parents[0] };
-                        }
+                            _parents = new CommitId[2] { parents[1], parents[0] };
                     }
                     return;
 
                 default:
                     {
-                        // Silently de-duplicate & sort
-                        _parents = parents
-                            .OrderBy(n => n.Sha1, Sha1Comparer.Default)
-                            .Distinct(CommitIdComparer.Default)
-                            .ToArray();
+                        // Copy
+                        var array = new CommitId[parents.Count];
+                        for (var i = 0; i < parents.Count; i++)
+                            array[i] = parents[i];
+
+                        // Sort: Delegate dispatch faster than interface (https://github.com/dotnet/coreclr/pull/8504)
+                        Array.Sort(array, CommitIdComparer.Default.Compare);
+
+                        // Distinct
+                        var j = 1;
+                        for (var i = 1; i < array.Length; i++)
+                        {
+                            // If it's a duplicate, silently skip
+                            if (CommitIdComparer.Default.Equals(array[i - 1], array[i]))
+                                continue;
+
+                            array[j++] = array[i]; // Increment target index iff distinct
+                        }
+
+                        if (j < array.Length)
+                            Array.Resize(ref array, j);
+
+                        // Assign
+                        _parents = array;
                     }
                     return;
             }
