@@ -9,12 +9,14 @@
 >It is typically used for high-speed storage and retrieval of fixed content"
 
 [Git](https://en.wikipedia.org/wiki/Git) is a well-known example of a product that uses CAS.
+However Chasm does not aim to be a Git replacement. For example, there is no concept of a working tree.
+Rather, this is meant to be a general purpose CAS store for any document type.
 
 ### Requirements
 
 * CAS: Self-versioned, immutable store. 
 * Single-instance storage of data: If two authors create the exact same documents, their repos should not differ in Object data.
-* Efficient network/disk operations: XML is bad, JSON is better, Bond/Protobuf/etc are best
+* Efficient network/disk operations: XML is bad, JSON is better, Protobuf/etc are best
 * Simple: Avoid the need to reinvent graph semantics, etc
 
 ### Getting started

@@ -42,13 +42,7 @@ namespace SourceCode.Chasm
             { }
 
             public override bool Equals(TreeNodeList x, TreeNodeList y)
-            {
-                // Memory<T>.Span throws if IsEmpty == true
-                if (x._nodes.Length != y._nodes.Length) return false;
-                if (x._nodes.IsEmpty) return true;
-
-                return x._nodes.Span.SpanEquals(y._nodes.Span, true);
-            }
+                => x._nodes.MemoryEquals(y._nodes, true);
 
             public override int GetHashCode(TreeNodeList obj)
             {
