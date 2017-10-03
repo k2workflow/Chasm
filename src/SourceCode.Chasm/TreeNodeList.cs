@@ -444,8 +444,8 @@ namespace SourceCode.Chasm
         public bool Equals(TreeNodeList other) => TreeNodeListComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is TreeNodeList tnl
-            && TreeNodeListComparer.Default.Equals(this, tnl);
+            => obj is TreeNodeList tree
+            && TreeNodeListComparer.Default.Equals(this, tree);
 
         public override int GetHashCode() => TreeNodeListComparer.Default.GetHashCode(this);
 

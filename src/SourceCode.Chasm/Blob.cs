@@ -1,5 +1,4 @@
-﻿using SourceCode.Clay.Buffers;
-using System;
+﻿using System;
 
 namespace SourceCode.Chasm
 {
@@ -33,26 +32,23 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(Blob other)
-            => BufferComparer.Array.Equals(Data, other.Data);
+        public bool Equals(Blob other) => BlobComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
             => obj is Blob blob
-            && Equals(blob);
+            && BlobComparer.Default.Equals(blob);
 
-        public override int GetHashCode()
-            => BufferComparer.Array.GetHashCode(Data);
-
-        public static bool operator ==(Blob x, Blob y) => x.Equals(y);
-
-        public static bool operator !=(Blob x, Blob y) => !x.Equals(y);
+        public override int GetHashCode() => BlobComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public override string ToString()
-            => $"{nameof(Blob)}: {Data?.Length ?? 0}";
+        public static bool operator ==(Blob x, Blob y) => BlobComparer.Default.Equals(x, y);
+
+        public static bool operator !=(Blob x, Blob y) => !BlobComparer.Default.Equals(x, y); // not
+
+        public override string ToString() => $"{nameof(Blob)}: {Data?.Length ?? 0}";
 
         #endregion
     }
