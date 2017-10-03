@@ -76,12 +76,25 @@ namespace SourceCode.Chasm
 
                 case 2:
                     {
-                        // Throw if the Name is duplicated
+                        // If the Name alone is duplicated
+                        int cmp;
                         if (StringComparer.Ordinal.Equals(nodes[0].Name, nodes[1].Name))
+                        {
+                            // Check if it's a complete duplicate
+                            cmp = TreeNodeComparer.Default.Compare(nodes[0], nodes[1]);
+                            if (cmp == 0)
+                            {
+                                // If so, silently de-duplicate
+                                _nodes = new TreeNode[1] { nodes[0] };
+                                return;
+                            }
+
+                            // Else throw
                             throw CreateDuplicateException(nodes[0]);
+                        }
 
                         // Else sort & assign
-                        var cmp = TreeNodeComparer.Default.Compare(nodes[0], nodes[1]);
+                        cmp = TreeNodeComparer.Default.Compare(nodes[0], nodes[1]);
                         if (cmp < 0)
                             _nodes = new TreeNode[2] { nodes[0], nodes[1] };
                         else
@@ -104,7 +117,7 @@ namespace SourceCode.Chasm
                             if (!uniqueName.Add(array[i].Name))
                                 throw CreateDuplicateException(array[i]);
 
-                            // If it's empirically still sorted
+                            // If empirically, it's still sorted
                             if (sorted && i > 0)
                             {
                                 // Streaming assertion
@@ -161,12 +174,25 @@ namespace SourceCode.Chasm
                         enm.MoveNext();
                         var node1 = enm.Current;
 
-                        // Throw if the Name is duplicated
+                        // If the Name alone is duplicated
+                        int cmp;
                         if (StringComparer.Ordinal.Equals(node0.Name, node1.Name))
+                        {
+                            // Check if it's a complete duplicate
+                            cmp = TreeNodeComparer.Default.Compare(node0, node1);
+                            if (cmp == 0)
+                            {
+                                // If so, silently de-duplicate
+                                _nodes = new TreeNode[1] { node0 };
+                                return;
+                            }
+
+                            // Else throw
                             throw CreateDuplicateException(node0);
+                        }
 
                         // Else sort & assign
-                        var cmp = TreeNodeComparer.Default.Compare(node0, node1);
+                        cmp = TreeNodeComparer.Default.Compare(node0, node1);
                         if (cmp < 0)
                             _nodes = new TreeNode[2] { node0, node1 };
                         else
@@ -190,7 +216,7 @@ namespace SourceCode.Chasm
                             if (!uniqueName.Add(array[i].Name))
                                 throw CreateDuplicateException(array[i]);
 
-                            // If it's empirically still sorted
+                            // If empirically, it's still sorted
                             if (sorted && i > 0)
                             {
                                 // Streaming assertion
