@@ -65,22 +65,78 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicates))]
-        public static void TreeNodeList_Duplicates()
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_2))]
+        public static void TreeNodeList_Duplicate_Full_2()
         {
             var nodes = new[] { Node0, Node0 };
+
+            var tree = new TreeNodeList(nodes);
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0));
+
+            tree = new TreeNodeList(nodes.ToList()); // ICollection<T>
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0));
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_3))]
+        public static void TreeNodeList_Duplicate_Full_3()
+        {
+            var nodes = new[] { Node0, Node1, Node0 }; // Shuffled
+
+            var tree = new TreeNodeList(nodes);
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1));
+
+            tree = new TreeNodeList(nodes.ToList()); // ICollection<T>
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1));
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_4))]
+        public static void TreeNodeList_Duplicate_Full_4()
+        {
+            var nodes = new[] { Node0, Node2, Node1, Node0 }; // Shuffled
+
+            var tree = new TreeNodeList(nodes);
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1), n => Assert.Equal(n, Node2));
+
+            tree = new TreeNodeList(nodes.ToList()); // ICollection<T>
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1), n => Assert.Equal(n, Node2));
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_N))]
+        public static void TreeNodeList_Duplicate_Full_N()
+        {
+            var nodes = new[] { Node3, Node1, Node2, Node0, Node3, Node0, Node1, Node0, Node1, Node2, Node0, Node3 }; // Shuffled
+
+            var tree = new TreeNodeList(nodes);
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1), n => Assert.Equal(n, Node2), n => Assert.Equal(n, Node3));
+
+            tree = new TreeNodeList(nodes.ToList()); // ICollection<T>
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1), n => Assert.Equal(n, Node2), n => Assert.Equal(n, Node3));
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Name))]
+        public static void TreeNodeList_Duplicate_Name()
+        {
+            var nodes = new[] { new TreeNode(Node0.Name, NodeKind.Tree, Node1.Sha1), Node0 }; // Reversed
+
             Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
             Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes.ToList())); // ICollection<T>
+        }
 
-            nodes = new[] { Node0, Node1, Node0 };
-            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
-            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes.ToList())); // ICollection<T>
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Sha1))]
+        public static void TreeNodeList_Duplicate_Sha1()
+        {
+            var nodes = new[] { new TreeNode(Node1.Name, NodeKind.Tree, Node0.Sha1), Node0 }; // Reversed
 
-            nodes = new[] { Node0, Node1, Node2, Node0 };
-            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
-            Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes.ToList())); // ICollection<T>
+            var tree0 = new TreeNodeList(nodes);
+            Assert.Collection<TreeNode>(tree0, n => Assert.Equal(n, Node0), n => Assert.Equal(n, nodes[0]));
 
-            Assert.Throws<ArgumentException>(() => new TreeNodeList(Node0, new TreeNode(Node0.Name, NodeKind.Tree, Node1.Sha1))); // Duplicate Name
+            tree0 = new TreeNodeList(nodes.ToList()); // ICollection<T>
+            Assert.Collection<TreeNode>(tree0, n => Assert.Equal(n, Node0), n => Assert.Equal(n, nodes[0]));
         }
 
         [Trait("Type", "Unit")]
@@ -127,7 +183,7 @@ namespace SourceCode.Chasm.Tests
             var prev = list.Keys.First();
             foreach (var cur in list.Keys.Skip(1))
             {
-                Assert.True(StringComparer.Ordinal.Compare(cur, prev) > 0);
+                Assert.True(string.CompareOrdinal(cur, prev) > 0);
                 prev = cur;
             }
         }

@@ -58,6 +58,7 @@ namespace SourceCode.Chasm
                 cmp = Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);
                 if (cmp != 0) return cmp;
 
+                // And lastly by Kind
                 cmp = ((int)x.Kind).CompareTo((int)y.Kind);
                 return cmp;
             }

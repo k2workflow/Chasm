@@ -22,7 +22,7 @@ namespace SourceCode.Chasm
 
         #region Fields
 
-        internal readonly TreeNode[] _nodes; // May be null due to default ctor
+        internal readonly ReadOnlyMemory<TreeNode> _nodes;
 
         #endregion
 
@@ -32,10 +32,12 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (_nodes == null)
+                if (_nodes.IsEmpty)
                     return Array.Empty<TreeNode>()[index]; // Throw underlying exception
 
-                return _nodes[index];
+                var span = _nodes.Span;
+
+                return span[index];
             }
         }
 
@@ -50,7 +52,7 @@ namespace SourceCode.Chasm
             }
         }
 
-        public int Count => _nodes?.Length ?? 0;
+        public int Count => _nodes.Length;
 
         #endregion
 
@@ -58,188 +60,32 @@ namespace SourceCode.Chasm
 
         public TreeNodeList(params TreeNode[] nodes)
         {
-            // Coerce null to null
+            // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (nodes == null || nodes.Length == 0)
             {
-                // We choose to coerce empty & null to null, so that serialization round-trips properly.
-                // (May be null due to default ctor)
-                _nodes = null;
+                _nodes = default; // ie, same as default struct ctor
                 return;
             }
 
-            // Optimize for common cases 0, 1, 2, N
-            switch (nodes.Length)
-            {
-                case 1:
-                    _nodes = new TreeNode[1] { nodes[0] };
-                    return;
-
-                case 2:
-                    {
-                        // If the Name alone is duplicated
-                        int cmp;
-                        if (StringComparer.Ordinal.Equals(nodes[0].Name, nodes[1].Name))
-                        {
-                            // Check if it's a complete duplicate
-                            cmp = TreeNodeComparer.Default.Compare(nodes[0], nodes[1]);
-                            if (cmp == 0)
-                            {
-                                // If so, silently de-duplicate
-                                _nodes = new TreeNode[1] { nodes[0] };
-                                return;
-                            }
-
-                            // Else throw
-                            throw CreateDuplicateException(nodes[0]);
-                        }
-
-                        // Else sort & assign
-                        cmp = TreeNodeComparer.Default.Compare(nodes[0], nodes[1]);
-                        if (cmp < 0)
-                            _nodes = new TreeNode[2] { nodes[0], nodes[1] };
-                        else
-                            _nodes = new TreeNode[2] { nodes[1], nodes[0] };
-                    }
-                    return;
-
-                default:
-                    {
-                        // Assume it's already sorted
-                        var sorted = true;
-                        var array = new TreeNode[nodes.Length];
-                        var uniqueName = new HashSet<string>(nodes.Length, StringComparer.Ordinal);
-
-                        // Copy
-                        for (var i = 0; i < array.Length; i++)
-                        {
-                            array[i] = nodes[i];
-
-                            if (!uniqueName.Add(array[i].Name))
-                                throw CreateDuplicateException(array[i]);
-
-                            // If empirically, it's still sorted
-                            if (sorted && i > 0)
-                            {
-                                // Streaming assertion
-                                var cmp = TreeNodeComparer.Default.Compare(array[i - 1], array[i]);
-                                if (cmp > 0)
-                                    sorted = false;
-                            }
-                        }
-
-                        // Sort iff necessary
-                        if (!sorted)
-                        {
-                            // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
-                            Array.Sort(array, TreeNodeComparer.Default.Compare);
-                        }
-
-                        // Assign (sorted by Name)
-                        _nodes = array;
-                    }
-                    return;
-            }
+            // Sort & de-duplicate
+            _nodes = DistinctSort(nodes, false);
         }
 
         public TreeNodeList(ICollection<TreeNode> nodes)
         {
-            // Coerce null to null
+            // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (nodes == null || nodes.Count == 0)
             {
-                // We choose to coerce empty & null to null, so that serialization round-trips properly.
-                // (May be null due to default ctor)
-                _nodes = null;
+                _nodes = default; // ie, same as default struct ctor
                 return;
             }
 
-            // Optimize for common cases 0, 1, 2, N
-            switch (nodes.Count)
-            {
-                case 1:
-                    using (var enm = nodes.GetEnumerator())
-                    {
-                        enm.MoveNext();
-                        var node0 = enm.Current;
+            // Copy
+            var array = new TreeNode[nodes.Count];
+            nodes.CopyTo(array, 0);
 
-                        _nodes = new TreeNode[1] { node0 };
-                    }
-                    return;
-
-                case 2:
-                    using (var enm = nodes.GetEnumerator())
-                    {
-                        enm.MoveNext();
-                        var node0 = enm.Current;
-
-                        enm.MoveNext();
-                        var node1 = enm.Current;
-
-                        // If the Name alone is duplicated
-                        int cmp;
-                        if (StringComparer.Ordinal.Equals(node0.Name, node1.Name))
-                        {
-                            // Check if it's a complete duplicate
-                            cmp = TreeNodeComparer.Default.Compare(node0, node1);
-                            if (cmp == 0)
-                            {
-                                // If so, silently de-duplicate
-                                _nodes = new TreeNode[1] { node0 };
-                                return;
-                            }
-
-                            // Else throw
-                            throw CreateDuplicateException(node0);
-                        }
-
-                        // Else sort & assign
-                        cmp = TreeNodeComparer.Default.Compare(node0, node1);
-                        if (cmp < 0)
-                            _nodes = new TreeNode[2] { node0, node1 };
-                        else
-                            _nodes = new TreeNode[2] { node1, node0 };
-                    }
-                    return;
-
-                default:
-                    {
-                        // Assume it's already sorted
-                        var sorted = true;
-                        var array = new TreeNode[nodes.Count];
-                        var uniqueName = new HashSet<string>(nodes.Count, StringComparer.Ordinal);
-
-                        // Copy
-                        var i = 0;
-                        foreach (var node in nodes)
-                        {
-                            array[i] = node;
-
-                            if (!uniqueName.Add(array[i].Name))
-                                throw CreateDuplicateException(array[i]);
-
-                            // If empirically, it's still sorted
-                            if (sorted && i > 0)
-                            {
-                                // Streaming assertion
-                                var cmp = TreeNodeComparer.Default.Compare(array[i - 1], array[i]);
-                                if (cmp > 0)
-                                    sorted = false;
-                            }
-
-                            i += 1;
-                        }
-
-                        // Sort iff necessary
-                        if (!sorted)
-                        {
-                            // Delegate dispatch faster than interface dispatch (https://github.com/dotnet/coreclr/pull/8504)
-                            Array.Sort(array, TreeNodeComparer.Default.Compare);
-                        }
-
-                        // Assign (sorted by Name)
-                        _nodes = array;
-                    }
-                    return;
-            }
+            // Sort & de-duplicate
+            _nodes = DistinctSort(array, true);
         }
 
         #endregion
@@ -248,28 +94,30 @@ namespace SourceCode.Chasm
 
         public TreeNodeList Merge(TreeNode node)
         {
-            if (_nodes == null) return new TreeNodeList(node);
+            if (_nodes.IsEmpty) return new TreeNodeList(node);
 
             var index = IndexOf(node.Name);
 
-            TreeNode[] arr;
+            var span = _nodes.Span;
+
+            TreeNode[] array;
             if (index >= 0)
             {
-                arr = new TreeNode[_nodes.Length];
-                Array.Copy(_nodes, arr, _nodes.Length);
-                arr[index] = node;
+                array = new TreeNode[_nodes.Length];
+                span.CopyTo(array);
+                array[index] = node;
             }
             else
             {
                 index = ~index;
-                arr = new TreeNode[_nodes.Length + 1];
+                array = new TreeNode[_nodes.Length + 1];
 
                 var j = 0;
-                for (var i = 0; i < arr.Length; i++)
-                    arr[i] = i == index ? node : _nodes[j++];
+                for (var i = 0; i < array.Length; i++)
+                    array[i] = i == index ? node : span[j++];
             }
 
-            return new TreeNodeList(arr);
+            return new TreeNodeList(array);
         }
 
         public TreeNodeList Merge(TreeNodeList nodes)
@@ -277,7 +125,7 @@ namespace SourceCode.Chasm
             if (nodes == default || nodes.Count == 0)
                 return this;
 
-            if (_nodes == null || _nodes.Length == 0)
+            if (_nodes.IsEmpty || _nodes.Length == 0)
                 return nodes;
 
             var set = Merge(this, nodes);
@@ -291,7 +139,7 @@ namespace SourceCode.Chasm
             if (nodes == null || nodes.Count == 0)
                 return this;
 
-            if (_nodes == null || _nodes.Length == 0)
+            if (_nodes.IsEmpty)
                 return new TreeNodeList(nodes);
 
             var set = Merge(this, new TreeNodeList(nodes));
@@ -347,18 +195,18 @@ namespace SourceCode.Chasm
 
         public int IndexOf(string key)
         {
-            if (_nodes == null || key == null) return -1;
+            if (_nodes.IsEmpty || key == null) return -1;
 
             var l = 0;
             var r = _nodes.Length - 1;
             var i = r / 2;
             var ks = key;
 
+            var span = _nodes.Span;
+
             while (r >= l)
             {
-                var svc = _nodes[i];
-
-                var cmp = string.CompareOrdinal(svc.Name, ks);
+                var cmp = string.CompareOrdinal(span[i].Name, ks);
                 if (cmp == 0) return i;
                 else if (cmp > 0) r = i - 1;
                 else l = i + 1;
@@ -369,14 +217,13 @@ namespace SourceCode.Chasm
             return ~i;
         }
 
-        public bool ContainsKey(string key)
-            => IndexOf(key) >= 0;
+        public bool ContainsKey(string key) => IndexOf(key) >= 0;
 
         public bool TryGetValue(string key, out TreeNode value)
         {
             value = default;
 
-            if (_nodes == null || key == null)
+            if (_nodes.IsEmpty || key == null)
                 return false;
 
             var l = 0;
@@ -384,9 +231,11 @@ namespace SourceCode.Chasm
             var i = r / 2;
             var ks = key;
 
+            var span = _nodes.Span;
+
             while (r >= l)
             {
-                value = _nodes[i];
+                value = span[i];
 
                 var cmp = string.CompareOrdinal(value.Name, ks);
                 if (cmp == 0) return true;
@@ -419,8 +268,76 @@ namespace SourceCode.Chasm
 
         #region Helpers
 
-        private static ArgumentException CreateDuplicateException(TreeNode node)
-            => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeList)}: ({node})");
+        private static ReadOnlyMemory<TreeNode> DistinctSort(TreeNode[] array, bool alreadyCopied)
+        {
+            Debug.Assert(array != null); // Already checked at callsites
+
+            // Optimize for common cases 0, 1, 2, N
+            switch (array.Length)
+            {
+                case 1: return array;
+
+                case 2:
+                    {
+                        // If the Name (alone) is duplicated
+                        if (StringComparer.Ordinal.Equals(array[0].Name, array[1].Name))
+                        {
+                            // If it's a complete duplicate, silently skip
+                            if (TreeNodeComparer.Default.Equals(array[0], array[1]))
+                                return new TreeNode[1] { array[0] };
+
+                            // Else throw
+                            throw CreateDuplicateException(array[0]);
+                        }
+
+                        // Sort
+                        if (TreeNodeComparer.Default.Compare(array[0], array[1]) < 0)
+                            return new TreeNode[2] { array[0], array[1] };
+
+                        return new TreeNode[2] { array[1], array[0] };
+                    }
+
+                default:
+                    {
+                        // If callsite did not already copy, do so before mutating
+                        var nodes = array;
+                        if (!alreadyCopied)
+                        {
+                            nodes = new TreeNode[array.Length];
+                            array.CopyTo(nodes, 0);
+                        }
+
+                        // Sort: Delegate dispatch faster than interface (https://github.com/dotnet/coreclr/pull/8504)
+                        Array.Sort(nodes, TreeNodeComparer.Default.Compare);
+
+                        // Distinct
+                        var j = 1;
+                        for (var i = 1; i < nodes.Length; i++)
+                        {
+                            // If the Name (alone) is duplicated
+                            if (StringComparer.Ordinal.Equals(nodes[i - 1], nodes[i]))
+                            {
+                                // If it's a complete duplicate, silently skip
+                                if (TreeNodeComparer.Default.Equals(nodes[i - 1], nodes[i]))
+                                    continue;
+
+                                // Else throw
+                                throw CreateDuplicateException(nodes[0]);
+                            }
+
+                            nodes[j++] = nodes[i]; // Increment target index iff distinct
+                        }
+
+                        // Assign
+                        var span = new ReadOnlyMemory<TreeNode>(nodes, 0, j);
+                        return span;
+                    }
+            }
+
+            // Local functions
+            ArgumentException CreateDuplicateException(TreeNode node)
+                => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeList)}: ({node})");
+        }
 
         #endregion
 
@@ -430,11 +347,14 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (_nodes == null || _nodes.Length == 0)
+                if (_nodes.IsEmpty)
                     yield break;
 
-                foreach (var node in _nodes)
-                    yield return node.Name;
+                // TODO: Is Span safe under yield?
+                var span = _nodes.Span;
+
+                for (var i = 0; i < _nodes.Length; i++)
+                    yield return span[i].Name;
             }
         }
 
@@ -442,11 +362,14 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (_nodes == null || _nodes.Length == 0)
+                if (_nodes.IsEmpty)
                     yield break;
 
-                foreach (var node in _nodes)
-                    yield return node;
+                // TODO: Is Span safe under yield?
+                var span = _nodes.Span;
+
+                for (var i = 0; i < _nodes.Length; i++)
+                    yield return span[i];
             }
         }
 
@@ -456,11 +379,14 @@ namespace SourceCode.Chasm
 
         IEnumerator<KeyValuePair<string, TreeNode>> IEnumerable<KeyValuePair<string, TreeNode>>.GetEnumerator()
         {
-            if (_nodes == null || _nodes.Length == 0)
+            if (_nodes.IsEmpty)
                 yield break;
 
-            foreach (var item in _nodes)
-                yield return new KeyValuePair<string, TreeNode>(item.Name, item);
+            // TODO: Is Span safe under yield?
+            var span = _nodes.Span;
+
+            for (var i = 0; i < _nodes.Length; i++)
+                yield return new KeyValuePair<string, TreeNode>(span[i].Name, span[i]);
         }
 
         #endregion
@@ -483,7 +409,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(TreeNodeList x, TreeNodeList y) => !TreeNodeListComparer.Default.Equals(x, y); // not
 
-        public override string ToString() => $"{nameof(TreeNodeList)}: {_nodes?.Length ?? 0}";
+        public override string ToString() => $"{nameof(TreeNodeList)}: {_nodes.Length}";
 
         #endregion
     }
