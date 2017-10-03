@@ -1,4 +1,4 @@
-﻿using SourceCode.Clay.Collections.Generic;
+using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
 
@@ -47,7 +47,7 @@ namespace SourceCode.Chasm
                 if (x.CommitUtc != y.CommitUtc) return false;
                 if (!x.TreeId.Equals(y.TreeId)) return false;
                 if (!StringComparer.Ordinal.Equals(x.CommitMessage, y.CommitMessage)) return false;
-                if (!x.Parents.NullableEquals(y.Parents, CommitIdComparer.Default, true)) return false;
+                if (!x.Parents.ListEquals(y.Parents, CommitIdComparer.Default, true)) return false;
 
                 return true;
             }
