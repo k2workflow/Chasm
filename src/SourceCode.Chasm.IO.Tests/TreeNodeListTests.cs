@@ -15,7 +15,11 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeList_Default(IChasmSerializer ser)
         {
             TreeNodeList expected = default;
-            Assert.Throws<ArgumentNullException>(() => ser.Serialize(expected));
+            using (var buf = ser.Serialize(expected))
+            {
+                var actual = ser.DeserializeTree(buf.Result);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -49,7 +53,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeList_Empty_Array(IChasmSerializer ser)
         {
-            var expected = new TreeNodeList(Array.Empty<TreeNode>());
+            var expected = new TreeNodeList();
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeTree(buf.Result);

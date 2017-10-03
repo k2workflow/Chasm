@@ -7,7 +7,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
     {
         public static TreeWire Convert(this TreeNodeList model)
         {
-            if (model == null) return null;
             if (model.Count == 0) return new TreeWire();
 
             var wire = new TreeWire();
@@ -23,7 +22,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         public static TreeNodeList Convert(this TreeWire wire)
         {
             if (wire == null) return default;
-            if (wire.Nodes.Count == 0) return new TreeNodeList();
+            if (wire.Nodes.Count == 0) return default;
 
             var nodes = new TreeNode[wire.Nodes?.Count ?? 0];
             for (var i = 0; i < nodes.Length; i++)

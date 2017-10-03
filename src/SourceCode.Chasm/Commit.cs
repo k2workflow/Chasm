@@ -22,7 +22,7 @@ namespace SourceCode.Chasm
 
         #region Fields
 
-        private readonly IReadOnlyList<CommitId> _parents;
+        private readonly IReadOnlyList<CommitId> _parents; // May be null due to default ctor
         private readonly string _message;
 
         #endregion

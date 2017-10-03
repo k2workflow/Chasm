@@ -2,7 +2,7 @@
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static class NodeFixtures
+    public static class NodeTests
     {
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_NullTreeNodeList))]
