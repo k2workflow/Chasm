@@ -8,7 +8,6 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         public static JsonValue Convert(this TreeNodeList model)
         {
-            if (model == null) return default;
             if (model.Count == 0) return new JsonArray(Array.Empty<JsonValue>());
 
             var items = new JsonValue[model.Count];

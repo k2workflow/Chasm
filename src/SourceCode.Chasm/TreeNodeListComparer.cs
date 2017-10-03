@@ -1,5 +1,5 @@
-﻿using SourceCode.Clay.Collections.Generic;
 using System.Collections.Generic;
+using SourceCode.Clay.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -42,11 +42,7 @@ namespace SourceCode.Chasm
             { }
 
             public override bool Equals(TreeNodeList x, TreeNodeList y)
-            {
-                if (!x._nodes.NullableEquals(y._nodes, true)) return false;
-
-                return true;
-            }
+                => x._nodes.MemoryEquals(y._nodes, true);
 
             public override int GetHashCode(TreeNodeList obj)
             {
@@ -54,7 +50,10 @@ namespace SourceCode.Chasm
 
                 unchecked
                 {
-                    h = h * 7 + (obj._nodes?.Length ?? 42);
+                    h = h * 7 + obj._nodes.Length;
+
+                    if (obj._nodes.Length > 0)
+                        h = h * 7 + obj._nodes.Span[0].GetHashCode();
                 }
 
                 return h;

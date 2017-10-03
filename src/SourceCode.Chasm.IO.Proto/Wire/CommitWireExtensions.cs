@@ -16,30 +16,27 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             var wire = new CommitWire();
 
             // Parents
-            if (model.Parents != null)
+            switch (model.Parents.Count)
             {
-                switch (model.Parents.Count)
-                {
-                    case 0:
-                        break;
+                case 0:
+                    break;
 
-                    case 1:
+                case 1:
+                    {
+                        var sha1 = model.Parents[0].Sha1.Convert();
+                        wire.Parents.Add(sha1);
+                    }
+                    break;
+
+                default:
+                    {
+                        foreach (var parent in model.Parents)
                         {
-                            var sha1 = model.Parents[0].Sha1.Convert();
+                            var sha1 = parent.Sha1.Convert();
                             wire.Parents.Add(sha1);
                         }
-                        break;
-
-                    default:
-                        {
-                            foreach (var parent in model.Parents)
-                            {
-                                var sha1 = parent.Sha1.Convert();
-                                wire.Parents.Add(sha1);
-                            }
-                        }
-                        break;
-                }
+                    }
+                    break;
             }
 
             // CommitUtc
