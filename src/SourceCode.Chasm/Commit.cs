@@ -8,6 +8,12 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
+        /// <summary>
+        /// A singleton representing an empty <see cref="Commit"/> value.
+        /// </summary>
+        /// <value>
+        /// The empty.
+        /// </value>
         public static Commit Empty { get; }
 
         public static CommitId[] Orphaned { get; } = new[] { CommitId.Empty };
@@ -16,7 +22,7 @@ namespace SourceCode.Chasm
 
         #region Fields
 
-        private readonly IReadOnlyList<CommitId> _parents;
+        private readonly IReadOnlyList<CommitId> _parents; // May be null due to default ctor
         private readonly string _message;
 
         #endregion

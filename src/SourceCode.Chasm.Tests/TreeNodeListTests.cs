@@ -19,15 +19,20 @@ namespace SourceCode.Chasm.Tests
             var nullData = new TreeNodeList(null);
             var emptyData = new TreeNodeList(Array.Empty<TreeNode>());
 
-            Assert.Equal(noData, nullData);
-            Assert.Equal(noData.GetHashCode(), nullData.GetHashCode());
+            Assert.Empty(TreeNodeList.Empty);
+            Assert.Equal(default, TreeNodeList.Empty);
 
             Assert.Empty(noData);
-            Assert.Empty(nullData);
-            Assert.Empty(emptyData);
+            Assert.Equal(TreeNodeList.Empty, noData); // By design
+            Assert.Equal(TreeNodeList.Empty.GetHashCode(), noData.GetHashCode());
 
-            Assert.Equal(noData, emptyData); // By design
-            Assert.Equal(noData.GetHashCode(), emptyData.GetHashCode());
+            Assert.Empty(nullData);
+            Assert.Equal(TreeNodeList.Empty, nullData); // By design
+            Assert.Equal(TreeNodeList.Empty.GetHashCode(), nullData.GetHashCode());
+
+            Assert.Empty(emptyData);
+            Assert.Equal(TreeNodeList.Empty, emptyData); // By design
+            Assert.Equal(TreeNodeList.Empty.GetHashCode(), emptyData.GetHashCode());
         }
 
         [Trait("Type", "Unit")]

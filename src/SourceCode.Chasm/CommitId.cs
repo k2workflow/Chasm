@@ -6,6 +6,12 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
+        /// <summary>
+        /// A singleton representing an empty <see cref="CommitId"/> value.
+        /// </summary>
+        /// <value>
+        /// The empty.
+        /// </value>
         public static CommitId Empty { get; }
 
         #endregion

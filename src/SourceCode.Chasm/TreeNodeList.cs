@@ -6,17 +6,23 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
-    public sealed class TreeNodeList : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeList>
+    public struct TreeNodeList : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeList>
     {
         #region Constants
 
-        //
+        /// <summary>
+        /// A singleton representing an empty <see cref="TreeNodeList"/> value.
+        /// </summary>
+        /// <value>
+        /// The empty.
+        /// </value>
+        public static TreeNodeList Empty { get; }
 
         #endregion
 
         #region Fields
 
-        internal readonly TreeNode[] _nodes;
+        internal readonly TreeNode[] _nodes; // May be null due to default ctor
 
         #endregion
 
@@ -27,7 +33,7 @@ namespace SourceCode.Chasm
             get
             {
                 if (_nodes == null)
-                    return Array.Empty<TreeNode>()[index]; // Leverage underlying exception
+                    return Array.Empty<TreeNode>()[index]; // Throw underlying exception
 
                 return _nodes[index];
             }
@@ -50,28 +56,20 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        public TreeNodeList()
-        {
-            // Coerce null to empty
-            _nodes = Array.Empty<TreeNode>();
-        }
-
         public TreeNodeList(params TreeNode[] nodes)
         {
-            // Coerce null to empty
-            if (nodes == null)
+            // Coerce null to null
+            if (nodes == null || nodes.Length == 0)
             {
-                _nodes = Array.Empty<TreeNode>();
+                // We choose to coerce empty & null to null, so that serialization round-trips properly.
+                // (May be null due to default ctor)
+                _nodes = null;
                 return;
             }
 
             // Optimize for common cases 0, 1, 2, N
             switch (nodes.Length)
             {
-                case 0:
-                    _nodes = Array.Empty<TreeNode>();
-                    return;
-
                 case 1:
                     _nodes = new TreeNode[1] { nodes[0] };
                     return;
@@ -132,19 +130,18 @@ namespace SourceCode.Chasm
 
         public TreeNodeList(ICollection<TreeNode> nodes)
         {
-            if (nodes == null)
+            // Coerce null to null
+            if (nodes == null || nodes.Count == 0)
             {
-                _nodes = Array.Empty<TreeNode>();
+                // We choose to coerce empty & null to null, so that serialization round-trips properly.
+                // (May be null due to default ctor)
+                _nodes = null;
                 return;
             }
 
             // Optimize for common cases 0, 1, 2, N
             switch (nodes.Count)
             {
-                case 0:
-                    _nodes = Array.Empty<TreeNode>();
-                    return;
-
                 case 1:
                     using (var enm = nodes.GetEnumerator())
                     {
@@ -433,7 +430,8 @@ namespace SourceCode.Chasm
 
         IEnumerator<KeyValuePair<string, TreeNode>> IEnumerable<KeyValuePair<string, TreeNode>>.GetEnumerator()
         {
-            if (_nodes == null) yield break;
+            if (_nodes == null || _nodes.Length == 0)
+                yield break;
 
             foreach (var item in _nodes)
                 yield return new KeyValuePair<string, TreeNode>(item.Name, item);
@@ -446,8 +444,8 @@ namespace SourceCode.Chasm
         public bool Equals(TreeNodeList other) => TreeNodeListComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is TreeNodeList tnl
-            && TreeNodeListComparer.Default.Equals(this, tnl);
+            => obj is TreeNodeList tree
+            && TreeNodeListComparer.Default.Equals(this, tree);
 
         public override int GetHashCode() => TreeNodeListComparer.Default.GetHashCode(this);
 

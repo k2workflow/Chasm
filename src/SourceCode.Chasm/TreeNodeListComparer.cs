@@ -43,8 +43,6 @@ namespace SourceCode.Chasm
 
             public override bool Equals(TreeNodeList x, TreeNodeList y)
             {
-                if (ReferenceEquals(x, y)) return true; // (x, x) or (null, null)
-                if (ReferenceEquals(x, null) || ReferenceEquals(y, null)) return false; // (x, null) or (null, y)
                 if (!x._nodes.NullableEquals(y._nodes, true)) return false;
 
                 return true;
