@@ -13,24 +13,30 @@ before_build:
 
 build_script:
 - dotnet build "src\SourceCode.Chasm\SourceCode.Chasm.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "src\SourceCode.Chasm.IO.Json\SourceCode.Chasm.IO.Json.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "src\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "src\SourceCode.Chasm.IO.AzureBlobStorage\SourceCode.Chasm.IO.AzureBlobStorage.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "src\SourceCode.Chasm.IO.AzureTableStorage\SourceCode.Chasm.IO.AzureTableStorage.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+
+- dotnet build "src\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "src\SourceCode.Chasm.Serializer.Proto\SourceCode.Chasm.Serializer.Proto.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+
+- dotnet build "src\SourceCode.Chasm.Repository.AzureBlob\SourceCode.Chasm.Repository.AzureBlob.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "src\SourceCode.Chasm.Repository.AzureTable\SourceCode.Chasm.Repository.AzureTable.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 
 - dotnet build "src\SourceCode.Chasm.Tests\SourceCode.Chasm.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "src\SourceCode.Chasm.IO.Tests\SourceCode.Chasm.IO.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "src\SourceCode.Chasm.Serializer.Tests\SourceCode.Chasm.Serializer.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "src\SourceCode.Chasm.Repository.Tests\SourceCode.Chasm.Repository.Tests.csproj" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 
 after_build:
  - dotnet pack "src\SourceCode.Chasm\SourceCode.Chasm.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
- - dotnet pack "src\SourceCode.Chasm.IO.Json\SourceCode.Chasm.IO.Json.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
- - dotnet pack "src\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
- - dotnet pack "src\SourceCode.Chasm.IO.AzureBlobStorage\SourceCode.Chasm.IO.AzureBlobStorage.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
- - dotnet pack "src\SourceCode.Chasm.IO.AzureTableStorage\SourceCode.Chasm.IO.AzureTableStorage.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
+
+ - dotnet pack "src\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
+ - dotnet pack "src\SourceCode.Chasm.Serializer.Proto\SourceCode.Chasm.Serializer.Proto.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
+ 
+ - dotnet pack "src\SourceCode.Chasm.Repository.AzureBlob\SourceCode.Chasm.Repository.AzureBlob.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
+ - dotnet pack "src\SourceCode.Chasm.Repository.AzureTable\SourceCode.Chasm.Repository.AzureTable.csproj" -c %CONFIGURATION% --no-build --version-suffix %LABEL%
 
 test_script:
 - dotnet test "src\SourceCode.Chasm.Tests\SourceCode.Chasm.Tests.csproj" -c %CONFIGURATION% --no-build
-- dotnet test "src\SourceCode.Chasm.IO.Tests\SourceCode.Chasm.IO.Tests.csproj" -c %CONFIGURATION% --no-build
+- dotnet test "src\SourceCode.Chasm.Serializer.Tests\SourceCode.Chasm.Serializer.Tests.csproj" -c %CONFIGURATION% --no-build
+- dotnet test "src\SourceCode.Chasm.Repository.Tests\SourceCode.Chasm.Repository.Tests.csproj" -c %CONFIGURATION% --no-build
 
 artifacts:
   - path: '**\*.nupkg'
