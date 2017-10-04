@@ -12,7 +12,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170923-02" />
     <PackageReference Include="xunit" Version="2.3.0-rc1-build3809" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-rc1-build3809" />
-    <PackageReference Include="Moq" Version="4.7.127" />
+    <PackageReference Include="Moq" Version="4.7.137" />
   </ItemGroup>
 
   <ItemGroup>
