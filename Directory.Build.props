@@ -17,6 +17,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <PackageProjectUrl>https://github.com/k2workflow/Chasm/</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/k2workflow/Chasm/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+  <PropertyGroup>
   </PropertyGroup>
 </Project>

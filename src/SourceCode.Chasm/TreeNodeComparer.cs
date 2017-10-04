@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace SourceCode.Chasm
@@ -74,16 +74,16 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNode obj)
             {
-                var h = 11;
+                var hc = 11L;
 
                 unchecked
                 {
-                    h = h * 7 + (obj.Name == null ? 0 : StringComparer.Ordinal.GetHashCode(obj.Name));
-                    h = h * 7 + (int)obj.Kind;
-                    h = h * 7 + obj.Sha1.GetHashCode();
+                    hc = hc * 7 + (obj.Name == null ? 0 : StringComparer.Ordinal.GetHashCode(obj.Name));
+                    hc = hc * 7 + (int)obj.Kind;
+                    hc = hc * 7 + obj.Sha1.GetHashCode();
                 }
 
-                return h;
+                return ((int)(hc >> 32)) ^ (int)hc;
             }
         }
 
