@@ -22,8 +22,9 @@
 
   <PropertyGroup>
     <PackageId>SourceCode.Chasm.Repository.AzureBlob</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>CAS - Content Addressable Storage (Azure Blob Storage).</Description>
+    <Authors>SourceCode</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>CAS - Content Addressable Storage (Azure Blob Storage Repository).</Description>
     <PackageTags>cas content storage sha1 git azure blob</PackageTags>
   </PropertyGroup>
 </Project>
