@@ -1,12 +1,13 @@
+using SourceCode.Chasm.IO;
 using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureBlobStorage
+namespace SourceCode.Chasm.Repository.AzureTable
 {
-    partial class AzureBlobChasmRepo // .Tree
+    partial class AzureTableChasmRepo // .Tree
     {
         #region Read (via TreeId)
 

@@ -12,7 +12,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureTableStorage
+namespace SourceCode.Chasm.Repository.AzureTable
 {
     partial class AzureTableChasmRepo // .Object
     {

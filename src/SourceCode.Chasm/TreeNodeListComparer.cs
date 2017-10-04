@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using SourceCode.Clay.Collections.Generic;
+using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {

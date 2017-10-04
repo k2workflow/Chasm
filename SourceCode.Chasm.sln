@@ -7,19 +7,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm", "src\Sou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Tests", "src\SourceCode.Chasm.Tests\SourceCode.Chasm.Tests.csproj", "{E5C63B7F-51ED-4B85-AE71-375D8F1B0A3D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Json", "src\SourceCode.Chasm.IO.Json\SourceCode.Chasm.IO.Json.csproj", "{26312E66-C152-429B-B455-099A22929772}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Serializer.Json", "src\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj", "{26312E66-C152-429B-B455-099A22929772}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Tests", "src\SourceCode.Chasm.IO.Tests\SourceCode.Chasm.IO.Tests.csproj", "{15175969-02BF-4156-B4E4-EADC6E0074A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Serializer.Tests", "src\SourceCode.Chasm.Serializer.Tests\SourceCode.Chasm.Serializer.Tests.csproj", "{15175969-02BF-4156-B4E4-EADC6E0074A7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Proto", "src\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj", "{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Serializer.Proto", "src\SourceCode.Chasm.Serializer.Proto\SourceCode.Chasm.Serializer.Proto.csproj", "{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2E823422-9C14-40E9-A4E4-FD62EBA208A6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.AzureBlobStorage", "src\SourceCode.Chasm.IO.AzureBlobStorage\SourceCode.Chasm.IO.AzureBlobStorage.csproj", "{4BCE88E4-3614-4561-9807-62418664CE5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.AzureBlob", "src\SourceCode.Chasm.Repository.AzureBlob\SourceCode.Chasm.Repository.AzureBlob.csproj", "{4BCE88E4-3614-4561-9807-62418664CE5A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.AzureTableStorage", "src\SourceCode.Chasm.IO.AzureTableStorage\SourceCode.Chasm.IO.AzureTableStorage.csproj", "{4B34F2F6-157D-4E6E-B996-05031B33EC17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.AzureTable", "src\SourceCode.Chasm.Repository.AzureTable\SourceCode.Chasm.Repository.AzureTable.csproj", "{4B34F2F6-157D-4E6E-B996-05031B33EC17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceCode.Chasm.IO.Azure.Tests", "src\SourceCode.Chasm.IO.Azure.Tests\SourceCode.Chasm.IO.Azure.Tests.csproj", "{054B1D31-402F-4111-AB34-CDDB7461FB72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.Tests", "src\SourceCode.Chasm.Repository.Tests\SourceCode.Chasm.Repository.Tests.csproj", "{054B1D31-402F-4111-AB34-CDDB7461FB72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,7 +2,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 
-namespace SourceCode.Chasm.IO.AzureTableStorage
+namespace SourceCode.Chasm.Repository.AzureTable
 {
     public sealed class DataEntity : TableEntity
     {

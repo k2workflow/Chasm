@@ -1,5 +1,6 @@
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using SourceCode.Chasm.IO;
 using SourceCode.Clay;
 using System;
 using System.IO;
@@ -8,7 +9,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureTableStorage
+namespace SourceCode.Chasm.Repository.AzureTable
 {
     partial class AzureTableChasmRepo // .CommitRef
     {

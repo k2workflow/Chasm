@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureTableStorage
+namespace SourceCode.Chasm.IO.AzureBlob
 {
-    partial class AzureTableChasmRepo // .Tree
+    partial class AzureBlobChasmRepo // .Tree
     {
         #region Read (via TreeId)
 

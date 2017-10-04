@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Common properties defined in Directory.Build.props -->
 
@@ -12,14 +12,12 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170923-02" />
     <PackageReference Include="xunit" Version="2.3.0-rc2-build3812" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-rc2-build3812" />
+    <PackageReference Include="Moq" Version="4.7.137" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.Repository.AzureBlob\SourceCode.Chasm.Repository.AzureBlob.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.Repository.AzureTable\SourceCode.Chasm.Repository.AzureTable.csproj" />
     <ProjectReference Include="..\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 </Project>

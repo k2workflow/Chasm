@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureBlobStorage
+namespace SourceCode.Chasm.IO.AzureBlob
 {
     partial class AzureBlobChasmRepo // .Commit
     {

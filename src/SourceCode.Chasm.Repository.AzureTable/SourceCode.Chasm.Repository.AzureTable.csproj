@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <PackageId>SourceCode.Chasm.Repository.AzureTable</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>CAS - Content Addressable Storage (Azure Table Storage).</Description>
     <PackageTags>cas content storage sha1 git azure table</PackageTags>
