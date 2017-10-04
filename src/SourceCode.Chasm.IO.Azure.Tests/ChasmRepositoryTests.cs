@@ -1,8 +1,8 @@
-﻿using Moq;
+using Moq;
 using SourceCode.Chasm.IO.Json;
 using Xunit;
 
-namespace SourceCode.Chasm.IO.Tests
+namespace SourceCode.Chasm.IO.Azure.Tests
 {
     public static class ChasmRepositoryTests
     {

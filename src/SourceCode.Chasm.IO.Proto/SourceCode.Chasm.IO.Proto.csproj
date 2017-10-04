@@ -3,11 +3,7 @@
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <Description>CAS - Content Addressable Storage (Protobuf).</Description>
-    <PackageTags>cas content storage sha1 git proto</PackageTags>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -27,4 +23,9 @@
   <Target Name="BeforeBuild">
     <Exec Command="AutoGen.cmd" WorkingDirectory="Wire" />
   </Target>
+
+  <PropertyGroup>
+    <Description>CAS - Content Addressable Storage (Protobuf).</Description>
+    <PackageTags>cas content storage sha1 git proto</PackageTags>
+  </PropertyGroup>
 </Project>

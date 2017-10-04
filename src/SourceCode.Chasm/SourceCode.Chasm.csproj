@@ -3,11 +3,7 @@
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <Description>CAS - Content Addressable Storage.</Description>
-    <PackageTags>cas content storage sha1 git model</PackageTags>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -19,4 +15,9 @@
     <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00175" />
     <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00175" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <Description>CAS - Content Addressable Storage.</Description>
+    <PackageTags>cas content storage sha1 git model</PackageTags>
+  </PropertyGroup>
 </Project>

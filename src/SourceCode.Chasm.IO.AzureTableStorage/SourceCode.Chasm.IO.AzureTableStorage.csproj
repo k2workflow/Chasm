@@ -4,11 +4,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <VersionPrefix>1.0.0</VersionPrefix>
-    <Product>SourceCode.Chasm</Product>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -24,4 +19,9 @@
   <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <Description>CAS - Content Addressable Storage (Azure Table Storage).</Description>
+    <PackageTags>cas content storage sha1 git azure table</PackageTags>
+  </PropertyGroup>
 </Project>

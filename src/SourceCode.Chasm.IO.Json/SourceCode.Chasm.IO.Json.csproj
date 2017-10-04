@@ -3,11 +3,7 @@
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <Description>CAS - Content Addressable Storage (Json).</Description>
-    <PackageTags>cas content storage sha1 git json</PackageTags>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -22,4 +18,9 @@
   <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <Description>CAS - Content Addressable Storage (Json).</Description>
+    <PackageTags>cas content storage sha1 git json</PackageTags>
+  </PropertyGroup>
 </Project>
