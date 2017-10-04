@@ -72,16 +72,16 @@ namespace SourceCode.Chasm
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override int GetHashCode(Sha1 obj)
             {
-                var h = 11L;
+                var hc = 11L;
 
                 unchecked
                 {
-                    h = h * 7 + (long)obj.Blit0;
-                    h = h * 7 + (long)obj.Blit1;
-                    h = h * 7 + obj.Blit2;
+                    hc = hc * 7 + (long)obj.Blit0;
+                    hc = hc * 7 + (long)obj.Blit1;
+                    hc = hc * 7 + obj.Blit2;
                 }
 
-                return (int)h;
+                return ((int)(hc >> 32)) ^ (int)hc;
             }
         }
 

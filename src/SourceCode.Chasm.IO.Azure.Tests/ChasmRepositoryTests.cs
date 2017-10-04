@@ -1,8 +1,10 @@
-﻿using Moq;
+using Moq;
 using SourceCode.Chasm.IO.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace SourceCode.Chasm.IO.Tests
+namespace SourceCode.Chasm.IO.Azure.Tests
 {
     public static class ChasmRepositoryTests
     {
@@ -20,16 +22,17 @@ namespace SourceCode.Chasm.IO.Tests
         public static void Repo_ReadCommitRef() //byte[] x, byte[] y, bool isEqual)
         {
             var repo = new Mock<IChasmRepository>();
+
             repo.Setup(r => r.Serializer).Returns(new JsonChasmSerializer());
             repo.Setup(r => r.CompressionLevel).Returns(System.IO.Compression.CompressionLevel.NoCompression);
+            repo.Setup(r => r.MaxDop).Returns(-1);
 
-            repo.Setup(r => r.ReadCommitRef(null, null)).Returns(CommitId.Empty);
+            repo.Setup(r => r.ReadCommitRefAsync(null, null, CancellationToken.None)).Returns(new ValueTask<CommitId>(CommitId.Empty));
+            repo.Setup(r => r.ReadCommitRefAsync(string.Empty, null, CancellationToken.None)).Returns(new ValueTask<CommitId>(CommitId.Empty));
+            repo.Setup(r => r.ReadCommitRefAsync(null, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitId>(CommitId.Empty));
+            repo.Setup(r => r.ReadCommitRefAsync(string.Empty, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitId>(CommitId.Empty));
 
-            repo.Setup(r => r.ReadCommitRef(string.Empty, null)).Returns(CommitId.Empty);
-            repo.Setup(r => r.ReadCommitRef(null, string.Empty)).Returns(CommitId.Empty);
-            repo.Setup(r => r.ReadCommitRef(string.Empty, string.Empty)).Returns(CommitId.Empty);
-
-            repo.Setup(r => r.ReadCommitRef("branch", "name")).Returns(new CommitId(Sha1.Hash("branch-name")));
+            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitId>(new CommitId(Sha1.Hash("branch-name"))));
         }
     }
 }

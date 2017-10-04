@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,21 +12,17 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Google.Protobuf" Version="3.4.1" />
-    <PackageReference Include="Google.Protobuf.Tools" Version="3.4.0" />
+    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00182" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
 
-  <Target Name="BeforeBuild">
-    <Exec Command="AutoGen.cmd" WorkingDirectory="Wire" />
-  </Target>
-
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>CAS - Content Addressable Storage (Protobuf).</Description>
-    <PackageTags>cas content storage sha1 git proto</PackageTags>
+    <Description>CAS - Content Addressable Storage (Azure Blob Storage).</Description>
+    <PackageTags>cas content storage sha1 git azure blob</PackageTags>
   </PropertyGroup>
 </Project>

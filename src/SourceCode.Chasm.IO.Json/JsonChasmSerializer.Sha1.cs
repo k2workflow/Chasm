@@ -1,4 +1,4 @@
-﻿using SourceCode.Clay.Buffers;
+using SourceCode.Clay.Buffers;
 using System;
 using System.Text;
 
@@ -8,7 +8,7 @@ namespace SourceCode.Chasm.IO.Json
     {
         #region Serialize
 
-        public override BufferSession Serialize(Sha1 model)
+        public BufferSession Serialize(Sha1 model)
         {
             var json = model.ToString("N");
 
@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public override Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
+        public Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
 

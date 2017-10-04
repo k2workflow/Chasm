@@ -1,4 +1,4 @@
-﻿using SourceCode.Chasm.IO.Json.Wire;
+using SourceCode.Chasm.IO.Json.Wire;
 using SourceCode.Clay.Buffers;
 using System;
 using System.Text;
@@ -9,7 +9,7 @@ namespace SourceCode.Chasm.IO.Json
     {
         #region Serialize
 
-        public override BufferSession Serialize(TreeNodeList model)
+        public BufferSession Serialize(TreeNodeList model)
         {
             var wire = model.Convert();
             var json = wire?.ToString() ?? "null";
@@ -27,7 +27,7 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public override TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
+        public TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
 

@@ -3,11 +3,7 @@
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <Description>CAS - Content Addressable Storage (Json).</Description>
-    <PackageTags>cas content storage sha1 git json</PackageTags>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -16,10 +12,16 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00175" />
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00182" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>CAS - Content Addressable Storage (Json).</Description>
+    <PackageTags>cas content storage sha1 git json</PackageTags>
+  </PropertyGroup>
 </Project>

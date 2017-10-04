@@ -46,17 +46,17 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNodeList obj)
             {
-                var h = 11;
+                var hc = 11L;
 
                 unchecked
                 {
-                    h = h * 7 + obj._nodes.Length;
+                    hc = hc * 7 + obj._nodes.Length;
 
                     if (obj._nodes.Length > 0)
-                        h = h * 7 + obj._nodes.Span[0].GetHashCode();
+                        hc = hc * 7 + obj._nodes.Span[0].GetHashCode();
                 }
 
-                return h;
+                return ((int)(hc >> 32)) ^ (int)hc;
             }
         }
 
