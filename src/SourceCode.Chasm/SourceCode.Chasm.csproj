@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <PackageId>SourceCode.Chasm</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>CAS - Content Addressable Storage.</Description>
     <PackageTags>cas content storage sha1 git model</PackageTags>

@@ -13,7 +13,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureBlobStorage
+namespace SourceCode.Chasm.IO.AzureBlob
 {
     partial class AzureBlobChasmRepo // .Object
     {

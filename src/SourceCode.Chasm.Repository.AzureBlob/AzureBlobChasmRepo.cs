@@ -1,17 +1,17 @@
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO.Compression;
 using System.Threading;
 
-namespace SourceCode.Chasm.IO.AzureTableStorage
+namespace SourceCode.Chasm.IO.AzureBlob
 {
-    public sealed partial class AzureTableChasmRepo : IChasmRepository
+    public sealed partial class AzureBlobChasmRepo : IChasmRepository
     {
         #region Fields
 
-        private readonly Lazy<CloudTable> _refsTable;
-        private readonly Lazy<CloudTable> _objectsTable;
+        private readonly Lazy<CloudBlobContainer> _refsContainer;
+        private readonly Lazy<CloudBlobContainer> _objectsContainer;
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
 
         #region Constructors
 
-        public AzureTableChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
+        public AzureBlobChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
             if (!Enum.IsDefined(typeof(CompressionLevel), compressionLevel)) throw new ArgumentOutOfRangeException(nameof(compressionLevel));
@@ -37,13 +37,14 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
             CompressionLevel = compressionLevel;
             MaxDop = maxDop;
 
-            var client = storageAccount.CreateCloudTableClient();
+            var client = storageAccount.CreateCloudBlobClient();
+            client.DefaultRequestOptions.ParallelOperationThreadCount = 4; // Default is 1
 
             // Refs
-            _refsTable = new Lazy<CloudTable>(() =>
+            _refsContainer = new Lazy<CloudBlobContainer>(() =>
             {
-                const string table = "refs";
-                var tr = client.GetTableReference(table);
+                var container = "refs";
+                var tr = client.GetContainerReference(container);
 
                 tr.CreateIfNotExistsAsync().Wait();
 
@@ -51,10 +52,10 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
             }, LazyThreadSafetyMode.PublicationOnly);
 
             // Objects
-            _objectsTable = new Lazy<CloudTable>(() =>
+            _objectsContainer = new Lazy<CloudBlobContainer>(() =>
             {
                 const string container = "objects";
-                var tr = client.GetTableReference(container);
+                var tr = client.GetContainerReference(container);
 
                 tr.CreateIfNotExistsAsync().Wait();
 
@@ -62,11 +63,11 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
             }, LazyThreadSafetyMode.PublicationOnly);
         }
 
-        public AzureTableChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, CompressionLevel compressionLevel)
+        public AzureBlobChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, CompressionLevel compressionLevel)
           : this(storageAccount, serializer, compressionLevel, -1)
         { }
 
-        public AzureTableChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer)
+        public AzureBlobChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer)
             : this(storageAccount, serializer, CompressionLevel.Optimal)
         { }
 
@@ -74,13 +75,13 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
 
         #region Factory
 
-        public static AzureTableChasmRepo Create(string connectionString, IChasmSerializer serializer, CompressionLevel compressionLevel)
+        public static AzureBlobChasmRepo Create(string connectionString, IChasmSerializer serializer, CompressionLevel compressionLevel)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException(nameof(connectionString));
             if (serializer == null) throw new ArgumentNullException(nameof(serializer));
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
-            var repo = new AzureTableChasmRepo(storageAccount, serializer, compressionLevel);
+            var repo = new AzureBlobChasmRepo(storageAccount, serializer, compressionLevel);
 
             return repo;
         }

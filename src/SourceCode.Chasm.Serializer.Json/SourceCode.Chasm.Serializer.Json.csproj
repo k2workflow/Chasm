@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <PackageId>SourceCode.Chasm.IO.Json</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>CAS - Content Addressable Storage (Json).</Description>
     <PackageTags>cas content storage sha1 git json</PackageTags>
