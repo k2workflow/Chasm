@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26923.0
+VisualStudioVersion = 15.0.26929.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm", "src\SourceCode.Chasm\SourceCode.Chasm.csproj", "{430F8C16-427D-4756-B788-80C1F41E2B9A}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.Proto", "src\SourceCode.Chasm.IO.Proto\SourceCode.Chasm.IO.Proto.csproj", "{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2E823422-9C14-40E9-A4E4-FD62EBA208A6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IO.AzureBlobStorage", "src\SourceCode.Chasm.IO.AzureBlobStorage\SourceCode.Chasm.IO.AzureBlobStorage.csproj", "{4BCE88E4-3614-4561-9807-62418664CE5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0FBE1AA-9680-4FF5-AA18-56145CCB7D7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BCE88E4-3614-4561-9807-62418664CE5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BCE88E4-3614-4561-9807-62418664CE5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BCE88E4-3614-4561-9807-62418664CE5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BCE88E4-3614-4561-9807-62418664CE5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
