@@ -1,6 +1,6 @@
-﻿namespace SourceCode.Chasm.IO.Json
+namespace SourceCode.Chasm.IO.Json
 {
-    public sealed partial class JsonChasmSerializer : ChasmSerializer
+    public sealed partial class JsonChasmSerializer : IChasmSerializer
     {
     }
 }

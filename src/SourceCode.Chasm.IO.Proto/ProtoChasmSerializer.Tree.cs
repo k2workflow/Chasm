@@ -1,4 +1,4 @@
-﻿using Google.Protobuf;
+using Google.Protobuf;
 using SourceCode.Chasm.IO.Proto.Wire;
 using SourceCode.Clay.Buffers;
 using System;
@@ -9,7 +9,7 @@ namespace SourceCode.Chasm.IO.Proto
     {
         #region Serialize
 
-        public override BufferSession Serialize(TreeNodeList model)
+        public BufferSession Serialize(TreeNodeList model)
         {
             var wire = model.Convert();
 
@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public override TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
+        public TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) return default;
 

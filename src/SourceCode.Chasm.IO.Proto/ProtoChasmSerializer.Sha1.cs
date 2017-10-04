@@ -1,4 +1,4 @@
-﻿using Google.Protobuf;
+using Google.Protobuf;
 using SourceCode.Chasm.IO.Proto.Wire;
 using SourceCode.Clay.Buffers;
 using System;
@@ -9,7 +9,7 @@ namespace SourceCode.Chasm.IO.Proto
     {
         #region Serialize
 
-        public override BufferSession Serialize(Sha1 model)
+        public BufferSession Serialize(Sha1 model)
         {
             var wire = model.Convert();
             if (wire == null)
@@ -33,7 +33,7 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public unsafe override Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
+        public unsafe Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) return default;
 
