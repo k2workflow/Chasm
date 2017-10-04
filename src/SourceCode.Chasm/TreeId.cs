@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SourceCode.Chasm
 {
@@ -54,7 +54,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(TreeId x, TreeId y) => !TreeIdComparer.Default.Equals(x, y); // not
 
-        public override string ToString() => $"{nameof(TreeId)}: {Sha1}";
+        public override string ToString() => Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
 
         #endregion
     }

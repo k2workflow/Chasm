@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace SourceCode.Chasm
 {
@@ -56,7 +56,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(CommitRef x, CommitRef y) => !CommitRefComparer.Default.Equals(x, y); // not
 
-        public override string ToString() => $"{nameof(CommitRef)}: {CommitId}";
+        public override string ToString() => CommitId.Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
 
         #endregion
     }

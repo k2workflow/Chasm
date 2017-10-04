@@ -42,17 +42,16 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
                 var bytes = (byte[])result.Result;
                 using (var input = new MemoryStream(bytes))
                 using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
+                using (var output = new MemoryStream())
                 {
-                    using (var output = new MemoryStream())
-                    {
-                        input.Position = 0; // Else gzip returns []
-                        gzip.CopyTo(output);
+                    input.Position = 0; // Else gzip returns []
+                    gzip.CopyTo(output);
 
-                        if (output.Length > 0)
-                        {
-                            var sha1 = serializer.DeserializeSha1(output.ToArray()); // TODO: Perf
-                            commitId = new CommitId(sha1);
-                        }
+                    if (output.Length > 0)
+                    {
+                        var buffer = output.ToArray(); // TODO: Perf
+                        var sha1 = serializer.DeserializeSha1(buffer);
+                        commitId = new CommitId(sha1);
                     }
                 }
             }

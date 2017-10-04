@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 
 namespace SourceCode.Chasm.Tests
 {
@@ -10,6 +10,7 @@ namespace SourceCode.Chasm.Tests
         {
             Assert.Equal(Sha1.Empty, CommitId.Empty.Sha1);
             Assert.Equal(default, CommitId.Empty);
+            Assert.Equal(Sha1.Empty.ToString(), CommitId.Empty.ToString());
         }
 
         [Trait("Type", "Unit")]
@@ -20,14 +21,21 @@ namespace SourceCode.Chasm.Tests
             var commitId2 = new CommitId(Sha1.Hash("abc"));
             var commitId3 = new CommitId(Sha1.Hash("def"));
 
+            Assert.Equal(commitId1.Sha1.ToString(), commitId1.ToString());
+            Assert.Equal(commitId2.Sha1.ToString(), commitId2.ToString());
+            Assert.Equal(commitId3.Sha1.ToString(), commitId3.ToString());
+
             Assert.Equal(commitId1, commitId2);
             Assert.Equal(commitId1.GetHashCode(), commitId2.GetHashCode());
+            Assert.Equal(commitId1.ToString(), commitId2.ToString());
 
             Assert.NotEqual(CommitId.Empty, commitId1);
             Assert.NotEqual(CommitId.Empty.GetHashCode(), commitId1.GetHashCode());
+            Assert.NotEqual(CommitId.Empty.ToString(), commitId1.ToString());
 
             Assert.NotEqual(commitId3, commitId1);
             Assert.NotEqual(commitId3.GetHashCode(), commitId1.GetHashCode());
+            Assert.NotEqual(commitId3.ToString(), commitId1.ToString());
         }
     }
 }

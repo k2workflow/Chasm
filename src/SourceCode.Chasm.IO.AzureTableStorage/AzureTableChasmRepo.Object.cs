@@ -32,13 +32,16 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
             try
             {
                 var result = await objectsTable.ExecuteAsync(op, new TableRequestOptions(), new OperationContext(), cancellationToken).ConfigureAwait(false);
+
+                if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
+                    return Array.Empty<byte>();
+
                 var bytes = (byte[])result.Result;
 
                 using (var input = new MemoryStream(bytes))
                 using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
                 using (var output = new MemoryStream())
                 {
-                    input.Position = 0; // Else gzip returns []
                     gzip.CopyTo(output);
 
                     var buffer = output.ToArray(); // TODO: Perf
@@ -106,13 +109,16 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
                 {
                     // Bad practice to use async within Parallel
                     var result = objectsTable.ExecuteAsync(op, new TableRequestOptions(), new OperationContext(), options.CancellationToken).Result;
+
+                    if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
+                        return;
+
                     var bytes = (byte[])result.Result;
 
                     using (var input = new MemoryStream(bytes))
                     using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
                     using (var output = new MemoryStream())
                     {
-                        input.Position = 0; // Else gzip returns []
                         gzip.CopyTo(output);
 
                         var buffer = output.ToArray(); // TODO: Perf
@@ -145,8 +151,8 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
                 {
                     gz.Write(segment.Array, segment.Offset, segment.Count);
                 }
-
                 output.Position = 0;
+
                 var seg = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
 
                 var op = DataEntity.BuildWriteOperation(objectId, seg, forceOverwrite);
@@ -204,8 +210,8 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
                         var segment = item.Value;
                         gz.Write(segment.Array, segment.Offset, segment.Count);
                     }
-
                     output.Position = 0;
+
                     var seg = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
 
                     zipped.Add(item.Key, seg);

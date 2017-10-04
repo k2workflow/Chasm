@@ -32,17 +32,17 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
             var kvps = await ReadObjectsAsync(sha1s, cancellationToken).ConfigureAwait(false);
 
             // Deserialize
-            var dict = DeserializeTrees(kvps);
+            var dict = DeserializeTreesImpl(Serializer, kvps);
             return dict;
         }
 
-        private IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTrees(IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
+        private static IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTreesImpl(IChasmSerializer serializer, IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
         {
             var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
 
             foreach (var kvp in kvps)
             {
-                var tree = Serializer.DeserializeTree(kvp.Value.Span);
+                var tree = serializer.DeserializeTree(kvp.Value.Span);
 
                 var treeId = new TreeId(kvp.Key);
                 dict[treeId] = tree;
@@ -78,12 +78,12 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
             if (commitId == CommitId.Empty) return default;
 
             // Commit
-            var commit = await ReadCommitAsync(commitId, cancellationToken).ConfigureAwait(false); ;
+            var commit = await ReadCommitAsync(commitId, cancellationToken).ConfigureAwait(false);
             if (commit == Commit.Empty)
                 return default;
 
             // Tree
-            var tree = await ReadTreeAsync(commit.TreeId, cancellationToken);
+            var tree = await ReadTreeAsync(commit.TreeId, cancellationToken).ConfigureAwait(false);
             return tree;
         }
 
@@ -108,7 +108,7 @@ namespace SourceCode.Chasm.IO.AzureTableStorage
 
         #region Write (return CommitId)
 
-        public async ValueTask<CommitId> WriteAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime commitUtc, string commitMessage, bool forceOverwrite, CancellationToken cancellationToken)
+        public async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime commitUtc, string commitMessage, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
 
