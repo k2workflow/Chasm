@@ -12,7 +12,7 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00182" />
+    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00184" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.4.0" />
   </ItemGroup>
 
@@ -22,8 +22,9 @@
 
   <PropertyGroup>
     <PackageId>SourceCode.Chasm.Repository.AzureBlob</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>CAS - Content Addressable Storage (Azure Blob Storage).</Description>
+    <Authors>SourceCode</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>CAS - Content Addressable Storage (Azure Blob Storage Repository).</Description>
     <PackageTags>cas content storage sha1 git azure blob</PackageTags>
   </PropertyGroup>
 </Project>

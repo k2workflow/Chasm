@@ -26,8 +26,9 @@
 
   <PropertyGroup>
     <PackageId>SourceCode.Chasm.IO.Proto</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>CAS - Content Addressable Storage (Protobuf).</Description>
+    <Authors>SourceCode</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>CAS - Content Addressable Storage (Protobuf Serializer).</Description>
     <PackageTags>cas content storage sha1 git proto</PackageTags>
   </PropertyGroup>
 </Project>
