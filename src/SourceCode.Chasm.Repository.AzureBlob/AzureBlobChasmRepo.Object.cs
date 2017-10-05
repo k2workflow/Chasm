@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using Microsoft.WindowsAzure.Storage;
 using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
@@ -58,7 +65,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 return new ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>>(ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>());
 
             // Execute batches
-            return ParallelAsync.ForEachAsync(objectIds, parallelOptions, async n =>
+            var task = ParallelAsync.ForEachAsync(objectIds, parallelOptions, async n =>
             {
                 // Execute batch
                 var buffer = await ReadObjectAsync(n, parallelOptions.CancellationToken).ConfigureAwait(false);
@@ -67,6 +74,8 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 var kvp = new KeyValuePair<Sha1, ReadOnlyMemory<byte>>(n, buffer);
                 return kvp;
             });
+
+            return task;
         }
 
         #endregion
@@ -110,11 +119,13 @@ namespace SourceCode.Chasm.IO.AzureBlob
             if (items == null || !items.Any()) return Task.CompletedTask;
 
             // Execute batches
-            return ParallelAsync.ForEachAsync(items, parallelOptions, async kvps =>
+            var task = ParallelAsync.ForEachAsync(items, parallelOptions, async kvps =>
             {
                 // Execute batch
                 await WriteObjectAsync(kvps.Key, kvps.Value, forceOverwrite, parallelOptions.CancellationToken).ConfigureAwait(false);
             });
+
+            return task;
         }
 
         #endregion
