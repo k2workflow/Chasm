@@ -97,7 +97,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             {
                 var sha1 = Sha1.Hash(session.Result);
 
-                await WriteObjectAsync(sha1, session.Result, cancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(sha1, session.Result, false, cancellationToken).ConfigureAwait(false);
 
                 var model = new TreeId(sha1);
                 return model;

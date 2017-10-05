@@ -96,31 +96,33 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Write
 
-        public async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> segment, CancellationToken cancellationToken)
+        public async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var objectsTable = _objectsTable.Value;
+
+            // TODO: Perf: Do not write if row already exists (objects are immutable)
 
             using (var output = new MemoryStream())
             {
                 using (var gz = new GZipStream(output, CompressionLevel, true))
                 {
-                    gz.Write(segment.Array, segment.Offset, segment.Count);
+                    gz.Write(item.Array, item.Offset, item.Count);
                 }
                 output.Position = 0;
 
                 var seg = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
 
-                var op = DataEntity.BuildWriteOperation(objectId, seg);
+                var op = DataEntity.BuildWriteOperation(objectId, seg, forceOverwrite);
                 await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, ParallelOptions parallelOptions)
+        public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 
             // Build batches
-            var batches = BuildWriteBatches(items, CompressionLevel, parallelOptions.CancellationToken);
+            var batches = BuildWriteBatches(items, forceOverwrite, CompressionLevel, parallelOptions.CancellationToken);
 
             // Execute batches
             var objectsTable = _objectsTable.Value;
@@ -131,7 +133,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             });
         }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, CompressionLevel compressionLevel, CancellationToken cancellationToken)
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
         {
             var zipped = new Dictionary<Sha1, ArraySegment<byte>>();
 
@@ -149,13 +151,12 @@ namespace SourceCode.Chasm.IO.AzureTable
                     }
                     output.Position = 0;
 
-                    var seg = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
-
-                    zipped.Add(item.Key, seg);
+                    var zip = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
+                    zipped.Add(item.Key, zip);
                 }
             }
 
-            var batches = DataEntity.BuildWriteBatches(zipped);
+            var batches = DataEntity.BuildWriteBatches(zipped, forceOverwrite);
             return batches;
         }
 

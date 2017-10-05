@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             {
                 var sha1 = Sha1.Hash(session.Result);
 
-                await WriteObjectAsync(sha1, session.Result, cancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(sha1, session.Result, false, cancellationToken).ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);
                 return commitId;

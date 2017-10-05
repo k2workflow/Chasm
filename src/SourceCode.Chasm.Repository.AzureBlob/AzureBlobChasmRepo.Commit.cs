@@ -8,8 +8,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
         public async ValueTask<Commit> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
             var buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
-            if (buffer.IsEmpty)
-                return Commit.Empty;
+            if (buffer.IsEmpty) return default;
 
             var model = Serializer.DeserializeCommit(buffer.Span);
             return model;
@@ -21,7 +20,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             {
                 var sha1 = Sha1.Hash(session.Result);
 
-                await WriteObjectAsync(sha1, session.Result, cancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(sha1, session.Result, false, cancellationToken).ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);
                 return commitId;
