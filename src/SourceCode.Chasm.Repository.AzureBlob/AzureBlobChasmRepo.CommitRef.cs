@@ -3,7 +3,6 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -35,26 +34,21 @@ namespace SourceCode.Chasm.IO.AzureBlob
             AccessCondition accessCondition = null;
             try
             {
-                using (var input = new MemoryStream())
-                using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
+                // CommitRefs are not compressed
+
+                using (var output = new MemoryStream())
                 {
                     // Perf: Use a stream instead of a preceding call to fetch the buffer length
-                    await blobRef.DownloadToStreamAsync(input, default, default, default, cancellationToken).ConfigureAwait(false);
+                    await blobRef.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
 
                     // Grab the etag - we need it for optimistic concurrency control
                     var etag = blobRef.Properties.ETag;
                     accessCondition = AccessCondition.GenerateIfMatchCondition(etag);
 
-                    using (var output = new MemoryStream())
+                    if (output.Length > 0)
                     {
-                        input.Position = 0; // Else gzip returns []
-                        gzip.CopyTo(output);
-
-                        if (output.Length > 0)
-                        {
-                            var sha1 = Serializer.DeserializeSha1(output.ToArray()); // TODO: Perf
-                            commitId = new CommitId(sha1);
-                        }
+                        var sha1 = Serializer.DeserializeSha1(output.ToArray()); // TODO: Perf
+                        commitId = new CommitId(sha1);
                     }
                 }
             }
@@ -103,14 +97,13 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 // Required to create blob before appending to it
                 await blobRef.CreateOrReplaceAsync(accessCondition, default, default, cancellationToken).ConfigureAwait(false); // Note ETAG access condition
 
+                // CommitRefs are not compressed
+
+                using (var session = Serializer.Serialize(newCommitId.Sha1))
                 using (var output = new MemoryStream())
                 {
-                    using (var gz = new GZipStream(output, CompressionLevel, true))
-                    using (var session = Serializer.Serialize(newCommitId.Sha1))
-                    {
-                        var result = session.Result;
-                        gz.Write(result.Array, result.Offset, result.Count);
-                    }
+                    var seg = session.Result;
+                    output.Write(seg.Array, seg.Offset, seg.Count);
                     output.Position = 0;
 
                     // Append blob. Following seems to be the only safe multi-writer method available

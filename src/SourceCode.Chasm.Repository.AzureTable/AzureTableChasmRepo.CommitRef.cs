@@ -2,8 +2,6 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Clay;
 using System;
-using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,18 +11,6 @@ namespace SourceCode.Chasm.IO.AzureTable
     partial class AzureTableChasmRepo // .CommitRef
     {
         #region Read
-
-        public async ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
-
-            var refsTable = _refsTable.Value;
-            var operation = DataEntity.BuildReadOperation(branch, name);
-
-            var (commitId, _) = await ReadCommitRefImplAsync(refsTable, operation, Serializer, cancellationToken).ConfigureAwait(false);
-            return commitId;
-        }
 
         private static async ValueTask<(CommitId, string)> ReadCommitRefImplAsync(CloudTable refsTable, TableOperation operation, IChasmSerializer serializer, CancellationToken cancellationToken)
         {
@@ -41,20 +27,10 @@ namespace SourceCode.Chasm.IO.AzureTable
 
                 var entity = (DataEntity)result.Result;
 
-                using (var input = new MemoryStream(entity.Content))
-                using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
-                using (var output = new MemoryStream())
-                {
-                    input.Position = 0; // Else gzip returns []
-                    gzip.CopyTo(output);
+                // CommitRefs are not compressed
 
-                    if (output.Length > 0)
-                    {
-                        var buffer = output.ToArray(); // TODO: Perf
-                        var sha1 = serializer.DeserializeSha1(buffer);
-                        commitId = new CommitId(sha1);
-                    }
-                }
+                var sha1 = serializer.DeserializeSha1(entity.Content);
+                commitId = new CommitId(sha1);
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {
@@ -63,6 +39,18 @@ namespace SourceCode.Chasm.IO.AzureTable
             }
 
             return (commitId, etag);
+        }
+
+        public async ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+
+            var refsTable = _refsTable.Value;
+            var operation = DataEntity.BuildReadOperation(branch, name);
+
+            var (commitId, _) = await ReadCommitRefImplAsync(refsTable, operation, Serializer, cancellationToken).ConfigureAwait(false);
+            return commitId;
         }
 
         #endregion
@@ -96,18 +84,10 @@ namespace SourceCode.Chasm.IO.AzureTable
 
             try
             {
-                using (var output = new MemoryStream())
+                // CommitRefs are not compressed
+                using (var session = Serializer.Serialize(newCommitId.Sha1))
                 {
-                    using (var gz = new GZipStream(output, CompressionLevel, true))
-                    using (var session = Serializer.Serialize(newCommitId.Sha1))
-                    {
-                        var result = session.Result;
-                        gz.Write(result.Array, result.Offset, result.Count);
-                    }
-                    output.Position = 0;
-
-                    var segment = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
-                    var op = DataEntity.BuildWriteOperation(branch, name, segment, etag); // Note ETAG access condition
+                    var op = DataEntity.BuildWriteOperation(branch, name, session.Result, etag); // Note ETAG access condition
 
                     await refsTable.ExecuteAsync(op).ConfigureAwait(false);
                 }
