@@ -15,13 +15,13 @@ namespace SourceCode.Chasm.IO.AzureBlob
             return model;
         }
 
-        public async ValueTask<CommitId> WriteCommitAsync(Commit commit, bool forceOverwrite, CancellationToken cancellationToken)
+        public async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
             using (var session = Serializer.Serialize(commit))
             {
                 var sha1 = Sha1.Hash(session.Result);
 
-                await WriteObjectAsync(sha1, session.Result, forceOverwrite, cancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(sha1, session.Result, cancellationToken).ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);
                 return commitId;
