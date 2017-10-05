@@ -34,22 +34,22 @@ build:
 test_script:
 - ps: .\GenerateTestSolution.ps1 .\SourceCode.Chasm.sln
 - >-
-    OpenCover.Console.exe 
-    -target:"dotnet.exe" 
-    -targetargs:"test SourceCode.Chasm.Tests.sln -c %CONFIGURATION% --no-build" 
+    OpenCover.Console.exe
+    -target:"dotnet.exe"
+    -targetargs:"test SourceCode.Chasm.Tests.sln -c %CONFIGURATION% --no-build"
     -filter:"+[SourceCode.Chasm*]* -[SourceCode.Chasm.IO.Bond.Tests*]* -[SourceCode.Chasm.IO.Json.Tests*]* -[SourceCode.Chasm.IO.Proto.Tests*]* -[SourceCode.Chasm.Tests*]*"
-    -output:"%APPVEYOR_BUILD_FOLDER%\coverage.xml" 
-    -excludebyattribute:*.ExcludeFromCodeCoverage* 
-    -oldStyle 
-    -register:user 
-    -mergebyhash 
+    -output:"%APPVEYOR_BUILD_FOLDER%\coverage.xml"
+    -excludebyattribute:*.ExcludeFromCodeCoverage*
+    -oldStyle
+    -register:user
+    -mergebyhash
     -hideskipped:File
 
 after_test:
-#- >-
-#    codecov 
-#    -X gcov 
-#    -f "%APPVEYOR_BUILD_FOLDER%\coverage.xml"
+- >-
+    codecov 
+    -X gcov 
+    -f "%APPVEYOR_BUILD_FOLDER%\coverage.xml"
 
 artifacts:
   - path: '**\*.nupkg'

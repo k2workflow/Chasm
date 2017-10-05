@@ -16,6 +16,13 @@
     <NoWarn>1701;1702;1705;S3242</NoWarn>
   </PropertyGroup>
 
+  <!-- TODO: Remove this when OpenCover supports portable PDBs -->
+  <!-- https://github.com/OpenCover/opencover/issues/601 -->
+  <PropertyGroup>
+    <DebugType>full</DebugType>
+    <DebugType Condition="'$(Configuration)'=='Release'">pdbonly</DebugType>
+  </PropertyGroup>
+
   <PropertyGroup>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
