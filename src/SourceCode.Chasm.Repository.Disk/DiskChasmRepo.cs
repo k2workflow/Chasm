@@ -10,8 +10,8 @@ namespace SourceCode.Chasm.IO.Disk
     {
         #region Fields
 
-        private readonly DirectoryInfo _refsContainer;
-        private readonly DirectoryInfo _objectsContainer;
+        private readonly string _refsContainer;
+        private readonly string _objectsContainer;
 
         #endregion
 
@@ -55,7 +55,7 @@ namespace SourceCode.Chasm.IO.Disk
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
 
-                _refsContainer = new DirectoryInfo(path);
+                _refsContainer = path;
             }
 
             // Objects
@@ -66,7 +66,7 @@ namespace SourceCode.Chasm.IO.Disk
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
 
-                _objectsContainer = new DirectoryInfo(path);
+                _objectsContainer = path;
             }
         }
 

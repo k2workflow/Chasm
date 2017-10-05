@@ -15,7 +15,7 @@ namespace SourceCode.Chasm.IO.Disk
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
             var filename = DeriveCommitRefFileName(branch, name);
-            var path = Path.Combine(_refsContainer.FullName, filename);
+            var path = Path.Combine(_refsContainer, filename);
 
             var bytes = ReadFile(path);
 
@@ -37,7 +37,7 @@ namespace SourceCode.Chasm.IO.Disk
             // TODO: Optimistic concurrency
 
             var filename = DeriveCommitRefFileName(branch, name);
-            var path = Path.Combine(_refsContainer.FullName, filename);
+            var path = Path.Combine(_refsContainer, filename);
 
             using (var session = Serializer.Serialize(newCommitId.Sha1))
             {

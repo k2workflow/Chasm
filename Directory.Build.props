@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>1.0.0</VersionPrefix>
     <Company>SourceCode Technology Holdings Inc.</Company>
     <Product>SourceCode.Chasm</Product>
     <Copyright>Copyright © 2017 SourceCode Technology Holdings Inc.</Copyright>
@@ -16,11 +15,21 @@
     <NoWarn>1701;1702;1705;S3242</NoWarn>
   </PropertyGroup>
 
+  <!-- TODO: Remove this when OpenCover supports portable PDBs -->
+  <!-- https://github.com/OpenCover/opencover/issues/601 -->
+  <PropertyGroup>
+    <DebugType>full</DebugType>
+    <DebugType Condition="'$(Configuration)'=='Release'">pdbonly</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
   <PropertyGroup>
     <PackageProjectUrl>https://github.com/k2workflow/Chasm/</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/k2workflow/Chasm/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-  </PropertyGroup>
-  <PropertyGroup>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/k2workflow/Chasm/master/LICENSE</PackageLicenseUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 </Project>

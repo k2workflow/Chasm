@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.IO.Disk
         public ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             var filename = DeriveFileName(objectId);
-            var path = Path.Combine(_refsContainer.FullName, filename);
+            var path = Path.Combine(_objectsContainer, filename);
 
             var bytes = ReadFile(path);
 
@@ -78,7 +78,7 @@ namespace SourceCode.Chasm.IO.Disk
         public Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var filename = DeriveFileName(objectId);
-            var path = Path.Combine(_refsContainer.FullName, filename);
+            var path = Path.Combine(_objectsContainer, filename);
 
             // Objects are immutable
             if (!File.Exists(path)
