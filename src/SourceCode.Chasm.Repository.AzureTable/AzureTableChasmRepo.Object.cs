@@ -29,9 +29,9 @@ namespace SourceCode.Chasm.IO.AzureTable
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                     return Array.Empty<byte>();
 
-                var bytes = (byte[])result.Result;
+                var entity = (DataEntity)result.Result;
 
-                using (var input = new MemoryStream(bytes))
+                using (var input = new MemoryStream(entity.Content))
                 using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
                 using (var output = new MemoryStream())
                 {
@@ -69,10 +69,23 @@ namespace SourceCode.Chasm.IO.AzureTable
                 // Transform batch results
                 foreach (var result in results)
                 {
+                    if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
+                        continue;
+
                     var entity = (DataEntity)result.Result;
                     var sha1 = DataEntity.FromPartition(entity);
 
-                    dict[sha1] = entity.Content;
+                    // Unzip
+                    using (var input = new MemoryStream(entity.Content))
+                    using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
+                    using (var output = new MemoryStream())
+                    {
+                        gzip.CopyTo(output);
+
+                        var buffer = output.ToArray(); // TODO: Perf
+                        dict[sha1] = buffer;
+                        return;
+                    }
                 }
             });
 
