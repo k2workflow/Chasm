@@ -30,7 +30,7 @@ build:
 
 test_script:
 - ps1: .\GenerateTestSolution.ps1 .\SourceCode.Chasm.sln
-- dotnet test "src\SourceCode.Chasm.Tests.sln" -c %CONFIGURATION% --no-build
+- dotnet test SourceCode.Chasm.Tests.sln -c %CONFIGURATION% --no-build
 
 artifacts:
   - path: '**\*.nupkg'
