@@ -72,12 +72,20 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Write
 
-        public async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> segment, CancellationToken cancellationToken)
+        public async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var objectsContainer = _objectsContainer.Value;
 
             var blobName = DeriveBlobName(objectId);
             var blobRef = objectsContainer.GetAppendBlobReference(blobName);
+
+            // Objects are immutable
+            if (!forceOverwrite)
+            {
+                var exists = await blobRef.ExistsAsync().ConfigureAwait(false);
+                if (exists)
+                    return;
+            }
 
             // Required to create blob before appending to it
             await blobRef.CreateOrReplaceAsync().ConfigureAwait(false);
@@ -86,7 +94,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             {
                 using (var gz = new GZipStream(output, CompressionLevel, true))
                 {
-                    gz.Write(segment.Array, segment.Offset, segment.Count);
+                    gz.Write(item.Array, item.Offset, item.Count);
                 }
                 output.Position = 0;
 
@@ -96,7 +104,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             }
         }
 
-        public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, ParallelOptions parallelOptions)
+        public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
         {
             if (items == null || !items.Any()) return Task.CompletedTask;
 
@@ -104,7 +112,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             return AsyncParallelUtil.ForEachAsync(items, parallelOptions, async kvps =>
             {
                 // Execute batch
-                await WriteObjectAsync(kvps.Key, kvps.Value, parallelOptions.CancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(kvps.Key, kvps.Value, forceOverwrite, parallelOptions.CancellationToken).ConfigureAwait(false);
             });
         }
 

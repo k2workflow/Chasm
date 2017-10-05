@@ -35,6 +35,17 @@ namespace SourceCode.Chasm.IO.AzureTable
             ETag = etag;
         }
 
+        private DataEntity(string partitionKey, string rowKey, ArraySegment<byte> content, bool forceOverwrite)
+            : this(partitionKey, rowKey, content)
+        {
+            if (forceOverwrite)
+            {
+                // https://azure.microsoft.com/en-us/blog/managing-concurrency-in-microsoft-azure-storage-2/
+                // "To explicitly disable the concurrency check, you should set the ETag property of the ... object to “*” before you execute the replace operation"
+                ETag = "*";
+            }
+        }
+
         #endregion
 
         #region Factory
@@ -46,6 +57,16 @@ namespace SourceCode.Chasm.IO.AzureTable
             var split = GetPartition(sha1);
 
             var entity = new DataEntity(split.Key, split.Value, content, etag);
+            return entity;
+        }
+
+        internal static DataEntity Create(Sha1 sha1, ArraySegment<byte> content, bool forceOverwrite)
+        {
+            if (sha1 == Sha1.Empty) throw new ArgumentNullException(nameof(sha1));
+
+            var split = GetPartition(sha1);
+
+            var entity = new DataEntity(split.Key, split.Value, content, forceOverwrite);
             return entity;
         }
 
@@ -172,6 +193,16 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Write
 
+        internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> content, bool forceOverwrite)
+        {
+            if (sha1 == Sha1.Empty) throw new ArgumentNullException(nameof(sha1));
+
+            var entity = Create(sha1, content, forceOverwrite);
+
+            var op = TableOperation.InsertOrReplace(entity);
+            return op;
+        }
+
         internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> content, string etag)
         {
             if (sha1 == Sha1.Empty) throw new ArgumentNullException(nameof(sha1));
@@ -214,7 +245,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             return op;
         }
 
-        internal static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> contents)
+        internal static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> contents, bool forceOverwrite)
         {
             if (contents == null || !contents.Any()) return Array.Empty<TableBatchOperation>();
 
@@ -222,7 +253,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
             foreach (var content in contents)
             {
-                var entity = Create(content.Key, content.Value);
+                var entity = Create(content.Key, content.Value, forceOverwrite);
 
                 if (!batches.TryGetValue(entity.PartitionKey, out var batch))
                 {
