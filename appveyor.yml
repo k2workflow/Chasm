@@ -30,10 +30,25 @@ build:
 
 test_script:
 - ps: .\GenerateTestSolution.ps1 .\SourceCode.Chasm.sln
-- dotnet test SourceCode.Chasm.Tests.sln -c %CONFIGURATION% --no-build
+- >-
+    OpenCover.Console.exe 
+    -target:"dotnet.exe" 
+    -targetargs:"test SourceCode.Chasm.Tests.sln -c %CONFIGURATION% --no-build" 
+    -filter:"+[SourceCode.*]* -[*.Tests]*" 
+    -output:"$(appveyor_build_folder)\coverage.xml" 
+    -excludebyattribute:*.ExcludeFromCodeCoverage* 
+    -oldStyle 
+    -register:user 
+    -mergebyhash 
+    -hideskipped:File
+
+after_test:
+- pip install codecov 
+- codecov -X gcov -f "$(appveyor_build_folder)\coverage.xml"
 
 artifacts:
   - path: '**\*.nupkg'
+  - path: 'coverage.xml'
 
 deploy:
   provider: NuGet
