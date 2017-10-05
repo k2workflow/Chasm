@@ -1,3 +1,10 @@
+          #region License
+
+          // Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+          // Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+          #endregion
+
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
@@ -43,7 +50,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             // Refs
             _refsContainer = new Lazy<CloudBlobContainer>(() =>
             {
-                var container = "refs";
+                const string container = "refs";
                 var tr = client.GetContainerReference(container);
 
                 tr.CreateIfNotExistsAsync().Wait();
