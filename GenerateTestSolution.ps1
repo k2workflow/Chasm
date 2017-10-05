@@ -15,8 +15,6 @@ if (-not $TestPattern) { $TestPattern = '.+?\.Tests' }
 
 $TestPattern = "^\s*Project\("".+?""\)\s*=\s*""$TestPattern"",.+$"
 
-Write-Host $TestPattern
-
 $State = 0
 
 foreach ($SlnLine in Get-Content $InputSolution) {
