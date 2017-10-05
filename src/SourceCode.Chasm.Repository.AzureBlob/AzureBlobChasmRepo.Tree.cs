@@ -23,20 +23,20 @@ namespace SourceCode.Chasm.IO.AzureBlob
             return tree;
         }
 
-        public async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreesAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken)
+        public async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ParallelOptions parallelOptions)
         {
             if (treeIds == null) return ReadOnlyDictionary.Empty<TreeId, TreeNodeList>();
 
             // Read bytes
             var sha1s = System.Linq.Enumerable.Select(treeIds, n => n.Sha1);
-            var kvps = await ReadObjectsAsync(sha1s, cancellationToken).ConfigureAwait(false);
+            var kvps = await ReadObjectBatchAsync(sha1s, parallelOptions).ConfigureAwait(false);
 
             // Deserialize
-            var dict = DeserializeTreesImpl(Serializer, kvps);
+            var dict = DeserializeTreesBatch(Serializer, kvps);
             return dict;
         }
 
-        private static IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTreesImpl(IChasmSerializer serializer, IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
+        private static IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTreesBatch(IChasmSerializer serializer, IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
         {
             var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
 
@@ -91,13 +91,13 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Write (return TreeId)
 
-        public async ValueTask<TreeId> WriteTreeAsync(TreeNodeList tree, bool forceOverwrite, CancellationToken cancellationToken)
+        public async ValueTask<TreeId> WriteTreeAsync(TreeNodeList tree, CancellationToken cancellationToken)
         {
             using (var session = Serializer.Serialize(tree))
             {
                 var sha1 = Sha1.Hash(session.Result);
 
-                await WriteObjectAsync(sha1, session.Result, forceOverwrite, cancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(sha1, session.Result, cancellationToken).ConfigureAwait(false);
 
                 var model = new TreeId(sha1);
                 return model;
@@ -108,16 +108,16 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Write (return CommitId)
 
-        public async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime commitUtc, string commitMessage, bool forceOverwrite, CancellationToken cancellationToken)
+        public async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime commitUtc, string commitMessage, CancellationToken cancellationToken)
         {
             if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
 
             var treeId = TreeId.Empty;
             if (tree.Count > 0)
-                treeId = await WriteTreeAsync(tree, forceOverwrite, cancellationToken).ConfigureAwait(false);
+                treeId = await WriteTreeAsync(tree, cancellationToken).ConfigureAwait(false);
 
             var commit = new Commit(parents, treeId, commitUtc, commitMessage);
-            var commitId = await WriteCommitAsync(commit, forceOverwrite, cancellationToken).ConfigureAwait(false);
+            var commitId = await WriteCommitAsync(commit, cancellationToken).ConfigureAwait(false);
 
             return commitId;
         }

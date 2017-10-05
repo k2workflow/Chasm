@@ -7,6 +7,6 @@ namespace SourceCode.Chasm.IO
     {
         ValueTask<Commit> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken);
 
-        ValueTask<CommitId> WriteCommitAsync(Commit commit, bool forceOverwrite, CancellationToken cancellationToken);
+        ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken);
     }
 }

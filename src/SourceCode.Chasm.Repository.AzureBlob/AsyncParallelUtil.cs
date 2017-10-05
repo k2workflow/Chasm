@@ -1,4 +1,6 @@
+using SourceCode.Clay.Collections.Generic;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,54 +12,122 @@ namespace SourceCode.Chasm.IO
     {
         #region For
 
-        public static Task For(int fromInclusive, int toInclusive, Func<int, Task> body, int maxDop, CancellationToken cancellationToken)
+        public static async Task ForAsync(int from, int to, ParallelOptions options, Func<int, Task> body)
         {
-            if (toInclusive < fromInclusive) throw new ArgumentOutOfRangeException(nameof(toInclusive));
-            if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
+            if (to < from) throw new ArgumentOutOfRangeException(nameof(to));
             if (body == null) throw new ArgumentNullException(nameof(body));
 
-            var options = new ExecutionDataflowBlockOptions
+            var opt = new ExecutionDataflowBlockOptions
             {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = maxDop
+                CancellationToken = options == null ? CancellationToken.None : options.CancellationToken,
+                MaxDegreeOfParallelism = options == null ? -1 : options.MaxDegreeOfParallelism
             };
 
-            var block = new ActionBlock<int>(body, options);
-            {
-                for (var i = fromInclusive; i <= toInclusive; i++)
-                    block.Post(i);
-            }
-            block.Complete();
+            var block = new ActionBlock<int>(body, opt);
 
-            var task = block.Completion;
-            return task;
+            // Send
+            for (var i = from; i < to; i++)
+            {
+                await block.SendAsync(i, opt.CancellationToken).ConfigureAwait(false);
+            }
+
+            block.Complete();
+            await block.Completion;
+        }
+
+        public static async ValueTask<IReadOnlyDictionary<int, TValue>> ForAsync<TValue>(int from, int to, ParallelOptions options, Func<int, Task<TValue>> body)
+        {
+            if (to < from) throw new ArgumentOutOfRangeException(nameof(to));
+            if (body == null) throw new ArgumentNullException(nameof(body));
+
+            var dict = new ConcurrentDictionary<int, TValue>();
+
+            var opt = new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = options == null ? CancellationToken.None : options.CancellationToken,
+                MaxDegreeOfParallelism = options == null ? -1 : options.MaxDegreeOfParallelism
+            };
+
+            var block = new TransformBlock<int, TValue>(body, opt);
+
+            // Send
+            for (var i = from; i < to; i++)
+            {
+                await block.SendAsync(i, opt.CancellationToken).ConfigureAwait(false);
+            }
+
+            // Receive
+            for (var i = from; i < to; i++)
+            {
+                var value = await block.ReceiveAsync(opt.CancellationToken).ConfigureAwait(false);
+                dict[i] = value;
+            }
+
+            block.Complete();
+            await block.Completion;
+
+            return dict;
         }
 
         #endregion
 
         #region ForEach
 
-        public static Task ForEach<TSource>(IEnumerable<TSource> source, Func<TSource, Task> body, int maxDop, CancellationToken cancellationToken)
+        public static async Task ForEachAsync<TSource>(IEnumerable<TSource> source, ParallelOptions options, Func<TSource, Task> body)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
+            if (source == null) return;
             if (body == null) throw new ArgumentNullException(nameof(body));
 
-            var options = new ExecutionDataflowBlockOptions
+            var opt = new ExecutionDataflowBlockOptions
             {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = maxDop
+                CancellationToken = options == null ? CancellationToken.None : options.CancellationToken,
+                MaxDegreeOfParallelism = options == null ? -1 : options.MaxDegreeOfParallelism
             };
 
-            var block = new ActionBlock<TSource>(body, options);
-            {
-                foreach (var item in source)
-                    block.Post(item);
-            }
-            block.Complete();
+            var block = new ActionBlock<TSource>(body, opt);
 
-            var task = block.Completion;
-            return task;
+            // Send
+            foreach (var item in source)
+            {
+                await block.SendAsync(item, opt.CancellationToken).ConfigureAwait(false);
+            }
+
+            block.Complete();
+            await block.Completion;
+        }
+
+        public static async ValueTask<IReadOnlyDictionary<TSource, TValue>> ForEachAsync<TSource, TValue>(IEnumerable<TSource> source, ParallelOptions options, Func<TSource, Task<KeyValuePair<TSource, TValue>>> body)
+        {
+            if (source == null) return ReadOnlyDictionary.Empty<TSource, TValue>();
+            if (body == null) throw new ArgumentNullException(nameof(body));
+
+            var dict = new ConcurrentDictionary<TSource, TValue>();
+
+            var opt = new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = options == null ? CancellationToken.None : options.CancellationToken,
+                MaxDegreeOfParallelism = options == null ? -1 : options.MaxDegreeOfParallelism
+            };
+
+            var block = new TransformBlock<TSource, KeyValuePair<TSource, TValue>>(body, opt);
+
+            // Send
+            foreach (var item in source)
+            {
+                await block.SendAsync(item, opt.CancellationToken).ConfigureAwait(false);
+            }
+
+            // Receive
+            for (var i = 0; i <= block.OutputCount; i++)
+            {
+                var value = await block.ReceiveAsync(opt.CancellationToken).ConfigureAwait(false);
+                dict[value.Key] = value.Value;
+            }
+
+            block.Complete();
+            await block.Completion;
+
+            return dict;
         }
 
         #endregion

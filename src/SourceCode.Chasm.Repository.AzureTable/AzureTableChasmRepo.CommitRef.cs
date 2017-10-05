@@ -1,6 +1,5 @@
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using SourceCode.Chasm.IO;
 using SourceCode.Clay;
 using System;
 using System.IO;
@@ -40,8 +39,9 @@ namespace SourceCode.Chasm.IO.AzureTable
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                     return (commitId, etag);
 
-                var bytes = (byte[])result.Result;
-                using (var input = new MemoryStream(bytes))
+                var entity = (DataEntity)result.Result;
+
+                using (var input = new MemoryStream(entity.Content))
                 using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
                 using (var output = new MemoryStream())
                 {
@@ -109,7 +109,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                     var segment = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
                     var op = DataEntity.BuildWriteOperation(branch, name, segment, etag); // Note ETAG access condition
 
-                    var result1 = await refsTable.ExecuteAsync(op).ConfigureAwait(false);
+                    await refsTable.ExecuteAsync(op).ConfigureAwait(false);
                 }
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)

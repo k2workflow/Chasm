@@ -15,16 +15,15 @@ namespace SourceCode.Chasm.IO
 
         ValueTask<TreeNodeList> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken);
 
-        ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreesAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken);
+        ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ParallelOptions parallelOptions);
 
         #endregion
 
         #region Write
 
-        ValueTask<TreeId> WriteTreeAsync(TreeNodeList tree, bool forceOverwrite, CancellationToken cancellationToken);
+        ValueTask<TreeId> WriteTreeAsync(TreeNodeList tree, CancellationToken cancellationToken);
 
-        // TODO: Use param dto instead of individual params
-        ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime commitUtc, string commitMessage, bool forceOverwrite, CancellationToken cancellationToken);
+        ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime commitUtc, string commitMessage, CancellationToken cancellationToken);
 
         #endregion
     }
