@@ -13,8 +13,6 @@ namespace SourceCode.Chasm.IO
 
         Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> segment, bool forceOverwrite, CancellationToken cancellationToken);
 
-        Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken);
-
         Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, int maxDop, CancellationToken cancellationToken);
     }
 }

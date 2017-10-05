@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
             try
             {
-                var result = await objectsTable.ExecuteAsync(op, new TableRequestOptions(), new OperationContext(), cancellationToken).ConfigureAwait(false);
+                var result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
 
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                     return Array.Empty<byte>();
@@ -108,7 +108,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                 try
                 {
                     // Bad practice to use async within Parallel
-                    var result = objectsTable.ExecuteAsync(op, new TableRequestOptions(), new OperationContext(), options.CancellationToken).Result;
+                    var result = objectsTable.ExecuteAsync(op, default, default, options.CancellationToken).Result;
 
                     if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                         return;
@@ -156,49 +156,32 @@ namespace SourceCode.Chasm.IO.AzureTable
                 var seg = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
 
                 var op = DataEntity.BuildWriteOperation(objectId, seg, forceOverwrite);
-                await objectsTable.ExecuteAsync(op, new TableRequestOptions(), new OperationContext(), cancellationToken).ConfigureAwait(false);
+                await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public async Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, int maxDop, CancellationToken cancellationToken)
         {
-            if (items == null) return;
-
-            if (items is ICollection<KeyValuePair<Sha1, ArraySegment<byte>>> coll)
-            {
-                if (coll.Count == 0) return;
-
-                // For small count, run non-concurrent
-                if (coll.Count <= ConcurrentThreshold)
-                {
-                    foreach (var kvp in coll)
-                    {
-                        await WriteObjectAsync(kvp.Key, kvp.Value, forceOverwrite, cancellationToken).ConfigureAwait(false);
-                    }
-
-                    return;
-                }
-            }
-
-            var batches = BuildBatchesImpl(items, forceOverwrite, CompressionLevel, cancellationToken);
-
-            var options = new ParallelOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = MaxDop
-            };
+            if (items == null) throw new ArgumentNullException(nameof(items));
+            if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
 
             var objectsTable = _objectsTable.Value;
-            Parallel.ForEach(batches, options, batch =>
+
+            var batches = BuildBatches(items, false, CompressionLevel, cancellationToken);
+
+            return AsyncParallelUtil.ForEach(batches, batch =>
             {
-                // Bad practice to use async within Parallel
-                objectsTable.ExecuteBatchAsync(batch).Wait(cancellationToken);
-            });
+                var task = objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken);
+                return task;
+            },
+            maxDop,
+            cancellationToken);
         }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildBatchesImpl(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
+        private static IReadOnlyCollection<TableBatchOperation> BuildBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
         {
             var zipped = new Dictionary<Sha1, ArraySegment<byte>>();
+
             foreach (var item in items)
             {
                 if (cancellationToken.IsCancellationRequested) break;
@@ -222,20 +205,6 @@ namespace SourceCode.Chasm.IO.AzureTable
             DataEntity.BuildBatchWriteOperation(batches, zipped, forceOverwrite);
 
             return batches.Values;
-        }
-
-        public Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, int maxDop, CancellationToken cancellationToken)
-        {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-            if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
-
-            return AsyncParallelUtil.ForEach(items, kvps =>
-            {
-                var task = WriteObjectAsync(kvps.Key, kvps.Value, false, cancellationToken);
-                return task;
-            },
-            maxDop,
-            cancellationToken);
         }
 
         #endregion
