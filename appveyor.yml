@@ -38,7 +38,7 @@ test_script:
     -target:"dotnet.exe" 
     -targetargs:"test SourceCode.Chasm.Tests.sln -c %CONFIGURATION% --no-build" 
     -filter:"+[SourceCode.*]* -[*.Tests]*" 
-    -output:"{appveyor_build_folder}\coverage.xml" 
+    -output:"%APPVEYOR_BUILD_FOLDER%\coverage.xml" 
     -excludebyattribute:*.ExcludeFromCodeCoverage* 
     -oldStyle 
     -register:user 
@@ -49,7 +49,7 @@ after_test:
 - >-
     codecov 
     -X gcov 
-    -f "{appveyor_build_folder}\coverage.xml"
+    -f "%APPVEYOR_BUILD_FOLDER%\coverage.xml"
 
 artifacts:
   - path: '**\*.nupkg'
