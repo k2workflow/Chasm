@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\SourceCode.Chasm.Repository.AzureBlob\AsyncParallelUtil.cs" Link="AsyncParallelUtil.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.3.2" />
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
       <PrivateAssets>All</PrivateAssets>

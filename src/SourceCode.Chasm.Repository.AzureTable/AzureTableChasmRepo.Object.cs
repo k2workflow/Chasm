@@ -12,7 +12,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.Repository.AzureTable
+namespace SourceCode.Chasm.IO.AzureTable
 {
     partial class AzureTableChasmRepo // .Object
     {
@@ -222,6 +222,20 @@ namespace SourceCode.Chasm.Repository.AzureTable
             DataEntity.BuildBatchWriteOperation(batches, zipped, forceOverwrite);
 
             return batches.Values;
+        }
+
+        public Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, int maxDop, CancellationToken cancellationToken)
+        {
+            if (items == null) throw new ArgumentNullException(nameof(items));
+            if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
+
+            return AsyncParallelUtil.ForEach(items, kvps =>
+            {
+                var task = WriteObjectAsync(kvps.Key, kvps.Value, false, cancellationToken);
+                return task;
+            },
+            maxDop,
+            cancellationToken);
         }
 
         #endregion
