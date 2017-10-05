@@ -26,5 +26,6 @@
     <Authors>SourceCode</Authors>
     <Description>CAS - Content Addressable Storage (Azure Blob Storage Repository).</Description>
     <PackageTags>cas content storage sha1 git azure blob</PackageTags>
+    <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
 </Project>

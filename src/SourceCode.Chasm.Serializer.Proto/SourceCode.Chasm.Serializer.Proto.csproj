@@ -29,5 +29,6 @@
     <Authors>SourceCode</Authors>
     <Description>CAS - Content Addressable Storage (Protobuf Serializer).</Description>
     <PackageTags>cas content storage sha1 git proto</PackageTags>
+    <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
 </Project>
