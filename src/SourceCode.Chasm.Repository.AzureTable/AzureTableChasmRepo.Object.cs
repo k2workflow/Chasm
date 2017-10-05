@@ -50,19 +50,23 @@ namespace SourceCode.Chasm.IO.AzureTable
             return Array.Empty<byte>();
         }
 
-        public async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectsAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
+        public async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
         {
             if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
-            var batches = DataEntity.BuildBatchReadOperation(objectIds);
-
             var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>();
 
+            // Build batches
+            var batches = DataEntity.BuildReadBatches(objectIds);
+
+            // Execute batches
             var objectsTable = _objectsTable.Value;
             await AsyncParallelUtil.ForEachAsync(batches, parallelOptions, async batch =>
             {
+                // Execute batch
                 var results = await objectsTable.ExecuteBatchAsync(batch, default, default, parallelOptions.CancellationToken).ConfigureAwait(false);
 
+                // Transform batch results
                 foreach (var result in results)
                 {
                     var entity = (DataEntity)result.Result;
@@ -98,15 +102,18 @@ namespace SourceCode.Chasm.IO.AzureTable
             }
         }
 
-        public Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, ParallelOptions parallelOptions)
+        public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, ParallelOptions parallelOptions)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 
+            // Build batches
             var batches = BuildWriteBatches(items, CompressionLevel, parallelOptions.CancellationToken);
 
+            // Execute batches
             var objectsTable = _objectsTable.Value;
             return AsyncParallelUtil.ForEachAsync(batches, parallelOptions, async batch =>
             {
+                // Execute batch
                 await objectsTable.ExecuteBatchAsync(batch, null, null, parallelOptions.CancellationToken);
             });
         }
@@ -115,6 +122,7 @@ namespace SourceCode.Chasm.IO.AzureTable
         {
             var zipped = new Dictionary<Sha1, ArraySegment<byte>>();
 
+            // Zip
             foreach (var item in items)
             {
                 if (cancellationToken.IsCancellationRequested) break;
@@ -134,10 +142,8 @@ namespace SourceCode.Chasm.IO.AzureTable
                 }
             }
 
-            var batches = new Dictionary<string, TableBatchOperation>(StringComparer.Ordinal);
-            DataEntity.BuildBatchWriteOperation(batches, zipped);
-
-            return batches.Values;
+            var batches = DataEntity.BuildWriteBatches(zipped);
+            return batches;
         }
 
         #endregion

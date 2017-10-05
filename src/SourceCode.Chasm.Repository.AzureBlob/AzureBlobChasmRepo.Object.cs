@@ -51,16 +51,20 @@ namespace SourceCode.Chasm.IO.AzureBlob
             return Array.Empty<byte>();
         }
 
-        public ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectsAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
+        public ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
         {
             if (objectIds == null)
                 return new ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>>(ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>());
 
+            // Execute batches
             return AsyncParallelUtil.ForEachAsync(objectIds, parallelOptions, async n =>
             {
+                // Execute batch
                 var buffer = await ReadObjectAsync(n, parallelOptions.CancellationToken).ConfigureAwait(false);
 
-                return new KeyValuePair<Sha1, ReadOnlyMemory<byte>>(n, buffer);
+                // Transform batch result
+                var kvp = new KeyValuePair<Sha1, ReadOnlyMemory<byte>>(n, buffer);
+                return kvp;
             });
         }
 
@@ -92,12 +96,14 @@ namespace SourceCode.Chasm.IO.AzureBlob
             }
         }
 
-        public Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, ParallelOptions parallelOptions)
+        public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, ParallelOptions parallelOptions)
         {
             if (items == null || !items.Any()) return Task.CompletedTask;
 
+            // Execute batches
             return AsyncParallelUtil.ForEachAsync(items, parallelOptions, async kvps =>
             {
+                // Execute batch
                 await WriteObjectAsync(kvps.Key, kvps.Value, parallelOptions.CancellationToken).ConfigureAwait(false);
             });
         }

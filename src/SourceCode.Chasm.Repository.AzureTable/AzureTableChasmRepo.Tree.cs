@@ -23,13 +23,13 @@ namespace SourceCode.Chasm.IO.AzureTable
             return tree;
         }
 
-        public async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreesAsync(IEnumerable<TreeId> treeIds, ParallelOptions parallelOptions)
+        public async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ParallelOptions parallelOptions)
         {
             if (treeIds == null) return ReadOnlyDictionary.Empty<TreeId, TreeNodeList>();
 
             // Read bytes
             var sha1s = System.Linq.Enumerable.Select(treeIds, n => n.Sha1);
-            var kvps = await ReadObjectsAsync(sha1s, parallelOptions).ConfigureAwait(false);
+            var kvps = await ReadObjectBatchAsync(sha1s, parallelOptions).ConfigureAwait(false);
 
             // Deserialize
             var dict = DeserializeTreesImpl(Serializer, kvps);

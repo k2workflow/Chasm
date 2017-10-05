@@ -1,6 +1,7 @@
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace SourceCode.Chasm.IO.AzureTable
@@ -20,15 +21,15 @@ namespace SourceCode.Chasm.IO.AzureTable
         public DataEntity()
         { }
 
-        private DataEntity(string partitionKey, string rowKey, ArraySegment<byte> segment)
+        private DataEntity(string partitionKey, string rowKey, ArraySegment<byte> content)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
-            Content = segment.ToArray(); // TODO: Perf
+            Content = content.ToArray(); // TODO: Perf
         }
 
-        private DataEntity(string partitionKey, string rowKey, ArraySegment<byte> segment, string etag)
-            : this(partitionKey, rowKey, segment)
+        private DataEntity(string partitionKey, string rowKey, ArraySegment<byte> content, string etag)
+            : this(partitionKey, rowKey, content)
         {
             // https://azure.microsoft.com/en-us/blog/managing-concurrency-in-microsoft-azure-storage-2/
             ETag = etag;
@@ -38,27 +39,27 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Factory
 
-        internal static DataEntity Create(Sha1 sha1, ArraySegment<byte> segment, string etag)
+        internal static DataEntity Create(Sha1 sha1, ArraySegment<byte> content, string etag)
         {
             if (sha1 == Sha1.Empty) throw new ArgumentNullException(nameof(sha1));
 
             var split = GetPartition(sha1);
 
-            var entity = new DataEntity(split.Key, split.Value, segment, etag);
+            var entity = new DataEntity(split.Key, split.Value, content, etag);
             return entity;
         }
 
-        internal static DataEntity Create(Sha1 sha1, ArraySegment<byte> segment)
+        internal static DataEntity Create(Sha1 sha1, ArraySegment<byte> content)
         {
             if (sha1 == Sha1.Empty) throw new ArgumentNullException(nameof(sha1));
 
             var split = GetPartition(sha1);
 
-            var entity = new DataEntity(split.Key, split.Value, segment);
+            var entity = new DataEntity(split.Key, split.Value, content);
             return entity;
         }
 
-        internal static DataEntity Create(string repo, string name, ArraySegment<byte> segment, string etag)
+        internal static DataEntity Create(string repo, string name, ArraySegment<byte> content, string etag)
         {
             if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -66,11 +67,11 @@ namespace SourceCode.Chasm.IO.AzureTable
             var partitionKey = GetPartitionKey(repo);
             var rowKey = GetRowKey(name);
 
-            var entity = new DataEntity(partitionKey, rowKey, segment, etag);
+            var entity = new DataEntity(partitionKey, rowKey, content, etag);
             return entity;
         }
 
-        internal static DataEntity Create(string repo, string name, ArraySegment<byte> segment)
+        internal static DataEntity Create(string repo, string name, ArraySegment<byte> content)
         {
             if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -78,15 +79,15 @@ namespace SourceCode.Chasm.IO.AzureTable
             var partitionKey = GetPartitionKey(repo);
             var rowKey = GetRowKey(name);
 
-            var entity = new DataEntity(partitionKey, rowKey, segment);
+            var entity = new DataEntity(partitionKey, rowKey, content);
             return entity;
         }
 
         #endregion
 
-        #region Methods
+        #region Exists
 
-        private static readonly List<string> _cols = new List<string> { "PartitionKey", "RowKey" };
+        private static readonly List<string> _cols = new List<string> { nameof(ITableEntity.PartitionKey), nameof(ITableEntity.RowKey) };
 
         internal static TableOperation BuildExistsOperation(Sha1 sha1)
         {
@@ -98,6 +99,10 @@ namespace SourceCode.Chasm.IO.AzureTable
             var op = TableOperation.Retrieve<DataEntity>(partitionKey, rowKey, _cols);
             return op;
         }
+
+        #endregion
+
+        #region Read
 
         internal static TableOperation BuildReadOperation(Sha1 sha1)
         {
@@ -140,9 +145,9 @@ namespace SourceCode.Chasm.IO.AzureTable
             return batch;
         }
 
-        internal static IReadOnlyCollection<TableBatchOperation> BuildBatchReadOperation(IEnumerable<Sha1> sha1s)
+        internal static IReadOnlyCollection<TableBatchOperation> BuildReadBatches(IEnumerable<Sha1> sha1s)
         {
-            if (sha1s == null) return Array.Empty<TableBatchOperation>();
+            if (sha1s == null || !sha1s.Any()) return Array.Empty<TableBatchOperation>();
 
             var batches = new Dictionary<string, TableBatchOperation>(StringComparer.Ordinal);
 
@@ -163,57 +168,61 @@ namespace SourceCode.Chasm.IO.AzureTable
             return batches.Values;
         }
 
-        internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> segment, string etag)
+        #endregion
+
+        #region Write
+
+        internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> content, string etag)
         {
             if (sha1 == Sha1.Empty) throw new ArgumentNullException(nameof(sha1));
 
-            var entity = Create(sha1, segment, etag);
+            var entity = Create(sha1, content, etag);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> segment)
+        internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> content)
         {
             if (sha1 == Sha1.Empty) throw new ArgumentNullException(nameof(sha1));
 
-            var entity = Create(sha1, segment);
+            var entity = Create(sha1, content);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(string repo, string name, ArraySegment<byte> segment, string etag)
+        internal static TableOperation BuildWriteOperation(string repo, string name, ArraySegment<byte> content, string etag)
         {
             if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var entity = Create(repo, name, segment, etag);
+            var entity = Create(repo, name, content, etag);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(string repo, string name, ArraySegment<byte> segment)
+        internal static TableOperation BuildWriteOperation(string repo, string name, ArraySegment<byte> content)
         {
             if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var entity = Create(repo, name, segment);
+            var entity = Create(repo, name, content);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static void BuildBatchWriteOperation(Dictionary<string, TableBatchOperation> batches, IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items)
+        internal static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> contents)
         {
-            if (batches == null) throw new ArgumentNullException(nameof(batches));
+            if (contents == null || !contents.Any()) return Array.Empty<TableBatchOperation>();
 
-            if (items == null) return;
+            var batches = new Dictionary<string, TableBatchOperation>(StringComparer.Ordinal);
 
-            foreach (var item in items)
+            foreach (var content in contents)
             {
-                var entity = Create(item.Key, item.Value);
+                var entity = Create(content.Key, content.Value);
 
                 if (!batches.TryGetValue(entity.PartitionKey, out var batch))
                 {
@@ -224,7 +233,13 @@ namespace SourceCode.Chasm.IO.AzureTable
                 var op = TableOperation.InsertOrReplace(entity);
                 batch.Add(op);
             }
+
+            return batches.Values;
         }
+
+        #endregion
+
+        #region Delete
 
         internal static TableOperation BuildDeleteOperation(Sha1 sha1)
         {

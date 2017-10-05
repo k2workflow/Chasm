@@ -9,10 +9,10 @@ namespace SourceCode.Chasm.IO
     {
         ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
-        ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectsAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions);
+        ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions);
 
         Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> segment, CancellationToken cancellationToken);
 
-        Task WriteObjectsAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, ParallelOptions parallelOptions);
+        Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, ParallelOptions parallelOptions);
     }
 }
