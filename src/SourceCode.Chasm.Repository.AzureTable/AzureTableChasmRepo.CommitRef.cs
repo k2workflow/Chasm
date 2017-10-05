@@ -39,8 +39,9 @@ namespace SourceCode.Chasm.IO.AzureTable
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                     return (commitId, etag);
 
-                var bytes = (byte[])result.Result;
-                using (var input = new MemoryStream(bytes))
+                var entity = (DataEntity)result.Result;
+
+                using (var input = new MemoryStream(entity.Content))
                 using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
                 using (var output = new MemoryStream())
                 {

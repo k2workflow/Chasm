@@ -32,11 +32,11 @@ namespace SourceCode.Chasm.IO.AzureTable
             var kvps = await ReadObjectBatchAsync(sha1s, parallelOptions).ConfigureAwait(false);
 
             // Deserialize
-            var dict = DeserializeTreesImpl(Serializer, kvps);
+            var dict = DeserializeTreeBatch(Serializer, kvps);
             return dict;
         }
 
-        private static IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTreesImpl(IChasmSerializer serializer, IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
+        private static IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTreeBatch(IChasmSerializer serializer, IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
         {
             var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
 
