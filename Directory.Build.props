@@ -17,10 +17,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageProjectUrl>https://github.com/k2workflow/Chasm/</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/k2workflow/Chasm/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release">true</GeneratePackageOnBuild>
   </PropertyGroup>
+
   <PropertyGroup>
+    <PackageProjectUrl>https://github.com/k2workflow/Chasm/</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/k2workflow/Chasm/master/LICENSE</PackageLicenseUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 </Project>

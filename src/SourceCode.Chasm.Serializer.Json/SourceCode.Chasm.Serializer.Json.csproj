@@ -22,7 +22,6 @@
   <PropertyGroup>
     <PackageId>SourceCode.Chasm.IO.Json</PackageId>
     <Authors>SourceCode</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>CAS - Content Addressable Storage (Json Serializer).</Description>
     <PackageTags>cas content storage sha1 git json</PackageTags>
   </PropertyGroup>
