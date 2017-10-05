@@ -5,13 +5,7 @@ namespace SourceCode.Chasm.IO
 {
     partial interface IChasmRepository // .CommitRef
     {
-        #region Read
-
         ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
-
-        #endregion
-
-        #region Write
 
         /// <summary>
         /// Write a <see cref="CommitRef"/> to the repository using the provided values.
@@ -25,7 +19,5 @@ namespace SourceCode.Chasm.IO
         /// <exception cref="ChasmConcurrencyException">Thrown when a concurrency exception is detected.</exception>
         /// <returns></returns>
         Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitId newCommitId, CancellationToken cancellationToken);
-
-        #endregion
     }
 }

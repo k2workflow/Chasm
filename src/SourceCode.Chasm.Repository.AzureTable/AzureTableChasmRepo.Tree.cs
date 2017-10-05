@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.Repository.AzureTable
+namespace SourceCode.Chasm.IO.AzureTable
 {
     partial class AzureTableChasmRepo // .Tree
     {

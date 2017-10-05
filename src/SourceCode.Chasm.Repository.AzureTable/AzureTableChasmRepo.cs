@@ -5,7 +5,7 @@ using System;
 using System.IO.Compression;
 using System.Threading;
 
-namespace SourceCode.Chasm.Repository.AzureTable
+namespace SourceCode.Chasm.IO.AzureTable
 {
     public sealed partial class AzureTableChasmRepo : IChasmRepository
     {
