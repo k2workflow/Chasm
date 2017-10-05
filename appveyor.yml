@@ -35,7 +35,7 @@ test_script:
     -target:"dotnet.exe" 
     -targetargs:"test SourceCode.Chasm.Tests.sln -c %CONFIGURATION% --no-build" 
     -filter:"+[SourceCode.*]* -[*.Tests]*" 
-    -output:"$(appveyor_build_folder)\coverage.xml" 
+    -output:"{appveyor_build_folder}\coverage.xml" 
     -excludebyattribute:*.ExcludeFromCodeCoverage* 
     -oldStyle 
     -register:user 
@@ -44,7 +44,7 @@ test_script:
 
 after_test:
 - pip install codecov 
-- codecov -X gcov -f "$(appveyor_build_folder)\coverage.xml"
+- >- codecov -X gcov -f "{appveyor_build_folder}\coverage.xml"
 
 artifacts:
   - path: '**\*.nupkg'
