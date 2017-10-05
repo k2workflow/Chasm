@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Clay;
@@ -88,7 +95,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                         return;
                     }
                 }
-            });
+            }).ConfigureAwait(false);
 
             return dict;
         }
@@ -96,6 +103,33 @@ namespace SourceCode.Chasm.IO.AzureTable
         #endregion
 
         #region Write
+
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
+        {
+            var zipped = new Dictionary<Sha1, ArraySegment<byte>>();
+
+            // Zip
+            foreach (var item in items)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+
+                using (var output = new MemoryStream())
+                {
+                    using (var gz = new GZipStream(output, compressionLevel, true))
+                    {
+                        var segment = item.Value;
+                        gz.Write(segment.Array, segment.Offset, segment.Count);
+                    }
+                    output.Position = 0;
+
+                    var zip = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
+                    zipped.Add(item.Key, zip);
+                }
+            }
+
+            var batches = DataEntity.BuildWriteBatches(zipped, forceOverwrite);
+            return batches;
+        }
 
         public async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
@@ -125,40 +159,16 @@ namespace SourceCode.Chasm.IO.AzureTable
             // Build batches
             var batches = BuildWriteBatches(items, forceOverwrite, CompressionLevel, parallelOptions.CancellationToken);
 
-            // Execute batches
             var objectsTable = _objectsTable.Value;
-            return ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
+
+            // Execute batches
+            var task = ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
-                await objectsTable.ExecuteBatchAsync(batch, null, null, parallelOptions.CancellationToken);
+                await objectsTable.ExecuteBatchAsync(batch, null, null, parallelOptions.CancellationToken).ConfigureAwait(false);
             });
-        }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
-        {
-            var zipped = new Dictionary<Sha1, ArraySegment<byte>>();
-
-            // Zip
-            foreach (var item in items)
-            {
-                if (cancellationToken.IsCancellationRequested) break;
-
-                using (var output = new MemoryStream())
-                {
-                    using (var gz = new GZipStream(output, compressionLevel, true))
-                    {
-                        var segment = item.Value;
-                        gz.Write(segment.Array, segment.Offset, segment.Count);
-                    }
-                    output.Position = 0;
-
-                    var zip = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
-                    zipped.Add(item.Key, zip);
-                }
-            }
-
-            var batches = DataEntity.BuildWriteBatches(zipped, forceOverwrite);
-            return batches;
+            return task;
         }
 
         #endregion
