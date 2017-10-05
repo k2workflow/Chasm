@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26929.2
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm", "src\SourceCode.Chasm\SourceCode.Chasm.csproj", "{430F8C16-427D-4756-B788-80C1F41E2B9A}"
 EndProject
@@ -20,6 +20,15 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.AzureTable", "src\SourceCode.Chasm.Repository.AzureTable\SourceCode.Chasm.Repository.AzureTable.csproj", "{4B34F2F6-157D-4E6E-B996-05031B33EC17}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.Tests", "src\SourceCode.Chasm.Repository.Tests\SourceCode.Chasm.Repository.Tests.csproj", "{054B1D31-402F-4111-AB34-CDDB7461FB72}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{557A4569-C22F-46E2-BE3A-E76E3E2CAED5}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		codemaid.config = codemaid.config
+		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
