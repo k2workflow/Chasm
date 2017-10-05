@@ -15,6 +15,9 @@ init:
 - ps: $Env:NUGET_VERSION = "1.0.0-preview1-" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:is_not_pr = "true"; }
 
+install:
+- pip install codecov 
+
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
@@ -43,8 +46,10 @@ test_script:
     -hideskipped:File
 
 after_test:
-- pip install codecov 
-- >- codecov -X gcov -f "{appveyor_build_folder}\coverage.xml"
+- >-
+    codecov 
+    -X gcov 
+    -f "{appveyor_build_folder}\coverage.xml"
 
 artifacts:
   - path: '**\*.nupkg'
