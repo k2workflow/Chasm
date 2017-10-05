@@ -18,8 +18,8 @@ init:
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
-  version: '{version}-%LABEL%'
-  package_version: '{version}-%LABEL%'
+  version: '{version}-${label}'
+  package_version: '{version}-${label}'
 
 before_build:
 - appveyor-retry dotnet restore -v Minimal
