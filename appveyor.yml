@@ -15,18 +15,11 @@ init:
 - ps: $Env:LABEL = "preview1-" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:is_not_pr = "true"; }
 
-dotnet_csproj:
-  patch: true
-  file: '**\*.csproj'
-  version: '%LABEL%'
-  package_version: '%LABEL%'
-
 before_build:
 - appveyor-retry dotnet restore -v Minimal
 
-build:
- project: SourceCode.Chasm.sln
- verbosity: minimal
+build_script:
+- dotnet build SourceCode.Chasm.sln -c %CONFIGURATION% --version-suffix %LABEL%
 
 test_script:
 - ps1: .\GenerateTestSolution.ps1 .\SourceCode.Chasm.sln

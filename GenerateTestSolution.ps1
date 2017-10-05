@@ -64,3 +64,5 @@ foreach ($SlnLine in Get-Content $InputSolution) {
   }
 
 }
+
+Write-Host "Created $OutputSolution."
