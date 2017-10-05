@@ -1,3 +1,6 @@
+# Copyright (c) SourceCode Technology Holdings Inc. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
 Param(
   [Parameter(Mandatory=$True,Position=1)]
   [string]$InputSolution,
@@ -7,6 +10,9 @@ Param(
   [string]$TestPattern
 )
 
+Write-Host "Test Solution Generator version 0.0.1"
+Write-Host "Copyright (C) SourceCode Technology Holdings Inc. All rights reserved."
+
 if (-not $OutputSolution) { $OutputSolution = [IO.Path]::ChangeExtension($InputSolution, ".Tests.sln") }
 
 if (Test-Path $OutputSolution) { Remove-Item $OutputSolution }
@@ -14,6 +20,10 @@ if (Test-Path $OutputSolution) { Remove-Item $OutputSolution }
 if (-not $TestPattern) { $TestPattern = '.+?\.Tests' }
 
 $TestPattern = "^\s*Project\("".+?""\)\s*=\s*""$TestPattern"",.+$"
+
+Write-Host "InputSolution: $InputSolution"
+Write-Host "OutputSolution: $OutputSolution"
+Write-Host "TestPattern: $TestPattern"
 
 $State = 0
 
@@ -44,6 +54,7 @@ foreach ($SlnLine in Get-Content $InputSolution) {
 
     $State = 2
     Add-Content $OutputSolution $SlnLine
+    Write-Host "Matched project: $SlnLine"
 
   } elseif ($SlnLine -match '^\s*Project\(') {
     #Ignore any preceding non-test projects
