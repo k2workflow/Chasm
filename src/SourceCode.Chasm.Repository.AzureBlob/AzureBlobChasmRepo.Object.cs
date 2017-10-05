@@ -1,6 +1,7 @@
 using Microsoft.WindowsAzure.Storage;
 using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
+using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,7 +58,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 return new ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>>(ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>());
 
             // Execute batches
-            return AsyncParallelUtil.ForEachAsync(objectIds, parallelOptions, async n =>
+            return ParallelAsync.ForEachAsync(objectIds, parallelOptions, async n =>
             {
                 // Execute batch
                 var buffer = await ReadObjectAsync(n, parallelOptions.CancellationToken).ConfigureAwait(false);
@@ -109,7 +110,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             if (items == null || !items.Any()) return Task.CompletedTask;
 
             // Execute batches
-            return AsyncParallelUtil.ForEachAsync(items, parallelOptions, async kvps =>
+            return ParallelAsync.ForEachAsync(items, parallelOptions, async kvps =>
             {
                 // Execute batch
                 await WriteObjectAsync(kvps.Key, kvps.Value, forceOverwrite, parallelOptions.CancellationToken).ConfigureAwait(false);

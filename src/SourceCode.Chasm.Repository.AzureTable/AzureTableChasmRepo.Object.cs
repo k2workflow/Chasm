@@ -2,6 +2,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
+using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -61,7 +62,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
             // Execute batches
             var objectsTable = _objectsTable.Value;
-            await AsyncParallelUtil.ForEachAsync(batches, parallelOptions, async batch =>
+            await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
                 var results = await objectsTable.ExecuteBatchAsync(batch, default, default, parallelOptions.CancellationToken).ConfigureAwait(false);
@@ -126,7 +127,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
             // Execute batches
             var objectsTable = _objectsTable.Value;
-            return AsyncParallelUtil.ForEachAsync(batches, parallelOptions, async batch =>
+            return ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
                 await objectsTable.ExecuteBatchAsync(batch, null, null, parallelOptions.CancellationToken);
