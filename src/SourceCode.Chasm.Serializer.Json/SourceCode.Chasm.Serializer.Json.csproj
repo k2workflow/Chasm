@@ -24,6 +24,7 @@
     <Authors>SourceCode</Authors>
     <Description>CAS - Content Addressable Storage (Json Serializer).</Description>
     <PackageTags>cas content storage sha1 git json</PackageTags>
+    <Version>1.0.0</Version>
     <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
 </Project>
