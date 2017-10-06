@@ -99,7 +99,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 await blobRef.CreateOrReplaceAsync(accessCondition, default, default).ConfigureAwait(false);
             }
             // Try-catch is cheaper than a separate (latent) exists check
-            catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
+            catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
                 se.Suppress();
                 return;
