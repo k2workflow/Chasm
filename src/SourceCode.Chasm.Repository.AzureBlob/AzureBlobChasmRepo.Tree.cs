@@ -69,10 +69,12 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
             // CommitRef
             var commitRef = await ReadCommitRefAsync(branch, commitRefName, cancellationToken).ConfigureAwait(false);
-            if (commitRef == CommitRef.Empty) return default;
+
+            // NotFound
+            if (commitRef == null) return default;
 
             // Tree
-            var tree = await ReadTreeAsync(commitRef.CommitId, cancellationToken).ConfigureAwait(false);
+            var tree = await ReadTreeAsync(commitRef.Value.CommitId, cancellationToken).ConfigureAwait(false);
             return tree;
         }
 

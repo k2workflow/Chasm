@@ -53,7 +53,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             return (false, default, default);
         }
 
-        public async ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -61,8 +61,12 @@ namespace SourceCode.Chasm.IO.AzureTable
             var refsTable = _refsTable.Value;
             var operation = DataEntity.BuildReadOperation(branch, name);
 
-            var (_, commitId, _) = await ReadCommitRefImplAsync(refsTable, operation, Serializer, cancellationToken).ConfigureAwait(false);
+            var (found, commitId, _) = await ReadCommitRefImplAsync(refsTable, operation, Serializer, cancellationToken).ConfigureAwait(false);
 
+            // NotFound
+            if (!found) return null;
+
+            // Found
             var commitRef = new CommitRef(name, commitId);
             return commitRef;
         }

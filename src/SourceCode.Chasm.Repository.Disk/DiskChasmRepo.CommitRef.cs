@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.IO.Disk
     {
         #region Read
 
-        public async ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -24,9 +24,14 @@ namespace SourceCode.Chasm.IO.Disk
             var filename = DeriveCommitRefFileName(branch, name);
             var path = Path.Combine(_refsContainer, filename);
 
+            // Sha1s are not compressed
             var bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
 
-            // Sha1s are not compressed
+            // NotFound
+            if (bytes == null || bytes.Length == 0)
+                return null;
+
+            // Found
             var sha1 = Serializer.DeserializeSha1(bytes);
 
             var commitId = new CommitId(sha1);
