@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.IO
     {
         #region Methods
 
-        ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
+        ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
 
         /// <summary>
         /// Write a <see cref="CommitRef"/> to the repository using the provided values.

@@ -65,13 +65,17 @@ namespace SourceCode.Chasm.IO.AzureBlob
             return (false, default, default, default);
         }
 
-        public async ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var (_, commitId, _, _) = await ReadCommitRefImplAsync(branch, name, cancellationToken).ConfigureAwait(false);
+            var (found, commitId, _, _) = await ReadCommitRefImplAsync(branch, name, cancellationToken).ConfigureAwait(false);
 
+            // NotFound
+            if (!found) return null;
+
+            // Found
             var commitRef = new CommitRef(name, commitId);
             return commitRef;
         }
