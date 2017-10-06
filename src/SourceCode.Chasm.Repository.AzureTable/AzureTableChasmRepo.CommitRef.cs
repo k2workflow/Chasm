@@ -37,7 +37,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
                 // Sha1s are not compressed
                 var count = entity.Content?.Length ?? 0;
-                if (count != Sha1.ByteLen)
+                if (count < Sha1.ByteLen)
                     throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
 
                 var sha1 = serializer.DeserializeSha1(entity.Content);
