@@ -8,8 +8,7 @@ namespace SourceCode.Chasm.IO.Disk
         public async ValueTask<Commit> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
             var buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
-            if (buffer.IsEmpty)
-                return Commit.Empty;
+            if (buffer.IsEmpty) return default;
 
             var model = Serializer.DeserializeCommit(buffer.Span);
             return model;

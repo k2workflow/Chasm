@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SourceCode.Chasm.IO.Disk
 {
@@ -82,7 +83,7 @@ namespace SourceCode.Chasm.IO.Disk
 
         #region Helpers
 
-        private static byte[] ReadFile(string path)
+        private static async ValueTask<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
 
@@ -90,7 +91,7 @@ namespace SourceCode.Chasm.IO.Disk
             if (!Directory.Exists(dir))
                 return default;
 
-            using (var fileStream = WaitForFile(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var fileStream = WaitForFile(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 if (fileStream == null)
                     return default;
@@ -101,7 +102,7 @@ namespace SourceCode.Chasm.IO.Disk
                 var bytes = new byte[remaining];
                 while (remaining > 0)
                 {
-                    var count = fileStream.Read(bytes, offset, remaining);
+                    var count = await fileStream.ReadAsync(bytes, offset, remaining, cancellationToken).ConfigureAwait(false);
                     if (count == 0)
                         throw new EndOfStreamException("End of file");
 
@@ -113,7 +114,7 @@ namespace SourceCode.Chasm.IO.Disk
             }
         }
 
-        private static void WriteFile(string path, ArraySegment<byte> segment)
+        private static async Task WriteFileAsync(string path, ArraySegment<byte> segment, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
 
@@ -123,15 +124,17 @@ namespace SourceCode.Chasm.IO.Disk
 
             using (var fileStream = WaitForFile(path, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                fileStream?.Write(segment.Array, segment.Offset, segment.Count);
+                await fileStream.WriteAsync(segment.Array, segment.Offset, segment.Count, cancellationToken).ConfigureAwait(false);
             }
 
             // Touch
+
+            // TODO: Under load we see intermittent IO exceptions. This is a temp fix.
             for (var retryCount = 0; retryCount < _retryMax; retryCount++)
             {
                 try
                 {
-                    File.SetLastAccessTime(path, DateTime.Now);
+                    File.SetLastAccessTimeUtc(path, DateTime.UtcNow);
                     break;
                 }
                 catch (IOException)
@@ -143,6 +146,7 @@ namespace SourceCode.Chasm.IO.Disk
 
         private static FileStream WaitForFile(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize = 4096)
         {
+            // TODO: Under load we see intermittent IO exceptions. This is a temp fix.
             for (var retryCount = 0; retryCount < _retryMax; retryCount++)
             {
                 FileStream fs = null;
@@ -161,22 +165,6 @@ namespace SourceCode.Chasm.IO.Disk
             }
 
             return null;
-        }
-
-        private static void DeleteFile(string path)
-        {
-            for (var retryCount = 0; retryCount < _retryMax; retryCount++)
-            {
-                try
-                {
-                    if (File.Exists(path))
-                        File.Delete(path);
-                }
-                catch (IOException)
-                {
-                    Thread.Sleep(_retryMs);
-                }
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
