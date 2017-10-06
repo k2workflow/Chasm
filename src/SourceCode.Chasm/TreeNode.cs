@@ -6,9 +6,11 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
+    [DebuggerDisplay("{ToString(),nq,ac}")]
     public struct TreeNode : IEquatable<TreeNode>, IComparable<TreeNode>
     {
         #region Constants
@@ -116,7 +118,7 @@ namespace SourceCode.Chasm
 
         public static bool operator <(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Compare(x, y) < 0;
 
-        public override string ToString() => $"{Kind}: {Name} ({Sha1})";
+        public override string ToString() => $"{Name}: {Kind} ({Sha1:D})";
 
         #endregion
     }

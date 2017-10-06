@@ -6,9 +6,11 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
+    [DebuggerDisplay("{" + nameof(Name) + ",nq} ({" + nameof(CommitId) + "." + nameof(Chasm.CommitId.Sha1) + ".ToString(\"D\"),nq,ac})")]
     public struct CommitRef : IEquatable<CommitRef>
     {
         #region Constants
@@ -61,7 +63,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(CommitRef x, CommitRef y) => !(x == y);
 
-        public override string ToString() => $"{Name} ({CommitId.Sha1:N})";
+        public override string ToString() => $"{CommitId.Sha1:D} ({Name})";
 
         #endregion
     }

@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
-    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
+    [DebuggerDisplay("{ToString(),nq,ac}")]
     public struct TreeNodeList : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeList>
     {
         #region Constants
@@ -418,7 +418,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(TreeNodeList x, TreeNodeList y) => !(x == y);
 
-        public override string ToString() => $"{nameof(TreeNodeList)}: {_nodes.Length}";
+        public override string ToString() => $"{nameof(Count)}: {_nodes.Length}";
 
         #endregion
     }

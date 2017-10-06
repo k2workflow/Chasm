@@ -60,7 +60,9 @@ namespace SourceCode.Chasm.Tests
         [Theory(DisplayName = nameof(Blob_equality))]
         public static void Blob_equality(byte[] x, byte[] y, bool isEqual)
         {
-            Assert.Equal(isEqual, new Blob(x).Equals((object)new Blob(y)));
+            var blob0 = new Blob(x);
+            var blob1 = new Blob(y);
+            Assert.Equal(isEqual, blob0.Equals((object)blob1));
         }
 
 #pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
