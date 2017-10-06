@@ -41,7 +41,7 @@ namespace SourceCode.Chasm.IO.Azure.Tests
             repo.Setup(r => r.ReadCommitRefAsync(null, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitRef>(CommitRef.Empty));
             repo.Setup(r => r.ReadCommitRefAsync(string.Empty, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitRef>(CommitRef.Empty));
 
-            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitRef>(new CommitRef(new CommitId(Sha1.Hash("branch-name")))));
+            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitRef>(new CommitRef("branch-name", new CommitId(Sha1.Hash("branch-name")))));
         }
 
         #endregion
