@@ -13,7 +13,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static CommitRefWire Convert(this CommitRef model)
         {
-            if (model == CommitRef.Empty) return default;
+            if (model == CommitRef.Empty) return new CommitRefWire();
 
             var wire = new CommitRefWire
             {

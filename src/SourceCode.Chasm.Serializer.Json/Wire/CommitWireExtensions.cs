@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 {
     internal static class CommitWireExtensions
     {
-        #region Fields
+        #region Constants
 
         private const string _parents = "parents";
         private const string _treeId = "treeId";
