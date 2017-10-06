@@ -29,6 +29,7 @@ namespace SourceCode.Chasm.Tests
             var expected = Sha1.Empty;
             Assert.True(default == expected);
             Assert.False(default != expected);
+            Assert.True(expected.Equals((object)expected));
 
             // Null string
             var actual = Sha1.Hash((string)null);

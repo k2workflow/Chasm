@@ -21,9 +21,6 @@ namespace SourceCode.Chasm.Tests
             var noData = new TreeNode();
             var nullData = new TreeNode("a", NodeKind.None, Sha1.Empty);
 
-            Assert.True(default == TreeNode.Empty);
-            Assert.False(default != TreeNode.Empty);
-
             // Name
             Assert.Null(TreeNode.Empty.Name);
             Assert.Null(TreeNode.EmptyBlob.Name);
@@ -55,40 +52,44 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(TreeNode_equality))]
         public static void TreeNode_equality()
         {
-            var expected = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+            var tree1 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+            var tree2 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+
+            Assert.True(tree1 == tree2);
+            Assert.False(tree1 != tree2);
+            Assert.True(tree1.Equals((object)tree2));
 
             // Equal
-            var actual = new TreeNode(expected.Name, expected.Kind, expected.Sha1);
-            Assert.Equal(expected, actual);
-            Assert.True(expected.Equals((object)actual));
-            Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            var actual = new TreeNode(tree1.Name, tree1.Kind, tree1.Sha1);
+            Assert.Equal(tree1, actual);
+            Assert.Equal(tree1.GetHashCode(), actual.GetHashCode());
 
             // Name
-            actual = new TreeNode("b", expected.Kind, expected.Sha1);
-            Assert.NotEqual(expected, actual);
-            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            actual = new TreeNode("b", tree1.Kind, tree1.Sha1);
+            Assert.NotEqual(tree1, actual);
+            Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
 
-            actual = new TreeNode("ab", expected.Kind, expected.Sha1);
-            Assert.NotEqual(expected, actual);
-            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            actual = new TreeNode("ab", tree1.Kind, tree1.Sha1);
+            Assert.NotEqual(tree1, actual);
+            Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
 
-            actual = new TreeNode(expected.Name.ToUpperInvariant(), expected.Kind, expected.Sha1);
-            Assert.NotEqual(expected, actual);
-            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            actual = new TreeNode(tree1.Name.ToUpperInvariant(), tree1.Kind, tree1.Sha1);
+            Assert.NotEqual(tree1, actual);
+            Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
 
             // Kind
-            actual = new TreeNode(expected.Name, default, expected.Sha1);
-            Assert.NotEqual(expected, actual);
-            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            actual = new TreeNode(tree1.Name, default, tree1.Sha1);
+            Assert.NotEqual(tree1, actual);
+            Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
 
-            actual = new TreeNode(expected.Name, NodeKind.Tree, expected.Sha1);
-            Assert.NotEqual(expected, actual);
-            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            actual = new TreeNode(tree1.Name, NodeKind.Tree, tree1.Sha1);
+            Assert.NotEqual(tree1, actual);
+            Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
 
             // Sha1
-            actual = new TreeNode(expected.Name, expected.Kind, Sha1.Hash("def"));
-            Assert.NotEqual(expected, actual);
-            Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            actual = new TreeNode(tree1.Name, tree1.Kind, Sha1.Hash("def"));
+            Assert.NotEqual(tree1, actual);
+            Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
         }
 
         [Trait("Type", "Unit")]

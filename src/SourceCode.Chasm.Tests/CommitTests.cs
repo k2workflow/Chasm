@@ -30,6 +30,10 @@ namespace SourceCode.Chasm.Tests
             var noData = new Commit();
             var nullData = new Commit(null, default, default, null);
 
+            Assert.True(default == Commit.Empty);
+            Assert.False(default != Commit.Empty);
+            Assert.True(Commit.Empty.Equals((object)Commit.Empty));
+
             // Parents
             Assert.Empty(Commit.Empty.Parents); // Default ctor (implicit)
             Assert.Empty(noData.Parents); // Default ctor (explicit)
@@ -61,6 +65,7 @@ namespace SourceCode.Chasm.Tests
             // Equal
             var actual = new Commit(expected.Parents, expected.TreeId, expected.CommitUtc, expected.CommitMessage);
             Assert.Equal(expected, actual);
+            Assert.Equal(expected.ToString(), actual.ToString());
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
             // Parents
