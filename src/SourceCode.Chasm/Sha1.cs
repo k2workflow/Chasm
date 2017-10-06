@@ -316,16 +316,18 @@ namespace SourceCode.Chasm
 
         #region ToString
 
+        private const char FormatN = (char)0;
+
         [SecuritySafeCritical]
         private char[] ToChars(char separator)
         {
-            Debug.Assert(separator == (char)0 || separator == '-' || separator == ' ');
+            Debug.Assert(separator == FormatN || separator == '-' || separator == ' ');
 
             var sep = 0;
             char[] chars;
 
             // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
-            if (separator == (char)0)
+            if (separator == FormatN)
             {
                 chars = new char[CharLen];
             }
@@ -377,7 +379,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public override string ToString()
         {
-            var chars = ToChars((char)0); // "N"
+            var chars = ToChars(FormatN);
             return new string(chars);
         }
 
@@ -403,7 +405,7 @@ namespace SourceCode.Chasm
                 case 'n':
                 case 'N':
                     {
-                        var chars = ToChars((char)0);
+                        var chars = ToChars(FormatN);
                         return new string(chars);
                     }
 
@@ -435,7 +437,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public KeyValuePair<string, string> Split(int prefixLength)
         {
-            var chars = ToChars((char)0); // "N"
+            var chars = ToChars(FormatN);
 
             if (prefixLength <= 0)
                 return new KeyValuePair<string, string>(string.Empty, new string(chars));
