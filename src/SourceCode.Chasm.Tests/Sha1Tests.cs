@@ -7,6 +7,7 @@
 
 using SourceCode.Clay.Buffers;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
@@ -27,9 +28,15 @@ namespace SourceCode.Chasm.Tests
         public static void When_create_null_sha1()
         {
             var expected = Sha1.Empty;
+
+            Assert.Throws<ArgumentNullException>(() => new Sha1((byte[])null, 0));
+
             Assert.True(default == expected);
             Assert.False(default != expected);
             Assert.True(expected.Equals((object)expected));
+            Assert.Equal(new KeyValuePair<string, string>("", "0000000000000000000000000000000000000000"), expected.Split(0));
+            Assert.Equal(new KeyValuePair<string, string>("00", "00000000000000000000000000000000000000"), expected.Split(2));
+            Assert.Equal(new KeyValuePair<string, string>("0000000000000000000000000000000000000000", ""), expected.Split(Sha1.CharLen));
 
             // Null string
             var actual = Sha1.Hash((string)null);
@@ -89,6 +96,12 @@ namespace SourceCode.Chasm.Tests
         {
             var expected = Sha1.Hash("abc");
             var buffer = new byte[Sha1.ByteLen + 10];
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(new byte[Sha1.ByteLen - 1], 0)); // Too short
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(new byte[Sha1.ByteLen], 1)); // Bad offset
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => Sha1.Hash(new byte[Sha1.ByteLen], 0, -1)); // Bad count
+            Assert.Throws<ArgumentOutOfRangeException>(() => Sha1.Hash(new byte[Sha1.ByteLen], 1, Sha1.ByteLen)); // Bad offset
 
             // Construct Byte[]
             expected.CopyTo(buffer, 0);
@@ -157,6 +170,9 @@ namespace SourceCode.Chasm.Tests
         {
             var expected = Sha1.Hash("abc");
             var buffer = new byte[Sha1.ByteLen + 10];
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(Memory<byte>.Empty.Span)); // Empty
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(new Memory<byte>(new byte[Sha1.ByteLen - 1]).Span)); // Too short
 
             // Construct Memory
             expected.CopyTo(buffer, 0);
@@ -696,6 +712,14 @@ namespace SourceCode.Chasm.Tests
         {
             const string expected_N = "a9993e364706816aba3e25717850c26c9cd0d89d";
             var sha1 = Sha1.Parse(expected_N);
+
+            Assert.True(Sha1.TryParse(expected_N, out _));
+            Assert.True(Sha1.TryParse("0x" + expected_N, out _));
+            Assert.True(Sha1.TryParse("0X" + expected_N, out _));
+            Assert.False(Sha1.TryParse(expected_N.Substring(10), out _));
+            Assert.False(Sha1.TryParse("0x" + expected_N.Substring(10), out _));
+            Assert.False(Sha1.TryParse("0X" + expected_N.Substring(10), out _));
+            Assert.False(Sha1.TryParse(expected_N.Replace('8', 'g'), out _));
 
             // "N"
             {

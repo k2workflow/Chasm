@@ -332,14 +332,6 @@ namespace SourceCode.Chasm.Tests
                 new TreeNode("r", NodeKind.Blob, Sha1.Hash("Test9")),
             };
 
-            var dupes = new[]
-            {
-                new TreeNode(list2[0].Name, list2[0].Kind, list2[1].Sha1),
-                new TreeNode(list2[1].Name, list2[1].Kind, list2[2].Sha1),
-                new TreeNode(list2[2].Name, list2[2].Kind, list2[3].Sha1),
-                new TreeNode(list2[3].Name, list2[3].Kind, list2[0].Sha1)
-            };
-
             var list3 = list1.Merge(list2);
 
             Assert.Equal(9, list3.Count);
@@ -364,7 +356,15 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(list2[5].Sha1, list3[7].Sha1);
             Assert.Equal(list2[6].Sha1, list3[8].Sha1);
 
-            //Assert.Throws<ArgumentException>(() => list3.Merge(dupes));
+            var dupes = new[]
+            {
+                new TreeNode(list2[0].Name, list2[0].Kind, list2[1].Sha1),
+                new TreeNode(list2[1].Name, list2[1].Kind, list2[2].Sha1),
+                new TreeNode(list2[2].Name, list2[2].Kind, list2[3].Sha1),
+                new TreeNode(list2[3].Name, list2[3].Kind, list2[0].Sha1)
+            };
+
+            list3 = list3.Merge(dupes);
         }
 
         #endregion
