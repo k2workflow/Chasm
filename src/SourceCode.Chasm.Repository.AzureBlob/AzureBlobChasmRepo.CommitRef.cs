@@ -9,7 +9,6 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
 using System;
-using System.Buffers;
 using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -29,32 +28,33 @@ namespace SourceCode.Chasm.IO.AzureBlob
             var blobName = DeriveCommitRefBlobName(branch, name);
             var blobRef = refsContainer.GetAppendBlobReference(blobName);
 
-            var rented = ArrayPool<byte>.Shared.Rent(Sha1.ByteLen);
             try
             {
-                var count = await blobRef.DownloadToByteArrayAsync(rented, 0, default, default, default, cancellationToken).ConfigureAwait(false);
+                using (var output = new MemoryStream(Sha1.ByteLen * 3)) // Evidence is 40-52 bytes
+                {
+                    // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
+                    // Or use DownloadToByteArrayAsync since we already know expected length of data (Sha1.ByteLen)
+                    // Keep in mind Azure may add some overhead: it looks like the byte length is 40-52 bytes
+                    await blobRef.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
 
-                // Grab the etag - we need it for optimistic concurrency control
-                var ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
+                    // Grab the etag - we need it for optimistic concurrency control
+                    var ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
 
-                if (count != Sha1.ByteLen)
-                    throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
+                    if (output.Length < Sha1.ByteLen)
+                        throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
 
-                // Sha1s are not compressed
-                var sha1 = Serializer.DeserializeSha1(rented);
-                var commitId = new CommitId(sha1);
+                    // Sha1s are not compressed
+                    var sha1 = Serializer.DeserializeSha1(output.ToArray()); // TODO: Perf
+                    var commitId = new CommitId(sha1);
 
-                // Found
-                return (true, commitId, ifMatchCondition, blobRef);
+                    // Found
+                    return (true, commitId, ifMatchCondition, blobRef);
+                }
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {
                 // Try-catch is cheaper than a separate (latent) exists check
                 se.Suppress();
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(rented);
             }
 
             // NotFound

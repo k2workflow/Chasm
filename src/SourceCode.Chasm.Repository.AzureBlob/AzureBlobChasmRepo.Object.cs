@@ -37,7 +37,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 using (var input = new MemoryStream())
                 using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
                 {
-                    // Perf: Use a stream instead of a preceding call to fetch the buffer length
+                    // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
                     await blobRef.DownloadToStreamAsync(input).ConfigureAwait(false);
 
                     using (var output = new MemoryStream())
