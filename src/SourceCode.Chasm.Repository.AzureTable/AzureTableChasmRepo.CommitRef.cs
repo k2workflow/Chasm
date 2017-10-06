@@ -6,10 +6,10 @@
 #endregion
 
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Clay;
 using System;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,9 +19,11 @@ namespace SourceCode.Chasm.IO.AzureTable
     {
         #region Read
 
-        private static async ValueTask<(bool found, CommitId, string)> ReadCommitRefImplAsync(CloudTable refsTable, TableOperation operation, IChasmSerializer serializer, CancellationToken cancellationToken)
+        private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string branch, string name, IChasmSerializer serializer, CancellationToken cancellationToken)
         {
-            var commitId = CommitId.Empty;
+            var refsTable = _refsTable.Value;
+            var operation = DataEntity.BuildReadOperation(branch, name);
+
             try
             {
                 // Read from table
@@ -34,11 +36,12 @@ namespace SourceCode.Chasm.IO.AzureTable
                 var entity = (DataEntity)result.Result;
 
                 // Sha1s are not compressed
-                if (entity.Content?.Length > 0)
-                {
-                    var sha1 = serializer.DeserializeSha1(entity.Content);
-                    commitId = new CommitId(sha1);
-                }
+                var count = entity.Content?.Length ?? 0;
+                if (count != Sha1.ByteLen)
+                    throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
+
+                var sha1 = serializer.DeserializeSha1(entity.Content);
+                var commitId = new CommitId(sha1);
 
                 // Found
                 return (true, commitId, result.Etag);
@@ -58,10 +61,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var refsTable = _refsTable.Value;
-            var operation = DataEntity.BuildReadOperation(branch, name);
-
-            var (found, commitId, _) = await ReadCommitRefImplAsync(refsTable, operation, Serializer, cancellationToken).ConfigureAwait(false);
+            var (found, commitId, _) = await ReadCommitRefImplAsync(branch, name, Serializer, cancellationToken).ConfigureAwait(false);
 
             // NotFound
             if (!found) return null;
@@ -80,11 +80,8 @@ namespace SourceCode.Chasm.IO.AzureTable
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
-            var refsTable = _refsTable.Value;
-            var operation = DataEntity.BuildReadOperation(branch, commitRef.Name);
-
             // Load existing commit ref in order to use its etag
-            var (found, existingCommitId, etag) = await ReadCommitRefImplAsync(refsTable, operation, Serializer, cancellationToken).ConfigureAwait(false);
+            var (found, existingCommitId, etag) = await ReadCommitRefImplAsync(branch, commitRef.Name, Serializer, cancellationToken).ConfigureAwait(false);
 
             // Optimistic concurrency check
             if (found)
@@ -111,6 +108,8 @@ namespace SourceCode.Chasm.IO.AzureTable
 
             try
             {
+                var refsTable = _refsTable.Value;
+
                 // Sha1s are not compressed
                 using (var session = Serializer.Serialize(commitRef.CommitId.Sha1))
                 {

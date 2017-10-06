@@ -25,28 +25,24 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         private async ValueTask<(bool found, CommitId, AccessCondition, CloudAppendBlob)> ReadCommitRefImplAsync(string branch, string name, CancellationToken cancellationToken)
         {
-            var commitId = CommitId.Empty;
-            AccessCondition ifMatchCondition = null;
-            CloudAppendBlob blobRef = null;
+            var refsContainer = _refsContainer.Value;
+            var blobName = DeriveCommitRefBlobName(branch, name);
+            var blobRef = refsContainer.GetAppendBlobReference(blobName);
 
             var rented = ArrayPool<byte>.Shared.Rent(Sha1.ByteLen);
             try
             {
-                var refsContainer = _refsContainer.Value;
-                var blobName = DeriveCommitRefBlobName(branch, name);
-                blobRef = refsContainer.GetAppendBlobReference(blobName);
-
                 var count = await blobRef.DownloadToByteArrayAsync(rented, 0, default, default, default, cancellationToken).ConfigureAwait(false);
 
                 // Grab the etag - we need it for optimistic concurrency control
-                ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
+                var ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
 
                 if (count != Sha1.ByteLen)
                     throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
 
                 // Sha1s are not compressed
                 var sha1 = Serializer.DeserializeSha1(rented);
-                commitId = new CommitId(sha1);
+                var commitId = new CommitId(sha1);
 
                 // Found
                 return (true, commitId, ifMatchCondition, blobRef);
@@ -62,7 +58,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             }
 
             // NotFound
-            return (false, default, default, default);
+            return (false, default, default, blobRef);
         }
 
         public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)

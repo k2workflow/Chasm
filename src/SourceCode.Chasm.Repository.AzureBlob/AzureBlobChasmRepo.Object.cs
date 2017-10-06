@@ -6,7 +6,6 @@
 #endregion
 
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
 using SourceCode.Clay.Threading;
