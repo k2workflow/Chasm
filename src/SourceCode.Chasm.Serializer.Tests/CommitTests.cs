@@ -5,6 +5,7 @@
 
 #endregion
 
+using System;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
@@ -18,8 +19,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Default(IChasmSerializer ser)
         {
-            // All default
-            var expected = new Commit(null, default, default, null);
+            var expected = Commit.Empty;
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);

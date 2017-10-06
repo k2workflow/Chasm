@@ -33,8 +33,6 @@ namespace SourceCode.Chasm
 
         public CommitRef(CommitId commitId)
         {
-            if (commitId == CommitId.Empty) throw new ArgumentNullException(nameof(commitId));
-
             CommitId = commitId;
         }
 

@@ -12,7 +12,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 {
     internal static class CommitRefWireExtensions
     {
-        #region Fields
+        #region Constants
 
         private const string _sha1 = "sha1";
 
@@ -22,7 +22,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static JsonObject Convert(this CommitRef model)
         {
-            if (model == CommitRef.Empty) return default;
+            if (model == CommitRef.Empty) return default; // null
 
             var wire = new JsonObject
             {

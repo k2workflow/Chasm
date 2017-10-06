@@ -11,7 +11,7 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static class TreeNodeListTests
     {
-        #region Fields
+        #region Constants
 
         private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), new BlobId(Sha1.Hash(nameof(Node1))));
         private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), new BlobId(Sha1.Hash(nameof(Node2))));

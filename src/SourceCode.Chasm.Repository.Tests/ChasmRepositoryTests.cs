@@ -36,12 +36,12 @@ namespace SourceCode.Chasm.IO.Azure.Tests
             repo.Setup(r => r.CompressionLevel).Returns(System.IO.Compression.CompressionLevel.NoCompression);
             repo.Setup(r => r.MaxDop).Returns(-1);
 
-            repo.Setup(r => r.ReadCommitRefAsync(null, null, CancellationToken.None)).Returns(new ValueTask<CommitId>(CommitId.Empty));
-            repo.Setup(r => r.ReadCommitRefAsync(string.Empty, null, CancellationToken.None)).Returns(new ValueTask<CommitId>(CommitId.Empty));
-            repo.Setup(r => r.ReadCommitRefAsync(null, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitId>(CommitId.Empty));
-            repo.Setup(r => r.ReadCommitRefAsync(string.Empty, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitId>(CommitId.Empty));
+            repo.Setup(r => r.ReadCommitRefAsync(null, null, CancellationToken.None)).Returns(new ValueTask<CommitRef>(CommitRef.Empty));
+            repo.Setup(r => r.ReadCommitRefAsync(string.Empty, null, CancellationToken.None)).Returns(new ValueTask<CommitRef>(CommitRef.Empty));
+            repo.Setup(r => r.ReadCommitRefAsync(null, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitRef>(CommitRef.Empty));
+            repo.Setup(r => r.ReadCommitRefAsync(string.Empty, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitRef>(CommitRef.Empty));
 
-            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitId>(new CommitId(Sha1.Hash("branch-name"))));
+            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitRef>(new CommitRef(new CommitId(Sha1.Hash("branch-name")))));
         }
 
         #endregion

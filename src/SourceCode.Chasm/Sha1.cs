@@ -121,8 +121,7 @@ namespace SourceCode.Chasm
         [SecuritySafeCritical]
         public Sha1(byte[] buffer, int offset)
         {
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
+            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
 
             if (buffer.Length < ByteLen)
                 throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)} must have length at least {ByteLen}");
@@ -441,7 +440,7 @@ namespace SourceCode.Chasm
             if (prefixLength <= 0)
                 return new KeyValuePair<string, string>(string.Empty, new string(chars));
 
-            if (prefixLength > CharLen)
+            if (prefixLength >= CharLen)
                 return new KeyValuePair<string, string>(new string(chars), string.Empty);
 
             var key = new string(chars, 0, prefixLength);
