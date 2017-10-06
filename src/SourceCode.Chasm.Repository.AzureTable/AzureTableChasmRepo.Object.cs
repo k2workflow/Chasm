@@ -49,7 +49,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                     return buffer;
                 }
             }
-            // Try-catch is cheaper than a separate exists check
+            // Try-catch is cheaper than a separate (latent) exists check
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {
                 se.Suppress();

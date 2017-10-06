@@ -6,9 +6,11 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
+    [DebuggerDisplay("{ToString(),nq,ac}")]
     public struct Blob : IEquatable<Blob>
     {
         #region Constants
@@ -50,7 +52,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(Blob x, Blob y) => !(x == y);
 
-        public override string ToString() => $"{nameof(Blob)}: {Data?.Length ?? 0}";
+        public override string ToString() => nameof(Data.Length) + ": " + (Data == null ? "null" : $"{Data.Length}");
 
         #endregion
     }

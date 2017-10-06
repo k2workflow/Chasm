@@ -6,9 +6,11 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
+    [DebuggerDisplay("{" + nameof(Name) + ",nq} ({" + nameof(CommitId) + "." + nameof(Chasm.CommitId.Sha1) + ".ToString(\"D\"),nq,ac})")]
     public struct CommitRef : IEquatable<CommitRef>
     {
         #region Constants
@@ -25,14 +27,19 @@ namespace SourceCode.Chasm
 
         #region Properties
 
+        public string Name { get; }
+
         public CommitId CommitId { get; }
 
         #endregion
 
         #region Constructors
 
-        public CommitRef(CommitId commitId)
+        public CommitRef(string name, CommitId commitId)
         {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+
+            Name = name;
             CommitId = commitId;
         }
 
@@ -56,7 +63,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(CommitRef x, CommitRef y) => !(x == y);
 
-        public override string ToString() => CommitId.Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
+        public override string ToString() => $"{CommitId.Sha1:D} ({Name})";
 
         #endregion
     }

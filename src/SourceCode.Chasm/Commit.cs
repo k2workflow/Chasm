@@ -7,9 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
+    [DebuggerDisplay("{" + nameof(CommitUtc) + ".ToString(\"o\"),nq,ac} ({" + nameof(TreeId) + "." + nameof(Chasm.TreeId.Sha1) + ".ToString(\"D\"),nq,ac})")]
     public struct Commit : IEquatable<Commit>
     {
         #region Constants
@@ -152,7 +154,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(Commit x, Commit y) => !(x == y);
 
-        public override string ToString() => $"{nameof(Commit)}: {CommitUtc:o} ({TreeId})";
+        public override string ToString() => $"{TreeId.Sha1:D} ({CommitUtc:o})";
 
         #endregion
     }

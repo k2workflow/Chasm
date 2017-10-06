@@ -26,7 +26,11 @@ namespace SourceCode.Chasm.IO.Disk
 
             var bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
 
-            var commitRef = Serializer.DeserializeCommitRef(bytes);
+            // Sha1s are not compressed
+            var sha1 = Serializer.DeserializeSha1(bytes);
+
+            var commitId = new CommitId(sha1);
+            var commitRef = new CommitRef(name, commitId);
             return commitRef;
         }
 
@@ -34,17 +38,18 @@ namespace SourceCode.Chasm.IO.Disk
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitRef commitRef, CancellationToken cancellationToken)
+        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // TODO: Optimistic concurrency
 
-            var filename = DeriveCommitRefFileName(branch, name);
+            var filename = DeriveCommitRefFileName(branch, commitRef.Name);
             var path = Path.Combine(_refsContainer, filename);
 
-            using (var session = Serializer.Serialize(commitRef))
+            // Sha1s are not compressed
+            using (var session = Serializer.Serialize(commitRef.CommitId.Sha1))
             {
                 await WriteFileAsync(path, session.Result, cancellationToken).ConfigureAwait(false);
             }

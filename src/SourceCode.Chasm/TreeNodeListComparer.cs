@@ -59,14 +59,14 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNodeList obj)
             {
-                var hc = 11L;
+                var hc = 17L;
 
                 unchecked
                 {
-                    hc = hc * 7 + obj._nodes.Length;
+                    hc = hc * 23 + obj._nodes.Length;
 
                     if (obj._nodes.Length > 0)
-                        hc = hc * 7 + obj._nodes.Span[0].GetHashCode();
+                        hc = hc * 23 + obj._nodes.Span[0].GetHashCode();
                 }
 
                 return ((int)(hc >> 32)) ^ (int)hc;

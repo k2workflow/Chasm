@@ -9,9 +9,11 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
 using System;
+using System.Buffers;
 using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,36 +23,46 @@ namespace SourceCode.Chasm.IO.AzureBlob
     {
         #region Read
 
-        private async ValueTask<(CommitRef, AccessCondition)> ReadCommitRefImplAsync(CloudBlob blobRef, CancellationToken cancellationToken)
+        private async ValueTask<(bool found, CommitId, AccessCondition, CloudAppendBlob)> ReadCommitRefImplAsync(string branch, string name, CancellationToken cancellationToken)
         {
-            var commitRef = CommitRef.Empty;
-            AccessCondition accessCondition = null;
+            var commitId = CommitId.Empty;
+            AccessCondition ifMatchCondition = null;
+            CloudAppendBlob blobRef = null;
+
+            var rented = ArrayPool<byte>.Shared.Rent(Sha1.ByteLen);
             try
             {
-                // CommitRefs are not compressed
+                var refsContainer = _refsContainer.Value;
+                var blobName = DeriveCommitRefBlobName(branch, name);
+                blobRef = refsContainer.GetAppendBlobReference(blobName);
 
-                using (var output = new MemoryStream())
-                {
-                    // Perf: Use a stream instead of a preceding call to fetch the buffer length
-                    await blobRef.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
+                var count = await blobRef.DownloadToByteArrayAsync(rented, 0, default, default, default, cancellationToken).ConfigureAwait(false);
 
-                    // Grab the etag - we need it for optimistic concurrency control
-                    var etag = blobRef.Properties.ETag;
-                    accessCondition = AccessCondition.GenerateIfMatchCondition(etag);
+                // Grab the etag - we need it for optimistic concurrency control
+                ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
 
-                    if (output.Length > 0)
-                    {
-                        commitRef = Serializer.DeserializeCommitRef(output.ToArray()); // TODO: Perf
-                    }
-                }
+                if (count != Sha1.ByteLen)
+                    throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
+
+                // Sha1s are not compressed
+                var sha1 = Serializer.DeserializeSha1(rented);
+                commitId = new CommitId(sha1);
+
+                // Found
+                return (true, commitId, ifMatchCondition, blobRef);
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {
-                // Try-catch is cheaper than a separate exists check
+                // Try-catch is cheaper than a separate (latent) exists check
                 se.Suppress();
             }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(rented);
+            }
 
-            return (commitRef, accessCondition);
+            // NotFound
+            return (false, default, default, default);
         }
 
         public async ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
@@ -58,12 +70,9 @@ namespace SourceCode.Chasm.IO.AzureBlob
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var refsContainer = _refsContainer.Value;
+            var (_, commitId, _, _) = await ReadCommitRefImplAsync(branch, name, cancellationToken).ConfigureAwait(false);
 
-            var blobName = DeriveCommitRefBlobName(branch, name);
-            var blobRef = refsContainer.GetAppendBlobReference(blobName);
-
-            var (commitRef, _) = await ReadCommitRefImplAsync(blobRef, cancellationToken).ConfigureAwait(false);
+            var commitRef = new CommitRef(name, commitId);
             return commitRef;
         }
 
@@ -71,41 +80,35 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitRef commitRef, CancellationToken cancellationToken)
+        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
-            var refsContainer = _refsContainer.Value;
+            // Load existing commit ref in order to use its etag
+            var (found, existingCommitId, ifMatchCondition, blobRef) = await ReadCommitRefImplAsync(branch, commitRef.Name, cancellationToken).ConfigureAwait(false);
 
-            var blobName = DeriveCommitRefBlobName(branch, name);
-            var blobRef = refsContainer.GetAppendBlobReference(blobName);
-
-            // Load existing commit ref in order to use its ETAG
-            var (existingCommitRef, accessCondition) = await ReadCommitRefImplAsync(blobRef, cancellationToken).ConfigureAwait(false);
-
-            if (existingCommitRef != CommitRef.Empty)
+            // Optimistic concurrency check
+            if (found)
             {
-                // Idempotent
-                if (existingCommitRef == commitRef)
-                    return;
-
-                // Optimistic concurrency check
-                if (previousCommitId.HasValue
-                    && existingCommitRef.CommitId != previousCommitId.Value)
+                // Semantics follow Interlocked.Exchange (compare then exchange)
+                if (previousCommitId.HasValue && existingCommitId != previousCommitId.Value)
                 {
-                    throw BuildConcurrencyException(branch, name, null);
+                    throw BuildConcurrencyException(branch, commitRef.Name, null);
                 }
+
+                // Idempotent
+                if (existingCommitId == commitRef.CommitId) // We already know that the name matches
+                    return;
             }
 
             try
             {
                 // Required to create blob before appending to it
-                await blobRef.CreateOrReplaceAsync(accessCondition, default, default, cancellationToken).ConfigureAwait(false); // Note ETAG access condition
+                await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
 
-                // CommitRefs are not compressed
-
-                using (var session = Serializer.Serialize(commitRef))
+                // Sha1s are not compressed
+                using (var session = Serializer.Serialize(commitRef.CommitId.Sha1))
                 using (var output = new MemoryStream())
                 {
                     var seg = session.Result;
@@ -119,7 +122,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
             {
-                throw BuildConcurrencyException(branch, name, se);
+                throw BuildConcurrencyException(branch, commitRef.Name, se);
             }
         }
 
