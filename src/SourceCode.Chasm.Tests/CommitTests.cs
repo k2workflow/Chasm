@@ -1,4 +1,11 @@
-﻿using System;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using System;
 using System.Linq;
 using Xunit;
 
@@ -6,9 +13,15 @@ namespace SourceCode.Chasm.Tests
 {
     public static class CommitTests
     {
+        #region Fields
+
         private static readonly CommitId Parent1 = new CommitId(Sha1.Hash(nameof(Parent1)));
         private static readonly CommitId Parent2 = new CommitId(Sha1.Hash(nameof(Parent2)));
         private static readonly CommitId Parent3 = new CommitId(Sha1.Hash(nameof(Parent3)));
+
+        #endregion
+
+        #region Methods
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(Commit_Empty))]
@@ -234,5 +247,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Collection(actual2.Parents, n => Assert.Equal(n, Parent3), n => Assert.Equal(n, Parent1), n => Assert.Equal(n, Parent2));
             Assert.Equal(actual, actual2);
         }
+
+        #endregion
     }
 }

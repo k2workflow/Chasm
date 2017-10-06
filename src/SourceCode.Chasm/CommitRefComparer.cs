@@ -1,4 +1,11 @@
-﻿using System.Collections.Generic;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -44,14 +51,22 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : CommitRefComparer
         {
+            #region Constructors
+
             internal DefaultComparer()
             { }
+
+            #endregion
+
+            #region Methods
 
             public override int Compare(CommitRef x, CommitRef y) => CommitIdComparer.Default.Compare(x.CommitId, y.CommitId);
 
             public override bool Equals(CommitRef x, CommitRef y) => CommitIdComparer.Default.Equals(x.CommitId, y.CommitId);
 
             public override int GetHashCode(CommitRef obj) => CommitIdComparer.Default.GetHashCode(obj.CommitId);
+
+            #endregion
         }
 
         #endregion
