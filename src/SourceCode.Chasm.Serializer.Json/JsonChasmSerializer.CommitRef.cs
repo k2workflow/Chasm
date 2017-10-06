@@ -34,8 +34,9 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public CommitRef DeserializeCommitRef(ReadOnlySpan<byte> span)
+        public CommitRef DeserializeCommitRef(string name, ReadOnlySpan<byte> span)
         {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
 
             string json;
@@ -47,7 +48,7 @@ namespace SourceCode.Chasm.IO.Json
                 }
             }
 
-            var model = json.ParseCommitRef();
+            var model = json.ParseCommitRef(name);
             return model;
         }
 

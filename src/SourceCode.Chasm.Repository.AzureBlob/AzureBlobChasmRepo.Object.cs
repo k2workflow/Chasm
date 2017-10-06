@@ -6,6 +6,7 @@
 #endregion
 
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
 using SourceCode.Clay.Threading;
@@ -50,7 +51,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                     }
                 }
             }
-            // Try-catch is cheaper than a separate exists check
+            // Try-catch is cheaper than a separate (latent) exists check
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {
                 se.Suppress();
@@ -90,15 +91,19 @@ namespace SourceCode.Chasm.IO.AzureBlob
             var blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
             // Objects are immutable
-            if (!forceOverwrite)
-            {
-                var exists = await blobRef.ExistsAsync().ConfigureAwait(false);
-                if (exists)
-                    return;
-            }
+            var accessCondition = forceOverwrite ? null : AccessCondition.GenerateIfNotExistsCondition(); // If-None-Match *
 
-            // Required to create blob before appending to it
-            await blobRef.CreateOrReplaceAsync().ConfigureAwait(false);
+            try
+            {
+                // Required to create blob header before appending to it
+                await blobRef.CreateOrReplaceAsync(accessCondition, default, default).ConfigureAwait(false);
+            }
+            // Try-catch is cheaper than a separate (latent) exists check
+            catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
+            {
+                se.Suppress();
+                return;
+            }
 
             using (var output = new MemoryStream())
             {

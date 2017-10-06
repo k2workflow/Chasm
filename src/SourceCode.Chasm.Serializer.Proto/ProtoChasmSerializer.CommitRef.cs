@@ -38,14 +38,15 @@ namespace SourceCode.Chasm.IO.Proto
 
         #region Deserialize
 
-        public CommitRef DeserializeCommitRef(ReadOnlySpan<byte> span)
+        public CommitRef DeserializeCommitRef(string name, ReadOnlySpan<byte> span)
         {
-            if (span.IsEmpty) return default;
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (span.IsEmpty) return new CommitRef(name, CommitId.Empty);
 
             var wire = new CommitRefWire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 
-            var model = wire.Convert();
+            var model = wire.Convert(name);
             return model;
         }
 

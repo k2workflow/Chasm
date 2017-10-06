@@ -5,6 +5,8 @@
 
 #endregion
 
+using System;
+
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
     internal static class CommitRefWireExtensions
@@ -23,14 +25,15 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return wire;
         }
 
-        public static CommitRef Convert(this CommitRefWire wire)
+        public static CommitRef Convert(this CommitRefWire wire, string name)
         {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (wire == null) return default;
 
             var sha1 = wire.CommitId.Convert();
             var commitId = new CommitId(sha1);
 
-            var model = new CommitRef(commitId);
+            var model = new CommitRef(name, commitId);
             return model;
         }
 

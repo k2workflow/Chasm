@@ -5,6 +5,7 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 namespace SourceCode.Chasm
@@ -53,9 +54,26 @@ namespace SourceCode.Chasm
 
             #region Methods
 
-            public override bool Equals(CommitRef x, CommitRef y) => CommitIdComparer.Default.Equals(x.CommitId, y.CommitId);
+            public override bool Equals(CommitRef x, CommitRef y)
+            {
+                if (!CommitIdComparer.Default.Equals(x.CommitId, y.CommitId)) return false;
+                if (!StringComparer.Ordinal.Equals(x.Name, y.Name)) return false;
 
-            public override int GetHashCode(CommitRef obj) => CommitIdComparer.Default.GetHashCode(obj.CommitId);
+                return true;
+            }
+
+            public override int GetHashCode(CommitRef obj)
+            {
+                var hc = 17L;
+
+                unchecked
+                {
+                    hc = hc * 23 + obj.CommitId.GetHashCode();
+                    hc = hc * 23 + (obj.Name?.Length ?? 0);
+                }
+
+                return ((int)(hc >> 32)) ^ (int)hc;
+            }
 
             #endregion
         }

@@ -6,6 +6,7 @@
 #endregion
 
 using SourceCode.Clay.Json;
+using System;
 using System.Json;
 
 namespace SourceCode.Chasm.IO.Json.Wire
@@ -32,9 +33,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
             return wire;
         }
 
-        public static CommitRef ConvertCommitRef(this JsonObject wire)
+        public static CommitRef ConvertCommitRef(this JsonObject wire, string name)
         {
-            if (wire == null) return default;
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (wire == null) return new CommitRef(name, CommitId.Empty);
 
             // Sha1
             var jv = wire.GetValue(_sha1, JsonType.String, false);
@@ -42,15 +44,17 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             var commitId = new CommitId(sha1);
 
-            var model = new CommitRef(commitId);
+            var model = new CommitRef(name, commitId);
             return model;
         }
 
-        public static CommitRef ParseCommitRef(this string json)
+        public static CommitRef ParseCommitRef(this string json, string name)
         {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+
             var wire = json.ParseJsonObject();
 
-            var model = ConvertCommitRef(wire);
+            var model = ConvertCommitRef(wire, name);
             return model;
         }
 

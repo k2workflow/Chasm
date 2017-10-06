@@ -67,14 +67,14 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(Commit obj)
             {
-                var hc = 11L;
+                var hc = 17L;
 
                 unchecked
                 {
-                    hc = hc * 7 + obj.TreeId.GetHashCode();
-                    hc = hc * 7 + obj.CommitUtc.GetHashCode();
-                    hc = hc * 7 + (obj.Parents?.Count ?? 42);
-                    hc = hc * 7 + (obj.CommitMessage?.Length ?? 0);
+                    hc = hc * 23 + obj.TreeId.GetHashCode();
+                    hc = hc * 23 + obj.CommitUtc.GetHashCode();
+                    hc = hc * 23 + (obj.Parents?.Count ?? 42);
+                    hc = hc * 23 + (obj.CommitMessage?.Length ?? 0);
                 }
 
                 return ((int)(hc >> 32)) ^ (int)hc;

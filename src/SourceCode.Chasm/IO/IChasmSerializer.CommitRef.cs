@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.IO
 
         BufferSession Serialize(CommitRef model);
 
-        CommitRef DeserializeCommitRef(ReadOnlySpan<byte> span);
+        CommitRef DeserializeCommitRef(string name, ReadOnlySpan<byte> span);
 
         #endregion
     }
