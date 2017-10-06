@@ -719,7 +719,7 @@ namespace SourceCode.Chasm.Tests
             Assert.False(Sha1.TryParse(expected_N.Substring(10), out _));
             Assert.False(Sha1.TryParse("0x" + expected_N.Substring(10), out _));
             Assert.False(Sha1.TryParse("0X" + expected_N.Substring(10), out _));
-            Assert.False(Sha1.TryParse(expected_N.Replace('8', 'g'), out _));
+            Assert.False(Sha1.TryParse(expected_N.Replace('8', 'G'), out _));
 
             // "N"
             {
