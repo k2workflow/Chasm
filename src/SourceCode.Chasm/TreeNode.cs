@@ -68,16 +68,12 @@ namespace SourceCode.Chasm
         }
 
         public TreeNode(string name, BlobId blobId)
-            : this(name, blobId.Sha1, NodeKind.Blob)
-        {
-            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
-        }
+            : this(name, NodeKind.Blob, blobId.Sha1)
+        { }
 
         public TreeNode(string name, TreeId treeId)
-            : this(name, treeId.Sha1, NodeKind.Tree)
-        {
-            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
-        }
+            : this(name, NodeKind.Tree, treeId.Sha1)
+        { }
 
         public void Deconstruct(out string name, out NodeKind kind, out Sha1 sha1)
         {
