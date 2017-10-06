@@ -9,7 +9,7 @@ using System;
 
 namespace SourceCode.Chasm
 {
-    public struct TreeId : IEquatable<TreeId>
+    public struct TreeId : IEquatable<TreeId>, IComparable<TreeId>
     {
         #region Constants
 
@@ -50,11 +50,25 @@ namespace SourceCode.Chasm
 
         #endregion
 
+        #region IComparable
+
+        public int CompareTo(TreeId other) => TreeIdComparer.Default.Compare(this, other);
+
+        #endregion
+
         #region Operators
 
         public static bool operator ==(TreeId x, TreeId y) => TreeIdComparer.Default.Equals(x, y);
 
-        public static bool operator !=(TreeId x, TreeId y) => !TreeIdComparer.Default.Equals(x, y); // not
+        public static bool operator !=(TreeId x, TreeId y) => !(x == y);
+
+        public static bool operator >=(TreeId x, TreeId y) => TreeIdComparer.Default.Compare(x, y) >= 0;
+
+        public static bool operator >(TreeId x, TreeId y) => TreeIdComparer.Default.Compare(x, y) > 0;
+
+        public static bool operator <=(TreeId x, TreeId y) => TreeIdComparer.Default.Compare(x, y) <= 0;
+
+        public static bool operator <(TreeId x, TreeId y) => TreeIdComparer.Default.Compare(x, y) < 0;
 
         public override string ToString() => Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
 

@@ -812,6 +812,30 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected, actual);
         }
 
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(Sha1_Compare))]
+        public static void Sha1_Compare()
+        {
+            var comparer = Sha1Comparer.Default;
+
+            var sha1 = Sha1.Hash("abc");
+            var sha2 = Sha1.Hash("abc");
+            var sha3 = Sha1.Hash("def");
+
+            Assert.True(Sha1.Empty < sha1);
+            Assert.True(sha1 > Sha1.Empty);
+
+            var list = new[] { sha1, sha2, sha3 };
+
+            Assert.True(comparer.Compare(sha1, sha2) == 0);
+            Assert.True(comparer.Compare(sha1, sha3) != 0);
+
+            Array.Sort(list, comparer.Compare);
+
+            Assert.True(comparer.Compare(list[0], list[1]) <= 0);
+            Assert.True(0 >= comparer.Compare(list[1], list[2]));
+        }
+
         #endregion
     }
 }

@@ -104,6 +104,29 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected, actual);
         }
 
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNode_Compare))]
+        public static void TreeNode_Compare()
+        {
+            var comparer = TreeNodeComparer.Default;
+
+            var tree1 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+            var tree2 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+            var tree3 = new TreeNode("d", NodeKind.Blob, Sha1.Hash("def"));
+            var list = new[] { tree1, tree2, tree3 };
+
+            Assert.True(TreeNode.Empty < tree1);
+            Assert.True(tree1 > TreeNode.Empty);
+
+            Assert.True(comparer.Compare(tree1, tree2) == 0);
+            Assert.True(comparer.Compare(tree1, tree3) != 0);
+
+            Array.Sort(list, comparer.Compare);
+
+            Assert.True(comparer.Compare(list[0], list[1]) <= 0);
+            Assert.True(comparer.Compare(list[1], list[2]) <= 0);
+        }
+
         #endregion
     }
 }

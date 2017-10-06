@@ -5,6 +5,7 @@
 
 #endregion
 
+using System;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests
@@ -48,6 +49,29 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(commitId3, commitId1);
             Assert.NotEqual(commitId3.GetHashCode(), commitId1.GetHashCode());
             Assert.NotEqual(commitId3.ToString(), commitId1.ToString());
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(CommitId_Compare))]
+        public static void CommitId_Compare()
+        {
+            var comparer = CommitIdComparer.Default;
+
+            var commitId1 = new CommitId(Sha1.Hash("abc"));
+            var commitId2 = new CommitId(Sha1.Hash("abc"));
+            var commitId3 = new CommitId(Sha1.Hash("def"));
+            var list = new[] { commitId1, commitId2, commitId3 };
+
+            Assert.True(CommitId.Empty < commitId1);
+            Assert.True(commitId1 > CommitId.Empty);
+
+            Assert.True(comparer.Compare(commitId1, commitId2) == 0);
+            Assert.True(comparer.Compare(commitId1, commitId3) != 0);
+
+            Array.Sort(list, comparer.Compare);
+
+            Assert.True(comparer.Compare(list[0], list[1]) <= 0);
+            Assert.True(0 >= comparer.Compare(list[1], list[2]));
         }
 
         #endregion

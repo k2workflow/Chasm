@@ -5,6 +5,7 @@
 
 #endregion
 
+using System;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests
@@ -48,6 +49,29 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(blobId3, blobId1);
             Assert.NotEqual(blobId3.GetHashCode(), blobId1.GetHashCode());
             Assert.NotEqual(blobId3.ToString(), blobId1.ToString());
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(BlobId_Compare))]
+        public static void BlobId_Compare()
+        {
+            var comparer = BlobIdComparer.Default;
+
+            var blobId1 = new BlobId(Sha1.Hash("abc"));
+            var blobId2 = new BlobId(Sha1.Hash("abc"));
+            var blobId3 = new BlobId(Sha1.Hash("def"));
+            var list = new[] { blobId1, blobId2, blobId3 };
+
+            Assert.True(BlobId.Empty < blobId1);
+            Assert.True(blobId1 > BlobId.Empty);
+
+            Assert.True(comparer.Compare(blobId1, blobId2) == 0);
+            Assert.True(comparer.Compare(blobId1, blobId3) != 0);
+
+            Array.Sort(list, comparer.Compare);
+
+            Assert.True(comparer.Compare(list[0], list[1]) <= 0);
+            Assert.True(0 >= comparer.Compare(list[1], list[2]));
         }
 
         #endregion

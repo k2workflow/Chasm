@@ -48,7 +48,7 @@ namespace SourceCode.Chasm
 
         public static bool operator ==(Blob x, Blob y) => BlobComparer.Default.Equals(x, y);
 
-        public static bool operator !=(Blob x, Blob y) => !BlobComparer.Default.Equals(x, y); // not
+        public static bool operator !=(Blob x, Blob y) => !(x == y);
 
         public override string ToString() => $"{nameof(Blob)}: {Data?.Length ?? 0}";
 

@@ -110,7 +110,7 @@ namespace SourceCode.Chasm
 
         public static bool operator ==(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Equals(x, y);
 
-        public static bool operator !=(TreeNode x, TreeNode y) => !TreeNodeComparer.Default.Equals(x, y); // not
+        public static bool operator !=(TreeNode x, TreeNode y) => !(x == y);
 
         public static bool operator >=(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Compare(x, y) >= 0;
 

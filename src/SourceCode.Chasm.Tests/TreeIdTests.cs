@@ -5,6 +5,7 @@
 
 #endregion
 
+using System;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests
@@ -48,6 +49,29 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(treeId3, treeId1);
             Assert.NotEqual(treeId3.GetHashCode(), treeId1.GetHashCode());
             Assert.NotEqual(treeId3.ToString(), treeId1.ToString());
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeId_Compare))]
+        public static void TreeId_Compare()
+        {
+            var comparer = TreeIdComparer.Default;
+
+            var treeId1 = new TreeId(Sha1.Hash("abc"));
+            var treeId2 = new TreeId(Sha1.Hash("abc"));
+            var treeId3 = new TreeId(Sha1.Hash("def"));
+            var list = new[] { treeId1, treeId2, treeId3 };
+
+            Assert.True(TreeId.Empty < treeId1);
+            Assert.True(treeId1 > TreeId.Empty);
+
+            Assert.True(comparer.Compare(treeId1, treeId2) == 0);
+            Assert.True(comparer.Compare(treeId1, treeId3) != 0);
+
+            Array.Sort(list, comparer.Compare);
+
+            Assert.True(comparer.Compare(list[0], list[1]) <= 0);
+            Assert.True(0 >= comparer.Compare(list[1], list[2]));
         }
 
         #endregion

@@ -605,7 +605,7 @@ namespace SourceCode.Chasm
 
         public static bool operator ==(Sha1 x, Sha1 y) => Sha1Comparer.Default.Equals(x, y);
 
-        public static bool operator !=(Sha1 x, Sha1 y) => !Sha1Comparer.Default.Equals(x, y); // not
+        public static bool operator !=(Sha1 x, Sha1 y) => !(x == y);
 
         public static bool operator >=(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) >= 0;
 
