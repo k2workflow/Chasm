@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
@@ -9,6 +16,21 @@ namespace SourceCode.Chasm.IO.AzureBlob
     partial class AzureBlobChasmRepo // .Tree
     {
         #region Read (via TreeId)
+
+        private static IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTreesBatch(IChasmSerializer serializer, IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
+        {
+            var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
+
+            foreach (var kvp in kvps)
+            {
+                var tree = serializer.DeserializeTree(kvp.Value.Span);
+
+                var treeId = new TreeId(kvp.Key);
+                dict[treeId] = tree;
+            }
+
+            return dict;
+        }
 
         public async ValueTask<TreeNodeList> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken)
         {
@@ -33,21 +55,6 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
             // Deserialize
             var dict = DeserializeTreesBatch(Serializer, kvps);
-            return dict;
-        }
-
-        private static IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTreesBatch(IChasmSerializer serializer, IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
-        {
-            var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
-
-            foreach (var kvp in kvps)
-            {
-                var tree = serializer.DeserializeTree(kvp.Value.Span);
-
-                var treeId = new TreeId(kvp.Key);
-                dict[treeId] = tree;
-            }
-
             return dict;
         }
 

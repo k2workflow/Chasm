@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -5,6 +12,8 @@ namespace SourceCode.Chasm.IO
 {
     partial interface IChasmRepository // .CommitRef
     {
+        #region Methods
+
         ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
 
         /// <summary>
@@ -19,5 +28,7 @@ namespace SourceCode.Chasm.IO
         /// <exception cref="ChasmConcurrencyException">Thrown when a concurrency exception is detected.</exception>
         /// <returns></returns>
         Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitId newCommitId, CancellationToken cancellationToken);
+
+        #endregion
     }
 }

@@ -1,4 +1,11 @@
-﻿using System;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using System;
 
 namespace SourceCode.Chasm
 {
@@ -60,13 +67,6 @@ namespace SourceCode.Chasm
             if (!Enum.IsDefined(typeof(NodeKind), kind)) throw new ArgumentOutOfRangeException(nameof(kind));
         }
 
-        public void Deconstruct(out string name, out NodeKind kind, out Sha1 sha1)
-        {
-            name = Name;
-            sha1 = Sha1;
-            kind = Kind;
-        }
-
         public TreeNode(string name, BlobId blobId)
             : this(name, blobId.Sha1, NodeKind.Blob)
         {
@@ -77,6 +77,13 @@ namespace SourceCode.Chasm
             : this(name, treeId.Sha1, NodeKind.Tree)
         {
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
+        }
+
+        public void Deconstruct(out string name, out NodeKind kind, out Sha1 sha1)
+        {
+            name = Name;
+            sha1 = Sha1;
+            kind = Kind;
         }
 
         #endregion

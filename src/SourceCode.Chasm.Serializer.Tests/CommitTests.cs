@@ -1,9 +1,18 @@
-﻿using Xunit;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitTests
     {
+        #region Methods
+
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Default))]
         [ClassData(typeof(TestData))]
@@ -17,5 +26,7 @@ namespace SourceCode.Chasm.IO.Tests
                 Assert.Equal(expected, actual);
             }
         }
+
+        #endregion
     }
 }

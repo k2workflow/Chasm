@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -168,15 +175,6 @@ namespace SourceCode.Chasm.IO.Disk
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string DeriveFileName(Sha1 sha1)
-        {
-            var tokens = sha1.Split(2);
-
-            var fileName = $@"{tokens.Key}\{tokens.Value}";
-            return fileName;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string DeriveCommitRefFileName(string branch, string name)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
@@ -184,6 +182,15 @@ namespace SourceCode.Chasm.IO.Disk
 
             var refName = $@"{branch}\{name}.commit";
             return refName;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string DeriveFileName(Sha1 sha1)
+        {
+            var tokens = sha1.Split(2);
+
+            var fileName = $@"{tokens.Key}\{tokens.Value}";
+            return fileName;
         }
 
         #endregion

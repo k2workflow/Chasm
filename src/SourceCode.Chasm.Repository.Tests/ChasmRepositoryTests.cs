@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using Moq;
 using SourceCode.Chasm.IO.Json;
 using System.Threading;
@@ -8,6 +15,8 @@ namespace SourceCode.Chasm.IO.Azure.Tests
 {
     public static class ChasmRepositoryTests
     {
+        #region Methods
+
         //[InlineData(null, null, true)]
         //[InlineData(new byte[0], null, false)]
         //[InlineData(new byte[0], new byte[0], true)]
@@ -34,5 +43,7 @@ namespace SourceCode.Chasm.IO.Azure.Tests
 
             repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitId>(new CommitId(Sha1.Hash("branch-name"))));
         }
+
+        #endregion
     }
 }

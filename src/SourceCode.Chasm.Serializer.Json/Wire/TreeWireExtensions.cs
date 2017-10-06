@@ -1,4 +1,11 @@
-﻿using SourceCode.Clay.Json;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using SourceCode.Clay.Json;
 using System;
 using System.Json;
 
@@ -6,6 +13,8 @@ namespace SourceCode.Chasm.IO.Json.Wire
 {
     internal static class TreeWireExtensions
     {
+        #region Methods
+
         public static JsonValue Convert(this TreeNodeList model)
         {
             if (model.Count == 0) return new JsonArray(Array.Empty<JsonValue>());
@@ -38,5 +47,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             var model = wire.ConvertTree();
             return model;
         }
+
+        #endregion
     }
 }

@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
@@ -17,9 +24,6 @@ namespace SourceCode.Chasm.IO.AzureTable
         #endregion
 
         #region Constructors
-
-        public DataEntity()
-        { }
 
         private DataEntity(string partitionKey, string rowKey, ArraySegment<byte> content)
         {
@@ -45,6 +49,9 @@ namespace SourceCode.Chasm.IO.AzureTable
                 ETag = "*";
             }
         }
+
+        public DataEntity()
+        { }
 
         #endregion
 
