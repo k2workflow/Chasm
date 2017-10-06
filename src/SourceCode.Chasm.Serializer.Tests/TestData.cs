@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.IO.Tests
 {
     internal sealed class TestData : IEnumerable<object[]>
     {
-        #region Fields
+        #region Constants
 
         private readonly List<object[]> _data = new List<object[]>
         {

@@ -118,13 +118,13 @@ namespace SourceCode.Chasm.Tests
             Assert.True(TreeNode.Empty < tree1);
             Assert.True(tree1 > TreeNode.Empty);
 
-            Assert.True(comparer.Compare(tree1, tree2) == 0);
-            Assert.True(comparer.Compare(tree1, tree3) != 0);
+            Assert.True(tree1.CompareTo(tree2) == 0);
+            Assert.True(tree1.CompareTo(tree3) != 0);
 
             Array.Sort(list, comparer.Compare);
 
-            Assert.True(comparer.Compare(list[0], list[1]) <= 0);
-            Assert.True(comparer.Compare(list[1], list[2]) <= 0);
+            Assert.True(list[0] <= list[1]);
+            Assert.True(list[2] >= list[1]);
         }
 
         #endregion

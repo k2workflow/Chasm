@@ -827,13 +827,13 @@ namespace SourceCode.Chasm.Tests
 
             var list = new[] { sha1, sha2, sha3 };
 
-            Assert.True(comparer.Compare(sha1, sha2) == 0);
-            Assert.True(comparer.Compare(sha1, sha3) != 0);
+            Assert.True(sha1.CompareTo(sha2) == 0);
+            Assert.True(sha1.CompareTo(sha3) != 0);
 
             Array.Sort(list, comparer.Compare);
 
-            Assert.True(comparer.Compare(list[0], list[1]) <= 0);
-            Assert.True(0 >= comparer.Compare(list[1], list[2]));
+            Assert.True(list[0] <= list[1]);
+            Assert.True(list[2] >= list[1]);
         }
 
         #endregion

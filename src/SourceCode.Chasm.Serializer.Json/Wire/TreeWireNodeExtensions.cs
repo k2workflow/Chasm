@@ -53,14 +53,6 @@ namespace SourceCode.Chasm.IO.Json.Wire
             return model;
         }
 
-        public static TreeNode ParseTreeNode(this string json)
-        {
-            var wire = json.ParseJsonObject();
-
-            var model = wire.ConvertTreeNode();
-            return model;
-        }
-
         #endregion
     }
 }

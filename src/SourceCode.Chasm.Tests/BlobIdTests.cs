@@ -65,13 +65,13 @@ namespace SourceCode.Chasm.Tests
             Assert.True(BlobId.Empty < blobId1);
             Assert.True(blobId1 > BlobId.Empty);
 
-            Assert.True(comparer.Compare(blobId1, blobId2) == 0);
-            Assert.True(comparer.Compare(blobId1, blobId3) != 0);
+            Assert.True(blobId1.CompareTo(blobId2) == 0);
+            Assert.True(blobId1.CompareTo(blobId3) != 0);
 
             Array.Sort(list, comparer.Compare);
 
-            Assert.True(comparer.Compare(list[0], list[1]) <= 0);
-            Assert.True(0 >= comparer.Compare(list[1], list[2]));
+            Assert.True(list[0] <= list[1]);
+            Assert.True(list[2] >= list[1]);
         }
 
         #endregion

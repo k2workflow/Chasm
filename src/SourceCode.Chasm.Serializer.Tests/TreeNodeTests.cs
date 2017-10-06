@@ -9,7 +9,7 @@ using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static class NodeTests
+    public static class TreeNodeTests
     {
         #region Methods
 
@@ -48,7 +48,10 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_WriteRead_TreeNodeList(IChasmSerializer ser)
         {
-            var expected = new TreeNodeList(new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc")));
+            var node0 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+            var node1 = new TreeNode("b", NodeKind.Tree, Sha1.Hash("def"));
+            var node2 = new TreeNode("c", NodeKind.None, Sha1.Hash("hij"));
+            var expected = new TreeNodeList(node0, node1, node2);
 
             using (var seg = ser.Serialize(expected))
             {
