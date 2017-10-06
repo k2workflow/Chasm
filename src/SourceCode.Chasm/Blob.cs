@@ -23,16 +23,11 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region De/Constructors
+        #region Constructors
 
         public Blob(byte[] data)
         {
             Data = data;
-        }
-
-        public void Deconstruct(out byte[] data)
-        {
-            data = Data;
         }
 
         #endregion
@@ -43,7 +38,7 @@ namespace SourceCode.Chasm
 
         public override bool Equals(object obj)
             => obj is Blob blob
-            && BlobComparer.Default.Equals(blob);
+            && BlobComparer.Default.Equals(this, blob);
 
         public override int GetHashCode() => BlobComparer.Default.GetHashCode(this);
 
@@ -53,7 +48,7 @@ namespace SourceCode.Chasm
 
         public static bool operator ==(Blob x, Blob y) => BlobComparer.Default.Equals(x, y);
 
-        public static bool operator !=(Blob x, Blob y) => !BlobComparer.Default.Equals(x, y); // not
+        public static bool operator !=(Blob x, Blob y) => !(x == y);
 
         public override string ToString() => $"{nameof(Blob)}: {Data?.Length ?? 0}";
 

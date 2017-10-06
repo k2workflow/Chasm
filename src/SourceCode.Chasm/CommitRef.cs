@@ -29,18 +29,13 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region De/Constructors
+        #region Constructors
 
         public CommitRef(CommitId commitId)
         {
             if (commitId == CommitId.Empty) throw new ArgumentNullException(nameof(commitId));
 
             CommitId = commitId;
-        }
-
-        public void Deconstruct(out CommitId commitId)
-        {
-            commitId = CommitId;
         }
 
         #endregion
@@ -61,7 +56,7 @@ namespace SourceCode.Chasm
 
         public static bool operator ==(CommitRef x, CommitRef y) => CommitRefComparer.Default.Equals(x, y);
 
-        public static bool operator !=(CommitRef x, CommitRef y) => !CommitRefComparer.Default.Equals(x, y); // not
+        public static bool operator !=(CommitRef x, CommitRef y) => !(x == y);
 
         public override string ToString() => CommitId.Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
 

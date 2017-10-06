@@ -9,7 +9,7 @@ using System;
 
 namespace SourceCode.Chasm
 {
-    public struct BlobId : IEquatable<BlobId>
+    public struct BlobId : IEquatable<BlobId>, IComparable<BlobId>
     {
         #region Constants
 
@@ -29,16 +29,11 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region De/Constructors
+        #region Constructors
 
         public BlobId(Sha1 sha1)
         {
             Sha1 = sha1;
-        }
-
-        public void Deconstruct(out Sha1 sha1)
-        {
-            sha1 = Sha1;
         }
 
         #endregion
@@ -55,11 +50,25 @@ namespace SourceCode.Chasm
 
         #endregion
 
+        #region IComparable
+
+        public int CompareTo(BlobId other) => BlobIdComparer.Default.Compare(this, other);
+
+        #endregion
+
         #region Operators
+
+        public static bool operator >=(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) >= 0;
+
+        public static bool operator >(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) > 0;
+
+        public static bool operator <=(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) <= 0;
+
+        public static bool operator <(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) < 0;
 
         public static bool operator ==(BlobId x, BlobId y) => BlobIdComparer.Default.Equals(x, y);
 
-        public static bool operator !=(BlobId x, BlobId y) => !BlobIdComparer.Default.Equals(x, y); // not
+        public static bool operator !=(BlobId x, BlobId y) => !(x == y);
 
         public override string ToString() => Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
 

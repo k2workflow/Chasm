@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.Tests
 {
     public static class Sha1Tests
     {
-        #region Fields
+        #region Constants
 
         private const string _surrogatePair = "\uD869\uDE01";
 
@@ -27,7 +27,9 @@ namespace SourceCode.Chasm.Tests
         public static void When_create_null_sha1()
         {
             var expected = Sha1.Empty;
-            Assert.Equal(default, expected);
+            Assert.True(default == expected);
+            Assert.False(default != expected);
+            Assert.True(expected.Equals((object)expected));
 
             // Null string
             var actual = Sha1.Hash((string)null);
@@ -308,6 +310,9 @@ namespace SourceCode.Chasm.Tests
                 actual = Sha1.Hash(bytes).ToString();
                 Assert.Equal(expected, actual);
 
+                // Object
+                Assert.True(expected.Equals((object)actual));
+
                 // Roundtrip string
                 actual = sha1.ToString();
                 Assert.Equal(expected, actual);
@@ -337,11 +342,6 @@ namespace SourceCode.Chasm.Tests
                 // Roundtrip Segment
                 actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
                 Assert.Equal(expected, actual);
-
-                // Roundtrip Buffer
-                //actual = new Sha1(new ReadOnlyMemory<byte>(buffer)).ToString();
-                //Assert.Equal(expected, actual);
-                //Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             }
         }
 
@@ -369,6 +369,9 @@ namespace SourceCode.Chasm.Tests
                 actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
                 Assert.Equal(expected, actual);
                 Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                // Object
+                Assert.True(expected.Equals((object)actual));
 
                 // Roundtrip string
                 actual = sha1.ToString();
@@ -431,6 +434,9 @@ namespace SourceCode.Chasm.Tests
                 actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
                 Assert.Equal(expected, actual);
 
+                // Object
+                Assert.True(expected.Equals((object)actual));
+
                 // Roundtrip string
                 actual = sha1.ToString();
                 Assert.Equal(expected, actual);
@@ -485,6 +491,9 @@ namespace SourceCode.Chasm.Tests
                 actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
                 Assert.Equal(expected, actual);
 
+                // Object
+                Assert.True(expected.Equals((object)actual));
+
                 // Roundtrip string
                 actual = sha1.ToString();
                 Assert.Equal(expected, actual);
@@ -538,6 +547,9 @@ namespace SourceCode.Chasm.Tests
 
                 actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
                 Assert.Equal(expected, actual);
+
+                // Object
+                Assert.True(expected.Equals((object)actual));
 
                 // Roundtrip string
                 actual = sha1.ToString();
@@ -786,6 +798,42 @@ namespace SourceCode.Chasm.Tests
                 sha2 = new Sha1(sha1.Blit0, sha1.Blit1, sha1.Blit2 + i);
                 Assert.True(sha2 > sha1);
             }
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(Sha1_Deconstruct))]
+        public static void Sha1_Deconstruct()
+        {
+            var expected = Sha1.Hash("abc");
+
+            var (blit0, blit1, blit2) = expected;
+            var actual = new Sha1(blit0, blit1, blit2);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(Sha1_Compare))]
+        public static void Sha1_Compare()
+        {
+            var comparer = Sha1Comparer.Default;
+
+            var sha1 = Sha1.Hash("abc");
+            var sha2 = Sha1.Hash("abc");
+            var sha3 = Sha1.Hash("def");
+
+            Assert.True(Sha1.Empty < sha1);
+            Assert.True(sha1 > Sha1.Empty);
+
+            var list = new[] { sha1, sha2, sha3 };
+
+            Assert.True(sha1.CompareTo(sha2) == 0);
+            Assert.True(sha1.CompareTo(sha3) != 0);
+
+            Array.Sort(list, comparer.Compare);
+
+            Assert.True(list[0] <= list[1]);
+            Assert.True(list[2] >= list[1]);
         }
 
         #endregion

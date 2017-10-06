@@ -416,7 +416,7 @@ namespace SourceCode.Chasm
 
         public static bool operator ==(TreeNodeList x, TreeNodeList y) => TreeNodeListComparer.Default.Equals(x, y);
 
-        public static bool operator !=(TreeNodeList x, TreeNodeList y) => !TreeNodeListComparer.Default.Equals(x, y); // not
+        public static bool operator !=(TreeNodeList x, TreeNodeList y) => !(x == y);
 
         public override string ToString() => $"{nameof(TreeNodeList)}: {_nodes.Length}";
 

@@ -12,7 +12,7 @@ namespace SourceCode.Chasm
     /// <summary>
     /// Represents a way to compare different <see cref="CommitRef"/> values.
     /// </summary>
-    public abstract class CommitRefComparer : IEqualityComparer<CommitRef>, IComparer<CommitRef>
+    public abstract class CommitRefComparer : IEqualityComparer<CommitRef>
     {
         #region Constants
 
@@ -27,13 +27,6 @@ namespace SourceCode.Chasm
 
         protected CommitRefComparer()
         { }
-
-        #endregion
-
-        #region IComparer
-
-        /// <inheritdoc/>
-        public abstract int Compare(CommitRef x, CommitRef y);
 
         #endregion
 
@@ -59,8 +52,6 @@ namespace SourceCode.Chasm
             #endregion
 
             #region Methods
-
-            public override int Compare(CommitRef x, CommitRef y) => CommitIdComparer.Default.Compare(x.CommitId, y.CommitId);
 
             public override bool Equals(CommitRef x, CommitRef y) => CommitIdComparer.Default.Equals(x.CommitId, y.CommitId);
 

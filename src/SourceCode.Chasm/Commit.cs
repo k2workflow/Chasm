@@ -150,7 +150,7 @@ namespace SourceCode.Chasm
 
         public static bool operator ==(Commit x, Commit y) => CommitComparer.Default.Equals(x, y);
 
-        public static bool operator !=(Commit x, Commit y) => !CommitComparer.Default.Equals(x, y); // not
+        public static bool operator !=(Commit x, Commit y) => !(x == y);
 
         public override string ToString() => $"{nameof(Commit)}: {CommitUtc:o} ({TreeId})";
 

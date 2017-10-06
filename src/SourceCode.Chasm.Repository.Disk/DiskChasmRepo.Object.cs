@@ -28,12 +28,12 @@ namespace SourceCode.Chasm.IO.Disk
 
         #region Read
 
-        public ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             var filename = DeriveFileName(objectId);
             var path = Path.Combine(_objectsContainer, filename);
 
-            var bytes = ReadFile(path);
+            var bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
 
             using (var input = new MemoryStream(bytes.ToArray())) // TODO: Perf
             using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
@@ -44,7 +44,7 @@ namespace SourceCode.Chasm.IO.Disk
 
                 if (output.Length > 0)
                 {
-                    return new ValueTask<ReadOnlyMemory<byte>>(output.ToArray()); // TODO: Perf
+                    return output.ToArray(); // TODO: Perf
                 }
             }
 
@@ -82,7 +82,7 @@ namespace SourceCode.Chasm.IO.Disk
 
         #region Write
 
-        public Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var filename = DeriveFileName(objectId);
             var path = Path.Combine(_objectsContainer, filename);
@@ -90,7 +90,7 @@ namespace SourceCode.Chasm.IO.Disk
             // Objects are immutable
             if (!File.Exists(path)
                 && !forceOverwrite)
-                return Task.CompletedTask;
+                return;
 
             using (var output = new MemoryStream())
             {
@@ -100,10 +100,8 @@ namespace SourceCode.Chasm.IO.Disk
                 }
                 output.Position = 0;
 
-                WriteFile(path, output.ToArray()); // TODO: Perf
+                await WriteFileAsync(path, output.ToArray(), cancellationToken).ConfigureAwait(false); // TODO: Perf
             }
-
-            return Task.CompletedTask;
         }
 
         public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)

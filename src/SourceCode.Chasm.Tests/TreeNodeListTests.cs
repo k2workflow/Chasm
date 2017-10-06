@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -13,12 +14,12 @@ namespace SourceCode.Chasm.Tests
 {
     public static class TreeNodeListTests
     {
-        #region Fields
+        #region Constants
 
         private static readonly TreeNode Node0 = new TreeNode(nameof(Node0), NodeKind.Tree, Sha1.Hash(nameof(Node0)));
-        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Tree, Sha1.Hash(nameof(Node1)));
+        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Blob, Sha1.Hash(nameof(Node1)));
         private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), NodeKind.Tree, Sha1.Hash(nameof(Node2)));
-        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.Tree, Sha1.Hash(nameof(Node3)));
+        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.None, Sha1.Hash(nameof(Node3)));
 
         #endregion
 
@@ -30,6 +31,7 @@ namespace SourceCode.Chasm.Tests
         {
             var noData = new TreeNodeList();
             var nullData = new TreeNodeList(null);
+            var collData = new TreeNodeList((IList<TreeNode>)null);
             var emptyData = new TreeNodeList(Array.Empty<TreeNode>());
 
             Assert.Empty(TreeNodeList.Empty);
@@ -43,9 +45,18 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(TreeNodeList.Empty, nullData); // By design
             Assert.Equal(TreeNodeList.Empty.GetHashCode(), nullData.GetHashCode());
 
+            Assert.Empty(collData);
+            Assert.Equal(TreeNodeList.Empty, collData); // By design
+            Assert.Equal(TreeNodeList.Empty.GetHashCode(), collData.GetHashCode());
+
             Assert.Empty(emptyData);
             Assert.Equal(TreeNodeList.Empty, emptyData); // By design
             Assert.Equal(TreeNodeList.Empty.GetHashCode(), emptyData.GetHashCode());
+
+            Assert.Throws<IndexOutOfRangeException>(() => noData[0]);
+            Assert.Throws<KeyNotFoundException>(() => noData["x"]);
+            Assert.False(noData.TryGetValue("x", out _));
+            Assert.False(noData.TryGetValue("x", NodeKind.Blob, out _));
         }
 
         [Trait("Type", "Unit")]
@@ -59,9 +70,30 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(tree0[0], tree1[0]);
             Assert.Equal(tree0[1], tree1[1]);
 
+            Assert.True(tree1[Node0.Name] == Node0);
+            Assert.True(tree1[Node1.Name] == Node1);
+            Assert.False(tree1.ContainsKey("x"));
+            Assert.True(tree1.ContainsKey(Node0.Name));
+            Assert.True(tree1.ContainsKey(Node1.Name));
+            Assert.False(tree1.TryGetValue("x", out _));
+            Assert.True(tree1.TryGetValue(Node0.Name, out var v20) && v20 == Node0);
+            Assert.True(tree1.TryGetValue(Node1.Name, out var v21) && v21 == Node1);
+
             nodes = new[] { Node0, Node1, Node2 };
             tree0 = new TreeNodeList(nodes.OrderBy(n => n.Sha1).ToArray());
             tree1 = new TreeNodeList(nodes.OrderByDescending(n => n.Sha1).ToList()); // ICollection<T>
+
+            Assert.True(tree1[Node0.Name] == Node0);
+            Assert.True(tree1[Node1.Name] == Node1);
+            Assert.True(tree1[Node2.Name] == Node2);
+            Assert.False(tree1.ContainsKey("x"));
+            Assert.True(tree1.ContainsKey(Node0.Name));
+            Assert.True(tree1.ContainsKey(Node1.Name));
+            Assert.True(tree1.ContainsKey(Node2.Name));
+            Assert.False(tree1.TryGetValue("x", out _));
+            Assert.True(tree1.TryGetValue(Node0.Name, out var v30) && v30 == Node0);
+            Assert.True(tree1.TryGetValue(Node1.Name, out var v31) && v31 == Node1);
+            Assert.True(tree1.TryGetValue(Node2.Name, out var v32) && v32 == Node2);
 
             Assert.Equal(tree0[0], tree1[0]);
             Assert.Equal(tree0[1], tree1[1]);
@@ -70,6 +102,21 @@ namespace SourceCode.Chasm.Tests
             nodes = new[] { Node0, Node1, Node2, Node3 };
             tree0 = new TreeNodeList(nodes.OrderBy(n => n.Sha1).ToArray());
             tree1 = new TreeNodeList(nodes.OrderByDescending(n => n.Sha1).ToList()); // ICollection<T>
+
+            Assert.True(tree1[Node0.Name] == Node0);
+            Assert.True(tree1[Node1.Name] == Node1);
+            Assert.True(tree1[Node2.Name] == Node2);
+            Assert.True(tree1[Node3.Name] == Node3);
+            Assert.False(tree1.ContainsKey("x"));
+            Assert.True(tree1.ContainsKey(Node0.Name));
+            Assert.True(tree1.ContainsKey(Node1.Name));
+            Assert.True(tree1.ContainsKey(Node2.Name));
+            Assert.True(tree1.ContainsKey(Node3.Name));
+            Assert.False(tree1.TryGetValue("x", out _));
+            Assert.True(tree1.TryGetValue(Node0.Name, out var v40) && v40 == Node0);
+            Assert.True(tree1.TryGetValue(Node1.Name, out var v41) && v41 == Node1);
+            Assert.True(tree1.TryGetValue(Node2.Name, out var v42) && v42 == Node2);
+            Assert.True(tree1.TryGetValue(Node3.Name, out var v43) && v43 == Node3);
 
             Assert.Equal(tree0[0], tree1[0]);
             Assert.Equal(tree0[1], tree1[1]);
@@ -180,6 +227,22 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Merge_Empty))]
+        public static void TreeNodeList_Merge_Empty()
+        {
+            var node = new TreeNode("b", NodeKind.Blob, Sha1.Hash("Test1"));
+            var list = new TreeNodeList(node);
+
+            // TreeNodeList
+            var merged = list.Merge(new TreeNodeList());
+            Assert.Equal(list, merged);
+
+            // ICollection
+            merged = list.Merge(Array.Empty<TreeNode>());
+            Assert.Equal(list, merged);
+        }
+
+        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeNodeList_Merge_Single))]
         public static void TreeNodeList_Merge_Single()
         {
@@ -269,6 +332,14 @@ namespace SourceCode.Chasm.Tests
                 new TreeNode("r", NodeKind.Blob, Sha1.Hash("Test9")),
             };
 
+            var dupes = new[]
+            {
+                new TreeNode(list2[0].Name, list2[0].Kind, list2[1].Sha1),
+                new TreeNode(list2[1].Name, list2[1].Kind, list2[2].Sha1),
+                new TreeNode(list2[2].Name, list2[2].Kind, list2[3].Sha1),
+                new TreeNode(list2[3].Name, list2[3].Kind, list2[0].Sha1)
+            };
+
             var list3 = list1.Merge(list2);
 
             Assert.Equal(9, list3.Count);
@@ -292,6 +363,8 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(list2[4].Sha1, list3[6].Sha1);
             Assert.Equal(list2[5].Sha1, list3[7].Sha1);
             Assert.Equal(list2[6].Sha1, list3[8].Sha1);
+
+            //Assert.Throws<ArgumentException>(() => list3.Merge(dupes));
         }
 
         #endregion

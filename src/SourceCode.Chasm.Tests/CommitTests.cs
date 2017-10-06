@@ -13,7 +13,7 @@ namespace SourceCode.Chasm.Tests
 {
     public static class CommitTests
     {
-        #region Fields
+        #region Constants
 
         private static readonly CommitId Parent1 = new CommitId(Sha1.Hash(nameof(Parent1)));
         private static readonly CommitId Parent2 = new CommitId(Sha1.Hash(nameof(Parent2)));
@@ -29,6 +29,10 @@ namespace SourceCode.Chasm.Tests
         {
             var noData = new Commit();
             var nullData = new Commit(null, default, default, null);
+
+            Assert.True(default == Commit.Empty);
+            Assert.False(default != Commit.Empty);
+            Assert.True(Commit.Empty.Equals((object)Commit.Empty));
 
             // Parents
             Assert.Empty(Commit.Empty.Parents); // Default ctor (implicit)
@@ -61,6 +65,7 @@ namespace SourceCode.Chasm.Tests
             // Equal
             var actual = new Commit(expected.Parents, expected.TreeId, expected.CommitUtc, expected.CommitMessage);
             Assert.Equal(expected, actual);
+            Assert.Equal(expected.ToString(), actual.ToString());
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
             // Parents
@@ -246,6 +251,18 @@ namespace SourceCode.Chasm.Tests
             var actual2 = new Commit(parents, default, default, null);
             Assert.Collection(actual2.Parents, n => Assert.Equal(n, Parent3), n => Assert.Equal(n, Parent1), n => Assert.Equal(n, Parent2));
             Assert.Equal(actual, actual2);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(Commit_Deconstruct))]
+        public static void Commit_Deconstruct()
+        {
+            var expected = new Commit(new[] { new CommitId(Sha1.Hash("c1")), new CommitId(Sha1.Hash("c2")) }, new TreeId(Sha1.Hash("abc")), DateTime.UtcNow, "hello");
+
+            var (parents, treeId, utc, message) = expected;
+            var actual = new Commit(parents, treeId, utc, message);
+
+            Assert.Equal(expected, actual);
         }
 
         #endregion
