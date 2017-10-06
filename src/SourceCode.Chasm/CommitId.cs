@@ -29,16 +29,11 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region De/Constructors
+        #region Constructors
 
         public CommitId(Sha1 sha1)
         {
             Sha1 = sha1;
-        }
-
-        public void Deconstruct(out Sha1 sha1)
-        {
-            sha1 = Sha1;
         }
 
         #endregion

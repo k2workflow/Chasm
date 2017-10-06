@@ -18,7 +18,8 @@ namespace SourceCode.Chasm.Tests
         public static void BlobId_has_empty_sha1()
         {
             Assert.Equal(Sha1.Empty, BlobId.Empty.Sha1);
-            Assert.Equal(default, BlobId.Empty);
+            Assert.True(default == BlobId.Empty);
+            Assert.False(default != BlobId.Empty);
             Assert.Equal(Sha1.Empty.ToString(), BlobId.Empty.ToString());
         }
 
@@ -35,6 +36,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(blobId3.Sha1.ToString(), blobId3.ToString());
 
             Assert.Equal(blobId1, blobId2);
+            Assert.True(blobId1.Equals((object)blobId2));
             Assert.Equal(blobId1.GetHashCode(), blobId2.GetHashCode());
             Assert.Equal(blobId1.ToString(), blobId2.ToString());
 

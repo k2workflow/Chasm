@@ -29,18 +29,13 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region De/Constructors
+        #region Constructors
 
         public CommitRef(CommitId commitId)
         {
             if (commitId == CommitId.Empty) throw new ArgumentNullException(nameof(commitId));
 
             CommitId = commitId;
-        }
-
-        public void Deconstruct(out CommitId commitId)
-        {
-            commitId = CommitId;
         }
 
         #endregion

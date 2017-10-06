@@ -21,7 +21,8 @@ namespace SourceCode.Chasm.Tests
             var noData = new TreeNode();
             var nullData = new TreeNode("a", NodeKind.None, Sha1.Empty);
 
-            Assert.Equal(default, TreeNode.Empty);
+            Assert.True(default == TreeNode.Empty);
+            Assert.False(default != TreeNode.Empty);
 
             // Name
             Assert.Null(TreeNode.Empty.Name);
@@ -59,6 +60,7 @@ namespace SourceCode.Chasm.Tests
             // Equal
             var actual = new TreeNode(expected.Name, expected.Kind, expected.Sha1);
             Assert.Equal(expected, actual);
+            Assert.True(expected.Equals((object)actual));
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
             // Name
@@ -87,6 +89,18 @@ namespace SourceCode.Chasm.Tests
             actual = new TreeNode(expected.Name, expected.Kind, Sha1.Hash("def"));
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNode_Deconstruct))]
+        public static void TreeNode_Deconstruct()
+        {
+            var expected = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+
+            var (name, kind, sha) = expected;
+            var actual = new TreeNode(name, kind, sha);
+
+            Assert.Equal(expected, actual);
         }
 
         #endregion

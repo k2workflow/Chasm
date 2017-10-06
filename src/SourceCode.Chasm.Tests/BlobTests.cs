@@ -22,6 +22,9 @@ namespace SourceCode.Chasm.Tests
             var nullData = new Blob(null);
             var emptyData = new Blob(Array.Empty<byte>());
 
+            Assert.True(default == Blob.Empty);
+            Assert.False(default != Blob.Empty);
+
             Assert.Null(Blob.Empty.Data);
             Assert.Null(nullData.Data);
             Assert.Null(noData.Data);
@@ -55,7 +58,9 @@ namespace SourceCode.Chasm.Tests
         [Theory(DisplayName = nameof(Blob_equality))]
         public static void Blob_equality(byte[] x, byte[] y, bool isEqual)
         {
+            Assert.Equal(isEqual, new Blob(x).Equals((object)new Blob(y)));
             Assert.Equal(isEqual, new Blob(x) == new Blob(y));
+            Assert.NotEqual(isEqual, new Blob(x) != new Blob(y));
         }
 
 #pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to

@@ -18,7 +18,8 @@ namespace SourceCode.Chasm.Tests
         public static void TreeId_has_empty_sha1()
         {
             Assert.Equal(Sha1.Empty, TreeId.Empty.Sha1);
-            Assert.Equal(default, TreeId.Empty);
+            Assert.True(default == TreeId.Empty);
+            Assert.False(default != TreeId.Empty);
             Assert.Equal(Sha1.Empty.ToString(), TreeId.Empty.ToString());
         }
 
@@ -35,6 +36,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(treeId3.Sha1.ToString(), treeId3.ToString());
 
             Assert.Equal(treeId1, treeId2);
+            Assert.True(treeId1.Equals((object)treeId2));
             Assert.Equal(treeId1.GetHashCode(), treeId2.GetHashCode());
             Assert.Equal(treeId1.ToString(), treeId2.ToString());
 

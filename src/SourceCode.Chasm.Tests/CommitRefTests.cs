@@ -18,7 +18,8 @@ namespace SourceCode.Chasm.Tests
         public static void CommitRef_has_empty_commitId()
         {
             Assert.Equal(CommitId.Empty, CommitRef.Empty.CommitId);
-            Assert.Equal(default, CommitRef.Empty);
+            Assert.True(default == CommitRef.Empty);
+            Assert.False(default != CommitRef.Empty);
             Assert.Equal(Sha1.Empty.ToString(), CommitRef.Empty.ToString());
         }
 
@@ -35,6 +36,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(commitRef3.CommitId.Sha1.ToString(), commitRef3.ToString());
 
             Assert.Equal(commitRef1, commitRef2);
+            Assert.True(commitRef1.Equals((object)commitRef2));
             Assert.Equal(commitRef1.GetHashCode(), commitRef2.GetHashCode());
             Assert.Equal(commitRef1.ToString(), commitRef2.ToString());
 
