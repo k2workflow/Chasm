@@ -1,4 +1,11 @@
-﻿using System;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using System;
 using System.Linq;
 using Xunit;
 
@@ -6,10 +13,16 @@ namespace SourceCode.Chasm.Tests
 {
     public static class TreeNodeListTests
     {
+        #region Fields
+
         private static readonly TreeNode Node0 = new TreeNode(nameof(Node0), NodeKind.Tree, Sha1.Hash(nameof(Node0)));
         private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Tree, Sha1.Hash(nameof(Node1)));
         private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), NodeKind.Tree, Sha1.Hash(nameof(Node2)));
         private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.Tree, Sha1.Hash(nameof(Node3)));
+
+        #endregion
+
+        #region Methods
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeNodeList_Empty))]
@@ -280,5 +293,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(list2[5].Sha1, list3[7].Sha1);
             Assert.Equal(list2[6].Sha1, list3[8].Sha1);
         }
+
+        #endregion
     }
 }

@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,6 +35,8 @@ namespace SourceCode.Chasm
 
         #region Properties
 
+        public int Count => _nodes.Length;
+
         public TreeNode this[int index]
         {
             get
@@ -51,8 +60,6 @@ namespace SourceCode.Chasm
                 return node;
             }
         }
-
-        public int Count => _nodes.Length;
 
         #endregion
 
@@ -91,6 +98,52 @@ namespace SourceCode.Chasm
         #endregion
 
         #region Methods
+
+        private static TreeNode[] Merge(TreeNodeList first, TreeNodeList second)
+        {
+            var newArray = new TreeNode[first.Count + second.Count];
+
+            var i = 0;
+            var aIndex = 0;
+            var bIndex = 0;
+            for (; aIndex < first.Count || bIndex < second.Count; i++)
+            {
+                if (aIndex >= first.Count)
+                {
+                    newArray[i] = second[bIndex++];
+                }
+                else if (bIndex >= second.Count)
+                {
+                    newArray[i] = first[aIndex++];
+                }
+                else
+                {
+                    var a = first[aIndex];
+                    var b = second[bIndex];
+                    var cmp = string.CompareOrdinal(a.Name, b.Name);
+
+                    if (cmp == 0)
+                    {
+                        newArray[i] = b;
+                        ++bIndex;
+                        ++aIndex;
+                    }
+                    else if (cmp < 0)
+                    {
+                        newArray[i] = a;
+                        ++aIndex;
+                    }
+                    else
+                    {
+                        newArray[i] = b;
+                        ++bIndex;
+                    }
+                }
+            }
+
+            Array.Resize(ref newArray, i);
+            return newArray;
+        }
 
         public TreeNodeList Merge(TreeNode node)
         {
@@ -145,52 +198,6 @@ namespace SourceCode.Chasm
             var set = Merge(this, new TreeNodeList(nodes));
             var tree = new TreeNodeList(set);
             return tree;
-        }
-
-        private static TreeNode[] Merge(TreeNodeList first, TreeNodeList second)
-        {
-            var newArray = new TreeNode[first.Count + second.Count];
-
-            var i = 0;
-            var aIndex = 0;
-            var bIndex = 0;
-            for (; aIndex < first.Count || bIndex < second.Count; i++)
-            {
-                if (aIndex >= first.Count)
-                {
-                    newArray[i] = second[bIndex++];
-                }
-                else if (bIndex >= second.Count)
-                {
-                    newArray[i] = first[aIndex++];
-                }
-                else
-                {
-                    var a = first[aIndex];
-                    var b = second[bIndex];
-                    var cmp = string.CompareOrdinal(a.Name, b.Name);
-
-                    if (cmp == 0)
-                    {
-                        newArray[i] = b;
-                        ++bIndex;
-                        ++aIndex;
-                    }
-                    else if (cmp < 0)
-                    {
-                        newArray[i] = a;
-                        ++aIndex;
-                    }
-                    else
-                    {
-                        newArray[i] = b;
-                        ++bIndex;
-                    }
-                }
-            }
-
-            Array.Resize(ref newArray, i);
-            return newArray;
         }
 
         public int IndexOf(string key)

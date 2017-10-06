@@ -1,12 +1,25 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
     public static class TreeNodeListTests
     {
+        #region Fields
+
         private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), new BlobId(Sha1.Hash(nameof(Node1))));
         private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), new BlobId(Sha1.Hash(nameof(Node2))));
         private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), new BlobId(Sha1.Hash(nameof(Node3))));
+
+        #endregion
+
+        #region Methods
 
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Default))]
@@ -98,5 +111,7 @@ namespace SourceCode.Chasm.IO.Tests
                 Assert.Equal(expected, actual);
             }
         }
+
+        #endregion
     }
 }

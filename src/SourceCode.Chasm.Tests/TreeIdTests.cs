@@ -1,9 +1,18 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using Xunit;
 
 namespace SourceCode.Chasm.Tests
 {
     public static class TreeIdTests
     {
+        #region Methods
+
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeId_has_empty_sha1))]
         public static void TreeId_has_empty_sha1()
@@ -37,5 +46,7 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(treeId3.GetHashCode(), treeId1.GetHashCode());
             Assert.NotEqual(treeId3.ToString(), treeId1.ToString());
         }
+
+        #endregion
     }
 }

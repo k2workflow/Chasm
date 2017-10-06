@@ -1,12 +1,25 @@
-﻿using Google.Protobuf.WellKnownTypes;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using Google.Protobuf.WellKnownTypes;
 using System;
 
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
     internal static class CommitWireExtensions
     {
+        #region Fields
+
         // Windows epoch 1601-01-01T00:00:00Z is 11,644,473,600 seconds before Unix epoch 1970-01-01T00:00:00Z
         private const long epochOffset = 11_644_473_600;
+
+        #endregion
+
+        #region Methods
 
         public static CommitWire Convert(this Commit model)
         {
@@ -90,5 +103,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             var model = new Commit(parents, treeId, utc, wire.CommitMessage);
             return model;
         }
+
+        #endregion
     }
 }

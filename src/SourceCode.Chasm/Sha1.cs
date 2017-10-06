@@ -1,4 +1,11 @@
-﻿using System;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,14 +33,6 @@ namespace SourceCode.Chasm
         private static readonly ThreadLocal<SHA1> _sha1 = new ThreadLocal<SHA1>(SHA1.Create);
 
         /// <summary>
-        /// A singleton representing an empty <see cref="Sha1"/> value.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static Sha1 Empty { get; }
-
-        /// <summary>
         /// The fixed byte length of a <see cref="Sha1"/> value.
         /// </summary>
         public const byte ByteLen = 20;
@@ -41,7 +40,17 @@ namespace SourceCode.Chasm
         /// <summary>
         /// The number of hex characters required to represent a <see cref="Sha1"/> value.
         /// </summary>
-        public const byte CharLen = ByteLen * 2; // 40
+        public const byte CharLen = ByteLen * 2;
+
+        /// <summary>
+        /// A singleton representing an empty <see cref="Sha1"/> value.
+        /// </summary>
+        /// <value>
+        /// The empty.
+        /// </value>
+        public static Sha1 Empty { get; }
+
+        // 40
 
         #endregion
 
@@ -96,19 +105,6 @@ namespace SourceCode.Chasm
             Blit0 = blit0;
             Blit1 = blit1;
             Blit2 = blit2;
-        }
-
-        /// <summary>
-        /// Deconstructs the specified <see cref="Sha1"/>.
-        /// </summary>
-        /// <param name="blit0">The blit0.</param>
-        /// <param name="blit1">The blit1.</param>
-        /// <param name="blit2">The blit2.</param>
-        public void Deconstruct(out ulong blit0, out ulong blit1, out uint blit2)
-        {
-            blit0 = Blit0;
-            blit1 = Blit1;
-            blit2 = Blit2;
         }
 
         /// <summary>
@@ -167,6 +163,19 @@ namespace SourceCode.Chasm
                     Blit2 = *(uint*)(&ptr[16]);
                 }
             }
+        }
+
+        /// <summary>
+        /// Deconstructs the specified <see cref="Sha1"/>.
+        /// </summary>
+        /// <param name="blit0">The blit0.</param>
+        /// <param name="blit1">The blit1.</param>
+        /// <param name="blit2">The blit2.</param>
+        public void Deconstruct(out ulong blit0, out ulong blit1, out uint blit2)
+        {
+            blit0 = Blit0;
+            blit1 = Blit1;
+            blit2 = Blit2;
         }
 
         #endregion
@@ -308,6 +317,61 @@ namespace SourceCode.Chasm
 
         #region ToString
 
+        [SecuritySafeCritical]
+        private char[] ToChars(char separator)
+        {
+            Debug.Assert(separator == (char)0 || separator == '-' || separator == ' ');
+
+            var sep = 0;
+            char[] chars;
+
+            // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
+            if (separator == (char)0)
+            {
+                chars = new char[CharLen];
+            }
+            else
+            {
+                sep = 8;
+                chars = new char[CharLen + 4];
+            }
+
+            unsafe
+            {
+                var bytes = stackalloc byte[ByteLen]; // TODO: https://github.com/dotnet/corefx/pull/24212
+                {
+                    // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
+                    *(ulong*)(&bytes[0]) = Blit0;
+                    *(ulong*)(&bytes[8]) = Blit1;
+                    *(uint*)(&bytes[16]) = Blit2;
+                }
+
+                var pos = 0;
+                for (var i = 0; i < ByteLen; i++) // 20
+                {
+                    // Each byte is two hexits (convention is lowercase)
+
+                    var b = bytes[i] >> 4; // == b / 16
+                    chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
+
+                    b = bytes[i] - (b << 4); // == b % 16
+                    chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
+
+                    // Append a separator if required
+                    if (pos == sep) // pos >= 2, sep = 0|N
+                    {
+                        chars[pos++] = separator;
+
+                        sep = pos + 8;
+                        if (sep >= chars.Length)
+                            sep = 0;
+                    }
+                }
+            }
+
+            return chars;
+        }
+
         /// <summary>
         /// Returns a string representation of the <see cref="Sha1"/> instance using the 'N' format.
         /// </summary>
@@ -387,112 +451,9 @@ namespace SourceCode.Chasm
             return kvp;
         }
 
-        [SecuritySafeCritical]
-        private char[] ToChars(char separator)
-        {
-            Debug.Assert(separator == (char)0 || separator == '-' || separator == ' ');
-
-            var sep = 0;
-            char[] chars;
-
-            // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
-            if (separator == (char)0)
-            {
-                chars = new char[CharLen];
-            }
-            else
-            {
-                sep = 8;
-                chars = new char[CharLen + 4];
-            }
-
-            unsafe
-            {
-                var bytes = stackalloc byte[ByteLen]; // TODO: https://github.com/dotnet/corefx/pull/24212
-                {
-                    // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                    *(ulong*)(&bytes[0]) = Blit0;
-                    *(ulong*)(&bytes[8]) = Blit1;
-                    *(uint*)(&bytes[16]) = Blit2;
-                }
-
-                var pos = 0;
-                for (var i = 0; i < ByteLen; i++) // 20
-                {
-                    // Each byte is two hexits (convention is lowercase)
-
-                    var b = bytes[i] >> 4; // == b / 16
-                    chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
-
-                    b = bytes[i] - (b << 4); // == b % 16
-                    chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
-
-                    // Append a separator if required
-                    if (pos == sep) // pos >= 2, sep = 0|N
-                    {
-                        chars[pos++] = separator;
-
-                        sep = pos + 8;
-                        if (sep >= chars.Length)
-                            sep = 0;
-                    }
-                }
-            }
-
-            return chars;
-        }
-
         #endregion
 
         #region Parse
-
-        /// <summary>
-        /// Parses the specified hexadecimal.
-        /// </summary>
-        /// <param name="hex">The hexadecimal.</param>
-        /// <returns></returns>
-        /// <exception cref="FormatException">Sha1</exception>
-        public static Sha1 Parse(string hex)
-        {
-            if (!TryParse(hex, out Sha1 sha1))
-                throw new FormatException($"String was not recognized as a valid {nameof(Sha1)}");
-
-            return sha1;
-        }
-
-        /// <summary>
-        /// Tries to parse the specified hexadecimal.
-        /// </summary>
-        /// <param name="hex">The hexadecimal.</param>
-        /// <param name="value">The value.</param>
-        /// <returns></returns>
-        public static bool TryParse(string hex, out Sha1 value)
-        {
-            value = Empty;
-
-            // Length must be at least 40
-            if (hex == null || hex.Length < CharLen)
-                return false;
-
-            var startIndex = 0;
-
-            // Check if the hex specifier '0x' is present
-            if (hex[0] == '0' && (hex[1] == 'x' || hex[1] == 'X'))
-            {
-                // Length must be at least 42
-                if (hex.Length < 2 + CharLen)
-                    return false;
-
-                // Skip '0x'
-                startIndex = 2;
-            }
-
-            if (!TryParseImpl(hex, startIndex, out Sha1 sha1))
-                return false;
-
-            value = sha1;
-            return true;
-        }
 
         // Sentinel value for n/a (128)
         private const byte __ = 0b1000_0000;
@@ -569,6 +530,54 @@ namespace SourceCode.Chasm
                 return false;
 
             b = bex;
+            return true;
+        }
+
+        /// <summary>
+        /// Parses the specified hexadecimal.
+        /// </summary>
+        /// <param name="hex">The hexadecimal.</param>
+        /// <returns></returns>
+        /// <exception cref="FormatException">Sha1</exception>
+        public static Sha1 Parse(string hex)
+        {
+            if (!TryParse(hex, out Sha1 sha1))
+                throw new FormatException($"String was not recognized as a valid {nameof(Sha1)}");
+
+            return sha1;
+        }
+
+        /// <summary>
+        /// Tries to parse the specified hexadecimal.
+        /// </summary>
+        /// <param name="hex">The hexadecimal.</param>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
+        public static bool TryParse(string hex, out Sha1 value)
+        {
+            value = Empty;
+
+            // Length must be at least 40
+            if (hex == null || hex.Length < CharLen)
+                return false;
+
+            var startIndex = 0;
+
+            // Check if the hex specifier '0x' is present
+            if (hex[0] == '0' && (hex[1] == 'x' || hex[1] == 'X'))
+            {
+                // Length must be at least 42
+                if (hex.Length < 2 + CharLen)
+                    return false;
+
+                // Skip '0x'
+                startIndex = 2;
+            }
+
+            if (!TryParseImpl(hex, startIndex, out Sha1 sha1))
+                return false;
+
+            value = sha1;
             return true;
         }
 

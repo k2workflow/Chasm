@@ -1,4 +1,11 @@
-﻿using SourceCode.Clay.Buffers;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using SourceCode.Clay.Buffers;
 using System;
 using System.Text;
 using Xunit;
@@ -7,7 +14,13 @@ namespace SourceCode.Chasm.Tests
 {
     public static class Sha1Tests
     {
+        #region Fields
+
         private const string _surrogatePair = "\uD869\uDE01";
+
+        #endregion
+
+        #region Methods
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(When_create_null_sha1))]
@@ -774,5 +787,7 @@ namespace SourceCode.Chasm.Tests
                 Assert.True(sha2 > sha1);
             }
         }
+
+        #endregion
     }
 }

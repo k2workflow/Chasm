@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -5,6 +12,8 @@ namespace SourceCode.Chasm.IO.Disk
 {
     partial class DiskChasmRepo // .Commit
     {
+        #region Methods
+
         public async ValueTask<Commit> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
             var buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
@@ -27,5 +36,7 @@ namespace SourceCode.Chasm.IO.Disk
                 return commitId;
             }
         }
+
+        #endregion
     }
 }

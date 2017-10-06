@@ -1,3 +1,10 @@
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
@@ -13,20 +20,6 @@ namespace SourceCode.Chasm.IO.AzureBlob
     partial class AzureBlobChasmRepo // .CommitRef
     {
         #region Read
-
-        public async ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
-
-            var refsContainer = _refsContainer.Value;
-
-            var blobName = DeriveCommitRefBlobName(branch, name);
-            var blobRef = refsContainer.GetAppendBlobReference(blobName);
-
-            var (commitId, _) = await ReadCommitRefImplAsync(blobRef, cancellationToken).ConfigureAwait(false);
-            return commitId;
-        }
 
         private async ValueTask<(CommitId, AccessCondition)> ReadCommitRefImplAsync(CloudBlob blobRef, CancellationToken cancellationToken)
         {
@@ -59,6 +52,20 @@ namespace SourceCode.Chasm.IO.AzureBlob
             }
 
             return (commitId, accessCondition);
+        }
+
+        public async ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+
+            var refsContainer = _refsContainer.Value;
+
+            var blobName = DeriveCommitRefBlobName(branch, name);
+            var blobRef = refsContainer.GetAppendBlobReference(blobName);
+
+            var (commitId, _) = await ReadCommitRefImplAsync(blobRef, cancellationToken).ConfigureAwait(false);
+            return commitId;
         }
 
         #endregion
@@ -121,6 +128,9 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Helpers
 
+        private static ChasmConcurrencyException BuildConcurrencyException(string branch, string name, Exception innerException)
+            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {branch}/{name}", innerException);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private string DeriveCommitRefBlobName(string branch, string name)
         {
@@ -132,9 +142,6 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
             return refName;
         }
-
-        private static ChasmConcurrencyException BuildConcurrencyException(string branch, string name, Exception innerException)
-            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {branch}/{name}", innerException);
 
         #endregion
     }

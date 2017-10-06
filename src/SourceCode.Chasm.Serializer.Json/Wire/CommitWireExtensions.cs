@@ -1,4 +1,11 @@
-﻿using SourceCode.Clay.Json;
+#region License
+
+// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+#endregion
+
+using SourceCode.Clay.Json;
 using System;
 using System.Json;
 using System.Xml;
@@ -7,10 +14,16 @@ namespace SourceCode.Chasm.IO.Json.Wire
 {
     internal static class CommitWireExtensions
     {
+        #region Fields
+
         private const string _parents = "parents";
         private const string _treeId = "treeId";
         private const string _utc = "utc";
         private const string _message = "message";
+
+        #endregion
+
+        #region Methods
 
         public static JsonObject Convert(this Commit model)
         {
@@ -105,5 +118,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             var model = wire.ConvertCommit();
             return model;
         }
+
+        #endregion
     }
 }
