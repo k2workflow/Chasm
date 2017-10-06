@@ -95,8 +95,12 @@ namespace SourceCode.Chasm.IO.AzureBlob
             // Optimistic concurrency check
             if (found)
             {
+                // We found a previous commit but the caller didn't say to expect one
+                if (!previousCommitId.HasValue)
+                    throw BuildConcurrencyException(branch, commitRef.Name, null); // TODO: May need a different error
+
                 // Semantics follow Interlocked.Exchange (compare then exchange)
-                if (previousCommitId.HasValue && existingCommitId != previousCommitId.Value)
+                if (existingCommitId != previousCommitId.Value)
                 {
                     throw BuildConcurrencyException(branch, commitRef.Name, null);
                 }
@@ -104,6 +108,11 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 // Idempotent
                 if (existingCommitId == commitRef.CommitId) // We already know that the name matches
                     return;
+            }
+            // The caller expected a previous commit, but we didn't find one
+            else if (previousCommitId.HasValue)
+            {
+                throw BuildConcurrencyException(branch, commitRef.Name, null); // TODO: May need a different error
             }
 
             try
@@ -124,7 +133,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                     await blobRef.AppendBlockAsync(output).ConfigureAwait(false);
                 }
             }
-            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
+            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
                 throw BuildConcurrencyException(branch, commitRef.Name, se);
             }

@@ -19,7 +19,7 @@
   <!-- https://github.com/OpenCover/opencover/issues/601 -->
   <PropertyGroup>
     <DebugType>full</DebugType>
-    <DebugType Condition="'$(Configuration)'=='Release'">pdbonly</DebugType>
+    <!--<DebugType Condition="'$(Configuration)'=='Release'">pdbonly</DebugType>-->
   </PropertyGroup>
 
   <PropertyGroup>

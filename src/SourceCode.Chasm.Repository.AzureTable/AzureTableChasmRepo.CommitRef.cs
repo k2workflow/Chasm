@@ -89,6 +89,10 @@ namespace SourceCode.Chasm.IO.AzureTable
             // Optimistic concurrency check
             if (found)
             {
+                // We found a previous commit but the caller didn't say to expect one
+                if (!previousCommitId.HasValue)
+                    throw BuildConcurrencyException(branch, commitRef.Name, null); // TODO: May need a different error
+
                 // Semantics follow Interlocked.Exchange (compare then exchange)
                 if (previousCommitId.HasValue && existingCommitId != previousCommitId.Value)
                 {
@@ -98,6 +102,11 @@ namespace SourceCode.Chasm.IO.AzureTable
                 // Idempotent
                 if (existingCommitId == commitRef.CommitId)
                     return;
+            }
+            // The caller expected a previous commit, but we didn't find one
+            else if (previousCommitId.HasValue)
+            {
+                throw BuildConcurrencyException(branch, commitRef.Name, null); // TODO: May need a different error
             }
 
             try
@@ -110,7 +119,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                     await refsTable.ExecuteAsync(op).ConfigureAwait(false);
                 }
             }
-            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.PreconditionFailed)
+            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
                 throw BuildConcurrencyException(branch, commitRef.Name, se);
             }
