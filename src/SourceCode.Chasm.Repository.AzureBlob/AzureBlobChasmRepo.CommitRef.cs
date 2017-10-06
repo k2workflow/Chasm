@@ -21,9 +21,9 @@ namespace SourceCode.Chasm.IO.AzureBlob
     {
         #region Read
 
-        private async ValueTask<(CommitId, AccessCondition)> ReadCommitRefImplAsync(CloudBlob blobRef, CancellationToken cancellationToken)
+        private async ValueTask<(CommitRef, AccessCondition)> ReadCommitRefImplAsync(CloudBlob blobRef, CancellationToken cancellationToken)
         {
-            var commitId = CommitId.Empty;
+            var commitRef = CommitRef.Empty;
             AccessCondition accessCondition = null;
             try
             {
@@ -40,8 +40,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
                     if (output.Length > 0)
                     {
-                        var sha1 = Serializer.DeserializeSha1(output.ToArray()); // TODO: Perf
-                        commitId = new CommitId(sha1);
+                        commitRef = Serializer.DeserializeCommitRef(output.ToArray()); // TODO: Perf
                     }
                 }
             }
@@ -51,10 +50,10 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 se.Suppress();
             }
 
-            return (commitId, accessCondition);
+            return (commitRef, accessCondition);
         }
 
-        public async ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public async ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -64,15 +63,15 @@ namespace SourceCode.Chasm.IO.AzureBlob
             var blobName = DeriveCommitRefBlobName(branch, name);
             var blobRef = refsContainer.GetAppendBlobReference(blobName);
 
-            var (commitId, _) = await ReadCommitRefImplAsync(blobRef, cancellationToken).ConfigureAwait(false);
-            return commitId;
+            var (commitRef, _) = await ReadCommitRefImplAsync(blobRef, cancellationToken).ConfigureAwait(false);
+            return commitRef;
         }
 
         #endregion
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitId newCommitId, CancellationToken cancellationToken)
+        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -83,17 +82,17 @@ namespace SourceCode.Chasm.IO.AzureBlob
             var blobRef = refsContainer.GetAppendBlobReference(blobName);
 
             // Load existing commit ref in order to use its ETAG
-            var (existingCommitId, accessCondition) = await ReadCommitRefImplAsync(blobRef, cancellationToken).ConfigureAwait(false);
+            var (existingCommitRef, accessCondition) = await ReadCommitRefImplAsync(blobRef, cancellationToken).ConfigureAwait(false);
 
-            if (existingCommitId != CommitId.Empty)
+            if (existingCommitRef != CommitRef.Empty)
             {
                 // Idempotent
-                if (existingCommitId == newCommitId)
+                if (existingCommitRef == commitRef)
                     return;
 
                 // Optimistic concurrency check
                 if (previousCommitId.HasValue
-                    && existingCommitId != previousCommitId.Value)
+                    && existingCommitRef.CommitId != previousCommitId.Value)
                 {
                     throw BuildConcurrencyException(branch, name, null);
                 }
@@ -106,7 +105,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
                 // CommitRefs are not compressed
 
-                using (var session = Serializer.Serialize(newCommitId.Sha1))
+                using (var session = Serializer.Serialize(commitRef))
                 using (var output = new MemoryStream())
                 {
                     var seg = session.Result;

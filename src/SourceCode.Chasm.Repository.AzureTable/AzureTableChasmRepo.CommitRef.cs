@@ -19,9 +19,9 @@ namespace SourceCode.Chasm.IO.AzureTable
     {
         #region Read
 
-        private static async ValueTask<(CommitId, string)> ReadCommitRefImplAsync(CloudTable refsTable, TableOperation operation, IChasmSerializer serializer, CancellationToken cancellationToken)
+        private static async ValueTask<(CommitRef, string)> ReadCommitRefImplAsync(CloudTable refsTable, TableOperation operation, IChasmSerializer serializer, CancellationToken cancellationToken)
         {
-            var commitId = CommitId.Empty;
+            var commitRef = CommitRef.Empty;
             string etag = null;
             try
             {
@@ -30,14 +30,12 @@ namespace SourceCode.Chasm.IO.AzureTable
                 etag = result.Etag;
 
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
-                    return (commitId, etag);
+                    return (commitRef, etag);
 
                 var entity = (DataEntity)result.Result;
 
                 // CommitRefs are not compressed
-
-                var sha1 = serializer.DeserializeSha1(entity.Content);
-                commitId = new CommitId(sha1);
+                commitRef = serializer.DeserializeCommitRef(entity.Content);
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {
@@ -45,10 +43,10 @@ namespace SourceCode.Chasm.IO.AzureTable
                 se.Suppress();
             }
 
-            return (commitId, etag);
+            return (commitRef, etag);
         }
 
-        public async ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public async ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -64,7 +62,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitId newCommitId, CancellationToken cancellationToken)
+        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -75,15 +73,15 @@ namespace SourceCode.Chasm.IO.AzureTable
             // Load existing commit ref in order to use its ETAG
             var (existingCommitId, etag) = await ReadCommitRefImplAsync(refsTable, operation, Serializer, cancellationToken).ConfigureAwait(false);
 
-            if (existingCommitId != CommitId.Empty)
+            if (existingCommitId != CommitRef.Empty)
             {
                 // Idempotent
-                if (existingCommitId == newCommitId)
+                if (existingCommitId == commitRef)
                     return;
 
                 // Optimistic concurrency check
                 if (previousCommitId.HasValue
-                    && existingCommitId != previousCommitId.Value)
+                    && existingCommitId.CommitId != previousCommitId.Value)
                 {
                     throw BuildConcurrencyException(branch, name, null);
                 }
@@ -92,7 +90,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             try
             {
                 // CommitRefs are not compressed
-                using (var session = Serializer.Serialize(newCommitId.Sha1))
+                using (var session = Serializer.Serialize(commitRef))
                 {
                     var op = DataEntity.BuildWriteOperation(branch, name, session.Result, etag); // Note ETAG access condition
 

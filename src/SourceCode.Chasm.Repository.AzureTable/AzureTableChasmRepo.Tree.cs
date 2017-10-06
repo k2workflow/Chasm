@@ -68,11 +68,11 @@ namespace SourceCode.Chasm.IO.AzureTable
             if (string.IsNullOrWhiteSpace(commitRefName)) throw new ArgumentNullException(nameof(commitRefName));
 
             // CommitRef
-            var commitId = await ReadCommitRefAsync(branch, commitRefName, cancellationToken).ConfigureAwait(false);
-            if (commitId == CommitId.Empty) return default;
+            var commitRef = await ReadCommitRefAsync(branch, commitRefName, cancellationToken).ConfigureAwait(false);
+            if (commitRef == CommitRef.Empty) return default;
 
             // Tree
-            var tree = await ReadTreeAsync(commitId, cancellationToken).ConfigureAwait(false);
+            var tree = await ReadTreeAsync(commitRef.CommitId, cancellationToken).ConfigureAwait(false);
             return tree;
         }
 

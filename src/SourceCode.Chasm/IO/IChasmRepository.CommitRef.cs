@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.IO
     {
         #region Methods
 
-        ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
+        ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
 
         /// <summary>
         /// Write a <see cref="CommitRef"/> to the repository using the provided values.
@@ -23,11 +23,11 @@ namespace SourceCode.Chasm.IO
         /// <param name="branch">The repository name.</param>
         /// <param name="name">The name of the <see cref="CommitRef"/></param>
         /// <param name="previousCommitId">The previous <see cref="CommitId"/> that the caller used for reading.</param>
-        /// <param name="newCommitId">The new <see cref="CommitId"/> that represents the content being written.</param>
+        /// <param name="commitRef">The new <see cref="CommitRef"/> that represents the content being written.</param>
         /// <param name="cancellationToken">Allows the <see cref="Task"/> to be cancelled.</param>
         /// <exception cref="ChasmConcurrencyException">Thrown when a concurrency exception is detected.</exception>
         /// <returns></returns>
-        Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitId newCommitId, CancellationToken cancellationToken);
+        Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitRef commitRef, CancellationToken cancellationToken);
 
         #endregion
     }

@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.IO.Disk
     {
         #region Read
 
-        public async ValueTask<CommitId> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public async ValueTask<CommitRef> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -26,17 +26,15 @@ namespace SourceCode.Chasm.IO.Disk
 
             var bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
 
-            var sha1 = Serializer.DeserializeSha1(bytes);
-
-            var commitId = new CommitId(sha1);
-            return commitId;
+            var commitRef = Serializer.DeserializeCommitRef(bytes);
+            return commitRef;
         }
 
         #endregion
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitId newCommitId, CancellationToken cancellationToken)
+        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, string name, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -46,7 +44,7 @@ namespace SourceCode.Chasm.IO.Disk
             var filename = DeriveCommitRefFileName(branch, name);
             var path = Path.Combine(_refsContainer, filename);
 
-            using (var session = Serializer.Serialize(newCommitId.Sha1))
+            using (var session = Serializer.Serialize(commitRef))
             {
                 await WriteFileAsync(path, session.Result, cancellationToken).ConfigureAwait(false);
             }

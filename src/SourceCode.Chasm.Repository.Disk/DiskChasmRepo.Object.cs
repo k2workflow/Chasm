@@ -34,6 +34,8 @@ namespace SourceCode.Chasm.IO.Disk
             var path = Path.Combine(_objectsContainer, filename);
 
             var bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
+            if (bytes == null)
+                return default;
 
             using (var input = new MemoryStream(bytes.ToArray())) // TODO: Perf
             using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
