@@ -7,20 +7,30 @@
 
 using SourceCode.Clay.Buffers;
 using System;
+using System.Diagnostics;
 using System.Text;
 
 namespace SourceCode.Chasm.IO.Json
 {
     partial class JsonChasmSerializer // .Sha1
     {
+        #region Fields
+
+        private const int Sha1Utf8ByteLen = Sha1.ByteLen * 2;
+
+        #endregion
+
+        // Hex characters encode Utf8 in 2bpc
+
         #region Serialize
 
         public BufferSession Serialize(Sha1 model)
         {
-            var json = model.ToString("N");
+            // Do not add braces or other formatting. This is a concise representation.
 
-            var maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
-            var rented = BufferSession.RentBuffer(maxLen);
+            var json = model.ToString("N"); // Most concise format specifier
+
+            var rented = BufferSession.RentBuffer(Sha1Utf8ByteLen);
             var count = Encoding.UTF8.GetBytes(json, 0, json.Length, rented, 0);
 
             var seg = new ArraySegment<byte>(rented, 0, count);
@@ -35,13 +45,14 @@ namespace SourceCode.Chasm.IO.Json
         public Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
+            Debug.Assert(span.Length >= Sha1Utf8ByteLen);
 
             string json;
             unsafe
             {
                 fixed (byte* ptr = &span.DangerousGetPinnableReference())
                 {
-                    json = Encoding.UTF8.GetString(ptr, span.Length);
+                    json = Encoding.UTF8.GetString(ptr, Sha1Utf8ByteLen);
                 }
             }
 

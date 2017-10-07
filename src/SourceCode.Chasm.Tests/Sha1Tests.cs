@@ -309,6 +309,7 @@ namespace SourceCode.Chasm.Tests
                 // String
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
 
                 // Empty array
                 actual = Sha1.Hash(Array.Empty<byte>()).ToString();
@@ -375,6 +376,7 @@ namespace SourceCode.Chasm.Tests
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
                 Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
 
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
@@ -441,6 +443,7 @@ namespace SourceCode.Chasm.Tests
                 // String
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
 
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
@@ -498,6 +501,7 @@ namespace SourceCode.Chasm.Tests
                 // String
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
 
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
@@ -555,6 +559,7 @@ namespace SourceCode.Chasm.Tests
 
                 var actual = Sha1.Hash(input).ToString();
                 Assert.Equal(expected, actual);
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
 
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
@@ -609,6 +614,7 @@ namespace SourceCode.Chasm.Tests
                 var sha1 = Sha1.Hash(str);
 
                 Assert.NotEqual(Sha1.Empty, sha1);
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(sha1.ToString()));
             }
         }
 
@@ -622,6 +628,7 @@ namespace SourceCode.Chasm.Tests
                 var sha1 = Sha1.Hash(str);
 
                 Assert.NotEqual(Sha1.Empty, sha1);
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(sha1.ToString()));
             }
         }
 
@@ -636,6 +643,7 @@ namespace SourceCode.Chasm.Tests
                 var sha1 = Sha1.Hash(str);
 
                 Assert.NotEqual(Sha1.Empty, sha1);
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(sha1.ToString()));
             }
         }
 
