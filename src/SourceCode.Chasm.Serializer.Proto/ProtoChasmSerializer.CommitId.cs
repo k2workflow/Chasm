@@ -12,7 +12,7 @@ using System;
 
 namespace SourceCode.Chasm.IO.Proto
 {
-    partial class ProtoChasmSerializer // .Commit
+    partial class ProtoChasmSerializer // .CommitId
     {
         #region Serialize
 

@@ -12,7 +12,7 @@ using System.Text;
 
 namespace SourceCode.Chasm.IO.Json
 {
-    partial class JsonChasmSerializer // .Commit
+    partial class JsonChasmSerializer // .CommitId
     {
         #region Serialize
 
