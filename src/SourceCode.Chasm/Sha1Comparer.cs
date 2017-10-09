@@ -89,9 +89,9 @@ namespace SourceCode.Chasm
 
                 unchecked
                 {
-                    hc = hc * 23 + (long)obj.Blit0;
-                    hc = hc * 23 + (long)obj.Blit1;
-                    hc = hc * 23 + obj.Blit2;
+                    hc = (hc * 23) + (long)obj.Blit0;
+                    hc = (hc * 23) + (long)obj.Blit1;
+                    hc = (hc * 23) + obj.Blit2;
                 }
 
                 return ((int)(hc >> 32)) ^ (int)hc;

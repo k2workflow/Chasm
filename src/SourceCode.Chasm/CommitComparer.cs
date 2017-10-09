@@ -71,10 +71,10 @@ namespace SourceCode.Chasm
 
                 unchecked
                 {
-                    hc = hc * 23 + obj.TreeId.GetHashCode();
-                    hc = hc * 23 + obj.CommitUtc.GetHashCode();
-                    hc = hc * 23 + (obj.Parents?.Count ?? 42);
-                    hc = hc * 23 + (obj.CommitMessage?.Length ?? 0);
+                    hc = (hc * 23) + obj.TreeId.GetHashCode();
+                    hc = (hc * 23) + obj.CommitUtc.GetHashCode();
+                    hc = (hc * 23) + (obj.Parents?.Count ?? 42);
+                    hc = (hc * 23) + (obj.CommitMessage?.Length ?? 0);
                 }
 
                 return ((int)(hc >> 32)) ^ (int)hc;

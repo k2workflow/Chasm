@@ -91,9 +91,9 @@ namespace SourceCode.Chasm
 
                 unchecked
                 {
-                    hc = hc * 23 + (obj.Name == null ? 0 : StringComparer.Ordinal.GetHashCode(obj.Name));
-                    hc = hc * 23 + (int)obj.Kind;
-                    hc = hc * 23 + obj.Sha1.GetHashCode();
+                    hc = (hc * 23) + (obj.Name == null ? 0 : StringComparer.Ordinal.GetHashCode(obj.Name));
+                    hc = (hc * 23) + (int)obj.Kind;
+                    hc = (hc * 23) + obj.Sha1.GetHashCode();
                 }
 
                 return ((int)(hc >> 32)) ^ (int)hc;

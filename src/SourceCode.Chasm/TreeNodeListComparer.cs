@@ -63,10 +63,10 @@ namespace SourceCode.Chasm
 
                 unchecked
                 {
-                    hc = hc * 23 + obj._nodes.Length;
+                    hc = (hc * 23) + obj._nodes.Length;
 
                     if (obj._nodes.Length > 0)
-                        hc = hc * 23 + obj._nodes.Span[0].GetHashCode();
+                        hc = (hc * 23) + obj._nodes.Span[0].GetHashCode();
                 }
 
                 return ((int)(hc >> 32)) ^ (int)hc;
