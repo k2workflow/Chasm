@@ -116,9 +116,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     /// <summary>Field number for the "NodeId" field.</summary>
     public const int NodeIdFieldNumber = 3;
     private global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire nodeId_;
-    /// <summary>
-    /// Naming follows convention in JsonSerializer
-    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire NodeId {
       get { return nodeId_; }

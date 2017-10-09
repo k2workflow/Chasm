@@ -14,7 +14,9 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         #region Constants
 
-        private const string _id = "id"; // Naming follows convention in ProtoSerializer
+        // Naming follows convention in ProtoSerializer
+
+        private const string _id = "id";
 
         #endregion
 

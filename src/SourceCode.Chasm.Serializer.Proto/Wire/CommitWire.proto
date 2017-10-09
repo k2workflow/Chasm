@@ -9,7 +9,7 @@ option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 
 		Sha1Wire TreeId = 2;
 		
-		google.protobuf.Timestamp CommitUtc = 3;
+		google.protobuf.Timestamp Utc = 3;
 		
-		string CommitMessage = 4;
+		string Message = 4;
 	}

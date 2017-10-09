@@ -70,9 +70,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     /// <summary>Field number for the "Id" field.</summary>
     public const int IdFieldNumber = 1;
     private global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire id_;
-    /// <summary>
-    /// Naming follows convention in ProtoSerializer
-    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire Id {
       get { return id_; }

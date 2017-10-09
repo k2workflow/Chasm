@@ -19,7 +19,7 @@ option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 
 		NodeKindWire Kind = 2;
 
-		Sha1Wire NodeId = 3; // Naming follows convention in JsonSerializer
+		Sha1Wire NodeId = 3;
 	}
 
 	// TreeWire

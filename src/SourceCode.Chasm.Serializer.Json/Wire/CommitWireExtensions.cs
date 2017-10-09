@@ -16,6 +16,8 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         #region Constants
 
+        // Naming follows convention in ProtoSerializer
+
         private const string _parents = "parents";
         private const string _treeId = "treeId";
         private const string _utc = "utc";
@@ -57,10 +59,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
             }
 
             // CommitUtc
-            var utc = XmlConvert.ToString(model.CommitUtc, XmlDateTimeSerializationMode.Utc);
+            var utc = XmlConvert.ToString(model.Utc, XmlDateTimeSerializationMode.Utc);
 
             // Message
-            var msg = model.CommitMessage == null ? null : new JsonPrimitive(model.CommitMessage);
+            var msg = model.Message == null ? null : new JsonPrimitive(model.Message);
 
             // TreeId
             var treeId = model.TreeId.Sha1.ToString("N");

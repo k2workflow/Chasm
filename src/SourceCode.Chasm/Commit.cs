@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
-    [DebuggerDisplay("{" + nameof(CommitUtc) + ".ToString(\"o\"),nq,ac} ({" + nameof(TreeId) + "." + nameof(Chasm.TreeId.Sha1) + ".ToString(\"D\"),nq,ac})")]
+    [DebuggerDisplay("{" + nameof(Utc) + ".ToString(\"o\"),nq,ac} ({" + nameof(TreeId) + "." + nameof(Chasm.TreeId.Sha1) + ".ToString(\"D\"),nq,ac})")]
     public struct Commit : IEquatable<Commit>
     {
         #region Constants
@@ -41,21 +41,21 @@ namespace SourceCode.Chasm
 
         public TreeId TreeId { get; }
 
-        public DateTime CommitUtc { get; }
+        public DateTime Utc { get; }
 
-        public string CommitMessage => _message ?? string.Empty; // May be null due to default ctor
+        public string Message => _message ?? string.Empty; // May be null due to default ctor
 
         #endregion
 
         #region De/Constructors
 
-        public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, DateTime commitUtc, string commitMessage)
+        public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, DateTime utc, string message)
         {
-            if (commitUtc != default && commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException(nameof(commitUtc));
+            if (utc != default && utc.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException(nameof(utc));
 
             TreeId = treeId;
-            CommitUtc = commitUtc;
-            _message = commitMessage ?? string.Empty;
+            Utc = utc;
+            _message = message ?? string.Empty;
 
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (parents == null)
@@ -122,16 +122,16 @@ namespace SourceCode.Chasm
             }
         }
 
-        public Commit(CommitId parent, TreeId treeId, DateTime commitUtc, string commitMessage)
-            : this(new[] { parent }, treeId, commitUtc, commitMessage)
+        public Commit(CommitId parent, TreeId treeId, DateTime utc, string message)
+            : this(new[] { parent }, treeId, utc, message)
         { }
 
-        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId treeId, out DateTime commitUtc, out string commitMessage)
+        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId treeId, out DateTime utc, out string message)
         {
             parents = Parents;
             treeId = TreeId;
-            commitUtc = CommitUtc;
-            commitMessage = CommitMessage;
+            utc = Utc;
+            message = Message;
         }
 
         #endregion
@@ -154,7 +154,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(Commit x, Commit y) => !(x == y);
 
-        public override string ToString() => $"{TreeId.Sha1:D} ({CommitUtc:o})";
+        public override string ToString() => $"{TreeId.Sha1:D} ({Utc:o})";
 
         #endregion
     }

@@ -45,15 +45,15 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(TreeId.Empty, nullData.TreeId);
 
             // DateTime
-            Assert.Equal(default, Commit.Empty.CommitUtc);
-            Assert.Equal(default, noData.CommitUtc);
-            Assert.Equal(default, nullData.CommitUtc);
+            Assert.Equal(default, Commit.Empty.Utc);
+            Assert.Equal(default, noData.Utc);
+            Assert.Equal(default, nullData.Utc);
             Assert.Throws<ArgumentOutOfRangeException>(() => new Commit(null, TreeId.Empty, DateTime.Now, null)); // Non-Utc
 
             // Message
-            Assert.Equal(string.Empty, Commit.Empty.CommitMessage);
-            Assert.Equal(string.Empty, noData.CommitMessage);
-            Assert.Equal(string.Empty, nullData.CommitMessage);
+            Assert.Equal(string.Empty, Commit.Empty.Message);
+            Assert.Equal(string.Empty, noData.Message);
+            Assert.Equal(string.Empty, nullData.Message);
         }
 
         [Trait("Type", "Unit")]
@@ -63,60 +63,60 @@ namespace SourceCode.Chasm.Tests
             var expected = new Commit(new[] { new CommitId(Sha1.Hash("c1")), new CommitId(Sha1.Hash("c2")) }, new TreeId(Sha1.Hash("abc")), DateTime.UtcNow, "hello");
 
             // Equal
-            var actual = new Commit(expected.Parents, expected.TreeId, expected.CommitUtc, expected.CommitMessage);
+            var actual = new Commit(expected.Parents, expected.TreeId, expected.Utc, expected.Message);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.ToString(), actual.ToString());
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
             // Parents
-            actual = new Commit(null, expected.TreeId, expected.CommitUtc, expected.CommitMessage);
+            actual = new Commit(null, expected.TreeId, expected.Utc, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(Array.Empty<CommitId>(), expected.TreeId, expected.CommitUtc, expected.CommitMessage.ToUpperInvariant());
+            actual = new Commit(Array.Empty<CommitId>(), expected.TreeId, expected.Utc, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(Commit.Orphaned, expected.TreeId, expected.CommitUtc, expected.CommitMessage.ToUpperInvariant());
+            actual = new Commit(Commit.Orphaned, expected.TreeId, expected.Utc, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(new[] { expected.Parents[0] }, expected.TreeId, expected.CommitUtc, expected.CommitMessage.ToUpperInvariant());
+            actual = new Commit(new[] { expected.Parents[0] }, expected.TreeId, expected.Utc, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(new[] { expected.Parents[0], expected.Parents[1], new CommitId(Sha1.Hash("c3")) }, expected.TreeId, expected.CommitUtc, expected.CommitMessage.ToUpperInvariant());
+            actual = new Commit(new[] { expected.Parents[0], expected.Parents[1], new CommitId(Sha1.Hash("c3")) }, expected.TreeId, expected.Utc, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             // TreeId
-            actual = new Commit(expected.Parents, TreeId.Empty, expected.CommitUtc, expected.CommitMessage);
+            actual = new Commit(expected.Parents, TreeId.Empty, expected.Utc, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, new TreeId(Sha1.Hash("def")), expected.CommitUtc, expected.CommitMessage);
+            actual = new Commit(expected.Parents, new TreeId(Sha1.Hash("def")), expected.Utc, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             // DateTime
-            actual = new Commit(expected.Parents, expected.TreeId, default, expected.CommitMessage);
+            actual = new Commit(expected.Parents, expected.TreeId, default, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, expected.TreeId, DateTime.MaxValue.ToUniversalTime(), expected.CommitMessage);
+            actual = new Commit(expected.Parents, expected.TreeId, DateTime.MaxValue.ToUniversalTime(), expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, expected.TreeId, expected.CommitUtc.AddTicks(1), expected.CommitMessage);
+            actual = new Commit(expected.Parents, expected.TreeId, expected.Utc.AddTicks(1), expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             // Message
-            actual = new Commit(expected.Parents, expected.TreeId, expected.CommitUtc, null);
+            actual = new Commit(expected.Parents, expected.TreeId, expected.Utc, null);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, expected.TreeId, expected.CommitUtc, expected.CommitMessage.ToUpperInvariant());
+            actual = new Commit(expected.Parents, expected.TreeId, expected.Utc, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual); // hashcode is the same for upper/lower string
         }
 

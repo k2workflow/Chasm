@@ -15,9 +15,11 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         #region Fields
 
+        // Naming follows convention in ProtoSerializer
+
         private const string _name = "name";
         private const string _kind = "kind";
-        private const string _nodeId = "nodeId"; // Naming follows convention in ProtoSerializer
+        private const string _nodeId = "nodeId";
 
         #endregion
 
