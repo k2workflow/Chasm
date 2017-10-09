@@ -1,0 +1,8 @@
+syntax = "proto3";
+import "Sha1Wire.proto";
+option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
+
+	message CommitIdWire
+	{
+		Sha1Wire Sha1 = 1;
+	}

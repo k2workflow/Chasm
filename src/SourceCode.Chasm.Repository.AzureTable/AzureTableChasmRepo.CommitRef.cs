@@ -73,8 +73,8 @@ namespace SourceCode.Chasm.IO.AzureTable
             {
                 var refsTable = _refsTable.Value;
 
-                // Sha1s are not compressed
-                using (var session = Serializer.Serialize(commitRef.CommitId.Sha1))
+                // CommitIds are not compressed
+                using (var session = Serializer.Serialize(commitRef.CommitId))
                 {
                     var op = DataEntity.BuildWriteOperation(branch, commitRef.Name, session.Result, etag); // Note etag access condition
 
@@ -110,13 +110,12 @@ namespace SourceCode.Chasm.IO.AzureTable
 
                 var entity = (DataEntity)result.Result;
 
-                // Sha1s are not compressed
                 var count = entity.Content?.Length ?? 0;
                 if (count < Sha1.ByteLen)
                     throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
 
-                var sha1 = serializer.DeserializeSha1(entity.Content);
-                var commitId = new CommitId(sha1);
+                // CommitIds are not compressed
+                var commitId = serializer.DeserializeCommitId(entity.Content);
 
                 // Found
                 return (true, commitId, result.Etag);

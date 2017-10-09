@@ -76,8 +76,8 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 // Required to create blob before appending to it
                 await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
 
-                // Sha1s are not compressed
-                using (var session = Serializer.Serialize(commitRef.CommitId.Sha1))
+                // CommitIds are not compressed
+                using (var session = Serializer.Serialize(commitRef.CommitId))
                 using (var output = new MemoryStream())
                 {
                     var seg = session.Result;
@@ -125,9 +125,8 @@ namespace SourceCode.Chasm.IO.AzureBlob
                     if (output.Length < Sha1.ByteLen)
                         throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
 
-                    // Sha1s are not compressed
-                    var sha1 = Serializer.DeserializeSha1(output.ToArray()); // TODO: Perf
-                    var commitId = new CommitId(sha1);
+                    // CommitIds are not compressed
+                    var commitId = Serializer.DeserializeCommitId(output.ToArray()); // TODO: Perf
 
                     // Found
                     return (true, commitId, ifMatchCondition, blobRef);

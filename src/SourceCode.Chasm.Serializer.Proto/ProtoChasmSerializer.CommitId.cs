@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.IO.Proto
     {
         #region Serialize
 
-        public BufferSession Serialize(Commit model)
+        public BufferSession Serialize(CommitId model)
         {
             var wire = model.Convert();
 
@@ -34,11 +34,11 @@ namespace SourceCode.Chasm.IO.Proto
             }
         }
 
-        public Commit DeserializeCommit(ReadOnlySpan<byte> span)
+        public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) return default;
 
-            var wire = new CommitWire();
+            var wire = new CommitIdWire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 
             var model = wire.Convert();
