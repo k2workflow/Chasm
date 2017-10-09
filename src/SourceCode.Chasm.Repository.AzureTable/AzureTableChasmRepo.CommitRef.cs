@@ -19,43 +19,6 @@ namespace SourceCode.Chasm.IO.AzureTable
     {
         #region Read
 
-        private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string branch, string name, IChasmSerializer serializer, CancellationToken cancellationToken)
-        {
-            var refsTable = _refsTable.Value;
-            var operation = DataEntity.BuildReadOperation(branch, name);
-
-            try
-            {
-                // Read from table
-                var result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken).ConfigureAwait(false);
-
-                // NotFound
-                if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
-                    return (false, default, default);
-
-                var entity = (DataEntity)result.Result;
-
-                // Sha1s are not compressed
-                var count = entity.Content?.Length ?? 0;
-                if (count < Sha1.ByteLen)
-                    throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
-
-                var sha1 = serializer.DeserializeSha1(entity.Content);
-                var commitId = new CommitId(sha1);
-
-                // Found
-                return (true, commitId, result.Etag);
-            }
-            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
-            {
-                // Try-catch is cheaper than a separate (latent) exists check
-                se.Suppress();
-            }
-
-            // NotFound
-            return (false, default, default);
-        }
-
         public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
@@ -130,6 +93,43 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         private static ChasmConcurrencyException BuildConcurrencyException(string branch, string name, Exception innerException)
             => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {branch}/{name}", innerException);
+
+        private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string branch, string name, IChasmSerializer serializer, CancellationToken cancellationToken)
+        {
+            var refsTable = _refsTable.Value;
+            var operation = DataEntity.BuildReadOperation(branch, name);
+
+            try
+            {
+                // Read from table
+                var result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken).ConfigureAwait(false);
+
+                // NotFound
+                if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
+                    return (false, default, default);
+
+                var entity = (DataEntity)result.Result;
+
+                // Sha1s are not compressed
+                var count = entity.Content?.Length ?? 0;
+                if (count < Sha1.ByteLen)
+                    throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
+
+                var sha1 = serializer.DeserializeSha1(entity.Content);
+                var commitId = new CommitId(sha1);
+
+                // Found
+                return (true, commitId, result.Etag);
+            }
+            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
+            {
+                // Try-catch is cheaper than a separate (latent) exists check
+                se.Suppress();
+            }
+
+            // NotFound
+            return (false, default, default);
+        }
 
         #endregion
     }
