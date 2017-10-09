@@ -19,7 +19,7 @@ namespace SourceCode.Chasm.IO.AzureTable
     {
         #region Read
 
-        public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -38,7 +38,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
+        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
@@ -90,9 +90,6 @@ namespace SourceCode.Chasm.IO.AzureTable
         #endregion
 
         #region Helpers
-
-        private static ChasmConcurrencyException BuildConcurrencyException(string branch, string name, Exception innerException)
-            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {branch}/{name}", innerException);
 
         private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string branch, string name, IChasmSerializer serializer, CancellationToken cancellationToken)
         {
