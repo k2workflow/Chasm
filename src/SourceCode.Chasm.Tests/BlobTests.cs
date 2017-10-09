@@ -25,6 +25,7 @@ namespace SourceCode.Chasm.Tests
             Assert.True(default == Blob.Empty);
             Assert.False(default != Blob.Empty);
             Assert.True(Blob.Empty.Equals((object)Blob.Empty));
+            Assert.False(Blob.Empty.Equals(new object()));
 
             Assert.Null(Blob.Empty.Data);
             Assert.Null(nullData.Data);
@@ -32,6 +33,7 @@ namespace SourceCode.Chasm.Tests
 
             Assert.Equal(noData, nullData);
             Assert.Equal(noData.ToString(), nullData.ToString());
+            Assert.Equal("Length: 0", emptyData.ToString());
             Assert.Equal(noData.GetHashCode(), nullData.GetHashCode());
 
             Assert.Equal(Blob.Empty, noData);
