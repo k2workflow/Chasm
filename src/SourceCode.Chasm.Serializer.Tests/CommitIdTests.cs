@@ -9,32 +9,32 @@ using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static class Sha1Tests
+    public static partial class CommitIdTests
     {
         #region Methods
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Sha1_Empty))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_CommitId_Default))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_Sha1_Empty(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_CommitId_Default(IChasmSerializer ser)
         {
-            var expected = Sha1.Empty;
+            var expected = CommitId.Empty;
             using (var buf = ser.Serialize(expected))
             {
-                var actual = ser.DeserializeSha1(buf.Result);
+                var actual = ser.DeserializeCommitId(buf.Result);
                 Assert.Equal(expected, actual);
             }
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Sha1))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_CommitId))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_Sha1(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_CommitId(IChasmSerializer ser)
         {
-            var expected = Sha1.Hash("abc");
+            var expected = new CommitId(Sha1.Hash("abc"));
             using (var buf = ser.Serialize(expected))
             {
-                var actual = ser.DeserializeSha1(buf.Result);
+                var actual = ser.DeserializeCommitId(buf.Result);
                 Assert.Equal(expected, actual);
             }
         }

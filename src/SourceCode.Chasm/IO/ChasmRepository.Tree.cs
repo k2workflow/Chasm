@@ -11,28 +11,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.Disk
+namespace SourceCode.Chasm.IO
 {
-    partial class DiskChasmRepo // .Tree
+    partial class ChasmRepository // .Tree
     {
-        #region Read (via TreeId)
+        #region Read
 
-        private static IReadOnlyDictionary<TreeId, TreeNodeList> DeserializeTreesImpl(IChasmSerializer serializer, IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps)
-        {
-            var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
-
-            foreach (var kvp in kvps)
-            {
-                var tree = serializer.DeserializeTree(kvp.Value.Span);
-
-                var treeId = new TreeId(kvp.Key);
-                dict[treeId] = tree;
-            }
-
-            return dict;
-        }
-
-        public async ValueTask<TreeNodeList> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeNodeList> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken)
         {
             if (treeId == TreeId.Empty) return default;
 
@@ -45,7 +30,7 @@ namespace SourceCode.Chasm.IO.Disk
             return tree;
         }
 
-        public async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ParallelOptions parallelOptions)
+        public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ParallelOptions parallelOptions)
         {
             if (treeIds == null) return ReadOnlyDictionary.Empty<TreeId, TreeNodeList>();
 
@@ -54,15 +39,22 @@ namespace SourceCode.Chasm.IO.Disk
             var kvps = await ReadObjectBatchAsync(sha1s, parallelOptions).ConfigureAwait(false);
 
             // Deserialize
-            var dict = DeserializeTreesImpl(Serializer, kvps);
+            if (kvps.Count == 0) return ReadOnlyDictionary.Empty<TreeId, TreeNodeList>();
+
+            var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
+
+            foreach (var kvp in kvps)
+            {
+                var tree = Serializer.DeserializeTree(kvp.Value.Span);
+
+                var treeId = new TreeId(kvp.Key);
+                dict[treeId] = tree;
+            }
+
             return dict;
         }
 
-        #endregion
-
-        #region Read (via CommitRef)
-
-        public async ValueTask<TreeNodeList> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeNodeList> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(commitRefName)) throw new ArgumentNullException(nameof(commitRefName));
@@ -78,11 +70,7 @@ namespace SourceCode.Chasm.IO.Disk
             return tree;
         }
 
-        #endregion
-
-        #region Read (via CommitId)
-
-        public async ValueTask<TreeNodeList> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeNodeList> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken)
         {
             if (commitId == CommitId.Empty) return default;
 
@@ -98,9 +86,9 @@ namespace SourceCode.Chasm.IO.Disk
 
         #endregion
 
-        #region Write (return TreeId)
+        #region Write
 
-        public async ValueTask<TreeId> WriteTreeAsync(TreeNodeList tree, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeId> WriteTreeAsync(TreeNodeList tree, CancellationToken cancellationToken)
         {
             using (var session = Serializer.Serialize(tree))
             {
@@ -113,19 +101,15 @@ namespace SourceCode.Chasm.IO.Disk
             }
         }
 
-        #endregion
-
-        #region Write (return CommitId)
-
-        public async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime commitUtc, string commitMessage, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime utc, string message, CancellationToken cancellationToken)
         {
-            if (commitUtc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(commitUtc));
+            if (utc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(utc));
 
             var treeId = TreeId.Empty;
             if (tree.Count > 0)
                 treeId = await WriteTreeAsync(tree, cancellationToken).ConfigureAwait(false);
 
-            var commit = new Commit(parents, treeId, commitUtc, commitMessage);
+            var commit = new Commit(parents, treeId, utc, message);
             var commitId = await WriteCommitAsync(commit, cancellationToken).ConfigureAwait(false);
 
             return commitId;

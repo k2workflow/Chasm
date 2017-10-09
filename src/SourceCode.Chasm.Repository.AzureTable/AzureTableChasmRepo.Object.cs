@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.IO.AzureTable
     {
         #region Read
 
-        public async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             var objectsTable = _objectsTable.Value;
             var op = DataEntity.BuildReadOperation(objectId);
@@ -58,7 +58,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             return Array.Empty<byte>();
         }
 
-        public async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
+        public override async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
         {
             if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
@@ -131,7 +131,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             return batches;
         }
 
-        public async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var objectsTable = _objectsTable.Value;
 
@@ -152,7 +152,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             }
         }
 
-        public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
+        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 

@@ -5,19 +5,21 @@
 
 #endregion
 
+using SourceCode.Chasm.IO.Json.Wire;
 using SourceCode.Clay.Buffers;
 using System;
 using System.Text;
 
 namespace SourceCode.Chasm.IO.Json
 {
-    partial class JsonChasmSerializer // .Sha1
+    partial class JsonChasmSerializer // .CommitId
     {
         #region Serialize
 
-        public BufferSession Serialize(Sha1 model)
+        public BufferSession Serialize(CommitId model)
         {
-            var json = model.ToString("N");
+            var wire = model.Convert();
+            var json = wire?.ToString() ?? "null";
 
             var maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
             var rented = BufferSession.RentBuffer(maxLen);
@@ -32,7 +34,7 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
+        public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
 
@@ -45,7 +47,7 @@ namespace SourceCode.Chasm.IO.Json
                 }
             }
 
-            var model = Sha1.Parse(json);
+            var model = json.ParseCommitId();
             return model;
         }
 

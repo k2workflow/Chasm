@@ -68,8 +68,8 @@ namespace SourceCode.Chasm
 
                 unchecked
                 {
-                    hc = hc * 23 + obj.CommitId.GetHashCode();
-                    hc = hc * 23 + (obj.Name?.Length ?? 0);
+                    hc = (hc * 23) + obj.CommitId.GetHashCode();
+                    hc = (hc * 23) + (obj.Name?.Length ?? 0);
                 }
 
                 return ((int)(hc >> 32)) ^ (int)hc;

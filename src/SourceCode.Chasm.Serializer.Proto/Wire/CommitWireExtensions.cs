@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         public static CommitWire Convert(this Commit model)
         {
             if (model == Commit.Empty)
-                return new CommitWire() { CommitMessage = string.Empty };
+                return new CommitWire() { Message = string.Empty };
 
             var wire = new CommitWire();
 
@@ -53,15 +53,15 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             }
 
             // CommitUtc
-            wire.CommitUtc = new Timestamp
+            wire.Utc = new Timestamp
             {
                 // Convert System.DateTime to Google.Protobuf.WellKnownTypes.Timestamp
-                Seconds = (model.CommitUtc.Ticks / TimeSpan.TicksPerSecond) - epochOffset,
-                Nanos = (int)(model.CommitUtc.Ticks % TimeSpan.TicksPerSecond) * 100 // Windows tick is 100 nanoseconds
+                Seconds = (model.Utc.Ticks / TimeSpan.TicksPerSecond) - epochOffset,
+                Nanos = (int)(model.Utc.Ticks % TimeSpan.TicksPerSecond) * 100 // Windows tick is 100 nanoseconds
             };
 
             // Message
-            wire.CommitMessage = model.CommitMessage;
+            wire.Message = model.Message;
 
             // TreeId
             wire.TreeId = model.TreeId.Sha1.Convert();
@@ -92,15 +92,15 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
             // CommitUtc
             var utc = default(DateTime);
-            if (wire.CommitUtc != null)
+            if (wire.Utc != null)
             {
                 // Convert Google.Protobuf.WellKnownTypes.Timestamp to System.DateTime
-                var ticks = (wire.CommitUtc.Seconds + epochOffset) * TimeSpan.TicksPerSecond;
-                ticks += wire.CommitUtc.Nanos / 100; // Windows tick is 100 nanoseconds
+                var ticks = (wire.Utc.Seconds + epochOffset) * TimeSpan.TicksPerSecond;
+                ticks += wire.Utc.Nanos / 100; // Windows tick is 100 nanoseconds
                 utc = new DateTime(ticks, DateTimeKind.Utc);
             }
 
-            var model = new Commit(parents, treeId, utc, wire.CommitMessage);
+            var model = new Commit(parents, treeId, utc, wire.Message);
             return model;
         }
 

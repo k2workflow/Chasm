@@ -8,13 +8,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureBlob
+namespace SourceCode.Chasm.IO
 {
-    partial class AzureBlobChasmRepo // .Commit
+    partial class ChasmRepository // .Commit
     {
-        #region Methods
+        #region Read
 
-        public async ValueTask<Commit> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
+        public virtual async ValueTask<Commit> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
             var buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
             if (buffer.IsEmpty) return default;
@@ -23,7 +23,11 @@ namespace SourceCode.Chasm.IO.AzureBlob
             return model;
         }
 
-        public async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
+        #endregion
+
+        #region Write
+
+        public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
             using (var session = Serializer.Serialize(commit))
             {

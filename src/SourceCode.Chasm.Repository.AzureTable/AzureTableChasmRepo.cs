@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace SourceCode.Chasm.IO.AzureTable
 {
-    public sealed partial class AzureTableChasmRepo : IChasmRepository
+    public sealed partial class AzureTableChasmRepo : ChasmRepository
     {
         #region Fields
 
@@ -22,27 +22,12 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #endregion
 
-        #region Properties
-
-        public IChasmSerializer Serializer { get; }
-
-        public CompressionLevel CompressionLevel { get; }
-
-        public int MaxDop { get; }
-
-        #endregion
-
         #region Constructors
 
         public AzureTableChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
+            : base(serializer, compressionLevel, maxDop)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
-            if (!Enum.IsDefined(typeof(CompressionLevel), compressionLevel)) throw new ArgumentOutOfRangeException(nameof(compressionLevel));
-            if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
-
-            Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            CompressionLevel = compressionLevel;
-            MaxDop = maxDop;
 
             var client = storageAccount.CreateCloudTableClient();
 

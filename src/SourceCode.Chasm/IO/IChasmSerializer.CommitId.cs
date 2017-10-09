@@ -10,13 +10,13 @@ using System;
 
 namespace SourceCode.Chasm.IO
 {
-    partial interface IChasmSerializer // .Sha1
+    partial interface IChasmSerializer // .CommitId
     {
         #region Methods
 
-        BufferSession Serialize(Sha1 model);
+        BufferSession Serialize(CommitId model);
 
-        Sha1 DeserializeSha1(ReadOnlySpan<byte> span);
+        CommitId DeserializeCommitId(ReadOnlySpan<byte> span);
 
         #endregion
     }

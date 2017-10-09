@@ -143,12 +143,12 @@ namespace SourceCode.Chasm.IO.AzureTable
             return op;
         }
 
-        internal static TableOperation BuildReadOperation(string repo, string name)
+        internal static TableOperation BuildReadOperation(string branch, string name)
         {
-            if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var partitionKey = GetPartitionKey(repo);
+            var partitionKey = GetPartitionKey(branch);
             var rowKey = GetRowKey(name);
 
             var op = TableOperation.Retrieve<DataEntity>(partitionKey, rowKey);
@@ -322,7 +322,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         private static string GetRowKey(Sha1 sha1) => GetPartition(sha1).Value;
 
-        private static string GetPartitionKey(string repo) => repo.ToLowerInvariant();
+        private static string GetPartitionKey(string branch) => branch.ToLowerInvariant();
 
         private static string GetRowKey(string name) => $"{name}-commit";
 

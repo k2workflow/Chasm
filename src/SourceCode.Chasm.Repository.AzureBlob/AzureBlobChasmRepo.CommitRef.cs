@@ -11,7 +11,6 @@ using SourceCode.Clay;
 using System;
 using System.IO;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,46 +21,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
     {
         #region Read
 
-        private async ValueTask<(bool found, CommitId, AccessCondition, CloudAppendBlob)> ReadCommitRefImplAsync(string branch, string name, CancellationToken cancellationToken)
-        {
-            var refsContainer = _refsContainer.Value;
-            var blobName = DeriveCommitRefBlobName(branch, name);
-            var blobRef = refsContainer.GetAppendBlobReference(blobName);
-
-            try
-            {
-                using (var output = new MemoryStream(Sha1.ByteLen * 3)) // Evidence is 40-52 bytes
-                {
-                    // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
-                    // Or use DownloadToByteArrayAsync since we already know expected length of data (Sha1.ByteLen)
-                    // Keep in mind Azure may add some overhead: it looks like the byte length is 40-52 bytes
-                    await blobRef.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
-
-                    // Grab the etag - we need it for optimistic concurrency control
-                    var ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
-
-                    if (output.Length < Sha1.ByteLen)
-                        throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
-
-                    // Sha1s are not compressed
-                    var sha1 = Serializer.DeserializeSha1(output.ToArray()); // TODO: Perf
-                    var commitId = new CommitId(sha1);
-
-                    // Found
-                    return (true, commitId, ifMatchCondition, blobRef);
-                }
-            }
-            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
-            {
-                // Try-catch is cheaper than a separate (latent) exists check
-                se.Suppress();
-            }
-
-            // NotFound
-            return (false, default, default, blobRef);
-        }
-
-        public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -80,7 +40,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
+        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
@@ -116,8 +76,8 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 // Required to create blob before appending to it
                 await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
 
-                // Sha1s are not compressed
-                using (var session = Serializer.Serialize(commitRef.CommitId.Sha1))
+                // CommitIds are not compressed
+                using (var session = Serializer.Serialize(commitRef.CommitId))
                 using (var output = new MemoryStream())
                 {
                     var seg = session.Result;
@@ -139,19 +99,53 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Helpers
 
-        private static ChasmConcurrencyException BuildConcurrencyException(string branch, string name, Exception innerException)
-            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {branch}/{name}", innerException);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private string DeriveCommitRefBlobName(string branch, string name)
+        private async ValueTask<(bool found, CommitId, AccessCondition, CloudAppendBlob)> ReadCommitRefImplAsync(string branch, string name, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            // Callers have already validated parameters
 
-            var refName = $"{branch}.{name}.commit";
-            refName = Uri.EscapeUriString(refName);
+            var refsContainer = _refsContainer.Value;
+            var blobName = DeriveCommitRefBlobName(branch, name);
+            var blobRef = refsContainer.GetAppendBlobReference(blobName);
 
-            return refName;
+            try
+            {
+                using (var output = new MemoryStream())
+                {
+                    // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
+                    // Or use blobRef.DownloadToByteArrayAsync() since we already know expected length of data (Sha1.ByteLen)
+                    // Keep in mind Azure and/or specific IChasmSerializer may add some overhead: it looks like emperical byte length is 40-52 bytes
+                    await blobRef.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
+
+                    // Grab the etag - we need it for optimistic concurrency control
+                    var ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
+
+                    if (output.Length < Sha1.ByteLen)
+                        throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
+
+                    // CommitIds are not compressed
+                    var commitId = Serializer.DeserializeCommitId(output.ToArray()); // TODO: Perf
+
+                    // Found
+                    return (true, commitId, ifMatchCondition, blobRef);
+                }
+            }
+            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
+            {
+                // Try-catch is cheaper than a separate (latent) exists check
+                se.Suppress();
+            }
+
+            // NotFound
+            return (false, default, default, blobRef);
+
+            // Local functions
+            string DeriveCommitRefBlobName(string branchName, string commitName)
+            {
+                var refName = $"{branchName}.{commitName}.commit";
+                refName = Uri.EscapeUriString(refName);
+
+                return refName;
+            }
         }
 
         #endregion

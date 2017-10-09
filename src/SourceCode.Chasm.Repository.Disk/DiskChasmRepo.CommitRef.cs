@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.IO.Disk
     {
         #region Read
 
-        public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -24,17 +24,15 @@ namespace SourceCode.Chasm.IO.Disk
             var filename = DeriveCommitRefFileName(branch, name);
             var path = Path.Combine(_refsContainer, filename);
 
-            // Sha1s are not compressed
             var bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
 
             // NotFound
             if (bytes == null || bytes.Length == 0)
                 return null;
 
-            // Found
-            var sha1 = Serializer.DeserializeSha1(bytes);
+            // CommitIds are not compressed
+            var commitId = Serializer.DeserializeCommitId(bytes);
 
-            var commitId = new CommitId(sha1);
             var commitRef = new CommitRef(name, commitId);
             return commitRef;
         }
@@ -43,7 +41,7 @@ namespace SourceCode.Chasm.IO.Disk
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
+        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
@@ -53,8 +51,8 @@ namespace SourceCode.Chasm.IO.Disk
             var filename = DeriveCommitRefFileName(branch, commitRef.Name);
             var path = Path.Combine(_refsContainer, filename);
 
-            // Sha1s are not compressed
-            using (var session = Serializer.Serialize(commitRef.CommitId.Sha1))
+            // CommitIds are not compressed
+            using (var session = Serializer.Serialize(commitRef.CommitId))
             {
                 await WriteFileAsync(path, session.Result, cancellationToken).ConfigureAwait(false);
             }

@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
     {
         #region Read
 
-        public async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             var objectsContainer = _objectsContainer.Value;
 
@@ -59,7 +59,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             return Array.Empty<byte>();
         }
 
-        public ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
+        public override ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
         {
             if (objectIds == null)
                 return new ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>>(ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>());
@@ -82,7 +82,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Write
 
-        public async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var objectsContainer = _objectsContainer.Value;
 
@@ -118,7 +118,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             }
         }
 
-        public Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
+        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
         {
             if (items == null || !items.Any()) return Task.CompletedTask;
 

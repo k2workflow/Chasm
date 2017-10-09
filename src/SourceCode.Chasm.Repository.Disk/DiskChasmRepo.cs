@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace SourceCode.Chasm.IO.Disk
 {
-    public sealed partial class DiskChasmRepo : IChasmRepository
+    public sealed partial class DiskChasmRepo : ChasmRepository
     {
         #region Fields
 
@@ -23,31 +23,15 @@ namespace SourceCode.Chasm.IO.Disk
 
         #endregion
 
-        #region Properties
-
-        public IChasmSerializer Serializer { get; }
-
-        public CompressionLevel CompressionLevel { get; }
-
-        public int MaxDop { get; }
-
-        #endregion
-
         #region Constructors
 
         public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
+            : base(serializer, compressionLevel, maxDop)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length <= 2) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
             if (rootFolder[rootFolder.Length - 1] != Path.DirectorySeparatorChar) throw new ArgumentException("Path must end with " + Path.DirectorySeparatorChar, nameof(rootFolder));
             var rootPath = Path.GetFullPath(rootFolder);
             if (rootPath != rootFolder) throw new ArgumentException("Path must be fully qualified", nameof(rootFolder));
-
-            if (!Enum.IsDefined(typeof(CompressionLevel), compressionLevel)) throw new ArgumentOutOfRangeException(nameof(compressionLevel));
-            if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
-
-            Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            CompressionLevel = compressionLevel;
-            MaxDop = maxDop;
 
             // Root
             {

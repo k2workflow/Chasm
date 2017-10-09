@@ -12,11 +12,11 @@ using System;
 
 namespace SourceCode.Chasm.IO.Proto
 {
-    partial class ProtoChasmSerializer // .Sha1
+    partial class ProtoChasmSerializer // .CommitId
     {
         #region Serialize
 
-        public BufferSession Serialize(Sha1 model)
+        public BufferSession Serialize(CommitId model)
         {
             var wire = model.Convert();
 
@@ -34,15 +34,11 @@ namespace SourceCode.Chasm.IO.Proto
             }
         }
 
-        #endregion
-
-        #region Deserialize
-
-        public unsafe Sha1 DeserializeSha1(ReadOnlySpan<byte> span)
+        public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) return default;
 
-            var wire = new Sha1Wire();
+            var wire = new CommitIdWire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 
             var model = wire.Convert();

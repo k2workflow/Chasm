@@ -23,15 +23,14 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChBDb21taXRXaXJlLnByb3RvGg90aW1lc3RhbXAucHJvdG8aDlNoYTFXaXJl",
-            "LnByb3RvIokBCgpDb21taXRXaXJlEhoKB1BhcmVudHMYASADKAsyCS5TaGEx",
-            "V2lyZRIZCgZUcmVlSWQYAiABKAsyCS5TaGExV2lyZRItCglDb21taXRVdGMY",
-            "AyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhUKDUNvbW1pdE1l",
-            "c3NhZ2UYBCABKAlCIaoCHlNvdXJjZUNvZGUuQ2hhc20uSU8uUHJvdG8uV2ly",
-            "ZWIGcHJvdG8z"));
+            "LnByb3RvIn0KCkNvbW1pdFdpcmUSGgoHUGFyZW50cxgBIAMoCzIJLlNoYTFX",
+            "aXJlEhkKBlRyZWVJZBgCIAEoCzIJLlNoYTFXaXJlEicKA1V0YxgDIAEoCzIa",
+            "Lmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDwoHTWVzc2FnZRgEIAEoCUIh",
+            "qgIeU291cmNlQ29kZS5DaGFzbS5JTy5Qcm90by5XaXJlYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "CommitUtc", "CommitMessage" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Utc", "Message" }, null, null, null)
           }));
     }
     #endregion
@@ -64,8 +63,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     public CommitWire(CommitWire other) : this() {
       parents_ = other.parents_.Clone();
       TreeId = other.treeId_ != null ? other.TreeId.Clone() : null;
-      CommitUtc = other.commitUtc_ != null ? other.CommitUtc.Clone() : null;
-      commitMessage_ = other.commitMessage_;
+      Utc = other.utc_ != null ? other.Utc.Clone() : null;
+      message_ = other.message_;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -94,25 +93,25 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       }
     }
 
-    /// <summary>Field number for the "CommitUtc" field.</summary>
-    public const int CommitUtcFieldNumber = 3;
-    private global::Google.Protobuf.WellKnownTypes.Timestamp commitUtc_;
+    /// <summary>Field number for the "Utc" field.</summary>
+    public const int UtcFieldNumber = 3;
+    private global::Google.Protobuf.WellKnownTypes.Timestamp utc_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Google.Protobuf.WellKnownTypes.Timestamp CommitUtc {
-      get { return commitUtc_; }
+    public global::Google.Protobuf.WellKnownTypes.Timestamp Utc {
+      get { return utc_; }
       set {
-        commitUtc_ = value;
+        utc_ = value;
       }
     }
 
-    /// <summary>Field number for the "CommitMessage" field.</summary>
-    public const int CommitMessageFieldNumber = 4;
-    private string commitMessage_ = "";
+    /// <summary>Field number for the "Message" field.</summary>
+    public const int MessageFieldNumber = 4;
+    private string message_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string CommitMessage {
-      get { return commitMessage_; }
+    public string Message {
+      get { return message_; }
       set {
-        commitMessage_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        message_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -131,8 +130,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       }
       if(!parents_.Equals(other.parents_)) return false;
       if (!object.Equals(TreeId, other.TreeId)) return false;
-      if (!object.Equals(CommitUtc, other.CommitUtc)) return false;
-      if (CommitMessage != other.CommitMessage) return false;
+      if (!object.Equals(Utc, other.Utc)) return false;
+      if (Message != other.Message) return false;
       return true;
     }
 
@@ -141,8 +140,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       int hash = 1;
       hash ^= parents_.GetHashCode();
       if (treeId_ != null) hash ^= TreeId.GetHashCode();
-      if (commitUtc_ != null) hash ^= CommitUtc.GetHashCode();
-      if (CommitMessage.Length != 0) hash ^= CommitMessage.GetHashCode();
+      if (utc_ != null) hash ^= Utc.GetHashCode();
+      if (Message.Length != 0) hash ^= Message.GetHashCode();
       return hash;
     }
 
@@ -158,13 +157,13 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         output.WriteRawTag(18);
         output.WriteMessage(TreeId);
       }
-      if (commitUtc_ != null) {
+      if (utc_ != null) {
         output.WriteRawTag(26);
-        output.WriteMessage(CommitUtc);
+        output.WriteMessage(Utc);
       }
-      if (CommitMessage.Length != 0) {
+      if (Message.Length != 0) {
         output.WriteRawTag(34);
-        output.WriteString(CommitMessage);
+        output.WriteString(Message);
       }
     }
 
@@ -175,11 +174,11 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (treeId_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(TreeId);
       }
-      if (commitUtc_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CommitUtc);
+      if (utc_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Utc);
       }
-      if (CommitMessage.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(CommitMessage);
+      if (Message.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
       }
       return size;
     }
@@ -196,14 +195,14 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         }
         TreeId.MergeFrom(other.TreeId);
       }
-      if (other.commitUtc_ != null) {
-        if (commitUtc_ == null) {
-          commitUtc_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+      if (other.utc_ != null) {
+        if (utc_ == null) {
+          utc_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
         }
-        CommitUtc.MergeFrom(other.CommitUtc);
+        Utc.MergeFrom(other.Utc);
       }
-      if (other.CommitMessage.Length != 0) {
-        CommitMessage = other.CommitMessage;
+      if (other.Message.Length != 0) {
+        Message = other.Message;
       }
     }
 
@@ -227,14 +226,14 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             break;
           }
           case 26: {
-            if (commitUtc_ == null) {
-              commitUtc_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+            if (utc_ == null) {
+              utc_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
             }
-            input.ReadMessage(commitUtc_);
+            input.ReadMessage(utc_);
             break;
           }
           case 34: {
-            CommitMessage = input.ReadString();
+            Message = input.ReadString();
             break;
           }
         }

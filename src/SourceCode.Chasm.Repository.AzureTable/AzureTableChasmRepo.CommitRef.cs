@@ -19,44 +19,7 @@ namespace SourceCode.Chasm.IO.AzureTable
     {
         #region Read
 
-        private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string branch, string name, IChasmSerializer serializer, CancellationToken cancellationToken)
-        {
-            var refsTable = _refsTable.Value;
-            var operation = DataEntity.BuildReadOperation(branch, name);
-
-            try
-            {
-                // Read from table
-                var result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken).ConfigureAwait(false);
-
-                // NotFound
-                if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
-                    return (false, default, default);
-
-                var entity = (DataEntity)result.Result;
-
-                // Sha1s are not compressed
-                var count = entity.Content?.Length ?? 0;
-                if (count < Sha1.ByteLen)
-                    throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
-
-                var sha1 = serializer.DeserializeSha1(entity.Content);
-                var commitId = new CommitId(sha1);
-
-                // Found
-                return (true, commitId, result.Etag);
-            }
-            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
-            {
-                // Try-catch is cheaper than a separate (latent) exists check
-                se.Suppress();
-            }
-
-            // NotFound
-            return (false, default, default);
-        }
-
-        public async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -75,7 +38,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Write
 
-        public async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
+        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
@@ -110,8 +73,8 @@ namespace SourceCode.Chasm.IO.AzureTable
             {
                 var refsTable = _refsTable.Value;
 
-                // Sha1s are not compressed
-                using (var session = Serializer.Serialize(commitRef.CommitId.Sha1))
+                // CommitIds are not compressed
+                using (var session = Serializer.Serialize(commitRef.CommitId))
                 {
                     var op = DataEntity.BuildWriteOperation(branch, commitRef.Name, session.Result, etag); // Note etag access condition
 
@@ -128,8 +91,41 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Helpers
 
-        private static ChasmConcurrencyException BuildConcurrencyException(string branch, string name, Exception innerException)
-            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {branch}/{name}", innerException);
+        private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string branch, string name, IChasmSerializer serializer, CancellationToken cancellationToken)
+        {
+            var refsTable = _refsTable.Value;
+            var operation = DataEntity.BuildReadOperation(branch, name);
+
+            try
+            {
+                // Read from table
+                var result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken).ConfigureAwait(false);
+
+                // NotFound
+                if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
+                    return (false, default, default);
+
+                var entity = (DataEntity)result.Result;
+
+                var count = entity.Content?.Length ?? 0;
+                if (count < Sha1.ByteLen)
+                    throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {count}");
+
+                // CommitIds are not compressed
+                var commitId = serializer.DeserializeCommitId(entity.Content);
+
+                // Found
+                return (true, commitId, result.Etag);
+            }
+            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
+            {
+                // Try-catch is cheaper than a separate (latent) exists check
+                se.Suppress();
+            }
+
+            // NotFound
+            return (false, default, default);
+        }
 
         #endregion
     }

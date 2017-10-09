@@ -14,11 +14,15 @@ namespace SourceCode.Chasm.IO
 {
     partial interface IChasmRepository // .Object
     {
-        #region Methods
+        #region Read
 
         ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
         ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions);
+
+        #endregion
+
+        #region Write
 
         Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
 
