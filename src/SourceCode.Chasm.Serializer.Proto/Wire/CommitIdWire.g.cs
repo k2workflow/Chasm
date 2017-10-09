@@ -22,13 +22,13 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     static CommitIdWireReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChJDb21taXRJZFdpcmUucHJvdG8aDlNoYTFXaXJlLnByb3RvIicKDENvbW1p",
-            "dElkV2lyZRIXCgRTaGExGAEgASgLMgkuU2hhMVdpcmVCIaoCHlNvdXJjZUNv",
-            "ZGUuQ2hhc20uSU8uUHJvdG8uV2lyZWIGcHJvdG8z"));
+            "ChJDb21taXRJZFdpcmUucHJvdG8aDlNoYTFXaXJlLnByb3RvIiUKDENvbW1p",
+            "dElkV2lyZRIVCgJJZBgBIAEoCzIJLlNoYTFXaXJlQiGqAh5Tb3VyY2VDb2Rl",
+            "LkNoYXNtLklPLlByb3RvLldpcmViBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire.Parser, new[]{ "Sha1" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire.Parser, new[]{ "Id" }, null, null, null)
           }));
     }
     #endregion
@@ -59,7 +59,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public CommitIdWire(CommitIdWire other) : this() {
-      Sha1 = other.sha1_ != null ? other.Sha1.Clone() : null;
+      Id = other.id_ != null ? other.Id.Clone() : null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -67,14 +67,17 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       return new CommitIdWire(this);
     }
 
-    /// <summary>Field number for the "Sha1" field.</summary>
-    public const int Sha1FieldNumber = 1;
-    private global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire sha1_;
+    /// <summary>Field number for the "Id" field.</summary>
+    public const int IdFieldNumber = 1;
+    private global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire id_;
+    /// <summary>
+    /// Naming follows convention in ProtoSerializer
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire Sha1 {
-      get { return sha1_; }
+    public global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire Id {
+      get { return id_; }
       set {
-        sha1_ = value;
+        id_ = value;
       }
     }
 
@@ -91,14 +94,14 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (!object.Equals(Sha1, other.Sha1)) return false;
+      if (!object.Equals(Id, other.Id)) return false;
       return true;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (sha1_ != null) hash ^= Sha1.GetHashCode();
+      if (id_ != null) hash ^= Id.GetHashCode();
       return hash;
     }
 
@@ -109,17 +112,17 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (sha1_ != null) {
+      if (id_ != null) {
         output.WriteRawTag(10);
-        output.WriteMessage(Sha1);
+        output.WriteMessage(Id);
       }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (sha1_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Sha1);
+      if (id_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Id);
       }
       return size;
     }
@@ -129,11 +132,11 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (other == null) {
         return;
       }
-      if (other.sha1_ != null) {
-        if (sha1_ == null) {
-          sha1_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
+      if (other.id_ != null) {
+        if (id_ == null) {
+          id_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
         }
-        Sha1.MergeFrom(other.Sha1);
+        Id.MergeFrom(other.Id);
       }
     }
 
@@ -146,10 +149,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             input.SkipLastField();
             break;
           case 10: {
-            if (sha1_ == null) {
-              sha1_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
+            if (id_ == null) {
+              id_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
             }
-            input.ReadMessage(sha1_);
+            input.ReadMessage(id_);
             break;
           }
         }

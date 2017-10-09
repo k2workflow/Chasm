@@ -17,7 +17,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         private const string _name = "name";
         private const string _kind = "kind";
-        private const string _sha1 = "sha1";
+        private const string _nodeId = "nodeId"; // Naming follows convention in ProtoSerializer
 
         #endregion
 
@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             {
                 [_name] = model.Name,
                 [_kind] = model.Kind.ToString(),
-                [_sha1] = model.Sha1.ToString("N")
+                [_nodeId] = model.Sha1.ToString("N")
             };
 
             return wire;
@@ -46,7 +46,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             var jv = wire.GetValue(_kind, JsonType.String, false);
             var kind = (NodeKind)Enum.Parse(typeof(NodeKind), jv, true);
 
-            jv = wire.GetValue(_sha1, JsonType.String, false);
+            jv = wire.GetValue(_nodeId, JsonType.String, false);
             var sha1 = Sha1.Parse(jv);
 
             var model = new TreeNode(name, kind, sha1);

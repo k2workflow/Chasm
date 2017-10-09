@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         #region Constants
 
-        private const string _commitId = "commitId";
+        private const string _id = "id"; // Naming follows convention in ProtoSerializer
 
         #endregion
 
@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
         {
             var wire = new JsonObject
             {
-                [_commitId] = model.Sha1.ToString("N")
+                [_id] = model.Sha1.ToString("N")
             };
 
             return wire;
@@ -34,7 +34,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
         {
             if (wire == null) return default;
 
-            var jv = wire.GetValue(_commitId, JsonType.String, false);
+            var jv = wire.GetValue(_id, JsonType.String, false);
             var sha1 = Sha1.Parse(jv);
 
             var model = new CommitId(sha1);

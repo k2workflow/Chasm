@@ -4,5 +4,5 @@ option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 
 	message CommitIdWire
 	{
-		Sha1Wire Sha1 = 1;
+		Sha1Wire Id = 1; // Naming follows convention in ProtoSerializer
 	}

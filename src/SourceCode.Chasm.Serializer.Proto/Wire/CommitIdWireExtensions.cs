@@ -15,7 +15,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         {
             var wire = new CommitIdWire
             {
-                Sha1 = model.Sha1.Convert()
+                Id = model.Sha1.Convert()
             };
 
             return wire;
@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         {
             if (wire == null) return default;
 
-            var sha1 = wire.Sha1.Convert();
+            var sha1 = wire.Id.Convert();
 
             var model = new CommitId(sha1);
             return model;
