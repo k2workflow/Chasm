@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace SourceCode.Chasm.IO
@@ -46,6 +47,7 @@ namespace SourceCode.Chasm.IO
         // https://stackoverflow.com/questions/94488/what-is-the-correct-way-to-make-a-custom-net-exception-serializable
 
         // Private for sealed, protected for open (accessed via reflection by runtime)
+        [ExcludeFromCodeCoverage]
         private ChasmConcurrencyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }
