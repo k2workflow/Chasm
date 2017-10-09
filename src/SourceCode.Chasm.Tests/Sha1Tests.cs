@@ -296,8 +296,75 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_create_test_vector_1))]
-        public static void When_create_test_vector_1()
+        [Theory(DisplayName = nameof(When_create_test_vectors))]
+        [ClassData(typeof(TestVectors))]
+        public static void When_create_test_vectors(string input, string expected)
+        {
+            // http://www.di-mgt.com.au/sha_testvectors.html
+
+            var sha1 = Sha1.Parse(expected);
+            {
+                // String
+                var actual = Sha1.Hash(input).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
+
+                // Bytes
+                var bytes = Encoding.UTF8.GetBytes(input);
+                actual = Sha1.Hash(bytes).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                // Object
+                Assert.True(expected.Equals((object)actual));
+
+                // Roundtrip string
+                actual = sha1.ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                // Roundtrip formatted
+                actual = Sha1.Parse(sha1.ToString("D")).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                actual = Sha1.Parse(sha1.ToString("S")).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                // With hex specifier
+                actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                // Get Byte[]
+                var buffer = new byte[Sha1.ByteLen];
+                sha1.CopyTo(buffer, 0);
+
+                // Roundtrip Byte[]
+                actual = new Sha1(buffer).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+
+                // Roundtrip Segment
+                actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
+                Assert.Equal(expected, actual);
+                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            }
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_create_sha_from_empty_string))]
+        public static void When_create_sha_from_empty_string()
         {
             // http://www.di-mgt.com.au/sha_testvectors.html
 
@@ -325,248 +392,6 @@ namespace SourceCode.Chasm.Tests
                 // Bytes
                 var bytes = Encoding.UTF8.GetBytes(input);
                 actual = Sha1.Hash(bytes).ToString();
-                Assert.Equal(expected, actual);
-
-                // Object
-                Assert.True(expected.Equals((object)actual));
-
-                // Roundtrip string
-                actual = sha1.ToString();
-                Assert.Equal(expected, actual);
-
-                // Roundtrip formatted
-                actual = Sha1.Parse(sha1.ToString("D")).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Parse(sha1.ToString("S")).ToString();
-                Assert.Equal(expected, actual);
-
-                // With hex specifier
-                actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
-                Assert.Equal(expected, actual);
-
-                // Get Byte[]
-                var buffer = new byte[Sha1.ByteLen];
-                sha1.CopyTo(buffer, 0);
-
-                // Roundtrip Byte[]
-                actual = new Sha1(buffer).ToString();
-                Assert.Equal(expected, actual);
-
-                // Roundtrip Segment
-                actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
-                Assert.Equal(expected, actual);
-            }
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_create_test_vector_2))]
-        public static void When_create_test_vector_2()
-        {
-            // http://www.di-mgt.com.au/sha_testvectors.html
-            const string expected = "a9993e364706816aba3e25717850c26c9cd0d89d";
-            var sha1 = Sha1.Parse(expected);
-            {
-                const string input = "abc";
-
-                // String
-                var actual = Sha1.Hash(input).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
-
-                // Bytes
-                var bytes = Encoding.UTF8.GetBytes(input);
-                actual = Sha1.Hash(bytes).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // Object
-                Assert.True(expected.Equals((object)actual));
-
-                // Roundtrip string
-                actual = sha1.ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // Roundtrip formatted
-                actual = Sha1.Parse(sha1.ToString("D")).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                actual = Sha1.Parse(sha1.ToString("S")).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // With hex specifier
-                actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // Get Byte[]
-                var buffer = new byte[Sha1.ByteLen];
-                sha1.CopyTo(buffer, 0);
-
-                // Roundtrip Byte[]
-                actual = new Sha1(buffer).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-
-                // Roundtrip Segment
-                actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
-            }
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_create_test_vector_3))]
-        public static void When_create_test_vector_3()
-        {
-            // http://www.di-mgt.com.au/sha_testvectors.html
-            const string expected = "84983e441c3bd26ebaae4aa1f95129e5e54670f1";
-            var sha1 = Sha1.Parse(expected);
-            {
-                const string input = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-
-                // String
-                var actual = Sha1.Hash(input).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
-
-                // Bytes
-                var bytes = Encoding.UTF8.GetBytes(input);
-                actual = Sha1.Hash(bytes).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
-                Assert.Equal(expected, actual);
-
-                // Object
-                Assert.True(expected.Equals((object)actual));
-
-                // Roundtrip string
-                actual = sha1.ToString();
-                Assert.Equal(expected, actual);
-
-                // Roundtrip formatted
-                actual = Sha1.Parse(sha1.ToString("D")).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Parse(sha1.ToString("S")).ToString();
-                Assert.Equal(expected, actual);
-
-                // With hex specifier
-                actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
-                Assert.Equal(expected, actual);
-
-                // Get Byte[]
-                var buffer = new byte[Sha1.ByteLen];
-                sha1.CopyTo(buffer, 0);
-
-                // Roundtrip Byte[]
-                actual = new Sha1(buffer).ToString();
-                Assert.Equal(expected, actual);
-
-                // Roundtrip Segment
-                actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
-                Assert.Equal(expected, actual);
-            }
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_create_test_vector_4))]
-        public static void When_create_test_vector_4()
-        {
-            // http://www.di-mgt.com.au/sha_testvectors.html
-            const string expected = "a49b2446a02c645bf419f995b67091253a04a259";
-            var sha1 = Sha1.Parse(expected);
-            {
-                const string input = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
-
-                // String
-                var actual = Sha1.Hash(input).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
-
-                // Bytes
-                var bytes = Encoding.UTF8.GetBytes(input);
-                actual = Sha1.Hash(bytes).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
-                Assert.Equal(expected, actual);
-
-                // Object
-                Assert.True(expected.Equals((object)actual));
-
-                // Roundtrip string
-                actual = sha1.ToString();
-                Assert.Equal(expected, actual);
-
-                // Roundtrip formatted
-                actual = Sha1.Parse(sha1.ToString("D")).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Parse(sha1.ToString("S")).ToString();
-                Assert.Equal(expected, actual);
-
-                // With hex specifier
-                actual = Sha1.Parse("0x" + sha1.ToString("D")).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Parse("0x" + sha1.ToString("S")).ToString();
-                Assert.Equal(expected, actual);
-
-                // Get Byte[]
-                var buffer = new byte[Sha1.ByteLen];
-                sha1.CopyTo(buffer, 0);
-
-                // Roundtrip Byte[]
-                actual = new Sha1(buffer).ToString();
-                Assert.Equal(expected, actual);
-
-                // Roundtrip Segment
-                actual = new Sha1(new ArraySegment<byte>(buffer)).ToString();
-                Assert.Equal(expected, actual);
-            }
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_create_test_vector_5))]
-        public static void When_create_test_vector_5()
-        {
-            // http://www.di-mgt.com.au/sha_testvectors.html
-            const string expected = "34aa973cd4c4daa4f61eeb2bdbad27316534016f";
-            var sha1 = Sha1.Parse(expected);
-            {
-                // String
-                var input = new string('a', 1000_000);
-
-                var actual = Sha1.Hash(input).ToString();
-                Assert.Equal(expected, actual);
-                Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(actual));
-
-                // Bytes
-                var bytes = Encoding.UTF8.GetBytes(input);
-                actual = Sha1.Hash(bytes).ToString();
-                Assert.Equal(expected, actual);
-
-                actual = Sha1.Hash(bytes, 0, bytes.Length).ToString();
                 Assert.Equal(expected, actual);
 
                 // Object
