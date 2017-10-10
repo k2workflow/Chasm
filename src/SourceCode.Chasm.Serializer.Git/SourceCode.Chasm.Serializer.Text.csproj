@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Common properties defined in Directory.Build.props -->
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.3.2" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>SourceCode.Chasm.IO.Text</PackageId>
+    <Authors>SourceCode</Authors>
+    <Description>CAS - Content Addressable Storage (Text Serializer).</Description>
+    <PackageTags>cas content storage sha1 git text</PackageTags>
+    <Version>1.0.0-local</Version>
+    <PackageVersion>1.0.0-local</PackageVersion>
+  </PropertyGroup>
+</Project>
