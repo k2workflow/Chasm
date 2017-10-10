@@ -45,7 +45,7 @@ Rather, this is meant to be a general purpose CAS store for any document type.
      
 ### License
 
-Chasm is licensed under the MIT license, which can be found in license.txt.
+Chasm is licensed under the MIT license, which can be found in LICENSE.
 
 **Additional Restrictions**
 
