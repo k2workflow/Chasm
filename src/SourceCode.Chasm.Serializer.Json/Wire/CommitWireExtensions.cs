@@ -58,7 +58,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 }
             }
 
-            // CommitUtc
+            // Utc
             var utc = XmlConvert.ToString(model.Utc, XmlDateTimeSerializationMode.Utc);
 
             // Message
@@ -100,7 +100,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 }
             }
 
-            // CommitUtc
+            // Utc
             jv = wire.GetValue(_utc, JsonType.String, false);
             var utc = XmlConvert.ToDateTime(jv, XmlDateTimeSerializationMode.Utc);
 

@@ -12,7 +12,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 {
     internal static class CommitWireExtensions
     {
-        #region Fields
+        #region Constants
 
         // Windows epoch 1601-01-01T00:00:00Z is 11,644,473,600 seconds before Unix epoch 1970-01-01T00:00:00Z
         private const long epochOffset = 11_644_473_600;
@@ -52,7 +52,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
                     break;
             }
 
-            // CommitUtc
+            // Utc
             wire.Utc = new Timestamp
             {
                 // Convert System.DateTime to Google.Protobuf.WellKnownTypes.Timestamp
@@ -90,7 +90,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
                 }
             }
 
-            // CommitUtc
+            // Utc
             var utc = default(DateTime);
             if (wire.Utc != null)
             {
