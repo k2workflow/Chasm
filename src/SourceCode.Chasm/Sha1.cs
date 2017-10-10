@@ -295,7 +295,7 @@ namespace SourceCode.Chasm
             if (buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
 
-            if (offset < 0 || offset + ByteLen > buffer.Length)
+            if (offset < 0 || checked(offset + ByteLen) > buffer.Length)
                 throw new ArgumentOutOfRangeException(nameof(offset), $"{nameof(buffer)} must have length at least {ByteLen}");
 
             unsafe
