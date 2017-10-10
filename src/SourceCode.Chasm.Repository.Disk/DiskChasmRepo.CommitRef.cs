@@ -46,16 +46,37 @@ namespace SourceCode.Chasm.IO.Disk
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
-            // TODO: Optimistic concurrency
-
             var filename = DeriveCommitRefFileName(branch, commitRef.Name);
             var path = Path.Combine(_refsContainer, filename);
 
-            // CommitIds are not compressed
             using (var session = Serializer.Serialize(commitRef.CommitId))
+            using (var file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken).ConfigureAwait(false))
             {
-                await WriteFileAsync(path, session.Result, cancellationToken).ConfigureAwait(false);
+                if (file.Length == 0)
+                {
+                    if (previousCommitId.HasValue)
+                        throw BuildConcurrencyException(branch, commitRef.Name, null);
+                }
+                else
+                {
+                    // CommitIds are not compressed
+                    var bytes = await ReadFromStreamAsync(file, cancellationToken).ConfigureAwait(false);
+                    var commitId = Serializer.DeserializeCommitId(bytes);
+
+                    if (previousCommitId.Value != commitId)
+                        throw BuildConcurrencyException(branch, commitRef.Name, null);
+
+                    file.Position = 0;
+                }
+
+                // CommitIds are not compressed
+                await file.WriteAsync(session.Result.Array, session.Result.Offset, session.Result.Count, cancellationToken).ConfigureAwait(false);
+
+                if (file.Position != session.Result.Count)
+                    file.Position = session.Result.Count;
             }
+
+            await TouchFileAsync(path, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
