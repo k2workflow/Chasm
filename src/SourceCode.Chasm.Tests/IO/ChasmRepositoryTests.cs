@@ -119,6 +119,25 @@ namespace SourceCode.Chasm.Tests.IO
             Assert.Contains("compressionLevel", actual.Message);
         }
 
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(ChasmRepository_BuildConcurrencyException))]
+        public static void ChasmRepository_BuildConcurrencyException()
+        {
+            // Arrange
+            var expectedBranch = Guid.NewGuid().ToString();
+            var expectedName = Guid.NewGuid().ToString();
+            var expectedInnerException = new Exception(Guid.NewGuid().ToString());
+
+            // Action
+            var actual = MockChasmRepository.MockBuildConcurrencyException(expectedBranch, expectedName, expectedInnerException);
+
+            // Assert
+            Assert.Equal(expectedInnerException, actual.InnerException);
+            Assert.Contains(nameof(CommitRef), actual.Message);
+            Assert.Contains(expectedBranch, actual.Message);
+            Assert.Contains(expectedName, actual.Message);
+        }
+
         #endregion
     }
 }
