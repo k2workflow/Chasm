@@ -149,7 +149,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
             var message = wire.Substring(index).Trim(new char[] { '\r', '\n' });
 
             // Done
-            var model = new Commit(parents, treeId, author, message);
+            var model = new Commit(parents, treeId, author, committer, message);
             return model;
         }
 

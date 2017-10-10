@@ -123,16 +123,8 @@ namespace SourceCode.Chasm
             }
         }
 
-        public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, Audit author, string message)
-            : this(parents, treeId, author, author, message)
-        { }
-
         public Commit(CommitId parent, TreeId treeId, Audit author, Audit committer, string message)
-        : this(new[] { parent }, treeId, author, committer, message)
-        { }
-
-        public Commit(CommitId parent, TreeId treeId, Audit author, string message)
-       : this(new[] { parent }, treeId, author, author, message)
+            : this(new[] { parent }, treeId, author, committer, message)
         { }
 
         public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId treeId, out Audit author, out Audit committer, out string message)
