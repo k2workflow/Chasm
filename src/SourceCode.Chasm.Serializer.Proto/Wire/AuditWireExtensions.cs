@@ -15,9 +15,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static AuditWire Convert(this Audit model)
         {
-            if (model == Audit.Empty)
-                return new AuditWire() { Name = string.Empty };
-
             // Convert System.DateTimeOffset to Unix ms
             var ms = model.Timestamp.ToUniversalTime().ToUnixTimeMilliseconds();
 
@@ -38,18 +35,16 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static Audit Convert(this AuditWire wire)
         {
-            if (wire == null) return default;
-
             // Time (milliseconds)
-            var time = DateTimeOffset.FromUnixTimeMilliseconds(wire.Time);
+            var time = DateTimeOffset.FromUnixTimeMilliseconds(wire?.Time ?? 0);
 
             // Offset (minutes)
-            var offset = TimeSpan.FromMinutes(wire.Offset);
+            var offset = TimeSpan.FromMinutes(wire?.Offset ?? 0);
 
             // Convert Unix ms to System.DateTimeOffset
             time = time.ToOffset(offset);
 
-            var model = new Audit(wire.Name, time);
+            var model = new Audit(wire?.Name ?? string.Empty, time);
             return model;
         }
 

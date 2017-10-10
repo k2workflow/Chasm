@@ -15,8 +15,6 @@ namespace SourceCode.Chasm.IO.Text.Wire
 
         public static string Convert(this Audit model)
         {
-            if (model == Audit.Empty) return default; // null
-
             // Convert System.DateTimeOffset to Unix ms
 
             // Time (milliseconds)

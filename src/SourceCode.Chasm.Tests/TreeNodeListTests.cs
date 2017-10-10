@@ -283,9 +283,7 @@ namespace SourceCode.Chasm.Tests
 
             // Action/Assert
             Assert.Equal(-1, actual.IndexOf(null));
-
-            //TODO: Assert fails, verify if it is a bug
-            //Assert.Equal(-1, actual.IndexOf(Guid.NewGuid().ToString()));
+            Assert.True(actual.IndexOf(Guid.NewGuid().ToString()) < 0);
             Assert.Equal(0, actual.IndexOf(Node0.Name));
             Assert.Equal(1, actual.IndexOf(Node1.Name));
         }
