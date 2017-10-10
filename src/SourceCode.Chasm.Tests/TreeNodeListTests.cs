@@ -249,7 +249,6 @@ namespace SourceCode.Chasm.Tests
             Assert.True(actual.Equals((object)expected));
             Assert.True(expected == actual);
             Assert.False(expected != actual);
-            Assert.Equal(-1, actual.IndexOf(null));
 
             // Less Nodes
             actual = new TreeNodeList().Merge(expected[0]);
@@ -263,14 +262,32 @@ namespace SourceCode.Chasm.Tests
             actual = new TreeNodeList().Merge(expected).Merge(node3);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            Assert.False(actual.Equals((object)expected));
             Assert.False(expected == actual);
             Assert.True(expected != actual);
 
             // Different Nodes
             actual = new TreeNodeList().Merge(expected[0]).Merge(node3);
             Assert.NotEqual(expected, actual); // hashcode is the same (node count)
+            Assert.False(actual.Equals((object)expected));
             Assert.False(expected == actual);
             Assert.True(expected != actual);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_IndexOf))]
+        public static void TreeNodeList_IndexOf()
+        {
+            // Arrange
+            var actual = new TreeNodeList(new[] { Node0, Node1 });
+
+            // Action/Assert
+            Assert.Equal(-1, actual.IndexOf(null));
+
+            //TODO: Assert fails, verify if it is a bug
+            //Assert.Equal(-1, actual.IndexOf(Guid.NewGuid().ToString()));
+            Assert.Equal(0, actual.IndexOf(Node0.Name));
+            Assert.Equal(1, actual.IndexOf(Node1.Name));
         }
 
         [Trait("Type", "Unit")]

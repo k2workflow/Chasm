@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.Tests.IO
         [Fact(DisplayName = nameof(ChasmConcurrencyException_Constructor_Empty))]
         public static void ChasmConcurrencyException_Constructor_Empty()
         {
-            // Action
+            // Arrange & Action
             var actual = new ChasmConcurrencyException();
 
             // Assert
@@ -65,7 +65,6 @@ namespace SourceCode.Chasm.Tests.IO
         public static void ChasmConcurrencyException_Serialize()
         {
             // Arrange
-            //var returnObject = new object();
             var mockFormatterConverter = new Mock<IFormatterConverter>();
             var mockSerializationInfo = new SerializationInfo(typeof(ChasmConcurrencyException), mockFormatterConverter.Object);
             var mockStreamingContext = new StreamingContext();
