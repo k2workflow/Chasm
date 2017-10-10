@@ -2,6 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/993h43mvva8iqb7u/branch/master?svg=true)](https://ci.appveyor.com/project/jcdickinson/chasm/branch/master)
 [![Code Coverage](https://codecov.io/gh/k2workflow/Chasm/coverage.svg)](https://codecov.io/gh/k2workflow/Chasm)
+[![CodeFactor](https://www.codefactor.io/repository/github/jannesrsa/chasm/badge)](https://www.codefactor.io/repository/github/jannesrsa/chasm)
 
 ### CAS = Content Addressable Storage
 
