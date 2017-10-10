@@ -73,7 +73,7 @@ namespace SourceCode.Chasm
                 {
                     hc = (hc * 23) + obj.TreeId.GetHashCode();
                     hc = (hc * 23) + obj.Utc.GetHashCode();
-                    hc = (hc * 23) + (obj.Parents?.Count ?? 42);
+                    hc = (hc * 23) + (obj.Parents?.Count ?? -42);
                     hc = (hc * 23) + (obj.Message?.Length ?? 0);
                 }
 
