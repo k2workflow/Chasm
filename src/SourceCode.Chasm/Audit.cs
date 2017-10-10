@@ -67,7 +67,7 @@ namespace SourceCode.Chasm
 
         public override bool Equals(object obj)
             => obj is Audit audit
-            && Equals(this, audit);
+            && Equals(audit);
 
         public override int GetHashCode()
         {
@@ -86,7 +86,7 @@ namespace SourceCode.Chasm
 
         #region Operators
 
-        public static bool operator ==(Audit x, Audit y) => Equals(x, y);
+        public static bool operator ==(Audit x, Audit y) => x.Equals(y);
 
         public static bool operator !=(Audit x, Audit y) => !(x == y);
 
