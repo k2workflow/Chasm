@@ -5,11 +5,9 @@ option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 	// NodeKindWire
 	enum NodeKindWire 
 	{
-		None = 0; // Default
+		Blob = 0; // Default
 
 		Tree = 1;
-
-		Blob = 2;
 	}
 
 	// TreeWireNode
