@@ -1,3 +1,4 @@
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/k2workflow/Chasm.png?columns=all)](https://waffle.io/k2workflow/Chasm?utm_source=badge)
 ## Chasm
 
 [![Build status](https://ci.appveyor.com/api/projects/status/993h43mvva8iqb7u/branch/master?svg=true)](https://ci.appveyor.com/project/jcdickinson/chasm/branch/master)
