@@ -61,8 +61,8 @@ namespace SourceCode.Chasm.Tests.IO
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmConcurrencyException_Serialize))]
-        public static void ChasmConcurrencyException_Serialize()
+        [Fact(DisplayName = nameof(ChasmConcurrencyException_GetObjectData))]
+        public static void ChasmConcurrencyException_GetObjectData()
         {
             // Arrange
             var mockFormatterConverter = new Mock<IFormatterConverter>();
