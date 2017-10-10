@@ -57,8 +57,9 @@ namespace SourceCode.Chasm
 
             public override bool Equals(Commit x, Commit y)
             {
-                if (x.Utc != y.Utc) return false;
                 if (!x.TreeId.Equals(y.TreeId)) return false;
+                if (x.Author != y.Author) return false;
+                if (x.Committer != y.Committer) return false;
                 if (!StringComparer.Ordinal.Equals(x.Message, y.Message)) return false;
                 if (!x.Parents.ListEquals(y.Parents, CommitIdComparer.Default, true)) return false;
 
@@ -72,7 +73,8 @@ namespace SourceCode.Chasm
                 unchecked
                 {
                     hc = (hc * 23) + obj.TreeId.GetHashCode();
-                    hc = (hc * 23) + obj.Utc.GetHashCode();
+                    hc = (hc * 23) + obj.Author.GetHashCode();
+                    hc = (hc * 23) + obj.Committer.GetHashCode();
                     hc = (hc * 23) + (obj.Parents?.Count ?? -42);
                     hc = (hc * 23) + (obj.Message?.Length ?? 0);
                 }

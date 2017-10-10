@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
-    [DebuggerDisplay("{" + nameof(Utc) + ".ToString(\"o\"),nq,ac} ({" + nameof(TreeId) + "." + nameof(Chasm.TreeId.Sha1) + ".ToString(\"D\"),nq,ac})")]
+    [DebuggerDisplay("{" + nameof(Author) + ".ToString(),nq,ac} ({" + nameof(TreeId) + "." + nameof(Chasm.TreeId.Sha1) + ".ToString(\"D\"),nq,ac})")]
     public struct Commit : IEquatable<Commit>
     {
         #region Constants
@@ -41,7 +41,9 @@ namespace SourceCode.Chasm
 
         public TreeId TreeId { get; }
 
-        public DateTime Utc { get; }
+        public Audit Author { get; }
+
+        public Audit Committer { get; }
 
         public string Message => _message ?? string.Empty; // May be null due to default ctor
 
@@ -49,12 +51,11 @@ namespace SourceCode.Chasm
 
         #region De/Constructors
 
-        public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, DateTime utc, string message)
+        public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, Audit author, Audit committer, string message)
         {
-            if (utc != default && utc.Kind != DateTimeKind.Utc) throw new ArgumentOutOfRangeException(nameof(utc));
-
             TreeId = treeId;
-            Utc = utc;
+            Author = author;
+            Committer = committer;
             _message = message ?? string.Empty;
 
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
@@ -122,15 +123,24 @@ namespace SourceCode.Chasm
             }
         }
 
-        public Commit(CommitId parent, TreeId treeId, DateTime utc, string message)
-            : this(new[] { parent }, treeId, utc, message)
+        public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, Audit author, string message)
+            : this(parents, treeId, author, author, message)
         { }
 
-        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId treeId, out DateTime utc, out string message)
+        public Commit(CommitId parent, TreeId treeId, Audit author, Audit committer, string message)
+        : this(new[] { parent }, treeId, author, committer, message)
+        { }
+
+        public Commit(CommitId parent, TreeId treeId, Audit author, string message)
+       : this(new[] { parent }, treeId, author, author, message)
+        { }
+
+        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId treeId, out Audit author, out Audit committer, out string message)
         {
             parents = Parents;
             treeId = TreeId;
-            utc = Utc;
+            author = Author;
+            committer = Committer;
             message = Message;
         }
 
@@ -154,7 +164,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(Commit x, Commit y) => !(x == y);
 
-        public override string ToString() => $"{TreeId.Sha1:D} ({Utc:o})";
+        public override string ToString() => $"{TreeId.Sha1:D} ({Author})";
 
         #endregion
     }
