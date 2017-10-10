@@ -33,6 +33,7 @@ namespace SourceCode.Chasm.Tests
             Assert.True(blobId1 == blobId2);
             Assert.False(blobId1 != blobId2);
             Assert.True(blobId1.Equals((object)blobId2));
+            Assert.False(blobId1.Equals(new object()));
 
             Assert.Equal(blobId1.Sha1.ToString(), blobId1.ToString());
             Assert.Equal(blobId2.Sha1.ToString(), blobId2.ToString());

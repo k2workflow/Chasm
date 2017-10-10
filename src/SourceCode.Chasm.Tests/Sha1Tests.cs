@@ -5,10 +5,11 @@
 
 #endregion
 
-using SourceCode.Clay.Buffers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using SourceCode.Clay.Buffers;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests
@@ -51,6 +52,12 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory.Span, actual.Memory.Span, BufferComparer.Span);
 
             actual = Sha1.Hash(null, 0, 0);
+            Assert.Equal(expected, actual);
+            Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.Span, actual.Memory.Span, BufferComparer.Span);
+
+            // Stream
+            actual = Sha1.Hash((Stream)null);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             Assert.Equal(expected.Memory.Span, actual.Memory.Span, BufferComparer.Span);
@@ -232,6 +239,37 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_construct_sha1_from_Stream))]
+        public static void When_construct_sha1_from_Stream()
+        {
+            var buffer = Encoding.UTF8.GetBytes(Guid.NewGuid().ToString());
+
+            // Construct MemoryStream
+            var mem = new MemoryStream(buffer);
+            var expected = Sha1.Hash(buffer);
+            var actual = Sha1.Hash(mem);
+            Assert.Equal(expected, actual);
+            Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.Span, actual.Memory.Span, BufferComparer.Span);
+
+            // Construct MemoryStream with offset 0
+            mem = new MemoryStream(buffer, 0, buffer.Length);
+            expected = Sha1.Hash(buffer, 0, buffer.Length);
+            actual = Sha1.Hash(mem);
+            Assert.Equal(expected, actual);
+            Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.Span, actual.Memory.Span, BufferComparer.Span);
+
+            // Construct MemoryStream with offset N
+            mem = new MemoryStream(buffer, 5, buffer.Length - 5);
+            expected = Sha1.Hash(buffer, 5, buffer.Length - 5);
+            actual = Sha1.Hash(mem);
+            Assert.Equal(expected, actual);
+            Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.Equal(expected.Memory.Span, actual.Memory.Span, BufferComparer.Span);
+        }
+
+        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(When_construct_sha1_from_Span))]
         public static void When_construct_sha1_from_Span()
         {
@@ -261,6 +299,66 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             Assert.Equal(expected.Memory.Span, actual.Memory.Span, BufferComparer.Span);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_copyto_with_null_buffer))]
+        public static void When_copyto_with_null_buffer()
+        {
+            // Arrange
+            var buffer = (byte[])null;
+            var sha1 = new Sha1();
+
+            // Action
+            var actual = Assert.Throws<ArgumentNullException>(() => sha1.CopyTo(buffer, 0));
+
+            // Assert
+            Assert.Contains(nameof(buffer), actual.Message);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_copyto_with_null_buffer))]
+        public static void When_copyto_with_negative_offset()
+        {
+            // Arrange
+            var buffer = new byte[0];
+            var offset = int.MinValue;
+            var sha1 = new Sha1();
+
+            // Action
+            var actual = Assert.Throws<ArgumentOutOfRangeException>(() => sha1.CopyTo(buffer, offset));
+
+            // Assert
+            Assert.Contains(nameof(offset), actual.Message);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_copyto_with_overflow_offset))]
+        public static void When_copyto_with_overflow_offset()
+        {
+            // Arrange
+            var buffer = new byte[0];
+            var offset = int.MaxValue;
+            var sha1 = new Sha1();
+
+            // Action & Assert
+            Assert.Throws<OverflowException>(() => sha1.CopyTo(buffer, offset));
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(When_copyto_with_outofrange_offset))]
+        public static void When_copyto_with_outofrange_offset()
+        {
+            // Arrange
+            var buffer = new byte[0];
+            var offset = Sha1.ByteLen;
+            var sha1 = new Sha1();
+
+            // Action
+            var actual = Assert.Throws<ArgumentOutOfRangeException>(() => sha1.CopyTo(buffer, offset));
+
+            // Assert
+            Assert.Contains(nameof(offset), actual.Message);
         }
 
         [Trait("Type", "Unit")]
@@ -559,6 +657,10 @@ namespace SourceCode.Chasm.Tests
             Assert.False(Sha1.TryParse("0X" + expected_N.Substring(Sha1.CharLen - 2), out _));
 
             Assert.False(Sha1.TryParse(expected_N.Replace('8', 'G'), out _));
+
+            Assert.False(Sha1.TryParse($"0x{new string('1', 38)}", out _));
+            Assert.False(Sha1.TryParse($"0x{new string('1', 39)}", out _));
+            Assert.True(Sha1.TryParse($"0x{new string('1', 40)}", out _));
 
             // "N"
             {

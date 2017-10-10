@@ -324,7 +324,7 @@ namespace SourceCode.Chasm
                         for (var i = 1; i < nodes.Length; i++)
                         {
                             // If the Name (alone) is duplicated
-                            if (StringComparer.Ordinal.Equals(nodes[i - 1], nodes[i]))
+                            if (StringComparer.Ordinal.Equals(nodes[i - 1].Name, nodes[i].Name))
                             {
                                 // If it's a complete duplicate, silently skip
                                 if (TreeNodeComparer.Default.Equals(nodes[i - 1], nodes[i]))

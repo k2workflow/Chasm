@@ -17,6 +17,7 @@ namespace SourceCode.Chasm.Tests
         #region Constants
 
         private static readonly TreeNode Node0 = new TreeNode(nameof(Node0), NodeKind.Tree, Sha1.Hash(nameof(Node0)));
+        private static readonly TreeNode Node0Blob = new TreeNode(nameof(Node0), NodeKind.Blob, Sha1.Hash(nameof(Node0Blob)));
         private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Blob, Sha1.Hash(nameof(Node1)));
         private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), NodeKind.Tree, Sha1.Hash(nameof(Node2)));
         private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.Blob, Sha1.Hash(nameof(Node3)));
@@ -25,38 +26,41 @@ namespace SourceCode.Chasm.Tests
 
         #region Methods
 
+        private static void AssertEmpty(TreeNodeList treeNodeList)
+        {
+            Assert.Empty(treeNodeList);
+            Assert.Equal(TreeNodeList.Empty, treeNodeList); // By design
+            Assert.Equal(TreeNodeList.Empty.GetHashCode(), treeNodeList.GetHashCode());
+            Assert.Empty(treeNodeList.Keys);
+
+            Assert.Throws<IndexOutOfRangeException>(() => treeNodeList[0]);
+            Assert.Throws<KeyNotFoundException>(() => treeNodeList["x"]);
+            Assert.False(treeNodeList.TryGetValue("x", out _));
+            Assert.False(treeNodeList.TryGetValue("x", NodeKind.Blob, out _));
+
+            Assert.False(treeNodeList.Equals(new object()));
+            Assert.Contains("Count: 0", treeNodeList.ToString());
+            Assert.Equal(-1, treeNodeList.IndexOf(Guid.NewGuid().ToString()));
+        }
+
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeNodeList_Empty))]
         public static void TreeNodeList_Empty()
         {
             var noData = new TreeNodeList();
+            AssertEmpty(noData);
+
             var nullData = new TreeNodeList(null);
+            AssertEmpty(nullData);
+
             var collData = new TreeNodeList((IList<TreeNode>)null);
+            AssertEmpty(collData);
+
             var emptyData = new TreeNodeList(Array.Empty<TreeNode>());
+            AssertEmpty(emptyData);
 
             Assert.Empty(TreeNodeList.Empty);
             Assert.Equal(default, TreeNodeList.Empty);
-
-            Assert.Empty(noData);
-            Assert.Equal(TreeNodeList.Empty, noData); // By design
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), noData.GetHashCode());
-
-            Assert.Empty(nullData);
-            Assert.Equal(TreeNodeList.Empty, nullData); // By design
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), nullData.GetHashCode());
-
-            Assert.Empty(collData);
-            Assert.Equal(TreeNodeList.Empty, collData); // By design
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), collData.GetHashCode());
-
-            Assert.Empty(emptyData);
-            Assert.Equal(TreeNodeList.Empty, emptyData); // By design
-            Assert.Equal(TreeNodeList.Empty.GetHashCode(), emptyData.GetHashCode());
-
-            Assert.Throws<IndexOutOfRangeException>(() => noData[0]);
-            Assert.Throws<KeyNotFoundException>(() => noData["x"]);
-            Assert.False(noData.TryGetValue("x", out _));
-            Assert.False(noData.TryGetValue("x", NodeKind.Blob, out _));
         }
 
         [Trait("Type", "Unit")]
@@ -78,6 +82,8 @@ namespace SourceCode.Chasm.Tests
             Assert.False(tree1.TryGetValue("x", out _));
             Assert.True(tree1.TryGetValue(Node0.Name, out var v20) && v20 == Node0);
             Assert.True(tree1.TryGetValue(Node1.Name, out var v21) && v21 == Node1);
+            Assert.False(tree1.TryGetValue(Node0.Name, NodeKind.Blob, out _));
+            Assert.True(tree1.TryGetValue(Node0.Name, Node0.Kind, out _));
 
             nodes = new[] { Node0, Node1, Node2 };
             tree0 = new TreeNodeList(nodes.OrderBy(n => n.Sha1).ToArray());
@@ -151,6 +157,36 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_2_Exception))]
+        public static void TreeNodeList_Duplicate_Full_2_Exception()
+        {
+            // Arrange
+            var nodes = new[] { Node0, Node0Blob }; // Shuffled
+
+            // Action
+            var ex = Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
+
+            // Assert
+            Assert.Contains(Node0.Name, ex.Message);
+            Assert.Contains(Node0.Sha1.ToString(), ex.Message);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_3_Exception))]
+        public static void TreeNodeList_Duplicate_Full_3_Exception()
+        {
+            // Arrange
+            var nodes = new[] { Node0, Node0Blob, Node1 }; // Shuffled
+
+            // Action
+            var ex = Assert.Throws<ArgumentException>(() => new TreeNodeList(nodes));
+
+            // Assert
+            Assert.Contains(Node0.Name, ex.Message);
+            Assert.Contains(Node0.Sha1.ToString(), ex.Message);
+        }
+
+        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_4))]
         public static void TreeNodeList_Duplicate_Full_4()
         {
@@ -210,35 +246,84 @@ namespace SourceCode.Chasm.Tests
             var actual = new TreeNodeList().Merge(expected);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
+            Assert.True(actual.Equals((object)expected));
+            Assert.True(expected == actual);
+            Assert.False(expected != actual);
 
             // Less Nodes
             actual = new TreeNodeList().Merge(expected[0]);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            Assert.False(actual.Equals((object)expected));
+            Assert.False(expected == actual);
+            Assert.True(expected != actual);
 
             // More Nodes
             actual = new TreeNodeList().Merge(expected).Merge(node3);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
+            Assert.False(actual.Equals((object)expected));
+            Assert.False(expected == actual);
+            Assert.True(expected != actual);
 
             // Different Nodes
             actual = new TreeNodeList().Merge(expected[0]).Merge(node3);
             Assert.NotEqual(expected, actual); // hashcode is the same (node count)
+            Assert.False(actual.Equals((object)expected));
+            Assert.False(expected == actual);
+            Assert.True(expected != actual);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_IndexOf))]
+        public static void TreeNodeList_IndexOf()
+        {
+            // Arrange
+            var actual = new TreeNodeList(new[] { Node0, Node1 });
+
+            // Action/Assert
+            Assert.Equal(-1, actual.IndexOf(null));
+
+            //TODO: Assert fails, verify if it is a bug
+            //Assert.Equal(-1, actual.IndexOf(Guid.NewGuid().ToString()));
+            Assert.Equal(0, actual.IndexOf(Node0.Name));
+            Assert.Equal(1, actual.IndexOf(Node1.Name));
         }
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeNodeList_Merge_Empty))]
         public static void TreeNodeList_Merge_Empty()
         {
+            var emptyTreeNodeList = new TreeNodeList();
             var node = new TreeNode("b", NodeKind.Blob, Sha1.Hash("Test1"));
             var list = new TreeNodeList(node);
 
             // TreeNodeList
-            var merged = list.Merge(new TreeNodeList());
+            var merged = list.Merge(emptyTreeNodeList);
+            Assert.Equal(list, merged);
+
+            merged = emptyTreeNodeList.Merge(list);
             Assert.Equal(list, merged);
 
             // ICollection
             merged = list.Merge(Array.Empty<TreeNode>());
+            Assert.Equal(list, merged);
+
+            merged = emptyTreeNodeList.Merge(list.Values.ToArray());
+            Assert.Equal(list, merged);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Merge_Null))]
+        public static void TreeNodeList_Merge_Null()
+        {
+            // Arrange
+            var list = new TreeNodeList(Node0);
+
+            // Action
+            var merged = list.Merge(null);
+
+            // Assert
             Assert.Equal(list, merged);
         }
 
@@ -262,6 +347,28 @@ namespace SourceCode.Chasm.Tests
                 Assert.True(string.CompareOrdinal(cur, prev) > 0);
                 prev = cur;
             }
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_Merge_Single_Exist))]
+        public static void TreeNodeList_Merge_Single_Exist()
+        {
+            // Arrange
+            var list = new TreeNodeList();
+            var expectedName = Guid.NewGuid().ToString();
+            var expectedKind = NodeKind.Tree;
+            var expectedSha1 = Sha1.Hash(Guid.NewGuid().ToString());
+
+            list = list.Merge(new TreeNode(expectedName, NodeKind.Blob, Sha1.Hash("Test1")));
+
+            // Action
+            var actual = list.Merge(new TreeNode(expectedName, expectedKind, expectedSha1));
+            var actualNode = actual[expectedName];
+
+            // Assert
+            Assert.Equal(expectedName, actualNode.Name);
+            Assert.Equal(expectedKind, actualNode.Kind);
+            Assert.Equal(expectedSha1, actualNode.Sha1);
         }
 
         [Trait("Type", "Unit")]
@@ -365,6 +472,48 @@ namespace SourceCode.Chasm.Tests
             };
 
             list3 = list3.Merge(dupes);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_IReadOnlyDictionary_Empty_GetEnumerator))]
+        public static void TreeNodeList_IReadOnlyDictionary_Empty_GetEnumerator()
+        {
+            // Arrange
+            var treeNodeList = new TreeNodeList();
+            var readOnlyDictionary = treeNodeList as IReadOnlyDictionary<string, TreeNode>;
+
+            // Action
+            var enumerator = readOnlyDictionary.GetEnumerator();
+
+            // Assert
+            Assert.False(enumerator.MoveNext());
+
+            var current = enumerator.Current;
+            Assert.Null(current.Key);
+            Assert.Equal(TreeNode.Empty, current.Value);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeList_IReadOnlyDictionary_GetEnumerator))]
+        public static void TreeNodeList_IReadOnlyDictionary_GetEnumerator()
+        {
+            // Arrange
+            var nodes = new[] { Node0, Node1 };
+            var treeNodeList = new TreeNodeList(nodes);
+            var readOnlyDictionary = treeNodeList as IReadOnlyDictionary<string, TreeNode>;
+
+            // Action
+            var enumerator = readOnlyDictionary.GetEnumerator();
+
+            // Assert
+            Assert.True(enumerator.MoveNext());
+            Assert.Equal(Node0, enumerator.Current.Value);
+
+            Assert.True(enumerator.MoveNext());
+            Assert.Equal(Node1, enumerator.Current.Value);
+
+            Assert.False(enumerator.MoveNext());
+            Assert.Equal(Node1, enumerator.Current.Value);
         }
 
         #endregion
