@@ -2,6 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/993h43mvva8iqb7u/branch/master?svg=true)](https://ci.appveyor.com/project/jcdickinson/chasm/branch/master)
 [![Code Coverage](https://codecov.io/gh/k2workflow/Chasm/coverage.svg)](https://codecov.io/gh/k2workflow/Chasm)
+[![CodeFactor](https://www.codefactor.io/repository/github/jannesrsa/chasm/badge)](https://www.codefactor.io/repository/github/jannesrsa/chasm)
 
 ### CAS = Content Addressable Storage
 
@@ -19,6 +20,10 @@ Rather, this is meant to be a general purpose CAS store for any document type.
 * Single-instance storage of data: If two authors create the exact same documents, their repos should not differ in Object data.
 * Efficient network/disk operations: XML is bad, JSON is better, Protobuf/etc are best
 * Simple: Avoid the need to reinvent graph semantics, etc
+
+### Prerequisites
+
+* .NET Core SDK 2.0 (https://www.microsoft.com/net/download/core)
 
 ### Getting started
 

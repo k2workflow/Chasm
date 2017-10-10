@@ -23,6 +23,7 @@ namespace SourceCode.Chasm.IO.Json
 
             var maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
             var rented = BufferSession.RentBuffer(maxLen);
+
             var count = Encoding.UTF8.GetBytes(json, 0, json.Length, rented, 0);
 
             var seg = new ArraySegment<byte>(rented, 0, count);

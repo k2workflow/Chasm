@@ -101,15 +101,13 @@ namespace SourceCode.Chasm.IO
             }
         }
 
-        public virtual async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, DateTime utc, string message, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, Audit author, Audit committer, string message, CancellationToken cancellationToken)
         {
-            if (utc.Kind != DateTimeKind.Utc) throw new ArgumentException(nameof(utc));
-
             var treeId = TreeId.Empty;
             if (tree.Count > 0)
                 treeId = await WriteTreeAsync(tree, cancellationToken).ConfigureAwait(false);
 
-            var commit = new Commit(parents, treeId, utc, message);
+            var commit = new Commit(parents, treeId, author, committer, message);
             var commitId = await WriteCommitAsync(commit, cancellationToken).ConfigureAwait(false);
 
             return commitId;

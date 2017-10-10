@@ -25,9 +25,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             "Cg5UcmVlV2lyZS5wcm90bxoOU2hhMVdpcmUucHJvdG8iVAoMVHJlZVdpcmVO",
             "b2RlEgwKBE5hbWUYASABKAkSGwoES2luZBgCIAEoDjINLk5vZGVLaW5kV2ly",
             "ZRIZCgZOb2RlSWQYAyABKAsyCS5TaGExV2lyZSIoCghUcmVlV2lyZRIcCgVO",
-            "b2RlcxgBIAMoCzINLlRyZWVXaXJlTm9kZSosCgxOb2RlS2luZFdpcmUSCAoE",
-            "Tm9uZRAAEggKBFRyZWUQARIICgRCbG9iEAJCIaoCHlNvdXJjZUNvZGUuQ2hh",
-            "c20uSU8uUHJvdG8uV2lyZWIGcHJvdG8z"));
+            "b2RlcxgBIAMoCzINLlRyZWVXaXJlTm9kZSoiCgxOb2RlS2luZFdpcmUSCAoE",
+            "QmxvYhAAEggKBFRyZWUQAUIhqgIeU291cmNlQ29kZS5DaGFzbS5JTy5Qcm90",
+            "by5XaXJlYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::SourceCode.Chasm.IO.Proto.Wire.NodeKindWire), }, new pbr::GeneratedClrTypeInfo[] {
@@ -46,9 +46,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     /// <summary>
     /// Default
     /// </summary>
-    [pbr::OriginalName("None")] None = 0,
+    [pbr::OriginalName("Blob")] Blob = 0,
     [pbr::OriginalName("Tree")] Tree = 1,
-    [pbr::OriginalName("Blob")] Blob = 2,
   }
 
   #endregion

@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay.Buffers;
 using System;
 using System.Diagnostics;
 
@@ -36,19 +37,19 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(Blob other) => BlobComparer.Default.Equals(this, other);
+        public bool Equals(Blob other) => BufferComparer.Array.Equals(Data, other.Data);
 
         public override bool Equals(object obj)
             => obj is Blob blob
-            && BlobComparer.Default.Equals(this, blob);
+            && Equals(blob);
 
-        public override int GetHashCode() => BlobComparer.Default.GetHashCode(this);
+        public override int GetHashCode() => BufferComparer.Array.GetHashCode(Data);
 
         #endregion
 
         #region Operators
 
-        public static bool operator ==(Blob x, Blob y) => BlobComparer.Default.Equals(x, y);
+        public static bool operator ==(Blob x, Blob y) => x.Equals(y);
 
         public static bool operator !=(Blob x, Blob y) => !(x == y);
 

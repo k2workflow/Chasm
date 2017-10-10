@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.Tests
         private static readonly TreeNode Node0Blob = new TreeNode(nameof(Node0), NodeKind.Blob, Sha1.Hash(nameof(Node0Blob)));
         private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Blob, Sha1.Hash(nameof(Node1)));
         private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), NodeKind.Tree, Sha1.Hash(nameof(Node2)));
-        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.None, Sha1.Hash(nameof(Node3)));
+        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.Blob, Sha1.Hash(nameof(Node3)));
 
         #endregion
 
@@ -283,6 +283,7 @@ namespace SourceCode.Chasm.Tests
 
             // Action/Assert
             Assert.Equal(-1, actual.IndexOf(null));
+            Assert.True(actual.IndexOf(Guid.NewGuid().ToString()) < 0);
             Assert.Equal(0, actual.IndexOf(Node0.Name));
             Assert.Equal(1, actual.IndexOf(Node1.Name));
         }

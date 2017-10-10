@@ -13,7 +13,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 {
     internal static class TreeWireNodeExtensions
     {
-        #region Fields
+        #region Constants
 
         // Naming follows convention in ProtoSerializer
 
