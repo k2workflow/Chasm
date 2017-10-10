@@ -127,6 +127,22 @@ namespace SourceCode.Chasm.Tests
             Assert.True(list[2] >= list[1]);
         }
 
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNode_Constructor_String_TreeId))]
+        public static void TreeNode_Constructor_String_TreeId()
+        {
+            // Arrange
+            var expectedTreeId = new TreeId();
+            var expectedName = Guid.NewGuid().ToString();
+
+            // Action
+            var actual = new TreeNode(expectedName, expectedTreeId);
+
+            // Assert
+            Assert.Equal(expectedName, actual.Name);
+            Assert.Equal(expectedTreeId.Sha1, actual.Sha1);
+        }
+
         #endregion
     }
 }
