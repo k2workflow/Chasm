@@ -3,13 +3,24 @@ import "timestamp.proto";
 import "Sha1Wire.proto";
 option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 
+	message AuditWire
+	{
+		string Name = 1;
+
+		google.protobuf.Timestamp Time = 2;
+
+		int32 Offset = 3; // Minutes
+	}
+
 	message CommitWire
 	{
 		repeated Sha1Wire Parents = 1;
 
 		Sha1Wire TreeId = 2;
 		
-		google.protobuf.Timestamp Utc = 3;
+		AuditWire Author = 3;
 		
-		string Message = 4;
+		AuditWire Committer = 4;
+		
+		string Message = 5;
 	}

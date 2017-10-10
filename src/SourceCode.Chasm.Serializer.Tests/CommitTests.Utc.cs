@@ -12,9 +12,9 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitTests // .Utc
     {
-        #region Fields
+        #region Constants
 
-        private static readonly DateTime Utc1 = new DateTime(new DateTime(2000, 1, 1).Ticks, DateTimeKind.Utc);
+        private static readonly DateTimeOffset Utc1 = new DateTimeOffset(new DateTime(new DateTime(2000, 1, 1).Ticks, DateTimeKind.Utc));
 
         #endregion
 
@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Utc(IChasmSerializer ser)
         {
-            var expected = new Commit(null, default, Utc1, null);
+            var expected = new Commit(null, default, new Audit("bob", Utc1), null);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);

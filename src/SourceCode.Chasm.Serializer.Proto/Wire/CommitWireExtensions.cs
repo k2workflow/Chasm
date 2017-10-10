@@ -5,20 +5,12 @@
 
 #endregion
 
-using Google.Protobuf.WellKnownTypes;
 using System;
 
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
     internal static class CommitWireExtensions
     {
-        #region Constants
-
-        // Windows epoch 1601-01-01T00:00:00Z is 11,644,473,600 seconds before Unix epoch 1970-01-01T00:00:00Z
-        private const long epochOffset = 11_644_473_600;
-
-        #endregion
-
         #region Methods
 
         public static CommitWire Convert(this Commit model)
@@ -27,6 +19,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire
                 return new CommitWire() { Message = string.Empty };
 
             var wire = new CommitWire();
+
+            // TreeId
+            wire.TreeId = model.TreeId.Sha1.Convert();
 
             // Parents
             switch (model.Parents.Count)
@@ -52,19 +47,14 @@ namespace SourceCode.Chasm.IO.Proto.Wire
                     break;
             }
 
-            // Utc
-            wire.Utc = new Timestamp
-            {
-                // Convert System.DateTime to Google.Protobuf.WellKnownTypes.Timestamp
-                Seconds = (model.Utc.Ticks / TimeSpan.TicksPerSecond) - epochOffset,
-                Nanos = (int)(model.Utc.Ticks % TimeSpan.TicksPerSecond) * 100 // Windows tick is 100 nanoseconds
-            };
+            // Author
+            wire.Author = model.Author.Convert();
+
+            // Committer
+            wire.Committer = model.Committer.Convert();
 
             // Message
             wire.Message = model.Message;
-
-            // TreeId
-            wire.TreeId = model.TreeId.Sha1.Convert();
 
             return wire;
         }
@@ -90,17 +80,21 @@ namespace SourceCode.Chasm.IO.Proto.Wire
                 }
             }
 
-            // Utc
-            var utc = default(DateTime);
-            if (wire.Utc != null)
+            // Author
+            var author = Audit.Empty;
+            if (wire.Author != null)
             {
-                // Convert Google.Protobuf.WellKnownTypes.Timestamp to System.DateTime
-                var ticks = (wire.Utc.Seconds + epochOffset) * TimeSpan.TicksPerSecond;
-                ticks += wire.Utc.Nanos / 100; // Windows tick is 100 nanoseconds
-                utc = new DateTime(ticks, DateTimeKind.Utc);
+                author = wire.Author.Convert();
             }
 
-            var model = new Commit(parents, treeId, utc, wire.Message);
+            // Committer
+            var committer = Audit.Empty;
+            if (wire.Committer != null)
+            {
+                committer = wire.Committer.Convert();
+            }
+
+            var model = new Commit(parents, treeId, author, committer, wire.Message);
             return model;
         }
 

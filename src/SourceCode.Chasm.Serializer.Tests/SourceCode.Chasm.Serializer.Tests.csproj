@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm.Serializer.Git\SourceCode.Chasm.Serializer.Text.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.Serializer.Text\SourceCode.Chasm.Serializer.Text.csproj" />
     <ProjectReference Include="..\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" />
     <ProjectReference Include="..\SourceCode.Chasm.Serializer.Proto\SourceCode.Chasm.Serializer.Proto.csproj" />
   </ItemGroup>

@@ -5,11 +5,9 @@
 
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Xml;
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
@@ -55,19 +53,23 @@ namespace SourceCode.Chasm.IO.Text.Wire
             }
 
             // Author
-            const string author = "unknown";
-            var utc = XmlConvert.ToString(model.Utc, XmlDateTimeSerializationMode.Utc);
-            sb.AppendLine($"{_author}{utc}"); // TODO: Use compatible datetime format
+            if (model.Author != Audit.Empty)
+            {
+                var author = model.Author.Convert();
+                sb.AppendLine($"{_author}{author}");
+            }
 
             // Committer
-            const string committer = "unknown";
-            utc = XmlConvert.ToString(model.Utc, XmlDateTimeSerializationMode.Utc);
-            sb.AppendLine($"{_committer}{utc}"); // TODO: Use compatible datetime format
+            if (model.Committer != Audit.Empty)
+            {
+                var committer = model.Committer.Convert();
+                sb.AppendLine($"{_committer}{committer}");
+            }
 
             // Message
-            var msg = sb.AppendLine().AppendLine(model.Message);
+            sb.AppendLine().AppendLine(model.Message);
 
-            var wire = msg.ToString();
+            var wire = sb.ToString();
             return wire;
         }
 
@@ -106,52 +108,49 @@ namespace SourceCode.Chasm.IO.Text.Wire
             }
 
             // Author
-            var authorUtc = ParseAuditLine(_author);
+            Audit author = default;
+            {
+                var ix = wire.IndexOf(_author, index);
+                if (ix >= 0)
+                {
+                    index = ix + _author.Length;
+
+                    ix = wire.IndexOf('\n', index);
+                    if (ix >= 0)
+                    {
+                        var str = wire.Substring(index, ix - index);
+                        index = ix;
+
+                        author = str.ConvertAudit();
+                    }
+                }
+            }
 
             // Committer
-            var committerUtc = ParseAuditLine(_committer);
+            Audit committer = default;
+            {
+                var ix = wire.IndexOf(_committer, index);
+                if (ix >= 0)
+                {
+                    index = ix + _committer.Length;
+
+                    ix = wire.IndexOf('\n', index);
+                    if (ix >= 0)
+                    {
+                        var str = wire.Substring(index, ix - index); ;
+                        index = ix;
+
+                        committer = str.ConvertAudit();
+                    }
+                }
+            }
 
             // Message
             var message = wire.Substring(index).Trim(new char[] { '\r', '\n' });
 
             // Done
-            var model = new Commit(parents, treeId, authorUtc, message);
+            var model = new Commit(parents, treeId, author, message);
             return model;
-
-            // Local functions
-            DateTime ParseAuditLine(string name)
-            {
-                DateTime utc = default;
-
-                var ix = wire.IndexOf(name, index);
-                if (ix >= 0)
-                {
-                    index = ix + name.Length;
-
-                    ix = wire.IndexOf('\n', index);
-                    if (ix >= 0)
-                    {
-                        index = ix + 1;
-
-                        //var foundFirst = false;
-                        for (var jx = ix - 1; jx >= 0; jx--)
-                        {
-                            if (wire[jx] != ' ') continue;
-
-                            //if (foundFirst)
-                            {
-                                var str = wire.Substring(jx, ix - jx).TrimEnd();
-                                utc = XmlConvert.ToDateTime(str, XmlDateTimeSerializationMode.Utc);
-                                break;
-                            }
-
-                            //foundFirst = true;
-                        }
-                    }
-                }
-
-                return utc;
-            }
         }
 
         #endregion

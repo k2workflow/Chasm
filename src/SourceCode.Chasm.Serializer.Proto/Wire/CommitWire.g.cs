@@ -23,20 +23,206 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChBDb21taXRXaXJlLnByb3RvGg90aW1lc3RhbXAucHJvdG8aDlNoYTFXaXJl",
-            "LnByb3RvIn0KCkNvbW1pdFdpcmUSGgoHUGFyZW50cxgBIAMoCzIJLlNoYTFX",
-            "aXJlEhkKBlRyZWVJZBgCIAEoCzIJLlNoYTFXaXJlEicKA1V0YxgDIAEoCzIa",
-            "Lmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDwoHTWVzc2FnZRgEIAEoCUIh",
-            "qgIeU291cmNlQ29kZS5DaGFzbS5JTy5Qcm90by5XaXJlYgZwcm90bzM="));
+            "LnByb3RvIlMKCUF1ZGl0V2lyZRIMCgROYW1lGAEgASgJEigKBFRpbWUYAiAB",
+            "KAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBk9mZnNldBgDIAEo",
+            "BSKPAQoKQ29tbWl0V2lyZRIaCgdQYXJlbnRzGAEgAygLMgkuU2hhMVdpcmUS",
+            "GQoGVHJlZUlkGAIgASgLMgkuU2hhMVdpcmUSGgoGQXV0aG9yGAMgASgLMgou",
+            "QXVkaXRXaXJlEh0KCUNvbW1pdHRlchgEIAEoCzIKLkF1ZGl0V2lyZRIPCgdN",
+            "ZXNzYWdlGAUgASgJQiGqAh5Tb3VyY2VDb2RlLkNoYXNtLklPLlByb3RvLldp",
+            "cmViBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Utc", "Message" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.AuditWire), global::SourceCode.Chasm.IO.Proto.Wire.AuditWire.Parser, new[]{ "Name", "Time", "Offset" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Author", "Committer", "Message" }, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Messages
+  public sealed partial class AuditWire : pb::IMessage<AuditWire> {
+    private static readonly pb::MessageParser<AuditWire> _parser = new pb::MessageParser<AuditWire>(() => new AuditWire());
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<AuditWire> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::SourceCode.Chasm.IO.Proto.Wire.CommitWireReflection.Descriptor.MessageTypes[0]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AuditWire() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AuditWire(AuditWire other) : this() {
+      name_ = other.name_;
+      Time = other.time_ != null ? other.Time.Clone() : null;
+      offset_ = other.offset_;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public AuditWire Clone() {
+      return new AuditWire(this);
+    }
+
+    /// <summary>Field number for the "Name" field.</summary>
+    public const int NameFieldNumber = 1;
+    private string name_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string Name {
+      get { return name_; }
+      set {
+        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "Time" field.</summary>
+    public const int TimeFieldNumber = 2;
+    private global::Google.Protobuf.WellKnownTypes.Timestamp time_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Google.Protobuf.WellKnownTypes.Timestamp Time {
+      get { return time_; }
+      set {
+        time_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Offset" field.</summary>
+    public const int OffsetFieldNumber = 3;
+    private int offset_;
+    /// <summary>
+    /// Minutes
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int Offset {
+      get { return offset_; }
+      set {
+        offset_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as AuditWire);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(AuditWire other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Name != other.Name) return false;
+      if (!object.Equals(Time, other.Time)) return false;
+      if (Offset != other.Offset) return false;
+      return true;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Name.Length != 0) hash ^= Name.GetHashCode();
+      if (time_ != null) hash ^= Time.GetHashCode();
+      if (Offset != 0) hash ^= Offset.GetHashCode();
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Name.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Name);
+      }
+      if (time_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Time);
+      }
+      if (Offset != 0) {
+        output.WriteRawTag(24);
+        output.WriteInt32(Offset);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Name.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      if (time_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Time);
+      }
+      if (Offset != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Offset);
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(AuditWire other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Name.Length != 0) {
+        Name = other.Name;
+      }
+      if (other.time_ != null) {
+        if (time_ == null) {
+          time_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+        }
+        Time.MergeFrom(other.Time);
+      }
+      if (other.Offset != 0) {
+        Offset = other.Offset;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            input.SkipLastField();
+            break;
+          case 10: {
+            Name = input.ReadString();
+            break;
+          }
+          case 18: {
+            if (time_ == null) {
+              time_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+            }
+            input.ReadMessage(time_);
+            break;
+          }
+          case 24: {
+            Offset = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   public sealed partial class CommitWire : pb::IMessage<CommitWire> {
     private static readonly pb::MessageParser<CommitWire> _parser = new pb::MessageParser<CommitWire>(() => new CommitWire());
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -44,7 +230,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::SourceCode.Chasm.IO.Proto.Wire.CommitWireReflection.Descriptor.MessageTypes[0]; }
+      get { return global::SourceCode.Chasm.IO.Proto.Wire.CommitWireReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -63,7 +249,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     public CommitWire(CommitWire other) : this() {
       parents_ = other.parents_.Clone();
       TreeId = other.treeId_ != null ? other.TreeId.Clone() : null;
-      Utc = other.utc_ != null ? other.Utc.Clone() : null;
+      Author = other.author_ != null ? other.Author.Clone() : null;
+      Committer = other.committer_ != null ? other.Committer.Clone() : null;
       message_ = other.message_;
     }
 
@@ -93,19 +280,30 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       }
     }
 
-    /// <summary>Field number for the "Utc" field.</summary>
-    public const int UtcFieldNumber = 3;
-    private global::Google.Protobuf.WellKnownTypes.Timestamp utc_;
+    /// <summary>Field number for the "Author" field.</summary>
+    public const int AuthorFieldNumber = 3;
+    private global::SourceCode.Chasm.IO.Proto.Wire.AuditWire author_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Google.Protobuf.WellKnownTypes.Timestamp Utc {
-      get { return utc_; }
+    public global::SourceCode.Chasm.IO.Proto.Wire.AuditWire Author {
+      get { return author_; }
       set {
-        utc_ = value;
+        author_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Committer" field.</summary>
+    public const int CommitterFieldNumber = 4;
+    private global::SourceCode.Chasm.IO.Proto.Wire.AuditWire committer_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::SourceCode.Chasm.IO.Proto.Wire.AuditWire Committer {
+      get { return committer_; }
+      set {
+        committer_ = value;
       }
     }
 
     /// <summary>Field number for the "Message" field.</summary>
-    public const int MessageFieldNumber = 4;
+    public const int MessageFieldNumber = 5;
     private string message_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public string Message {
@@ -130,7 +328,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       }
       if(!parents_.Equals(other.parents_)) return false;
       if (!object.Equals(TreeId, other.TreeId)) return false;
-      if (!object.Equals(Utc, other.Utc)) return false;
+      if (!object.Equals(Author, other.Author)) return false;
+      if (!object.Equals(Committer, other.Committer)) return false;
       if (Message != other.Message) return false;
       return true;
     }
@@ -140,7 +339,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       int hash = 1;
       hash ^= parents_.GetHashCode();
       if (treeId_ != null) hash ^= TreeId.GetHashCode();
-      if (utc_ != null) hash ^= Utc.GetHashCode();
+      if (author_ != null) hash ^= Author.GetHashCode();
+      if (committer_ != null) hash ^= Committer.GetHashCode();
       if (Message.Length != 0) hash ^= Message.GetHashCode();
       return hash;
     }
@@ -157,12 +357,16 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         output.WriteRawTag(18);
         output.WriteMessage(TreeId);
       }
-      if (utc_ != null) {
+      if (author_ != null) {
         output.WriteRawTag(26);
-        output.WriteMessage(Utc);
+        output.WriteMessage(Author);
+      }
+      if (committer_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(Committer);
       }
       if (Message.Length != 0) {
-        output.WriteRawTag(34);
+        output.WriteRawTag(42);
         output.WriteString(Message);
       }
     }
@@ -174,8 +378,11 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (treeId_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(TreeId);
       }
-      if (utc_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Utc);
+      if (author_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Author);
+      }
+      if (committer_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Committer);
       }
       if (Message.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
@@ -195,11 +402,17 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         }
         TreeId.MergeFrom(other.TreeId);
       }
-      if (other.utc_ != null) {
-        if (utc_ == null) {
-          utc_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+      if (other.author_ != null) {
+        if (author_ == null) {
+          author_ = new global::SourceCode.Chasm.IO.Proto.Wire.AuditWire();
         }
-        Utc.MergeFrom(other.Utc);
+        Author.MergeFrom(other.Author);
+      }
+      if (other.committer_ != null) {
+        if (committer_ == null) {
+          committer_ = new global::SourceCode.Chasm.IO.Proto.Wire.AuditWire();
+        }
+        Committer.MergeFrom(other.Committer);
       }
       if (other.Message.Length != 0) {
         Message = other.Message;
@@ -226,13 +439,20 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             break;
           }
           case 26: {
-            if (utc_ == null) {
-              utc_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
+            if (author_ == null) {
+              author_ = new global::SourceCode.Chasm.IO.Proto.Wire.AuditWire();
             }
-            input.ReadMessage(utc_);
+            input.ReadMessage(author_);
             break;
           }
           case 34: {
+            if (committer_ == null) {
+              committer_ = new global::SourceCode.Chasm.IO.Proto.Wire.AuditWire();
+            }
+            input.ReadMessage(committer_);
+            break;
+          }
+          case 42: {
             Message = input.ReadString();
             break;
           }

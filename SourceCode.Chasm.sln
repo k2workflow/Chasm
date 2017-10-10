@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{557A4569
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.Disk", "src\SourceCode.Chasm.Repository.Disk\SourceCode.Chasm.Repository.Disk.csproj", "{47259EC6-D078-4E6A-89CD-F19FB73C8F34}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Serializer.Text", "src\SourceCode.Chasm.Serializer.Git\SourceCode.Chasm.Serializer.Text.csproj", "{5EC98200-9745-46C8-B455-8991B5DB3A9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Serializer.Text", "src\SourceCode.Chasm.Serializer.Text\SourceCode.Chasm.Serializer.Text.csproj", "{5EC98200-9745-46C8-B455-8991B5DB3A9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

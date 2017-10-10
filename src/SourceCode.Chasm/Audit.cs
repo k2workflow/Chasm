@@ -59,7 +59,7 @@ namespace SourceCode.Chasm
 
         public bool Equals(Audit other)
         {
-            if (StringComparer.Ordinal.Equals(Name, other.Name)) return false;
+            if (!StringComparer.Ordinal.Equals(Name, other.Name)) return false;
             if (Timestamp != other.Timestamp) return false;
 
             return true;

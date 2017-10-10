@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Null(IChasmSerializer ser)
         {
             // Force Commit to be non-default
-            var force = DateTime.UtcNow;
+            var force = new Audit("bob", default);
 
             var expected = new Commit(null, default, force, null);
             using (var buf = ser.Serialize(expected))

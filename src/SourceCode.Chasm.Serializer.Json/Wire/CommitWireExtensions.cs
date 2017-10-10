@@ -8,7 +8,6 @@
 using SourceCode.Clay.Json;
 using System;
 using System.Json;
-using System.Xml;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -20,7 +19,8 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         private const string _parents = "parents";
         private const string _treeId = "treeId";
-        private const string _utc = "utc";
+        private const string _author = "author";
+        private const string _committer = "committer";
         private const string _message = "message";
 
         #endregion
@@ -30,6 +30,9 @@ namespace SourceCode.Chasm.IO.Json.Wire
         public static JsonObject Convert(this Commit model)
         {
             if (model == Commit.Empty) return default; // null
+
+            // TreeId
+            var treeId = model.TreeId.Sha1.ToString("N");
 
             // Parents
             JsonArray parents = null;
@@ -58,20 +61,21 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 }
             }
 
-            // Utc
-            var utc = XmlConvert.ToString(model.Utc, XmlDateTimeSerializationMode.Utc);
+            // Author
+            var author = model.Author.Convert();
+
+            // Committer
+            var committer = model.Committer.Convert();
 
             // Message
             var msg = model.Message == null ? null : new JsonPrimitive(model.Message);
-
-            // TreeId
-            var treeId = model.TreeId.Sha1.ToString("N");
 
             var wire = new JsonObject
             {
                 [_parents] = parents,
                 [_treeId] = treeId,
-                [_utc] = utc,
+                [_author] = author,
+                [_committer] = committer,
                 [_message] = msg
             };
 
@@ -100,16 +104,26 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 }
             }
 
-            // Utc
-            jv = wire.GetValue(_utc, JsonType.String, false);
-            var utc = XmlConvert.ToDateTime(jv, XmlDateTimeSerializationMode.Utc);
+            // Author
+            Audit author = default;
+            if (wire.TryGetObject(_author, out var jo))
+            {
+                author = jo.ConvertAudit();
+            }
+
+            // Committer
+            Audit committer = default;
+            if (wire.TryGetObject(_committer, out jo))
+            {
+                committer = jo.ConvertAudit();
+            }
 
             // Message
             string message = null;
             if (wire.TryGetValue(_message, JsonType.String, true, out jv))
                 message = jv;
 
-            var model = new Commit(parents, treeId, utc, message);
+            var model = new Commit(parents, treeId, author, committer, message);
             return model;
         }
 
