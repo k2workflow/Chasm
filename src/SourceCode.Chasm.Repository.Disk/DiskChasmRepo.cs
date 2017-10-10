@@ -23,15 +23,24 @@ namespace SourceCode.Chasm.IO.Disk
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Gets the root path for the repository.
+        /// </summary>
+        public string RootPath { get; }
+
+        #endregion
+
         #region Constructors
 
         public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
             : base(serializer, compressionLevel, maxDop)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length <= 2) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
-            if (rootFolder[rootFolder.Length - 1] != Path.DirectorySeparatorChar) throw new ArgumentException("Path must end with " + Path.DirectorySeparatorChar, nameof(rootFolder));
             var rootPath = Path.GetFullPath(rootFolder);
-            if (rootPath != rootFolder) throw new ArgumentException("Path must be fully qualified", nameof(rootFolder));
+
+            RootPath = rootPath;
 
             // Root
             {
@@ -42,7 +51,7 @@ namespace SourceCode.Chasm.IO.Disk
             // Refs
             {
                 const string container = "refs";
-                var path = Path.Combine(rootPath, container) + Path.DirectorySeparatorChar;
+                var path = Path.Combine(rootPath, container);
 
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
@@ -53,7 +62,7 @@ namespace SourceCode.Chasm.IO.Disk
             // Objects
             {
                 const string container = "objects";
-                var path = Path.Combine(rootPath, container) + Path.DirectorySeparatorChar;
+                var path = Path.Combine(rootPath, container);
 
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
@@ -82,30 +91,35 @@ namespace SourceCode.Chasm.IO.Disk
             if (!Directory.Exists(dir))
                 return default;
 
-            using (var fileStream = WaitForFile(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            if (!File.Exists(path))
+                return default;
+
+            using (var fileStream = await WaitForFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken).ConfigureAwait(false))
             {
-                if (fileStream == null)
-                    return default;
-
-                var offset = 0;
-                var remaining = (int)fileStream.Length;
-
-                var bytes = new byte[remaining];
-                while (remaining > 0)
-                {
-                    var count = await fileStream.ReadAsync(bytes, offset, remaining, cancellationToken).ConfigureAwait(false);
-                    if (count == 0)
-                        throw new EndOfStreamException("End of file");
-
-                    offset += count;
-                    remaining -= count;
-                }
-
-                return bytes;
+                return await ReadFromStreamAsync(fileStream, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        private static async Task WriteFileAsync(string path, ArraySegment<byte> segment, CancellationToken cancellationToken)
+        private static async ValueTask<byte[]> ReadFromStreamAsync(Stream fileStream, CancellationToken cancellationToken)
+        {
+            var offset = 0;
+            var remaining = (int)fileStream.Length;
+
+            var bytes = new byte[remaining];
+            while (remaining > 0)
+            {
+                var count = await fileStream.ReadAsync(bytes, offset, remaining, cancellationToken).ConfigureAwait(false);
+                if (count == 0)
+                    throw new EndOfStreamException("End of file");
+
+                offset += count;
+                remaining -= count;
+            }
+
+            return bytes;
+        }
+
+        private static async Task WriteFileAsync(string path, Stream data, CancellationToken cancellationToken, bool forceOverwrite)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
 
@@ -113,14 +127,28 @@ namespace SourceCode.Chasm.IO.Disk
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            using (var fileStream = WaitForFile(path, FileMode.Create, FileAccess.Write, FileShare.None))
+            var dataLength = data.Length - data.Position;
+            if (dataLength <= 0) return;
+
+            using (var fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken).ConfigureAwait(false))
             {
-                await fileStream.WriteAsync(segment.Array, segment.Offset, segment.Count, cancellationToken).ConfigureAwait(false);
+                // Only write to the file if it does not already exist.
+                if ((fileStream.Length != dataLength || forceOverwrite))
+                {
+                    fileStream.Position = 0;
+
+                    await data.CopyToAsync(fileStream, 81920, cancellationToken).ConfigureAwait(false);
+
+                    if (fileStream.Position != dataLength)
+                        fileStream.SetLength(dataLength);
+                }
             }
 
-            // Touch
+            await TouchFileAsync(path, cancellationToken).ConfigureAwait(false);
+        }
 
-            // TODO: Under load we see intermittent IO exceptions. This is a temp fix.
+        private static async Task TouchFileAsync(string path, CancellationToken cancellationToken)
+        {
             for (var retryCount = 0; retryCount < _retryMax; retryCount++)
             {
                 try
@@ -130,15 +158,15 @@ namespace SourceCode.Chasm.IO.Disk
                 }
                 catch (IOException)
                 {
-                    Thread.Sleep(_retryMs);
+                    await Task.Delay(_retryMs, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
 
-        private static FileStream WaitForFile(string path, FileMode mode, FileAccess access, FileShare share, int bufferSize = 4096)
+        private static async ValueTask<FileStream> WaitForFileAsync(string path, FileMode mode, FileAccess access, FileShare share, CancellationToken cancellationToken, int bufferSize = 4096)
         {
-            // TODO: Under load we see intermittent IO exceptions. This is a temp fix.
-            for (var retryCount = 0; retryCount < _retryMax; retryCount++)
+            var retryCount = 0;
+            while (true)
             {
                 FileStream fs = null;
                 try
@@ -146,16 +174,12 @@ namespace SourceCode.Chasm.IO.Disk
                     fs = new FileStream(path, mode, access, share, bufferSize);
                     return fs;
                 }
-                catch (IOException)
+                catch (IOException) when (++retryCount < _retryMax)
                 {
                     fs?.Dispose();
-
-                    Thread.Sleep(_retryMs);
-                    continue;
+                    await Task.Delay(_retryMs, cancellationToken).ConfigureAwait(false);
                 }
             }
-
-            return null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -164,7 +188,7 @@ namespace SourceCode.Chasm.IO.Disk
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var refName = $@"{branch}\{name}.commit";
+            var refName = Path.Combine(branch, $"{name}.commit");
             return refName;
         }
 
@@ -173,7 +197,7 @@ namespace SourceCode.Chasm.IO.Disk
         {
             var tokens = sha1.Split(2);
 
-            var fileName = $@"{tokens.Key}\{tokens.Value}";
+            var fileName = Path.Combine(tokens.Key, tokens.Value);
             return fileName;
         }
 

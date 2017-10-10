@@ -8,6 +8,7 @@
 using SourceCode.Clay.Collections.Generic;
 using SourceCode.Clay.Threading;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -57,25 +58,23 @@ namespace SourceCode.Chasm.IO.Disk
         {
             if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
-            Dictionary<Sha1, ReadOnlyMemory<byte>> dict;
+            ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>> dict;
             if (objectIds is ICollection<Sha1> sha1s)
             {
                 if (sha1s.Count == 0) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
-                dict = new Dictionary<Sha1, ReadOnlyMemory<byte>>(sha1s.Count);
+                dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>(4 * Environment.ProcessorCount, sha1s.Count);
             }
             else
             {
                 if (!objectIds.Any()) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
-                dict = new Dictionary<Sha1, ReadOnlyMemory<byte>>();
+                dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>();
             }
 
-            // TODO: Parallelize
-            foreach (var sha1 in objectIds)
+            await ParallelAsync.ForEachAsync(objectIds, parallelOptions, async sha1 =>
             {
                 var buffer = await ReadObjectAsync(sha1, parallelOptions.CancellationToken).ConfigureAwait(false);
-
                 dict[sha1] = buffer;
-            }
+            }).ConfigureAwait(false);
 
             return dict;
         }
@@ -102,7 +101,7 @@ namespace SourceCode.Chasm.IO.Disk
                 }
                 output.Position = 0;
 
-                await WriteFileAsync(path, output.ToArray(), cancellationToken).ConfigureAwait(false); // TODO: Perf
+                await WriteFileAsync(path, output, cancellationToken, false).ConfigureAwait(false); // TODO: Perf
             }
         }
 

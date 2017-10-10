@@ -27,5 +27,6 @@
     <PackageTags>cas content storage sha1 git disk file</PackageTags>
     <Version>1.0.0-local</Version>
     <PackageVersion>1.0.0-local</PackageVersion>
+    <RootNamespace>SourceCode.Chasm.IO.Disk</RootNamespace>
   </PropertyGroup>
 </Project>
