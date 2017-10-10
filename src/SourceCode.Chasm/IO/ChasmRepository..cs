@@ -37,13 +37,21 @@ namespace SourceCode.Chasm.IO
             MaxDop = maxDop;
         }
 
+        #endregion
+
+        #region CommitRef
+
         public abstract ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
+
+        public abstract Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken);
+
+        #endregion
+
+        #region Object
 
         public abstract ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
         public abstract ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions);
-
-        public abstract Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken);
 
         public abstract Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
 
