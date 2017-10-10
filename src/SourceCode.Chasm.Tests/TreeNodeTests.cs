@@ -19,7 +19,7 @@ namespace SourceCode.Chasm.Tests
         public static void TreeNode_is_empty()
         {
             var noData = new TreeNode();
-            var nullData = new TreeNode("a", NodeKind.None, Sha1.Empty);
+            var nullData = new TreeNode("a", NodeKind.Blob, Sha1.Empty);
 
             // Name
             Assert.Null(TreeNode.Empty.Name);
@@ -27,18 +27,18 @@ namespace SourceCode.Chasm.Tests
             Assert.Null(TreeNode.EmptyTree.Name);
             Assert.Null(noData.Name);
             Assert.Equal("a", nullData.Name);
-            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, NodeKind.None, Sha1.Empty));
+            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, NodeKind.Blob, Sha1.Empty));
             Assert.Throws<ArgumentNullException>(() => new TreeNode(null, BlobId.Empty));
             Assert.Throws<ArgumentNullException>(() => new TreeNode(null, TreeId.Empty));
 
             // NodeKind
-            Assert.Equal(NodeKind.None, default);
+            Assert.Equal(NodeKind.Blob, default);
             Assert.Equal(default, TreeNode.Empty.Kind);
             Assert.Equal(default, noData.Kind);
             Assert.Equal(default, nullData.Kind);
             Assert.Equal(NodeKind.Blob, TreeNode.EmptyBlob.Kind);
             Assert.Equal(NodeKind.Tree, TreeNode.EmptyTree.Kind);
-            Assert.Throws<ArgumentOutOfRangeException>(() => new TreeNode("a", (NodeKind)4, Sha1.Empty));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new TreeNode("a", (NodeKind)2, Sha1.Empty));
 
             // Sha1
             Assert.Equal(default, TreeNode.Empty.Sha1);
@@ -52,8 +52,8 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(TreeNode_equality))]
         public static void TreeNode_equality()
         {
-            var tree1 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
-            var tree2 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+            var tree1 = new TreeNode("a", NodeKind.Tree, Sha1.Hash("abc"));
+            var tree2 = new TreeNode("a", NodeKind.Tree, Sha1.Hash("abc"));
 
             Assert.True(tree1 == tree2);
             Assert.False(tree1 != tree2);
@@ -82,7 +82,7 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(tree1, actual);
             Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
 
-            actual = new TreeNode(tree1.Name, NodeKind.Tree, tree1.Sha1);
+            actual = new TreeNode(tree1.Name, NodeKind.Blob, tree1.Sha1);
             Assert.NotEqual(tree1, actual);
             Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
 

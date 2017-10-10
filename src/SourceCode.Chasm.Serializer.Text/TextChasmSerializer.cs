@@ -5,12 +5,9 @@
 
 #endregion
 
-namespace SourceCode.Chasm
+namespace SourceCode.Chasm.IO.Text
 {
-    public enum NodeKind : byte
+    public sealed partial class TextChasmSerializer : IChasmSerializer
     {
-        Blob = 0, // Default
-
-        Tree = 1
     }
 }

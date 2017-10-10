@@ -12,7 +12,6 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00216" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,10 +19,10 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageId>SourceCode.Chasm.IO.Json</PackageId>
+    <PackageId>SourceCode.Chasm.IO.Text</PackageId>
     <Authors>SourceCode</Authors>
-    <Description>CAS - Content Addressable Storage (Json Serializer).</Description>
-    <PackageTags>cas content storage sha1 git json</PackageTags>
+    <Description>CAS - Content Addressable Storage (Text Serializer).</Description>
+    <PackageTags>cas content storage sha1 git text</PackageTags>
     <Version>1.0.0-local</Version>
     <PackageVersion>1.0.0-local</PackageVersion>
   </PropertyGroup>

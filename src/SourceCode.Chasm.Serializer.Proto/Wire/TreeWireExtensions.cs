@@ -47,7 +47,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             // Do not use direct integer conversion - it may fail silently
             switch (wire)
             {
-                case NodeKindWire.None: return NodeKind.None;
                 case NodeKindWire.Blob: return NodeKind.Blob;
                 case NodeKindWire.Tree: return NodeKind.Tree;
                 default: throw new ArgumentOutOfRangeException(nameof(wire));
@@ -60,7 +59,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             // Do not use direct integer conversion - it may fail silently
             switch (model)
             {
-                case NodeKind.None: return NodeKindWire.None;
                 case NodeKind.Blob: return NodeKindWire.Blob;
                 case NodeKind.Tree: return NodeKindWire.Tree;
                 default: throw new ArgumentOutOfRangeException(nameof(model));

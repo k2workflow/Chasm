@@ -5,26 +5,25 @@
 
 #endregion
 
-using SourceCode.Chasm.IO.Json.Wire;
+using SourceCode.Chasm.IO.Text.Wire;
 using SourceCode.Clay.Buffers;
 using System;
 using System.Text;
 
-namespace SourceCode.Chasm.IO.Json
+namespace SourceCode.Chasm.IO.Text
 {
-    partial class JsonChasmSerializer // .CommitId
+    partial class TextChasmSerializer // .Tree
     {
         #region Serialize
 
-        public BufferSession Serialize(CommitId model)
+        public BufferSession Serialize(TreeNodeList model)
         {
             var wire = model.Convert();
-            var json = wire?.ToString() ?? "null";
 
-            var maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
+            var maxLen = Encoding.UTF8.GetMaxByteCount(wire.Length); // Utf8 is 1-4 bpc
             var rented = BufferSession.RentBuffer(maxLen);
 
-            var count = Encoding.UTF8.GetBytes(json, 0, json.Length, rented, 0);
+            var count = Encoding.UTF8.GetBytes(wire, 0, wire.Length, rented, 0);
 
             var seg = new ArraySegment<byte>(rented, 0, count);
             var session = new BufferSession(seg);
@@ -35,20 +34,20 @@ namespace SourceCode.Chasm.IO.Json
 
         #region Deserialize
 
-        public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
+        public TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
         {
-            if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
+            if (span.IsEmpty) return default;
 
-            string json;
+            string text;
             unsafe
             {
                 fixed (byte* ptr = &span.DangerousGetPinnableReference())
                 {
-                    json = Encoding.UTF8.GetString(ptr, span.Length);
+                    text = Encoding.UTF8.GetString(ptr, span.Length);
                 }
             }
 
-            var model = json.ParseCommitId();
+            var model = text.ConvertTree();
             return model;
         }
 
