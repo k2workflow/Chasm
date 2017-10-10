@@ -1,5 +1,4 @@
 syntax = "proto3";
-import "timestamp.proto";
 import "Sha1Wire.proto";
 option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 
@@ -7,7 +6,7 @@ option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 	{
 		string Name = 1;
 
-		google.protobuf.Timestamp Time = 2;
+		int64 Time = 2; // Milliseconds
 
 		int32 Offset = 3; // Minutes
 	}

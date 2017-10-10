@@ -22,16 +22,15 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     static CommitWireReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChBDb21taXRXaXJlLnByb3RvGg90aW1lc3RhbXAucHJvdG8aDlNoYTFXaXJl",
-            "LnByb3RvIlMKCUF1ZGl0V2lyZRIMCgROYW1lGAEgASgJEigKBFRpbWUYAiAB",
-            "KAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBk9mZnNldBgDIAEo",
+            "ChBDb21taXRXaXJlLnByb3RvGg5TaGExV2lyZS5wcm90byI3CglBdWRpdFdp",
+            "cmUSDAoETmFtZRgBIAEoCRIMCgRUaW1lGAIgASgDEg4KBk9mZnNldBgDIAEo",
             "BSKPAQoKQ29tbWl0V2lyZRIaCgdQYXJlbnRzGAEgAygLMgkuU2hhMVdpcmUS",
             "GQoGVHJlZUlkGAIgASgLMgkuU2hhMVdpcmUSGgoGQXV0aG9yGAMgASgLMgou",
             "QXVkaXRXaXJlEh0KCUNvbW1pdHRlchgEIAEoCzIKLkF1ZGl0V2lyZRIPCgdN",
             "ZXNzYWdlGAUgASgJQiGqAh5Tb3VyY2VDb2RlLkNoYXNtLklPLlByb3RvLldp",
             "cmViBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::SourceCode.Chasm.IO.Proto.Wire.Sha1WireReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.AuditWire), global::SourceCode.Chasm.IO.Proto.Wire.AuditWire.Parser, new[]{ "Name", "Time", "Offset" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Author", "Committer", "Message" }, null, null, null)
@@ -66,7 +65,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public AuditWire(AuditWire other) : this() {
       name_ = other.name_;
-      Time = other.time_ != null ? other.Time.Clone() : null;
+      time_ = other.time_;
       offset_ = other.offset_;
     }
 
@@ -88,9 +87,12 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
 
     /// <summary>Field number for the "Time" field.</summary>
     public const int TimeFieldNumber = 2;
-    private global::Google.Protobuf.WellKnownTypes.Timestamp time_;
+    private long time_;
+    /// <summary>
+    /// Milliseconds
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Google.Protobuf.WellKnownTypes.Timestamp Time {
+    public long Time {
       get { return time_; }
       set {
         time_ = value;
@@ -125,7 +127,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         return true;
       }
       if (Name != other.Name) return false;
-      if (!object.Equals(Time, other.Time)) return false;
+      if (Time != other.Time) return false;
       if (Offset != other.Offset) return false;
       return true;
     }
@@ -134,7 +136,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (time_ != null) hash ^= Time.GetHashCode();
+      if (Time != 0L) hash ^= Time.GetHashCode();
       if (Offset != 0) hash ^= Offset.GetHashCode();
       return hash;
     }
@@ -150,9 +152,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         output.WriteRawTag(10);
         output.WriteString(Name);
       }
-      if (time_ != null) {
-        output.WriteRawTag(18);
-        output.WriteMessage(Time);
+      if (Time != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(Time);
       }
       if (Offset != 0) {
         output.WriteRawTag(24);
@@ -166,8 +168,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      if (time_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Time);
+      if (Time != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
       }
       if (Offset != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Offset);
@@ -183,11 +185,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      if (other.time_ != null) {
-        if (time_ == null) {
-          time_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
-        }
-        Time.MergeFrom(other.Time);
+      if (other.Time != 0L) {
+        Time = other.Time;
       }
       if (other.Offset != 0) {
         Offset = other.Offset;
@@ -206,11 +205,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             Name = input.ReadString();
             break;
           }
-          case 18: {
-            if (time_ == null) {
-              time_ = new global::Google.Protobuf.WellKnownTypes.Timestamp();
-            }
-            input.ReadMessage(time_);
+          case 16: {
+            Time = input.ReadInt64();
             break;
           }
           case 24: {

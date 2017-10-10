@@ -6,7 +6,6 @@
 #endregion
 
 using System;
-using System.Globalization;
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
@@ -18,9 +17,12 @@ namespace SourceCode.Chasm.IO.Text.Wire
         {
             if (model == Audit.Empty) return default; // null
 
-            var utc = model.Timestamp.ToUniversalTime();
-            var ms = utc.ToUnixTimeMilliseconds();
+            // Convert System.DateTimeOffset to Unix ms
 
+            // Time (milliseconds)
+            var ms = model.Timestamp.ToUniversalTime().ToUnixTimeMilliseconds();
+
+            // Offset (minutes)
             var tz = model.Timestamp.Offset.TotalMinutes;
 
             var wire = $"{model.Name} {ms} {tz:0000}";
@@ -31,7 +33,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
         {
             if (wire == null) return default;
 
-            DateTimeOffset utc = default;
+            DateTimeOffset time = default;
             TimeSpan offset = default;
 
             var len = wire.Length;
@@ -45,20 +47,27 @@ namespace SourceCode.Chasm.IO.Text.Wire
                 {
                     var str = wire.Substring(ix, len - ix).TrimEnd();
                     var ms = long.Parse(str);
-                    utc = DateTimeOffset.FromUnixTimeMilliseconds(ms);
+
+                    // Convert Unix ms to System.DateTimeOffset
+
+                    // Time (milliseconds)
+                    time = DateTimeOffset.FromUnixTimeMilliseconds(ms);
+                    time = time.ToOffset(offset);
                     break;
                 }
 
                 var stt = wire.Substring(ix, len - ix).TrimEnd();
                 var minutes = int.Parse(stt);
+
+                // Offset (minutes)
                 offset = TimeSpan.FromMinutes(minutes);
                 foundFirst = true;
                 len = ix;
             }
 
             var name = wire.Substring(0, ix);
-            utc = utc.ToOffset(offset);
-            return new Audit(name, utc);
+
+            return new Audit(name, time);
         }
 
         #endregion
