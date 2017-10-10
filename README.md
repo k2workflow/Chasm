@@ -21,6 +21,10 @@ Rather, this is meant to be a general purpose CAS store for any document type.
 * Efficient network/disk operations: XML is bad, JSON is better, Protobuf/etc are best
 * Simple: Avoid the need to reinvent graph semantics, etc
 
+### Prerequisites
+
+* .NET Core SDK 2.0 (https://www.microsoft.com/net/download/core)
+
 ### Getting started
 
 **Getting started with Git and GitHub**
