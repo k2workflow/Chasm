@@ -341,6 +341,53 @@ namespace SourceCode.Chasm.Tests.IO
             Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeList>(), actual);
         }
 
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(ChasmRepositoryTree_WriteTreeAsync_Tree))]
+        public static async Task ChasmRepositoryTree_WriteTreeAsync_CommitIds()
+        {
+            // Arrange
+            var sha1 = Sha1.Hash("abc");
+            var commitId = new CommitId(sha1);
+            var parents = new List<CommitId> { commitId };
+            var treeId = new TreeId(sha1);
+            var treeNodeList = new TreeNodeList(new TreeNode(Guid.NewGuid().ToString(), treeId));
+            var audit = new Audit(Guid.NewGuid().ToString(), DateTimeOffset.MaxValue);
+            var message = Guid.NewGuid().ToString();
+
+            var mockChasmSerializer = new Mock<IChasmSerializer>();
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
+            {
+                CallBase = true
+            };
+
+            // Action
+            var actual = await mockChasmRepository.Object.WriteTreeAsync(parents, treeNodeList, audit, audit, message, new CancellationToken());
+
+            // Assert
+            Assert.Equal(CommitId.Empty, actual);
+            mockChasmRepository.Verify(i => i.WriteTreeAsync(It.IsAny<TreeNodeList>(), It.IsAny<CancellationToken>()));
+            mockChasmRepository.Verify(i => i.WriteCommitAsync(It.IsAny<Commit>(), It.IsAny<CancellationToken>()));
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(ChasmRepositoryTree_WriteTreeAsync_Tree))]
+        public static async Task ChasmRepositoryTree_WriteTreeAsync_Tree()
+        {
+            // Arrange
+            var mockChasmSerializer = new Mock<IChasmSerializer>();
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
+            {
+                CallBase = true
+            };
+
+            // Action
+            var actual = await mockChasmRepository.Object.WriteTreeAsync(TreeNodeList.Empty, new CancellationToken());
+
+            // Assert
+            Assert.Equal(TreeId.Empty, actual);
+            mockChasmRepository.Verify(i => i.WriteObjectAsync(It.IsAny<Sha1>(), It.IsAny<ArraySegment<byte>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+        }
+
         #endregion
     }
 }
