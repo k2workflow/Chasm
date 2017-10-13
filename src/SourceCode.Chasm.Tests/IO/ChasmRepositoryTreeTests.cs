@@ -30,8 +30,7 @@ namespace SourceCode.Chasm.Tests.IO
         public static async Task ChasmRepositoryTree_ReadTreeAsync_Branch_CommitRefName()
         {
             // Arrange
-            var mockChasmSerializer = new Mock<IChasmSerializer>();
-            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(CommitTestObject.Random);
+            var mockChasmSerializer = new Mock<RandomChasmSerializer>();
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -110,8 +109,7 @@ namespace SourceCode.Chasm.Tests.IO
         public static async Task ChasmRepositoryTree_ReadTreeAsync_CommitId()
         {
             // Arrange
-            var mockChasmSerializer = new Mock<IChasmSerializer>();
-            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(CommitTestObject.Random);
+            var mockChasmSerializer = new Mock<RandomChasmSerializer>();
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -172,8 +170,7 @@ namespace SourceCode.Chasm.Tests.IO
         public static async Task ChasmRepositoryTree_ReadTreeAsync_TreeId()
         {
             // Arrange
-            var mockChasmSerializer = new Mock<IChasmSerializer>();
-            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(CommitTestObject.Random);
+            var mockChasmSerializer = new Mock<RandomChasmSerializer>();
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
