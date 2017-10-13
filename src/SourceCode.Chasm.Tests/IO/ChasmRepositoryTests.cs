@@ -10,6 +10,7 @@ using System.IO.Compression;
 using System.Reflection;
 using Moq;
 using SourceCode.Chasm.IO;
+using SourceCode.Chasm.Tests.Helpers;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests.IO
@@ -17,6 +18,25 @@ namespace SourceCode.Chasm.Tests.IO
     public static class ChasmRepositoryTests
     {
         #region Methods
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(ChasmRepository_BuildConcurrencyException))]
+        public static void ChasmRepository_BuildConcurrencyException()
+        {
+            // Arrange
+            var expectedBranch = RandomHelper.String;
+            var expectedName = RandomHelper.String;
+            var expectedInnerException = new Exception(RandomHelper.String);
+
+            // Action
+            var actual = MockChasmRepository.MockBuildConcurrencyException(expectedBranch, expectedName, expectedInnerException);
+
+            // Assert
+            Assert.Equal(expectedInnerException, actual.InnerException);
+            Assert.Contains(nameof(CommitRef), actual.Message);
+            Assert.Contains(expectedBranch, actual.Message);
+            Assert.Contains(expectedName, actual.Message);
+        }
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(ChasmRepository_Constructor_ChasmSerializer_CompressionLevel_MaxDop))]
@@ -36,6 +56,33 @@ namespace SourceCode.Chasm.Tests.IO
             Assert.Equal(mockChasmSerializer.Object, actual.Serializer);
             Assert.Equal(expectedCompressionLevel, actual.CompressionLevel);
             Assert.Equal(expectedMaxDop, actual.MaxDop);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(ChasmRepository_Constructor_OutOfRange_CompressionLevel))]
+        public static void ChasmRepository_Constructor_OutOfRange_CompressionLevel()
+        {
+            // Arrange
+            var mockChasmSerializer = new Mock<IChasmSerializer>();
+            var expectedCompressionLevel = (CompressionLevel)int.MaxValue;
+            var expectedMaxDop = default(int);
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+
+            // Action
+            var actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            {
+                try
+                {
+                    var obj = mockChasmRepository.Object;
+                }
+                catch (TargetInvocationException targetInvocationException)
+                {
+                    throw targetInvocationException.InnerException;
+                }
+            });
+
+            // Assert
+            Assert.Contains("compressionLevel", actual.Message);
         }
 
         [Trait("Type", "Unit")]
@@ -93,17 +140,17 @@ namespace SourceCode.Chasm.Tests.IO
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_Constructor_OutOfRange_CompressionLevel))]
-        public static void ChasmRepository_Constructor_OutOfRange_CompressionLevel()
+        [Fact(DisplayName = nameof(ChasmRepository_Constructor_ChasmSerializer_CompressionLevel_MaxDop))]
+        public static void ChasmRepository_Constructor_SerialzerNull()
         {
             // Arrange
-            var mockChasmSerializer = new Mock<IChasmSerializer>();
-            var expectedCompressionLevel = (CompressionLevel)int.MaxValue;
-            var expectedMaxDop = default(int);
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+            var chasmSerializer = default(IChasmSerializer);
+            var expectedCompressionLevel = CompressionLevel.NoCompression;
+            var expectedMaxDop = 5;
+            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedCompressionLevel, expectedMaxDop);
 
             // Action
-            var actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            var actual = Assert.Throws<ArgumentNullException>(() =>
             {
                 try
                 {
@@ -116,26 +163,7 @@ namespace SourceCode.Chasm.Tests.IO
             });
 
             // Assert
-            Assert.Contains("compressionLevel", actual.Message);
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_BuildConcurrencyException))]
-        public static void ChasmRepository_BuildConcurrencyException()
-        {
-            // Arrange
-            var expectedBranch = Guid.NewGuid().ToString();
-            var expectedName = Guid.NewGuid().ToString();
-            var expectedInnerException = new Exception(Guid.NewGuid().ToString());
-
-            // Action
-            var actual = MockChasmRepository.MockBuildConcurrencyException(expectedBranch, expectedName, expectedInnerException);
-
-            // Assert
-            Assert.Equal(expectedInnerException, actual.InnerException);
-            Assert.Contains(nameof(CommitRef), actual.Message);
-            Assert.Contains(expectedBranch, actual.Message);
-            Assert.Contains(expectedName, actual.Message);
+            Assert.Contains("serializer", actual.Message);
         }
 
         #endregion
