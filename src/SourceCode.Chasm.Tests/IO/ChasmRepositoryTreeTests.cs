@@ -28,14 +28,8 @@ namespace SourceCode.Chasm.Tests.IO
         public static async Task ChasmRepositoryTree_ReadTreeAsync_Branch_CommitRefName()
         {
             // Arrange
-            var sha1 = Sha1.Hash("abc");
-            var commitId = new CommitId(sha1);
-            var treeId = new TreeId(sha1);
-            var audit = new Audit(Guid.NewGuid().ToString(), DateTimeOffset.MaxValue);
-            var commit = new Commit(commitId, treeId, audit, audit, Guid.NewGuid().ToString());
-            var commetRef = new CommitRef(Guid.NewGuid().ToString(), commitId);
             var mockChasmSerializer = new Mock<IChasmSerializer>();
-            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(commit);
+            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(TestValues.Commit);
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -45,14 +39,11 @@ namespace SourceCode.Chasm.Tests.IO
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return commetRef;
+                    return TestValues.CommitRef;
                 });
 
-            var branch = Guid.NewGuid().ToString();
-            var commitRefName = Guid.NewGuid().ToString();
-
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(branch, commitRefName, new CancellationToken());
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(TestValues.Branch, TestValues.CommitRef.Name, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeNodeList.Empty, actual);
@@ -68,14 +59,12 @@ namespace SourceCode.Chasm.Tests.IO
             {
                 CallBase = true
             };
-            var branch = Guid.NewGuid().ToString();
-            var commitRefName = default(string);
 
             // Action
-            var actual = Assert.ThrowsAsync<ArgumentNullException>(async () => await mockChasmRepository.Object.ReadTreeAsync(branch, commitRefName, new CancellationToken()));
+            var actual = Assert.ThrowsAsync<ArgumentNullException>(async () => await mockChasmRepository.Object.ReadTreeAsync(TestValues.Branch, default, TestValues.CancellationToken));
 
             // Assert
-            Assert.Contains(nameof(commitRefName), actual.Result.Message);
+            Assert.Contains("commitRefName", actual.Result.Message);
         }
 
         [Trait("Type", "Unit")]
@@ -89,11 +78,8 @@ namespace SourceCode.Chasm.Tests.IO
                 CallBase = true
             };
 
-            var branch = Guid.NewGuid().ToString();
-            var commitRefName = Guid.NewGuid().ToString();
-
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(branch, commitRefName, new CancellationToken());
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(TestValues.Branch, TestValues.CommitRef.Name, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeNodeList.Empty, actual);
@@ -109,14 +95,12 @@ namespace SourceCode.Chasm.Tests.IO
             {
                 CallBase = true
             };
-            var branch = default(string);
-            var commitRefName = Guid.NewGuid().ToString();
 
             // Action
-            var actual = Assert.ThrowsAsync<ArgumentNullException>(async () => await mockChasmRepository.Object.ReadTreeAsync(branch, commitRefName, new CancellationToken()));
+            var actual = Assert.ThrowsAsync<ArgumentNullException>(async () => await mockChasmRepository.Object.ReadTreeAsync(default, TestValues.CommitRef.Name, TestValues.CancellationToken));
 
             // Assert
-            Assert.Contains(nameof(branch), actual.Result.Message);
+            Assert.Contains("branch", actual.Result.Message);
         }
 
         [Trait("Type", "Unit")]
@@ -124,14 +108,8 @@ namespace SourceCode.Chasm.Tests.IO
         public static async Task ChasmRepositoryTree_ReadTreeAsync_CommitId()
         {
             // Arrange
-            var sha1 = Sha1.Hash("abc");
-            var commitId = new CommitId(sha1);
-            var treeId = new TreeId(sha1);
-            var audit = new Audit();
-            var commit = new Commit(commitId, treeId, audit, audit, Guid.NewGuid().ToString());
-            var readOnlyMemory = new ReadOnlyMemory<byte>(new byte[] { 1, 2, 3, 4 });
             var mockChasmSerializer = new Mock<IChasmSerializer>();
-            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(commit);
+            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(TestValues.Commit);
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -141,11 +119,11 @@ namespace SourceCode.Chasm.Tests.IO
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return readOnlyMemory;
+                    return TestValues.ReadOnlyMemory;
                 });
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(commitId, new CancellationToken());
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(TestValues.CommitId, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeNodeList.Empty, actual);
@@ -163,7 +141,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(CommitId.Empty, new CancellationToken());
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(CommitId.Empty, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeNodeList.Empty, actual);
@@ -180,10 +158,8 @@ namespace SourceCode.Chasm.Tests.IO
                 CallBase = true
             };
 
-            var commitId = new CommitId(Sha1.Hash("abc"));
-
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(commitId, new CancellationToken());
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(TestValues.CommitId, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeNodeList.Empty, actual);
@@ -194,14 +170,8 @@ namespace SourceCode.Chasm.Tests.IO
         public static async Task ChasmRepositoryTree_ReadTreeAsync_TreeId()
         {
             // Arrange
-            var sha1 = Sha1.Hash("abc");
-            var commitId = new CommitId(sha1);
-            var treeId = new TreeId(sha1);
-            var audit = new Audit();
-            var commit = new Commit(commitId, treeId, audit, audit, Guid.NewGuid().ToString());
-            var readOnlyMemory = new ReadOnlyMemory<byte>(new byte[] { 1, 2, 3, 4 });
             var mockChasmSerializer = new Mock<IChasmSerializer>();
-            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(commit);
+            mockChasmSerializer.Setup(i => i.DeserializeCommit(It.IsAny<ReadOnlySpan<byte>>())).Returns(TestValues.Commit);
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -211,11 +181,11 @@ namespace SourceCode.Chasm.Tests.IO
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return readOnlyMemory;
+                    return TestValues.ReadOnlyMemory;
                 });
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(treeId, new CancellationToken());
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(TestValues.TreeId, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeNodeList.Empty, actual);
@@ -233,7 +203,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(TreeId.Empty, new CancellationToken());
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(TreeId.Empty, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeNodeList.Empty, actual);
@@ -250,10 +220,8 @@ namespace SourceCode.Chasm.Tests.IO
                 CallBase = true
             };
 
-            var treeId = new TreeId(Sha1.Hash("abc"));
-
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(treeId, new CancellationToken());
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(TestValues.TreeId, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeNodeList.Empty, actual);
@@ -264,8 +232,6 @@ namespace SourceCode.Chasm.Tests.IO
         public static async Task ChasmRepositoryTree_ReadTreeBatchAsync_TreeIds()
         {
             // Arrange
-            var sha1 = Sha1.Hash("abc");
-            var readOnlyMemory = new ReadOnlyMemory<byte>(new byte[] { 1, 2, 3, 4 });
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
@@ -280,16 +246,14 @@ namespace SourceCode.Chasm.Tests.IO
                     var dictionary = new Dictionary<Sha1, ReadOnlyMemory<byte>>();
                     foreach (var objectId in objectIds)
                     {
-                        dictionary.Add(objectId, readOnlyMemory);
+                        dictionary.Add(objectId, TestValues.ReadOnlyMemory);
                     }
 
                     return new ReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>(dictionary);
                 });
 
-            var treeId = new TreeId(Sha1.Hash("abc"));
-
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { treeId }, new ParallelOptions());
+            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TestValues.TreeId }, TestValues.ParallelOptions);
 
             // Assert
             Assert.Equal(1, actual.Count);
@@ -308,7 +272,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(null, new ParallelOptions());
+            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(null, TestValues.ParallelOptions);
 
             // Assert
             Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeList>(), actual);
@@ -332,10 +296,8 @@ namespace SourceCode.Chasm.Tests.IO
                     return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
                 });
 
-            var treeId = new TreeId(Sha1.Hash("abc"));
-
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { treeId }, new ParallelOptions());
+            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TestValues.TreeId }, TestValues.ParallelOptions);
 
             // Assert
             Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeList>(), actual);
@@ -346,14 +308,7 @@ namespace SourceCode.Chasm.Tests.IO
         public static async Task ChasmRepositoryTree_WriteTreeAsync_CommitIds()
         {
             // Arrange
-            var sha1 = Sha1.Hash("abc");
-            var commitId = new CommitId(sha1);
-            var parents = new List<CommitId> { commitId };
-            var treeId = new TreeId(sha1);
-            var treeNodeList = new TreeNodeList(new TreeNode(Guid.NewGuid().ToString(), treeId));
-            var audit = new Audit(Guid.NewGuid().ToString(), DateTimeOffset.MaxValue);
-            var message = Guid.NewGuid().ToString();
-
+            var parents = new List<CommitId> { TestValues.CommitId };
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
@@ -361,7 +316,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.WriteTreeAsync(parents, treeNodeList, audit, audit, message, new CancellationToken());
+            var actual = await mockChasmRepository.Object.WriteTreeAsync(parents, TestValues.TreeNodeList, TestValues.Audit, TestValues.Audit, TestValues.Message, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(CommitId.Empty, actual);
@@ -381,7 +336,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.WriteTreeAsync(TreeNodeList.Empty, new CancellationToken());
+            var actual = await mockChasmRepository.Object.WriteTreeAsync(TreeNodeList.Empty, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeId.Empty, actual);
