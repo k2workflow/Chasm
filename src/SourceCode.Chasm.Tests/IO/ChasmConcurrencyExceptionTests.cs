@@ -9,6 +9,7 @@ using System;
 using System.Runtime.Serialization;
 using Moq;
 using SourceCode.Chasm.IO;
+using SourceCode.Chasm.Tests.Helpers;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests.IO
@@ -33,7 +34,7 @@ namespace SourceCode.Chasm.Tests.IO
         public static void ChasmConcurrencyException_Constructor_String()
         {
             // Arrange
-            var expectedMessage = Guid.NewGuid().ToString();
+            var expectedMessage = RandomHelper.String;
 
             // Action
             var actual = new ChasmConcurrencyException(expectedMessage);
@@ -48,8 +49,8 @@ namespace SourceCode.Chasm.Tests.IO
         public static void ChasmConcurrencyException_Constructor_String_Exception()
         {
             // Arrange
-            var expectedInnerException = new Exception(Guid.NewGuid().ToString());
-            var expectedMessage = Guid.NewGuid().ToString();
+            var expectedInnerException = new Exception(RandomHelper.String);
+            var expectedMessage = RandomHelper.String;
 
             // Action
             var actual = new ChasmConcurrencyException(expectedMessage, expectedInnerException);

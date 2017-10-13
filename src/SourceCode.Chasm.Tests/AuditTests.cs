@@ -6,6 +6,8 @@
 #endregion
 
 using System;
+using SourceCode.Chasm.Tests.Helpers;
+using SourceCode.Chasm.Tests.TestObjects;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests
@@ -19,8 +21,8 @@ namespace SourceCode.Chasm.Tests
         public static void Audit_Deconstruct()
         {
             // Arrange
-            var expectedName = Guid.NewGuid().ToString();
-            var expectedDateTimeOffset = DateTimeOffset.MaxValue;
+            var expectedName = RandomHelper.String;
+            var expectedDateTimeOffset = RandomHelper.DateTimeOffset;
             var audit = new Audit(expectedName, expectedDateTimeOffset);
 
             // Action
@@ -32,13 +34,11 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(Audit_Deconstruct))]
+        [Fact(DisplayName = nameof(Audit_Equals_Object))]
         public static void Audit_Equals_Object()
         {
             // Arrange
-            var expectedName = Guid.NewGuid().ToString();
-            var expectedDateTimeOffset = DateTimeOffset.MaxValue;
-            var audit = new Audit(expectedName, expectedDateTimeOffset);
+            var audit = AuditTestObject.Random;
 
             // Action
             Assert.True(audit.Equals((object)audit));

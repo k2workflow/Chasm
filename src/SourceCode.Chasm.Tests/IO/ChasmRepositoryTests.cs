@@ -10,6 +10,7 @@ using System.IO.Compression;
 using System.Reflection;
 using Moq;
 using SourceCode.Chasm.IO;
+using SourceCode.Chasm.Tests.Helpers;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests.IO
@@ -23,9 +24,9 @@ namespace SourceCode.Chasm.Tests.IO
         public static void ChasmRepository_BuildConcurrencyException()
         {
             // Arrange
-            var expectedBranch = Guid.NewGuid().ToString();
-            var expectedName = Guid.NewGuid().ToString();
-            var expectedInnerException = new Exception(Guid.NewGuid().ToString());
+            var expectedBranch = RandomHelper.String;
+            var expectedName = RandomHelper.String;
+            var expectedInnerException = new Exception(RandomHelper.String);
 
             // Action
             var actual = MockChasmRepository.MockBuildConcurrencyException(expectedBranch, expectedName, expectedInnerException);
