@@ -1,5 +1,6 @@
 ## Chasm
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build status](https://ci.appveyor.com/api/projects/status/i9h982hdgtebfqhg?svg=true)](https://ci.appveyor.com/project/k2oss/chasm)
 [![Code Coverage](https://codecov.io/gh/k2workflow/Chasm/coverage.svg)](https://codecov.io/gh/k2workflow/Chasm)
 [![CodeFactor](https://www.codefactor.io/repository/github/k2workflow/chasm/badge)](https://www.codefactor.io/repository/github/k2workflow/chasm)
