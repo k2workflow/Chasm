@@ -57,7 +57,7 @@ namespace SourceCode.Chasm.IO.Disk
                 Directory.CreateDirectory(dir);
 
             // Objects are immutable
-            if (!File.Exists(path)
+            if (File.Exists(path)
                 && !forceOverwrite)
                 return;
 
