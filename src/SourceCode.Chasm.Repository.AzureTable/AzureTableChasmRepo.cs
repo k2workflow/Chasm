@@ -66,13 +66,13 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Factory
 
-        public static AzureTableChasmRepo Create(string connectionString, IChasmSerializer serializer, CompressionLevel compressionLevel)
+        public static AzureTableChasmRepo Create(string connectionString, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException(nameof(connectionString));
             if (serializer == null) throw new ArgumentNullException(nameof(serializer));
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
-            var repo = new AzureTableChasmRepo(storageAccount, serializer, compressionLevel);
+            var repo = new AzureTableChasmRepo(storageAccount, serializer, compressionLevel, maxDop);
 
             return repo;
         }
