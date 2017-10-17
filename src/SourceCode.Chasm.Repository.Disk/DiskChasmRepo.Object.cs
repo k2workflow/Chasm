@@ -52,6 +52,10 @@ namespace SourceCode.Chasm.IO.Disk
             var filename = DeriveFileName(objectId);
             var path = Path.Combine(_objectsContainer, filename);
 
+            var dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
             // Objects are immutable
             if (!File.Exists(path)
                 && !forceOverwrite)

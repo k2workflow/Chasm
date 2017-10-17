@@ -49,6 +49,10 @@ namespace SourceCode.Chasm.IO.Disk
             var filename = DeriveCommitRefFileName(branch, commitRef.Name);
             var path = Path.Combine(_refsContainer, filename);
 
+            var dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
             using (var session = Serializer.Serialize(commitRef.CommitId))
             using (var file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken).ConfigureAwait(false))
             {
