@@ -18,10 +18,11 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             if (model == Commit.Empty)
                 return new CommitWire() { Message = string.Empty };
 
-            var wire = new CommitWire();
-
-            // TreeId
-            wire.TreeId = model.TreeId.Sha1.Convert();
+            var wire = new CommitWire
+            {
+                // TreeId
+                TreeId = model.TreeId.Sha1.Convert()
+            };
 
             // Parents
             switch (model.Parents.Count)

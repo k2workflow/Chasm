@@ -493,8 +493,8 @@ namespace SourceCode.Chasm
                     for (var j = 0; j < 4; j++)
                     {
                         // Two hexits per byte: aaaa bbbb
-                        if (!TryParseHexit(hex[pos++], out byte h1)
-                            || !TryParseHexit(hex[pos++], out byte h2))
+                        if (!TryParseHexit(hex[pos++], out var h1)
+                            || !TryParseHexit(hex[pos++], out var h2))
                             return false;
 
                         bytes[i * 4 + j] = (byte)((h1 << 4) | h2);
@@ -542,7 +542,7 @@ namespace SourceCode.Chasm
         /// <exception cref="FormatException">Sha1</exception>
         public static Sha1 Parse(string hex)
         {
-            if (!TryParse(hex, out Sha1 sha1))
+            if (!TryParse(hex, out var sha1))
                 throw new FormatException($"String was not recognized as a valid {nameof(Sha1)}");
 
             return sha1;
@@ -575,7 +575,7 @@ namespace SourceCode.Chasm
                 startIndex = 2;
             }
 
-            if (!TryParseImpl(hex, startIndex, out Sha1 sha1))
+            if (!TryParseImpl(hex, startIndex, out var sha1))
                 return false;
 
             value = sha1;
