@@ -67,13 +67,13 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Factory
 
-        public static AzureBlobChasmRepo Create(string connectionString, IChasmSerializer serializer, CompressionLevel compressionLevel)
+        public static AzureBlobChasmRepo Create(string connectionString, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException(nameof(connectionString));
             if (serializer == null) throw new ArgumentNullException(nameof(serializer));
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
-            var repo = new AzureBlobChasmRepo(storageAccount, serializer, compressionLevel);
+            var repo = new AzureBlobChasmRepo(storageAccount, serializer, compressionLevel, maxDop);
 
             return repo;
         }
