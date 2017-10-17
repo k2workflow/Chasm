@@ -7,13 +7,9 @@
 
 using Microsoft.WindowsAzure.Storage;
 using SourceCode.Clay;
-using SourceCode.Clay.Collections.Generic;
-using SourceCode.Clay.Threading;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -59,25 +55,6 @@ namespace SourceCode.Chasm.IO.AzureBlob
             return Array.Empty<byte>();
         }
 
-        public override ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
-        {
-            if (objectIds == null)
-                return new ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>>(ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>());
-
-            // Execute batches
-            var task = ParallelAsync.ForEachAsync(objectIds, parallelOptions, async n =>
-            {
-                // Execute batch
-                var buffer = await ReadObjectAsync(n, parallelOptions.CancellationToken).ConfigureAwait(false);
-
-                // Transform batch result
-                var kvp = new KeyValuePair<Sha1, ReadOnlyMemory<byte>>(n, buffer);
-                return kvp;
-            });
-
-            return task;
-        }
-
         #endregion
 
         #region Write
@@ -116,20 +93,6 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
                 await blobRef.AppendBlockAsync(output).ConfigureAwait(false);
             }
-        }
-
-        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
-        {
-            if (items == null || !items.Any()) return Task.CompletedTask;
-
-            // Execute batches
-            var task = ParallelAsync.ForEachAsync(items, parallelOptions, async kvps =>
-            {
-                // Execute batch
-                await WriteObjectAsync(kvps.Key, kvps.Value, forceOverwrite, parallelOptions.CancellationToken).ConfigureAwait(false);
-            });
-
-            return task;
         }
 
         #endregion

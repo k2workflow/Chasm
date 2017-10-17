@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Common properties defined in Directory.Build.props -->
 
@@ -12,8 +12,6 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.4.1.3596">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00235" />
-    <PackageReference Include="WindowsAzure.Storage" Version="8.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,10 +19,10 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageId>SourceCode.Chasm.Repository.AzureBlob</PackageId>
+    <PackageId>SourceCode.Chasm.Repository.Hybrid</PackageId>
     <Authors>SourceCode</Authors>
-    <Description>CAS - Content Addressable Storage (Azure Blob Storage Repository).</Description>
-    <PackageTags>cas content storage sha1 git azure blob</PackageTags>
+    <Description>CAS - Content Addressable Storage (Hybrid Storage Repository).</Description>
+    <PackageTags>cas content storage sha1 git hybrid</PackageTags>
     <Version>1.0.0-local</Version>
     <PackageVersion>1.0.0-local</PackageVersion>
   </PropertyGroup>

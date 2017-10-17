@@ -14,6 +14,7 @@
     </PackageReference>
     <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00235" />
     <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00235" />
+    <PackageReference Include="SourceCode.Clay.Threading" Version="1.0.0-preview1-00235" />
   </ItemGroup>
 
   <PropertyGroup>

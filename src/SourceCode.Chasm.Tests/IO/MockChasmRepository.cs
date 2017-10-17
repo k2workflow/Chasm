@@ -38,7 +38,7 @@ namespace SourceCode.Chasm.Tests.IO
             throw new NotImplementedException();
         }
 
-        public override ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
+        public override ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -53,7 +53,7 @@ namespace SourceCode.Chasm.Tests.IO
             throw new NotImplementedException();
         }
 
-        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
+        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

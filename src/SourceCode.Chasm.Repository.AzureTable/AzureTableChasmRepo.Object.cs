@@ -58,7 +58,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             return Array.Empty<byte>();
         }
 
-        public override async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ParallelOptions parallelOptions)
+        public override async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
@@ -67,12 +67,18 @@ namespace SourceCode.Chasm.IO.AzureTable
             // Build batches
             var batches = DataEntity.BuildReadBatches(objectIds);
 
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = MaxDop,
+                CancellationToken = cancellationToken
+            };
+
             // Execute batches
             var objectsTable = _objectsTable.Value;
             await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
-                var results = await objectsTable.ExecuteBatchAsync(batch, default, default, parallelOptions.CancellationToken).ConfigureAwait(false);
+                var results = await objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken).ConfigureAwait(false);
 
                 // Transform batch results
                 foreach (var result in results)
@@ -152,20 +158,26 @@ namespace SourceCode.Chasm.IO.AzureTable
             }
         }
 
-        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, ParallelOptions parallelOptions)
+        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 
             // Build batches
-            var batches = BuildWriteBatches(items, forceOverwrite, CompressionLevel, parallelOptions.CancellationToken);
+            var batches = BuildWriteBatches(items, forceOverwrite, CompressionLevel, cancellationToken);
 
             var objectsTable = _objectsTable.Value;
+
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = MaxDop,
+                CancellationToken = cancellationToken
+            };
 
             // Execute batches
             var task = ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
-                await objectsTable.ExecuteBatchAsync(batch, null, null, parallelOptions.CancellationToken).ConfigureAwait(false);
+                await objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken).ConfigureAwait(false);
             });
 
             return task;

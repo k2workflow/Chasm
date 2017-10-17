@@ -237,8 +237,8 @@ namespace SourceCode.Chasm.Tests.IO
                 CallBase = true
             };
 
-            mockChasmRepository.Setup(i => i.ReadObjectBatchAsync(It.IsAny<IEnumerable<Sha1>>(), It.IsAny<ParallelOptions>()))
-                .Returns<IEnumerable<Sha1>, ParallelOptions>(async (objectIds, parallelOptions) =>
+            mockChasmRepository.Setup(i => i.ReadObjectBatchAsync(It.IsAny<IEnumerable<Sha1>>(), It.IsAny<CancellationToken>()))
+                .Returns<IEnumerable<Sha1>, CancellationToken>(async (objectIds, parallelOptions) =>
                 {
                     await Task.Yield();
 
@@ -252,7 +252,7 @@ namespace SourceCode.Chasm.Tests.IO
                 });
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.ParallelOptions);
+            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
             Assert.Equal(1, actual.Count);
@@ -271,7 +271,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(null, TestValues.ParallelOptions);
+            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(null, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
             Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeList>(), actual);
@@ -288,7 +288,7 @@ namespace SourceCode.Chasm.Tests.IO
                 CallBase = true
             };
 
-            mockChasmRepository.Setup(i => i.ReadObjectBatchAsync(It.IsAny<IEnumerable<Sha1>>(), It.IsAny<ParallelOptions>()))
+            mockChasmRepository.Setup(i => i.ReadObjectBatchAsync(It.IsAny<IEnumerable<Sha1>>(), It.IsAny<CancellationToken>()))
                 .Returns(async () =>
                 {
                     await Task.Yield();
@@ -296,7 +296,7 @@ namespace SourceCode.Chasm.Tests.IO
                 });
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.ParallelOptions);
+            var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
             Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeList>(), actual);

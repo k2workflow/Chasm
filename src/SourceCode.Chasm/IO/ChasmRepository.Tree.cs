@@ -30,15 +30,15 @@ namespace SourceCode.Chasm.IO
             return tree;
         }
 
-        public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ParallelOptions parallelOptions)
+        public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken)
         {
             if (treeIds == null) return ReadOnlyDictionary.Empty<TreeId, TreeNodeList>();
 
-            // Read bytes
+            // Read bytes in batch
             var sha1s = System.Linq.Enumerable.Select(treeIds, n => n.Sha1);
-            var kvps = await ReadObjectBatchAsync(sha1s, parallelOptions).ConfigureAwait(false);
+            var kvps = await ReadObjectBatchAsync(sha1s, cancellationToken).ConfigureAwait(false);
 
-            // Deserialize
+            // Deserialize batch
             if (kvps.Count == 0) return ReadOnlyDictionary.Empty<TreeId, TreeNodeList>();
 
             var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);

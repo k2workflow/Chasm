@@ -16,6 +16,13 @@ namespace SourceCode.Chasm.IO.Disk
 {
     public sealed partial class DiskChasmRepo : ChasmRepository
     {
+        #region Constants
+
+        private const int _retryMax = 10;
+        private const int _retryMs = 15;
+
+        #endregion
+
         #region Fields
 
         private readonly string _refsContainer;
