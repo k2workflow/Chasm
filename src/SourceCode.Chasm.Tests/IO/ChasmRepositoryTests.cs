@@ -5,12 +5,12 @@
 
 #endregion
 
-using System;
-using System.IO.Compression;
-using System.Reflection;
 using Moq;
 using SourceCode.Chasm.IO;
 using SourceCode.Chasm.Tests.Helpers;
+using System;
+using System.IO.Compression;
+using System.Reflection;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests.IO

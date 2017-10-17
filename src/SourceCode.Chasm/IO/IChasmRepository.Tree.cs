@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.IO
 
         ValueTask<TreeNodeList> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken);
 
-        ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ParallelOptions parallelOptions);
+        ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken);
 
         #endregion
 

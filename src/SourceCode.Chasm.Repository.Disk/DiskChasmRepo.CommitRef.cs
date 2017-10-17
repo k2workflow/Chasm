@@ -28,7 +28,7 @@ namespace SourceCode.Chasm.IO.Disk
 
             // NotFound
             if (bytes == null || bytes.Length == 0)
-                return null;
+                return default;
 
             // CommitIds are not compressed
             var commitId = Serializer.DeserializeCommitId(bytes);

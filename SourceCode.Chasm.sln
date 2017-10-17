@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+VisualStudioVersion = 15.0.27009.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm", "src\SourceCode.Chasm\SourceCode.Chasm.csproj", "{430F8C16-427D-4756-B788-80C1F41E2B9A}"
 EndProject
@@ -33,6 +33,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.Disk", "src\SourceCode.Chasm.Repository.Disk\SourceCode.Chasm.Repository.Disk.csproj", "{47259EC6-D078-4E6A-89CD-F19FB73C8F34}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Serializer.Text", "src\SourceCode.Chasm.Serializer.Text\SourceCode.Chasm.Serializer.Text.csproj", "{5EC98200-9745-46C8-B455-8991B5DB3A9C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.Hybrid", "src\SourceCode.Chasm.Repository.Hybrid\SourceCode.Chasm.Repository.Hybrid.csproj", "{505E9DC1-437A-46FC-A6DC-3629952A8034}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +82,10 @@ Global
 		{5EC98200-9745-46C8-B455-8991B5DB3A9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EC98200-9745-46C8-B455-8991B5DB3A9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EC98200-9745-46C8-B455-8991B5DB3A9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{505E9DC1-437A-46FC-A6DC-3629952A8034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{505E9DC1-437A-46FC-A6DC-3629952A8034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{505E9DC1-437A-46FC-A6DC-3629952A8034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{505E9DC1-437A-46FC-A6DC-3629952A8034}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,64 @@
+syntax = "proto3";
+option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
+
+	// Sha1
+	message Sha1Wire
+	{
+		uint64 Blit0 = 1; // 0..7
+		uint64 Blit1 = 2; // 8..15
+		uint32 Blit2 = 3; // 16..19
+	}
+
+	// NodeKind
+	enum NodeKindWire 
+	{
+		Blob = 0; // Default
+
+		Tree = 1;
+	}
+
+	// TreeNode
+	message TreeWireNode
+	{
+		string Name = 1;
+
+		NodeKindWire Kind = 2;
+
+		Sha1Wire NodeId = 3;
+	}
+
+	// Tree
+	message TreeWire 
+	{
+		repeated TreeWireNode Nodes = 1;
+	}
+
+	// Audit
+	message AuditWire
+	{
+		string Name = 1;
+
+		int64 Time = 2; // Milliseconds
+
+		int32 Offset = 3; // Minutes
+	}
+
+	// Commit
+	message CommitWire
+	{
+		repeated Sha1Wire Parents = 1;
+
+		Sha1Wire TreeId = 2;
+		
+		AuditWire Author = 3;
+		
+		AuditWire Committer = 4;
+		
+		string Message = 5;
+	}
+
+	// CommitId
+	message CommitIdWire
+	{
+		Sha1Wire Id = 1;
+	}

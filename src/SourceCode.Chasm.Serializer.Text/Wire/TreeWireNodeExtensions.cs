@@ -7,7 +7,6 @@
 
 using System;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
