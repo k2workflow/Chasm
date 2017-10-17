@@ -156,6 +156,9 @@ namespace SourceCode.Chasm.IO.Disk
 
         private static async Task TouchFileAsync(string path, CancellationToken cancellationToken)
         {
+            if (!File.Exists(path))
+                return;
+
             for (var retryCount = 0; retryCount < _retryMax; retryCount++)
             {
                 try
