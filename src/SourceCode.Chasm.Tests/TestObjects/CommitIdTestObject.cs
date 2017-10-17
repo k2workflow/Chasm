@@ -5,8 +5,6 @@
 
 #endregion
 
-using SourceCode.Chasm.Tests.Helpers;
-
 namespace SourceCode.Chasm.Tests.TestObjects
 {
     public static class CommitIdTestObject

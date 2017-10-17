@@ -5,11 +5,11 @@
 
 #endregion
 
+using SourceCode.Clay.Buffers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using SourceCode.Clay.Buffers;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests

@@ -5,12 +5,12 @@
 
 #endregion
 
+using SourceCode.Chasm.IO;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
-using SourceCode.Chasm.IO;
 
 namespace SourceCode.Chasm.Tests.IO
 {

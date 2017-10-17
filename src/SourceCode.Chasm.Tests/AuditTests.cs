@@ -5,7 +5,6 @@
 
 #endregion
 
-using System;
 using SourceCode.Chasm.Tests.Helpers;
 using SourceCode.Chasm.Tests.TestObjects;
 using Xunit;

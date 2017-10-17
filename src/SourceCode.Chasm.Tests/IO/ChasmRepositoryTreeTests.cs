@@ -5,6 +5,11 @@
 
 #endregion
 
+using Moq;
+using SourceCode.Chasm.IO;
+using SourceCode.Chasm.Tests.Helpers;
+using SourceCode.Chasm.Tests.TestObjects;
+using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,11 +17,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Moq;
-using SourceCode.Chasm.IO;
-using SourceCode.Chasm.Tests.Helpers;
-using SourceCode.Chasm.Tests.TestObjects;
-using SourceCode.Clay.Collections.Generic;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests.IO
