@@ -10,22 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
     [ExcludeFromCodeCoverage]
-    partial class CommitWireReflection
-    {
-    }
-
-    [ExcludeFromCodeCoverage]
-    partial class CommitIdWireReflection
-    {
-    }
-
-    [ExcludeFromCodeCoverage]
-    partial class Sha1WireReflection
-    {
-    }
-
-    [ExcludeFromCodeCoverage]
-    partial class TreeWireReflection
+    partial class WireReflection
     {
     }
 
