@@ -5,6 +5,15 @@
 [![Code Coverage](https://codecov.io/gh/k2workflow/Chasm/coverage.svg)](https://codecov.io/gh/k2workflow/Chasm)
 [![CodeFactor](https://www.codefactor.io/repository/github/k2workflow/chasm/badge)](https://www.codefactor.io/repository/github/k2workflow/chasm)
 
+```
+   ______  ____  ____       _       ______   ____    ____  
+ .' ___  ||_   ||   _|     / \    .' ____ \ |_   \  /   _| 
+/ .'   \_|  | |__| |      / _ \   | (___ \_|  |   \/   |   
+| |         |  __  |     / ___ \   _.____`.   | |\  /| |   
+\ `.___.'\ _| |  | |_  _/ /   \ \_| \____) | _| |_\/_| |_  
+ `.____ .'|____||____||____| |____|\______.'|_____||_____| 
+```
+
 ### CAS = Content Addressable Storage
 
 [Wikipedia](https://en.wikipedia.org/wiki/Content-addressable_storage)

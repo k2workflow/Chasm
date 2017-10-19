@@ -63,6 +63,7 @@ namespace SourceCode.Chasm.IO.Hybrid
         #region Factory
 
         // TODO: Provide a builder that enables policy-based hybrid pipelines
+        // TODO: Reading from a remote should propagate content to local
 
         #endregion
     }
