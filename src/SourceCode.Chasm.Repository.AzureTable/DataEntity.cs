@@ -256,6 +256,8 @@ namespace SourceCode.Chasm.IO.AzureTable
         {
             if (contents == null || !contents.Any()) return Array.Empty<TableBatchOperation>();
 
+            // TODO: Limit number of items in each TableBatchOperation
+
             var batches = new Dictionary<string, TableBatchOperation>(StringComparer.Ordinal);
 
             foreach (var content in contents)

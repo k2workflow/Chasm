@@ -9,7 +9,7 @@ using SourceCode.Clay.Collections.Generic;
 using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Generic;
-using System.IO.Channels;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -74,7 +74,7 @@ namespace SourceCode.Chasm.IO.Hybrid
 
         public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (items == null) return;
+            if (items == null || !items.Any()) return;
 
             // TODO: Enable piecemeal writes (404s incur next repo)
 
@@ -85,39 +85,12 @@ namespace SourceCode.Chasm.IO.Hybrid
                 CancellationToken = cancellationToken
             };
 
+            // Enumerate batches
             await ParallelAsync.ForAsync(0, Chain.Length, parallelOptions, async i =>
             {
+                // Execute batch
                 await Chain[i].WriteObjectBatchAsync(items, forceOverwrite, cancellationToken).ConfigureAwait(false);
             }).ConfigureAwait(false);
-        }
-
-        public override async Task WriteObjectBatchAsync(Channel<KeyValuePair<Sha1, ArraySegment<byte>>> channel, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            var tasks = new Task[Chain.Length];
-            var channels = new Channel<KeyValuePair<Sha1, ArraySegment<byte>>>[Chain.Length];
-
-            for (var i = 0; i < Chain.Length; i++)
-            {
-                channels[i] = Channel.CreateUnbounded<KeyValuePair<Sha1, ArraySegment<byte>>>();
-                tasks[i] = Chain[i].WriteObjectBatchAsync(channels[i], forceOverwrite, cancellationToken);
-            }
-
-            while (await channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
-            {
-                if (await channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false) &&
-                    channel.Reader.TryRead(out var batch))
-                {
-                    for (var i = 0; i < Chain.Length; i++)
-                    {
-                        if (await channels[i].Writer.WaitToWriteAsync(cancellationToken).ConfigureAwait(false))
-                        {
-                            await channels[i].Writer.WriteAsync(batch, cancellationToken).ConfigureAwait(false);
-                        }
-                    }
-                }
-            }
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         #endregion
