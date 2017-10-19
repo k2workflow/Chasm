@@ -61,15 +61,15 @@ namespace SourceCode.Chasm
 
         public override int GetHashCode()
         {
-            var hc = 17L;
-
             unchecked
             {
+                var hc = 17L;
+
                 hc = (hc * 23) + CommitId.GetHashCode();
                 hc = (hc * 23) + (Name?.Length ?? 0);
-            }
 
-            return ((int)(hc >> 32)) ^ (int)hc;
+                return ((int)(hc >> 32)) ^ (int)hc;
+            }
         }
 
         #endregion

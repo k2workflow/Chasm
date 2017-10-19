@@ -68,18 +68,18 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(Commit obj)
             {
-                var hc = 17L;
-
                 unchecked
                 {
+                    var hc = 17L;
+
                     hc = (hc * 23) + obj.TreeId.GetHashCode();
                     hc = (hc * 23) + obj.Author.GetHashCode();
                     hc = (hc * 23) + obj.Committer.GetHashCode();
                     hc = (hc * 23) + (obj.Parents?.Count ?? -42);
                     hc = (hc * 23) + (obj.Message?.Length ?? 0);
-                }
 
-                return ((int)(hc >> 32)) ^ (int)hc;
+                    return ((int)(hc >> 32)) ^ (int)hc;
+                }
             }
 
             #endregion
