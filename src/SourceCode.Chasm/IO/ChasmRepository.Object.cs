@@ -72,11 +72,11 @@ namespace SourceCode.Chasm.IO
 
         public virtual async Task WriteObjectBatchAsync(Channel<KeyValuePair<Sha1, ArraySegment<byte>>> channel, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            while (await channel.Reader.WaitToReadAsync(cancellationToken))
+            while (await channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
             {
-                if (channel.Reader.TryRead(out var kvp))
+                if (channel.Reader.TryRead(out var item))
                 {
-                    await WriteObjectAsync(kvp.Key, kvp.Value, forceOverwrite, cancellationToken).ConfigureAwait(false);
+                    await WriteObjectAsync(item.Key, item.Value, forceOverwrite, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
