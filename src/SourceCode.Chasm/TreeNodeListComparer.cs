@@ -55,7 +55,7 @@ namespace SourceCode.Chasm
             #region Methods
 
             public override bool Equals(TreeNodeList x, TreeNodeList y)
-                => x._nodes.MemoryEquals(y._nodes, true);
+                => x._nodes.MemoryEquals(y._nodes);
 
             public override int GetHashCode(TreeNodeList obj)
             {
