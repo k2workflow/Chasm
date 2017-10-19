@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.Tests", "src\SourceCode.Chasm.Repository.Tests\SourceCode.Chasm.Repository.Tests.csproj", "{054B1D31-402F-4111-AB34-CDDB7461FB72}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{557A4569-C22F-46E2-BE3A-E76E3E2CAED5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".files", ".files", "{557A4569-C22F-46E2-BE3A-E76E3E2CAED5}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
 		codemaid.config = codemaid.config

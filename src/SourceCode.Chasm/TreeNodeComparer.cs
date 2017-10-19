@@ -87,16 +87,16 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNode obj)
             {
-                var hc = 17L;
-
                 unchecked
                 {
+                    var hc = 17L;
+
                     hc = (hc * 23) + (obj.Name == null ? 0 : StringComparer.Ordinal.GetHashCode(obj.Name));
                     hc = (hc * 23) + (int)obj.Kind;
                     hc = (hc * 23) + obj.Sha1.GetHashCode();
-                }
 
-                return ((int)(hc >> 32)) ^ (int)hc;
+                    return ((int)(hc >> 32)) ^ (int)hc;
+                }
             }
 
             #endregion

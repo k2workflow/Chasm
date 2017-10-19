@@ -12,9 +12,9 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.5.0.3766">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00240" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00240" />
-    <PackageReference Include="SourceCode.Clay.Threading" Version="1.0.0-preview1-00240" />
+    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00241" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00241" />
+    <PackageReference Include="SourceCode.Clay.Threading" Version="1.0.0-preview1-00241" />
   </ItemGroup>
 
   <PropertyGroup>
