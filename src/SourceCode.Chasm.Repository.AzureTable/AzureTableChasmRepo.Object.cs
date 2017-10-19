@@ -15,6 +15,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,7 +74,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                 CancellationToken = cancellationToken
             };
 
-            // Execute batches
+            // Enumerate batches
             var objectsTable = _objectsTable.Value;
             await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
@@ -158,9 +159,9 @@ namespace SourceCode.Chasm.IO.AzureTable
             }
         }
 
-        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (items == null) throw new ArgumentNullException(nameof(items));
+            if (items == null || !items.Any()) return;
 
             // Build batches
             var batches = BuildWriteBatches(items, forceOverwrite, CompressionLevel, cancellationToken);
@@ -173,14 +174,12 @@ namespace SourceCode.Chasm.IO.AzureTable
                 CancellationToken = cancellationToken
             };
 
-            // Execute batches
-            var task = ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
+            // Enumerate batches
+            await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
                 await objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken).ConfigureAwait(false);
-            });
-
-            return task;
+            }).ConfigureAwait(false);
         }
 
         #endregion

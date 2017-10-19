@@ -9,7 +9,6 @@ using SourceCode.Clay.Collections.Generic;
 using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Generic;
-using System.IO.Channels;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,11 +31,11 @@ namespace SourceCode.Chasm.IO
                 CancellationToken = cancellationToken
             };
 
-            // Execute batches
+            // Enumerate batches
             var dict = await ParallelAsync.ForEachAsync(objectIds, parallelOptions, async sha1 =>
             {
                 // Execute batch
-                var buffer = await ReadObjectAsync(sha1, parallelOptions.CancellationToken).ConfigureAwait(false);
+                var buffer = await ReadObjectAsync(sha1, cancellationToken).ConfigureAwait(false);
 
                 // Transform batch result
                 var kvp = new KeyValuePair<Sha1, ReadOnlyMemory<byte>>(sha1, buffer);
@@ -62,23 +61,12 @@ namespace SourceCode.Chasm.IO
                 CancellationToken = cancellationToken
             };
 
-            // Execute batches
+            // Enumerate batches
             await ParallelAsync.ForEachAsync(items, parallelOptions, async item =>
             {
                 // Execute batch
-                await WriteObjectAsync(item.Key, item.Value, forceOverwrite, parallelOptions.CancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(item.Key, item.Value, forceOverwrite, cancellationToken).ConfigureAwait(false);
             }).ConfigureAwait(false);
-        }
-
-        public virtual async Task WriteObjectBatchAsync(Channel<KeyValuePair<Sha1, ArraySegment<byte>>> channel, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            while (await channel.Reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
-            {
-                if (channel.Reader.TryRead(out var item))
-                {
-                    await WriteObjectAsync(item.Key, item.Value, forceOverwrite, cancellationToken).ConfigureAwait(false);
-                }
-            }
         }
 
         #endregion
