@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO.Channels;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,6 +28,8 @@ namespace SourceCode.Chasm.IO
         Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
 
         Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken);
+
+        Task WriteObjectBatchAsync(Channel<KeyValuePair<Sha1, ArraySegment<byte>>> channel, bool forceOverwrite, CancellationToken cancellationToken);
 
         #endregion
     }

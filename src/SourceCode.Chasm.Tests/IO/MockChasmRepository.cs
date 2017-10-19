@@ -24,9 +24,8 @@ namespace SourceCode.Chasm.Tests.IO
         }
 
         public MockChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-                    : base(serializer, compressionLevel, maxDop)
-        {
-        }
+            : base(serializer, compressionLevel, maxDop)
+        { }
 
         public override ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
         {

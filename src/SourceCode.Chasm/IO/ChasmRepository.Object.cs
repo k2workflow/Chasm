@@ -9,6 +9,7 @@ using SourceCode.Clay.Collections.Generic;
 using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Generic;
+using System.IO.Channels;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,11 +63,22 @@ namespace SourceCode.Chasm.IO
             };
 
             // Execute batches
-            await ParallelAsync.ForEachAsync(items, parallelOptions, async kvps =>
+            await ParallelAsync.ForEachAsync(items, parallelOptions, async item =>
             {
                 // Execute batch
-                await WriteObjectAsync(kvps.Key, kvps.Value, forceOverwrite, parallelOptions.CancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(item.Key, item.Value, forceOverwrite, parallelOptions.CancellationToken).ConfigureAwait(false);
             }).ConfigureAwait(false);
+        }
+
+        public virtual async Task WriteObjectBatchAsync(Channel<KeyValuePair<Sha1, ArraySegment<byte>>> channel, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            while (await channel.Reader.WaitToReadAsync(cancellationToken))
+            {
+                if (channel.Reader.TryRead(out var kvp))
+                {
+                    await WriteObjectAsync(kvp.Key, kvp.Value, forceOverwrite, cancellationToken).ConfigureAwait(false);
+                }
+            }
         }
 
         #endregion
