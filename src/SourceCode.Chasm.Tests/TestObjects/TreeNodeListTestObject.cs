@@ -11,7 +11,7 @@ namespace SourceCode.Chasm.Tests.TestObjects
     {
         #region Fields
 
-        public static readonly TreeNodeList Random = new TreeNodeList(TreeNodeTestObject.Random);
+        public static readonly TreeNodeMap Random = new TreeNodeMap(TreeNodeTestObject.Random);
 
         #endregion
     }

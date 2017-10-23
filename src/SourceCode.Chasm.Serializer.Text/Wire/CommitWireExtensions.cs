@@ -5,6 +5,7 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
@@ -79,7 +80,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
 
             // TreeId
             TreeId treeId;
-            var index = wire.IndexOf(_treeId);
+            var index = wire.IndexOf(_treeId, StringComparison.Ordinal);
             {
                 if (index < 0) throw new SerializationException();
                 index += _treeId.Length;
@@ -93,7 +94,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
             // Parents
             var parents = new List<CommitId>();
             {
-                var ix = wire.IndexOf(_parent, index);
+                var ix = wire.IndexOf(_parent, index, StringComparison.Ordinal);
                 while (ix >= 0)
                 {
                     index = ix + _parent.Length;
@@ -103,14 +104,14 @@ namespace SourceCode.Chasm.IO.Text.Wire
                     var sha1 = Sha1.Parse(curr);
                     parents.Add(new CommitId(sha1));
 
-                    ix = wire.IndexOf(_parent, index);
+                    ix = wire.IndexOf(_parent, index, StringComparison.Ordinal);
                 }
             }
 
             // Author
             Audit author = default;
             {
-                var ix = wire.IndexOf(_author, index);
+                var ix = wire.IndexOf(_author, index, StringComparison.Ordinal);
                 if (ix >= 0)
                 {
                     index = ix + _author.Length;
@@ -129,7 +130,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
             // Committer
             Audit committer = default;
             {
-                var ix = wire.IndexOf(_committer, index);
+                var ix = wire.IndexOf(_committer, index, StringComparison.Ordinal);
                 if (ix >= 0)
                 {
                     index = ix + _committer.Length;

@@ -15,7 +15,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         #region Methods
 
-        public static JsonValue Convert(this TreeNodeList model)
+        public static JsonValue Convert(this TreeNodeMap model)
         {
             if (model.Count == 0) return new JsonArray(Array.Empty<JsonValue>());
 
@@ -27,7 +27,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             return wire;
         }
 
-        public static TreeNodeList ConvertTree(this JsonArray wire)
+        public static TreeNodeMap ConvertTree(this JsonArray wire)
         {
             if (wire == null) return default;
             if (wire.Count == 0) return default;
@@ -36,11 +36,11 @@ namespace SourceCode.Chasm.IO.Json.Wire
             for (var i = 0; i < nodes.Length; i++)
                 nodes[i] = ((JsonObject)wire[i]).ConvertTreeNode();
 
-            var model = new TreeNodeList(nodes);
+            var model = new TreeNodeMap(nodes);
             return model;
         }
 
-        public static TreeNodeList ParseTree(this string json)
+        public static TreeNodeMap ParseTree(this string json)
         {
             var wire = json.ParseJsonArray();
 

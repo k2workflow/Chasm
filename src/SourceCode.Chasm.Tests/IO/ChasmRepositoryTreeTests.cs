@@ -47,7 +47,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeAsync(RandomHelper.String, CommitRefTestObject.Random.Name, TestValues.CancellationToken);
 
             // Assert
-            Assert.Equal(TreeNodeList.Empty, actual);
+            Assert.Equal(TreeNodeMap.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -83,7 +83,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeAsync(RandomHelper.String, CommitRefTestObject.Random.Name, TestValues.CancellationToken);
 
             // Assert
-            Assert.Equal(TreeNodeList.Empty, actual);
+            Assert.Equal(TreeNodeMap.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -126,7 +126,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeAsync(CommitIdTestObject.Random, TestValues.CancellationToken);
 
             // Assert
-            Assert.Equal(TreeNodeList.Empty, actual);
+            Assert.Equal(TreeNodeMap.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -144,7 +144,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeAsync(CommitId.Empty, TestValues.CancellationToken);
 
             // Assert
-            Assert.Equal(TreeNodeList.Empty, actual);
+            Assert.Equal(TreeNodeMap.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -162,7 +162,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeAsync(CommitIdTestObject.Random, TestValues.CancellationToken);
 
             // Assert
-            Assert.Equal(TreeNodeList.Empty, actual);
+            Assert.Equal(TreeNodeMap.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -187,7 +187,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeAsync(TreeIdTestObject.Random, TestValues.CancellationToken);
 
             // Assert
-            Assert.Equal(TreeNodeList.Empty, actual);
+            Assert.Equal(TreeNodeMap.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -205,7 +205,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeAsync(TreeId.Empty, TestValues.CancellationToken);
 
             // Assert
-            Assert.Equal(TreeNodeList.Empty, actual);
+            Assert.Equal(TreeNodeMap.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -223,7 +223,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeAsync(TreeIdTestObject.Random, TestValues.CancellationToken);
 
             // Assert
-            Assert.Equal(TreeNodeList.Empty, actual);
+            Assert.Equal(TreeNodeMap.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -256,7 +256,7 @@ namespace SourceCode.Chasm.Tests.IO
 
             // Assert
             Assert.Equal(1, actual.Count);
-            Assert.Equal(TreeNodeList.Empty, actual.Values.FirstOrDefault());
+            Assert.Equal(TreeNodeMap.Empty, actual.Values.FirstOrDefault());
         }
 
         [Trait("Type", "Unit")]
@@ -274,7 +274,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(null, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
-            Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeList>(), actual);
+            Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>(), actual);
         }
 
         [Trait("Type", "Unit")]
@@ -299,7 +299,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
-            Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeList>(), actual);
+            Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>(), actual);
         }
 
         [Trait("Type", "Unit")]
@@ -319,7 +319,7 @@ namespace SourceCode.Chasm.Tests.IO
 
             // Assert
             Assert.Equal(CommitId.Empty, actual);
-            mockChasmRepository.Verify(i => i.WriteTreeAsync(It.IsAny<TreeNodeList>(), It.IsAny<CancellationToken>()));
+            mockChasmRepository.Verify(i => i.WriteTreeAsync(It.IsAny<TreeNodeMap>(), It.IsAny<CancellationToken>()));
             mockChasmRepository.Verify(i => i.WriteCommitAsync(It.IsAny<Commit>(), It.IsAny<CancellationToken>()));
         }
 
@@ -335,7 +335,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.WriteTreeAsync(TreeNodeList.Empty, TestValues.CancellationToken);
+            var actual = await mockChasmRepository.Object.WriteTreeAsync(TreeNodeMap.Empty, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(TreeId.Empty, actual);

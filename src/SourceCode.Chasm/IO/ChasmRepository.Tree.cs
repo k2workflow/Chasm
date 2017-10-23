@@ -17,7 +17,7 @@ namespace SourceCode.Chasm.IO
     {
         #region Read
 
-        public virtual async ValueTask<TreeNodeList> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeNodeMap> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken)
         {
             if (treeId == TreeId.Empty) return default;
 
@@ -30,18 +30,18 @@ namespace SourceCode.Chasm.IO
             return tree;
         }
 
-        public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeList>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken)
+        public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken)
         {
-            if (treeIds == null) return ReadOnlyDictionary.Empty<TreeId, TreeNodeList>();
+            if (treeIds == null) return ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>();
 
             // Read bytes in batch
             var sha1s = System.Linq.Enumerable.Select(treeIds, n => n.Sha1);
             var kvps = await ReadObjectBatchAsync(sha1s, cancellationToken).ConfigureAwait(false);
 
             // Deserialize batch
-            if (kvps.Count == 0) return ReadOnlyDictionary.Empty<TreeId, TreeNodeList>();
+            if (kvps.Count == 0) return ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>();
 
-            var dict = new Dictionary<TreeId, TreeNodeList>(kvps.Count);
+            var dict = new Dictionary<TreeId, TreeNodeMap>(kvps.Count);
 
             foreach (var kvp in kvps)
             {
@@ -54,7 +54,7 @@ namespace SourceCode.Chasm.IO
             return dict;
         }
 
-        public virtual async ValueTask<TreeNodeList> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeNodeMap> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(commitRefName)) throw new ArgumentNullException(nameof(commitRefName));
@@ -70,7 +70,7 @@ namespace SourceCode.Chasm.IO
             return tree;
         }
 
-        public virtual async ValueTask<TreeNodeList> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeNodeMap> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken)
         {
             if (commitId == CommitId.Empty) return default;
 
@@ -88,7 +88,7 @@ namespace SourceCode.Chasm.IO
 
         #region Write
 
-        public virtual async ValueTask<TreeId> WriteTreeAsync(TreeNodeList tree, CancellationToken cancellationToken)
+        public virtual async ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken)
         {
             using (var session = Serializer.Serialize(tree))
             {
@@ -101,7 +101,7 @@ namespace SourceCode.Chasm.IO
             }
         }
 
-        public virtual async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeList tree, Audit author, Audit committer, string message, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken)
         {
             var treeId = TreeId.Empty;
             if (tree.Count > 0)
