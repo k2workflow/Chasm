@@ -69,7 +69,7 @@ namespace SourceCode.Chasm.IO.Disk
                 }
                 output.Position = 0;
 
-                await WriteFileAsync(path, output, cancellationToken, false).ConfigureAwait(false); // TODO: Perf
+                await WriteFileAsync(path, output, false, cancellationToken).ConfigureAwait(false); // TODO: Perf
             }
         }
 

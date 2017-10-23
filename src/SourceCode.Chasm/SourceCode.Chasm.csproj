@@ -9,12 +9,15 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.4.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.5.0.3766">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00241" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00241" />
-    <PackageReference Include="SourceCode.Clay.Threading" Version="1.0.0-preview1-00241" />
+    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00242" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00242" />
+    <PackageReference Include="SourceCode.Clay.Threading" Version="1.0.0-preview1-00242" />
   </ItemGroup>
 
   <PropertyGroup>

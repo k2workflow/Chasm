@@ -13,17 +13,19 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{ToString(),nq,ac}")]
-    public struct TreeNodeList : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeList>
+#pragma warning disable CA1710 // Identifiers should have correct suffix
+    public struct TreeNodeMap : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeMap>
+#pragma warning restore CA1710 // Identifiers should have correct suffix
     {
         #region Constants
 
         /// <summary>
-        /// A singleton representing an empty <see cref="TreeNodeList"/> value.
+        /// A singleton representing an empty <see cref="TreeNodeMap"/> value.
         /// </summary>
         /// <value>
         /// The empty.
         /// </value>
-        public static TreeNodeList Empty { get; }
+        public static TreeNodeMap Empty { get; }
 
         #endregion
 
@@ -65,7 +67,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        public TreeNodeList(params TreeNode[] nodes)
+        public TreeNodeMap(params TreeNode[] nodes)
         {
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (nodes == null || nodes.Length == 0)
@@ -78,7 +80,7 @@ namespace SourceCode.Chasm
             _nodes = DistinctSort(nodes, false);
         }
 
-        public TreeNodeList(ICollection<TreeNode> nodes)
+        public TreeNodeMap(ICollection<TreeNode> nodes)
         {
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (nodes == null || nodes.Count == 0)
@@ -99,7 +101,7 @@ namespace SourceCode.Chasm
 
         #region Methods
 
-        private static TreeNode[] Merge(TreeNodeList first, TreeNodeList second)
+        private static TreeNode[] Merge(TreeNodeMap first, TreeNodeMap second)
         {
             var newArray = new TreeNode[first.Count + second.Count];
 
@@ -145,9 +147,9 @@ namespace SourceCode.Chasm
             return newArray;
         }
 
-        public TreeNodeList Merge(TreeNode node)
+        public TreeNodeMap Merge(TreeNode node)
         {
-            if (_nodes.IsEmpty) return new TreeNodeList(node);
+            if (_nodes.IsEmpty) return new TreeNodeMap(node);
 
             var index = IndexOf(node.Name);
 
@@ -170,10 +172,10 @@ namespace SourceCode.Chasm
                     array[i] = i == index ? node : span[j++];
             }
 
-            return new TreeNodeList(array);
+            return new TreeNodeMap(array);
         }
 
-        public TreeNodeList Merge(TreeNodeList nodes)
+        public TreeNodeMap Merge(TreeNodeMap nodes)
         {
             if (nodes == default || nodes.Count == 0)
                 return this;
@@ -183,20 +185,20 @@ namespace SourceCode.Chasm
 
             var set = Merge(this, nodes);
 
-            var tree = new TreeNodeList(set);
+            var tree = new TreeNodeMap(set);
             return tree;
         }
 
-        public TreeNodeList Merge(ICollection<TreeNode> nodes)
+        public TreeNodeMap Merge(ICollection<TreeNode> nodes)
         {
             if (nodes == null || nodes.Count == 0)
                 return this;
 
             if (_nodes.IsEmpty)
-                return new TreeNodeList(nodes);
+                return new TreeNodeMap(nodes);
 
-            var set = Merge(this, new TreeNodeList(nodes));
-            var tree = new TreeNodeList(set);
+            var set = Merge(this, new TreeNodeMap(nodes));
+            var tree = new TreeNodeMap(set);
             return tree;
         }
 
@@ -345,7 +347,7 @@ namespace SourceCode.Chasm
 
             // Local functions
             ArgumentException CreateDuplicateException(TreeNode node)
-                => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeList)}: ({node})");
+                => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeMap)}: ({node})");
         }
 
         #endregion
@@ -402,21 +404,21 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(TreeNodeList other) => TreeNodeListComparer.Default.Equals(this, other);
+        public bool Equals(TreeNodeMap other) => TreeNodeMapComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is TreeNodeList tree
-            && TreeNodeListComparer.Default.Equals(this, tree);
+            => obj is TreeNodeMap tree
+            && TreeNodeMapComparer.Default.Equals(this, tree);
 
-        public override int GetHashCode() => TreeNodeListComparer.Default.GetHashCode(this);
+        public override int GetHashCode() => TreeNodeMapComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region Operators
 
-        public static bool operator ==(TreeNodeList x, TreeNodeList y) => TreeNodeListComparer.Default.Equals(x, y);
+        public static bool operator ==(TreeNodeMap x, TreeNodeMap y) => TreeNodeMapComparer.Default.Equals(x, y);
 
-        public static bool operator !=(TreeNodeList x, TreeNodeList y) => !(x == y);
+        public static bool operator !=(TreeNodeMap x, TreeNodeMap y) => !(x == y);
 
         public override string ToString() => $"{nameof(Count)}: {_nodes.Length}";
 

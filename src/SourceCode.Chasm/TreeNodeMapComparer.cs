@@ -11,22 +11,22 @@ using System.Collections.Generic;
 namespace SourceCode.Chasm
 {
     /// <summary>
-    /// Represents a way to compare different <see cref="TreeNodeList"/> values.
+    /// Represents a way to compare different <see cref="TreeNodeMap"/> values.
     /// </summary>
-    public abstract class TreeNodeListComparer : IEqualityComparer<TreeNodeList>
+    public abstract class TreeNodeMapComparer : IEqualityComparer<TreeNodeMap>
     {
         #region Constants
 
         /// <summary>
-        /// Gets a <see cref="TreeNodeListComparer"/> that compares all fields of a <see cref="TreeNodeList"/> value.
+        /// Gets a <see cref="TreeNodeMapComparer"/> that compares all fields of a <see cref="TreeNodeMap"/> value.
         /// </summary>
-        public static TreeNodeListComparer Default { get; } = new DefaultComparer();
+        public static TreeNodeMapComparer Default { get; } = new DefaultComparer();
 
         #endregion
 
         #region Constructors
 
-        protected TreeNodeListComparer()
+        protected TreeNodeMapComparer()
         { }
 
         #endregion
@@ -34,16 +34,16 @@ namespace SourceCode.Chasm
         #region IEqualityComparer
 
         /// <inheritdoc/>
-        public abstract bool Equals(TreeNodeList x, TreeNodeList y);
+        public abstract bool Equals(TreeNodeMap x, TreeNodeMap y);
 
         /// <inheritdoc/>
-        public abstract int GetHashCode(TreeNodeList obj);
+        public abstract int GetHashCode(TreeNodeMap obj);
 
         #endregion
 
         #region Concrete
 
-        private sealed class DefaultComparer : TreeNodeListComparer
+        private sealed class DefaultComparer : TreeNodeMapComparer
         {
             #region Constructors
 
@@ -54,10 +54,10 @@ namespace SourceCode.Chasm
 
             #region Methods
 
-            public override bool Equals(TreeNodeList x, TreeNodeList y)
+            public override bool Equals(TreeNodeMap x, TreeNodeMap y)
                 => x._nodes.MemoryEquals(y._nodes);
 
-            public override int GetHashCode(TreeNodeList obj)
+            public override int GetHashCode(TreeNodeMap obj)
             {
                 unchecked
                 {

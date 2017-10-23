@@ -126,7 +126,7 @@ namespace SourceCode.Chasm.IO.Disk
             return bytes;
         }
 
-        private static async Task WriteFileAsync(string path, Stream data, CancellationToken cancellationToken, bool forceOverwrite)
+        private static async Task WriteFileAsync(string path, Stream data, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
 

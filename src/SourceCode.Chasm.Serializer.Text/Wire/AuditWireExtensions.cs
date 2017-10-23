@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
@@ -44,7 +45,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
                 if (foundFirst)
                 {
                     var str = wire.Substring(ix, len - ix).TrimEnd();
-                    var ms = long.Parse(str);
+                    var ms = long.Parse(str, CultureInfo.InvariantCulture);
 
                     // Convert Unix ms to System.DateTimeOffset
 
@@ -55,7 +56,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
                 }
 
                 var stt = wire.Substring(ix, len - ix).TrimEnd();
-                var minutes = int.Parse(stt);
+                var minutes = int.Parse(stt, CultureInfo.InvariantCulture);
 
                 // Offset (minutes)
                 offset = TimeSpan.FromMinutes(minutes);

@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.IO.Text
     {
         #region Serialize
 
-        public BufferSession Serialize(TreeNodeList model)
+        public BufferSession Serialize(TreeNodeMap model)
         {
             var wire = model.Convert();
 
@@ -34,7 +34,7 @@ namespace SourceCode.Chasm.IO.Text
 
         #region Deserialize
 
-        public TreeNodeList DeserializeTree(ReadOnlySpan<byte> span)
+        public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.IsEmpty) return default;
 
