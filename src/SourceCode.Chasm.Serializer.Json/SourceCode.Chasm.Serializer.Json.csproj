@@ -15,7 +15,7 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.5.0.3766">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00246" />
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00247" />
   </ItemGroup>
 
   <ItemGroup>
