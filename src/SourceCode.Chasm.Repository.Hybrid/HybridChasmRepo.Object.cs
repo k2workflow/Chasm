@@ -19,15 +19,13 @@ namespace SourceCode.Chasm.IO.Hybrid
     {
         #region Read
 
-        public override async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             // We read from closest to furthest
             for (var i = 0; i < Chain.Length; i++)
             {
                 var bytes = await Chain[i].ReadObjectAsync(objectId, cancellationToken).ConfigureAwait(false);
-
-                if (!bytes.Equals(default))
-                    return bytes;
+                if (bytes != null) return bytes;
             }
 
             // NotFound
@@ -38,15 +36,14 @@ namespace SourceCode.Chasm.IO.Hybrid
         {
             if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
 
-            // TODO: Enable piecemeal reads (404s incur next repo)
+            // TODO: Perf
 
             // We read from closest to furthest
+            var objects = objectIds.ToArray();
             for (var i = 0; i < Chain.Length; i++)
             {
-                var dict = await Chain[i].ReadObjectBatchAsync(objectIds, cancellationToken).ConfigureAwait(false);
-
-                if (!dict.Equals(default))
-                    return dict;
+                var dict = await Chain[i].ReadObjectBatchAsync(objects, cancellationToken).ConfigureAwait(false);
+                if (dict.Count == objects.Length) return dict;
             }
 
             // NotFound

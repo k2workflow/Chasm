@@ -13,18 +13,6 @@ namespace SourceCode.Chasm
     [DebuggerDisplay("{" + nameof(Sha1) + ".ToString(\"D\"),nq,ac}")]
     public struct CommitId : IEquatable<CommitId>, IComparable<CommitId>
     {
-        #region Constants
-
-        /// <summary>
-        /// A singleton representing an empty <see cref="CommitId"/> value.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static CommitId Empty { get; }
-
-        #endregion
-
         #region Properties
 
         public Sha1 Sha1 { get; }
@@ -36,6 +24,19 @@ namespace SourceCode.Chasm
         public CommitId(Sha1 sha1)
         {
             Sha1 = sha1;
+        }
+
+        public static CommitId Parse(string hex) => new CommitId(Sha1.Parse(hex));
+
+        public static bool TryParse(string hex, out CommitId value)
+        {
+            if (Sha1.TryParse(hex, out var sha))
+            {
+                value = new CommitId(sha);
+                return true;
+            }
+            value = default;
+            return false;
         }
 
         #endregion

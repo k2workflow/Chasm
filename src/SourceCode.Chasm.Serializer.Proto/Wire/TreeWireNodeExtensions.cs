@@ -17,7 +17,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
             var sha1 = wire.NodeId.Convert();
 
-            var model = new TreeNode(wire.Name, wire.Kind.Convert(), sha1);
+            var model = new TreeNode(wire.Name, wire.Kind.Convert(), sha1.Value);
 
             return model;
         }

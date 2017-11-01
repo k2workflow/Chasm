@@ -14,12 +14,12 @@ namespace SourceCode.Chasm.IO
     {
         #region Read
 
-        public virtual async ValueTask<Commit> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
+        public virtual async ValueTask<Commit?> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
             var buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
-            if (buffer.IsEmpty) return default;
+            if (buffer == null) return default;
 
-            var model = Serializer.DeserializeCommit(buffer.Span);
+            var model = Serializer.DeserializeCommit(buffer.Value.Span);
             return model;
         }
 

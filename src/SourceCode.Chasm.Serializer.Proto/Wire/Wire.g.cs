@@ -22,22 +22,22 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     static WireReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgpXaXJlLnByb3RvIjcKCFNoYTFXaXJlEg0KBUJsaXQwGAEgASgEEg0KBUJs",
-            "aXQxGAIgASgEEg0KBUJsaXQyGAMgASgNIlQKDFRyZWVXaXJlTm9kZRIMCgRO",
-            "YW1lGAEgASgJEhsKBEtpbmQYAiABKA4yDS5Ob2RlS2luZFdpcmUSGQoGTm9k",
-            "ZUlkGAMgASgLMgkuU2hhMVdpcmUiKAoIVHJlZVdpcmUSHAoFTm9kZXMYASAD",
-            "KAsyDS5UcmVlV2lyZU5vZGUiNwoJQXVkaXRXaXJlEgwKBE5hbWUYASABKAkS",
-            "DAoEVGltZRgCIAEoAxIOCgZPZmZzZXQYAyABKAUijwEKCkNvbW1pdFdpcmUS",
-            "GgoHUGFyZW50cxgBIAMoCzIJLlNoYTFXaXJlEhkKBlRyZWVJZBgCIAEoCzIJ",
-            "LlNoYTFXaXJlEhoKBkF1dGhvchgDIAEoCzIKLkF1ZGl0V2lyZRIdCglDb21t",
-            "aXR0ZXIYBCABKAsyCi5BdWRpdFdpcmUSDwoHTWVzc2FnZRgFIAEoCSIlCgxD",
-            "b21taXRJZFdpcmUSFQoCSWQYASABKAsyCS5TaGExV2lyZSoiCgxOb2RlS2lu",
-            "ZFdpcmUSCAoEQmxvYhAAEggKBFRyZWUQAUIhqgIeU291cmNlQ29kZS5DaGFz",
-            "bS5JTy5Qcm90by5XaXJlYgZwcm90bzM="));
+            "CgpXaXJlLnByb3RvIkQKCFNoYTFXaXJlEgsKA1NldBgBIAEoCBINCgVCbGl0",
+            "MBgCIAEoBBINCgVCbGl0MRgDIAEoBBINCgVCbGl0MhgEIAEoDSJUCgxUcmVl",
+            "V2lyZU5vZGUSDAoETmFtZRgBIAEoCRIbCgRLaW5kGAIgASgOMg0uTm9kZUtp",
+            "bmRXaXJlEhkKBk5vZGVJZBgDIAEoCzIJLlNoYTFXaXJlIigKCFRyZWVXaXJl",
+            "EhwKBU5vZGVzGAEgAygLMg0uVHJlZVdpcmVOb2RlIjcKCUF1ZGl0V2lyZRIM",
+            "CgROYW1lGAEgASgJEgwKBFRpbWUYAiABKAMSDgoGT2Zmc2V0GAMgASgFIo8B",
+            "CgpDb21taXRXaXJlEhoKB1BhcmVudHMYASADKAsyCS5TaGExV2lyZRIZCgZU",
+            "cmVlSWQYAiABKAsyCS5TaGExV2lyZRIaCgZBdXRob3IYAyABKAsyCi5BdWRp",
+            "dFdpcmUSHQoJQ29tbWl0dGVyGAQgASgLMgouQXVkaXRXaXJlEg8KB01lc3Nh",
+            "Z2UYBSABKAkiJQoMQ29tbWl0SWRXaXJlEhUKAklkGAEgASgLMgkuU2hhMVdp",
+            "cmUqIgoMTm9kZUtpbmRXaXJlEggKBEJsb2IQABIICgRUcmVlEAFCIaoCHlNv",
+            "dXJjZUNvZGUuQ2hhc20uSU8uUHJvdG8uV2lyZWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::SourceCode.Chasm.IO.Proto.Wire.NodeKindWire), }, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire), global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire.Parser, new[]{ "Blit0", "Blit1", "Blit2" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire), global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire.Parser, new[]{ "Set", "Blit0", "Blit1", "Blit2" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.TreeWireNode), global::SourceCode.Chasm.IO.Proto.Wire.TreeWireNode.Parser, new[]{ "Name", "Kind", "NodeId" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.TreeWire), global::SourceCode.Chasm.IO.Proto.Wire.TreeWire.Parser, new[]{ "Nodes" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.AuditWire), global::SourceCode.Chasm.IO.Proto.Wire.AuditWire.Parser, new[]{ "Name", "Time", "Offset" }, null, null, null),
@@ -90,6 +90,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public Sha1Wire(Sha1Wire other) : this() {
+      set_ = other.set_;
       blit0_ = other.blit0_;
       blit1_ = other.blit1_;
       blit2_ = other.blit2_;
@@ -100,8 +101,19 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       return new Sha1Wire(this);
     }
 
+    /// <summary>Field number for the "Set" field.</summary>
+    public const int SetFieldNumber = 1;
+    private bool set_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Set {
+      get { return set_; }
+      set {
+        set_ = value;
+      }
+    }
+
     /// <summary>Field number for the "Blit0" field.</summary>
-    public const int Blit0FieldNumber = 1;
+    public const int Blit0FieldNumber = 2;
     private ulong blit0_;
     /// <summary>
     /// 0..7
@@ -115,7 +127,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     }
 
     /// <summary>Field number for the "Blit1" field.</summary>
-    public const int Blit1FieldNumber = 2;
+    public const int Blit1FieldNumber = 3;
     private ulong blit1_;
     /// <summary>
     /// 8..15
@@ -129,7 +141,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     }
 
     /// <summary>Field number for the "Blit2" field.</summary>
-    public const int Blit2FieldNumber = 3;
+    public const int Blit2FieldNumber = 4;
     private uint blit2_;
     /// <summary>
     /// 16..19
@@ -155,6 +167,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Set != other.Set) return false;
       if (Blit0 != other.Blit0) return false;
       if (Blit1 != other.Blit1) return false;
       if (Blit2 != other.Blit2) return false;
@@ -164,6 +177,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (Set != false) hash ^= Set.GetHashCode();
       if (Blit0 != 0UL) hash ^= Blit0.GetHashCode();
       if (Blit1 != 0UL) hash ^= Blit1.GetHashCode();
       if (Blit2 != 0) hash ^= Blit2.GetHashCode();
@@ -177,16 +191,20 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Blit0 != 0UL) {
+      if (Set != false) {
         output.WriteRawTag(8);
+        output.WriteBool(Set);
+      }
+      if (Blit0 != 0UL) {
+        output.WriteRawTag(16);
         output.WriteUInt64(Blit0);
       }
       if (Blit1 != 0UL) {
-        output.WriteRawTag(16);
+        output.WriteRawTag(24);
         output.WriteUInt64(Blit1);
       }
       if (Blit2 != 0) {
-        output.WriteRawTag(24);
+        output.WriteRawTag(32);
         output.WriteUInt32(Blit2);
       }
     }
@@ -194,6 +212,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (Set != false) {
+        size += 1 + 1;
+      }
       if (Blit0 != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Blit0);
       }
@@ -210,6 +231,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     public void MergeFrom(Sha1Wire other) {
       if (other == null) {
         return;
+      }
+      if (other.Set != false) {
+        Set = other.Set;
       }
       if (other.Blit0 != 0UL) {
         Blit0 = other.Blit0;
@@ -231,14 +255,18 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             input.SkipLastField();
             break;
           case 8: {
-            Blit0 = input.ReadUInt64();
+            Set = input.ReadBool();
             break;
           }
           case 16: {
-            Blit1 = input.ReadUInt64();
+            Blit0 = input.ReadUInt64();
             break;
           }
           case 24: {
+            Blit1 = input.ReadUInt64();
+            break;
+          }
+          case 32: {
             Blit2 = input.ReadUInt32();
             break;
           }

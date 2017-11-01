@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
     {
         #region Read
 
-        public override async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             var objectsContainer = _objectsContainer.Value;
 
@@ -50,9 +50,8 @@ namespace SourceCode.Chasm.IO.AzureBlob
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {
                 se.Suppress();
+                return default;
             }
-
-            return Array.Empty<byte>();
         }
 
         #endregion

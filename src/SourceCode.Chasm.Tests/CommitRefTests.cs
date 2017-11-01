@@ -14,13 +14,6 @@ namespace SourceCode.Chasm.Tests
         #region Methods
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(CommitRef_has_empty_commitId))]
-        public static void CommitRef_has_empty_commitId()
-        {
-            Assert.Equal(CommitId.Empty, CommitRef.Empty.CommitId);
-        }
-
-        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(CommitRef_equality))]
         public static void CommitRef_equality()
         {
@@ -38,7 +31,6 @@ namespace SourceCode.Chasm.Tests
 
             Assert.NotEqual(CommitRef.Empty, commitRef1);
             Assert.NotEqual(CommitRef.Empty.GetHashCode(), commitRef1.GetHashCode());
-            Assert.NotEqual(BlobId.Empty.ToString(), commitRef1.ToString());
 
             Assert.NotEqual(commitRef3, commitRef1);
             Assert.NotEqual(commitRef3.GetHashCode(), commitRef1.GetHashCode());

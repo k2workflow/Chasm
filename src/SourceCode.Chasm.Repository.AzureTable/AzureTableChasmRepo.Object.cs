@@ -26,7 +26,7 @@ namespace SourceCode.Chasm.IO.AzureTable
     {
         #region Read
 
-        public override async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             var objectsTable = _objectsTable.Value;
             var op = DataEntity.BuildReadOperation(objectId);
@@ -36,7 +36,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                 var result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
 
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
-                    return Array.Empty<byte>();
+                    return default;
 
                 var entity = (DataEntity)result.Result;
 
@@ -54,9 +54,8 @@ namespace SourceCode.Chasm.IO.AzureTable
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
             {
                 se.Suppress();
+                return default;
             }
-
-            return Array.Empty<byte>();
         }
 
         public override async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)

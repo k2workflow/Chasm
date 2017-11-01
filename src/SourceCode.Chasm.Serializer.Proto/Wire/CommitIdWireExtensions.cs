@@ -21,13 +21,14 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return wire;
         }
 
-        public static CommitId Convert(this CommitIdWire wire)
+        public static CommitId? Convert(this CommitIdWire wire)
         {
             if (wire == null) return default;
 
             var sha1 = wire.Id.Convert();
+            if (sha1 == null) return default;
 
-            var model = new CommitId(sha1);
+            var model = new CommitId(sha1.Value);
             return model;
         }
 

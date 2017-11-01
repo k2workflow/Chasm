@@ -30,7 +30,8 @@ namespace SourceCode.Chasm.IO.Text.Wire
             var sb = new StringBuilder();
 
             // Tree
-            sb.AppendLine($"{_treeId}{model.TreeId.Sha1:N}");
+            if (model.TreeId != null)
+                sb.AppendLine($"{_treeId}{model.TreeId.Value.Sha1:N}");
 
             // Parents
             if (model.Parents != null)
@@ -76,19 +77,25 @@ namespace SourceCode.Chasm.IO.Text.Wire
 
         public static Commit ConvertCommit(this string wire)
         {
-            if (string.IsNullOrWhiteSpace(wire)) return default;
+            if (string.IsNullOrEmpty(wire)) return default;
 
             // TreeId
-            TreeId treeId;
+            TreeId? treeId = default;
             var index = wire.IndexOf(_treeId, StringComparison.Ordinal);
             {
-                if (index < 0) throw new SerializationException();
-                index += _treeId.Length;
-                var curr = wire.Substring(index, Sha1.CharLen);
-                index += Sha1.CharLen;
+                if (index == 0)
+                {
+                    index += _treeId.Length;
+                    var curr = wire.Substring(index, Sha1.CharLen);
+                    index += Sha1.CharLen;
 
-                var sha1 = Sha1.Parse(curr);
-                treeId = new TreeId(sha1);
+                    var sha1 = Sha1.Parse(curr);
+                    treeId = new TreeId(sha1);
+                }
+                else
+                {
+                    index = 0;
+                }
             }
 
             // Parents

@@ -28,7 +28,7 @@ namespace SourceCode.Chasm.Tests
         public static void Commit_Empty()
         {
             var noData = new Commit();
-            var nullData = new Commit(null, default, default, default, null);
+            var nullData = new Commit(new CommitId?(), default, default, default, null);
 
             Assert.True(default == Commit.Empty);
             Assert.False(default != Commit.Empty);
@@ -40,9 +40,9 @@ namespace SourceCode.Chasm.Tests
             Assert.Empty(nullData.Parents); // Custom ctor (with null)
 
             // TreeId
-            Assert.Equal(TreeId.Empty, Commit.Empty.TreeId);
-            Assert.Equal(TreeId.Empty, noData.TreeId);
-            Assert.Equal(TreeId.Empty, nullData.TreeId);
+            Assert.Equal(default, Commit.Empty.TreeId);
+            Assert.Equal(default, noData.TreeId);
+            Assert.Equal(default, nullData.TreeId);
 
             // DateTime
             Assert.Equal(default, Commit.Empty.Author.Timestamp);
@@ -68,7 +68,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
             // Parents
-            actual = new Commit(null, expected.TreeId, expected.Author, expected.Committer, expected.Message);
+            actual = new Commit(new CommitId?(), expected.TreeId, expected.Author, expected.Committer, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
@@ -89,7 +89,7 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             // TreeId
-            actual = new Commit(expected.Parents, TreeId.Empty, expected.Author, expected.Committer, expected.Message);
+            actual = new Commit(expected.Parents, default, expected.Author, expected.Committer, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
@@ -124,11 +124,11 @@ namespace SourceCode.Chasm.Tests
         public static void Commit_Parents_Null()
         {
             // Force Commit to be non-default
-            var actual = new Commit(null, default, default, default, "force");
+            var actual = new Commit(new CommitId?(), default, default, default, "force");
             Assert.Empty(actual.Parents);
 
             // Force Commit to be non-default
-            actual = new Commit(null, default, default, default, "force");
+            actual = new Commit(new CommitId?(), default, default, default, "force");
             Assert.Empty(actual.Parents);
         }
 
@@ -144,8 +144,8 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(Commit_Parents_1_Empty))]
         public static void Commit_Parents_1_Empty()
         {
-            var actual = new Commit(CommitId.Empty, default, default, default, null);
-            Assert.Collection(actual.Parents, n => Assert.Equal(n, CommitId.Empty));
+            var actual = new Commit(new CommitId(), default, default, default, null);
+            Assert.Collection(actual.Parents, n => Assert.Equal(default, n));
         }
 
         [Trait("Type", "Unit")]
@@ -160,9 +160,9 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(Commit_Parents_2_Empty_Duplicated))]
         public static void Commit_Parents_2_Empty_Duplicated()
         {
-            var actual = new Commit(new[] { CommitId.Empty, CommitId.Empty }, default, default, default, null);
-            Assert.Collection(actual.Parents, n => Assert.Equal(n, CommitId.Empty));
-            Assert.Equal(CommitId.Empty, actual.Parents[0]);
+            var actual = new Commit(new[] { new CommitId(), new CommitId() }, default, default, default, null);
+            Assert.Collection(actual.Parents, n => Assert.Equal(n, new CommitId()));
+            Assert.Equal(new CommitId(), actual.Parents[0]);
         }
 
         [Trait("Type", "Unit")]
@@ -195,8 +195,8 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(Commit_Parents_3_Empty_Duplicated))]
         public static void Commit_Parents_3_Empty_Duplicated()
         {
-            var actual = new Commit(new[] { CommitId.Empty, CommitId.Empty, CommitId.Empty }, default, default, default, null);
-            Assert.Collection(actual.Parents, n => Assert.Equal(n, CommitId.Empty));
+            var actual = new Commit(new[] { new CommitId(), new CommitId(), new CommitId() }, default, default, default, null);
+            Assert.Collection(actual.Parents, n => Assert.Equal(default, n));
         }
 
         [Trait("Type", "Unit")]

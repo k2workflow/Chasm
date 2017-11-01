@@ -32,7 +32,7 @@ namespace SourceCode.Chasm.Tests.IO
             throw new NotImplementedException();
         }
 
-        public override ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

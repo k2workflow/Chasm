@@ -15,14 +15,6 @@ namespace SourceCode.Chasm.Tests
         #region Methods
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeId_has_empty_sha1))]
-        public static void TreeId_has_empty_sha1()
-        {
-            Assert.Equal(Sha1.Empty, TreeId.Empty.Sha1);
-            Assert.Equal(Sha1.Empty.ToString(), TreeId.Empty.ToString());
-        }
-
-        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeId_equality))]
         public static void TreeId_equality()
         {
@@ -42,10 +34,6 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(treeId1.GetHashCode(), treeId2.GetHashCode());
             Assert.Equal(treeId1.ToString(), treeId2.ToString());
 
-            Assert.NotEqual(TreeId.Empty, treeId1);
-            Assert.NotEqual(TreeId.Empty.GetHashCode(), treeId1.GetHashCode());
-            Assert.NotEqual(TreeId.Empty.ToString(), treeId1.ToString());
-
             Assert.NotEqual(treeId3, treeId1);
             Assert.NotEqual(treeId3.GetHashCode(), treeId1.GetHashCode());
             Assert.NotEqual(treeId3.ToString(), treeId1.ToString());
@@ -61,9 +49,6 @@ namespace SourceCode.Chasm.Tests
             var treeId2 = new TreeId(Sha1.Hash("abc"));
             var treeId3 = new TreeId(Sha1.Hash("def"));
             var list = new[] { treeId1, treeId2, treeId3 };
-
-            Assert.True(TreeId.Empty < treeId1);
-            Assert.True(treeId1 > TreeId.Empty);
 
             Assert.True(treeId1.CompareTo(treeId2) == 0);
             Assert.True(treeId1.CompareTo(treeId3) != 0);

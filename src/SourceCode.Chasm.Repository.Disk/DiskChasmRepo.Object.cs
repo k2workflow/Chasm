@@ -18,14 +18,13 @@ namespace SourceCode.Chasm.IO.Disk
     {
         #region Read
 
-        public override async ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             var filename = DeriveFileName(objectId);
             var path = Path.Combine(_objectsContainer, filename);
 
             var bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
-            if (bytes == null)
-                return default;
+            if (bytes == null) return default;
 
             using (var input = new MemoryStream(bytes.ToArray())) // TODO: Perf
             using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))

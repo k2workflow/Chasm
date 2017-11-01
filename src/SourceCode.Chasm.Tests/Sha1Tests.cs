@@ -28,7 +28,7 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(When_create_null_sha1))]
         public static void When_create_null_sha1()
         {
-            var expected = Sha1.Empty;
+            var expected = Sha1.Zero;
 
             Assert.Throws<ArgumentNullException>(() => new Sha1((byte[])null, 0));
 
@@ -536,7 +536,7 @@ namespace SourceCode.Chasm.Tests
                 var str = new string(Char.MinValue, i);
                 var sha1 = Sha1.Hash(str);
 
-                Assert.NotEqual(Sha1.Empty, sha1);
+                Assert.NotEqual(Sha1.Zero, sha1);
                 Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(sha1.ToString()));
             }
         }
@@ -550,7 +550,7 @@ namespace SourceCode.Chasm.Tests
                 var str = new string(Char.MaxValue, i);
                 var sha1 = Sha1.Hash(str);
 
-                Assert.NotEqual(Sha1.Empty, sha1);
+                Assert.NotEqual(Sha1.Zero, sha1);
                 Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(sha1.ToString()));
             }
         }
@@ -565,7 +565,7 @@ namespace SourceCode.Chasm.Tests
                 str += _surrogatePair;
                 var sha1 = Sha1.Hash(str);
 
-                Assert.NotEqual(Sha1.Empty, sha1);
+                Assert.NotEqual(Sha1.Zero, sha1);
                 Assert.Equal(Sha1.CharLen, Encoding.UTF8.GetByteCount(sha1.ToString()));
             }
         }
@@ -787,8 +787,8 @@ namespace SourceCode.Chasm.Tests
             var sha2 = Sha1.Hash("abc");
             var sha3 = Sha1.Hash("def");
 
-            Assert.True(Sha1.Empty < sha1);
-            Assert.True(sha1 > Sha1.Empty);
+            Assert.True(Sha1.Zero < sha1);
+            Assert.True(sha1 > Sha1.Zero);
 
             var list = new[] { sha1, sha2, sha3 };
 

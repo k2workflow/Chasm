@@ -18,7 +18,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_CommitId_Default(IChasmSerializer ser)
         {
-            var expected = CommitId.Empty;
+            var expected = new CommitId();
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommitId(buf.Result);

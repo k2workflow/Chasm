@@ -13,18 +13,6 @@ namespace SourceCode.Chasm
     [DebuggerDisplay("{" + nameof(Sha1) + ".ToString(\"D\"),nq,ac}")]
     public struct BlobId : IEquatable<BlobId>, IComparable<BlobId>
     {
-        #region Constants
-
-        /// <summary>
-        /// A singleton representing an empty <see cref="BlobId"/> value.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static BlobId Empty { get; }
-
-        #endregion
-
         #region Properties
 
         public Sha1 Sha1 { get; }
@@ -36,6 +24,19 @@ namespace SourceCode.Chasm
         public BlobId(Sha1 sha1)
         {
             Sha1 = sha1;
+        }
+
+        public static BlobId Parse(string hex) => new BlobId(Sha1.Parse(hex));
+
+        public static bool TryParse(string hex, out BlobId value)
+        {
+            if (Sha1.TryParse(hex, out var sha))
+            {
+                value = new BlobId(sha);
+                return true;
+            }
+            value = default;
+            return false;
         }
 
         #endregion
