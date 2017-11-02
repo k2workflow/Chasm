@@ -97,11 +97,16 @@ namespace SourceCode.Chasm
             _nodes = DistinctSort(array, true);
         }
 
+        private TreeNodeMap(ReadOnlyMemory<TreeNode> nodes)
+        {
+            _nodes = nodes;
+        }
+
         #endregion
 
         #region Methods
 
-        private static TreeNode[] Merge(TreeNodeMap first, TreeNodeMap second)
+        private static ReadOnlyMemory<TreeNode> Merge(TreeNodeMap first, TreeNodeMap second)
         {
             var newArray = new TreeNode[first.Count + second.Count];
 
@@ -143,8 +148,7 @@ namespace SourceCode.Chasm
                 }
             }
 
-            Array.Resize(ref newArray, i);
-            return newArray;
+            return new ReadOnlyMemory<TreeNode>(newArray, 0, i);
         }
 
         public TreeNodeMap Merge(TreeNode node)
@@ -173,6 +177,53 @@ namespace SourceCode.Chasm
             }
 
             return new TreeNodeMap(array);
+        }
+
+        public TreeNodeMap Delete(Func<string, bool> predicate)
+        {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+            if (_nodes.Length == 0) return this;
+
+            var copy = new TreeNode[_nodes.Length - 1];
+            var span = _nodes.Span;
+            var j = 0;
+            for (var i = 0; i < _nodes.Length; i++)
+            {
+                if (!predicate(span[i].Name))
+                    copy[j++] = span[i];
+            }
+
+            if (j == _nodes.Length)
+                return this;
+
+            return new TreeNodeMap(new ReadOnlyMemory<TreeNode>(copy, 0, j));
+        }
+
+        public TreeNodeMap Delete(string key)
+        {
+            if (_nodes.Length == 0) return this;
+
+            var copy = new TreeNode[_nodes.Length - 1];
+            var span = _nodes.Span;
+            var found = false;
+            for (var i = 0; i < _nodes.Length; i++)
+            {
+                if (found)
+                {
+                    copy[i - 1] = span[i];
+                }
+                else
+                {
+                    if (i < _nodes.Length - 1)
+                        copy[i] = span[i];
+                    found = string.Equals(span[i].Name, key, StringComparison.Ordinal);
+                }
+            }
+
+            if (found)
+                return new TreeNodeMap(new ReadOnlyMemory<TreeNode>(copy));
+
+            return this;
         }
 
         public TreeNodeMap Merge(TreeNodeMap nodes)
@@ -282,70 +333,73 @@ namespace SourceCode.Chasm
             Debug.Assert(array != null); // Already checked at callsites
 
             // Optimize for common cases 0, 1, 2, N
+            ReadOnlyMemory<TreeNode> result;
             switch (array.Length)
             {
+                case 0:
+                    return default;
+
                 case 1:
-                    // Always copy. The callsite may change the array after creating the TreeNodeList.
-                    return new TreeNode[1] { array[0] };
+                    // Always copy. The callsite may change the array after creating the TreeNodeMap.
+                    result = new TreeNode[1] { array[0] };
+                    return result;
 
                 case 2:
+                    // If it's a complete duplicate, silently skip
+                    if (StringComparer.Ordinal.Equals(array[0].Name, array[1].Name))
                     {
-                        // If the Name (alone) is duplicated
-                        if (StringComparer.Ordinal.Equals(array[0].Name, array[1].Name))
-                        {
-                            // If it's a complete duplicate, silently skip
-                            if (TreeNodeComparer.Default.Equals(array[0], array[1]))
-                                return new TreeNode[1] { array[0] };
-
-                            // Else throw
+                        if (TreeNodeComparer.Default.Equals(array[0], array[1]))
+                            result = new TreeNode[1] { array[0] };
+                        else
                             throw CreateDuplicateException(array[0]);
-                        }
-
-                        // Sort
-                        if (TreeNodeComparer.Default.Compare(array[0], array[1]) < 0)
-                            return new TreeNode[2] { array[0], array[1] };
-
-                        return new TreeNode[2] { array[1], array[0] };
                     }
+                    // Sort
+                    else if (TreeNodeComparer.Default.Compare(array[0], array[1]) > 0)
+                    {
+                        result = new TreeNode[2] { array[1], array[0] };
+                    }
+                    else if (alreadyCopied)
+                    {
+                        result = array;
+                    }
+                    else
+                    {
+                        result = new TreeNode[2] { array[0], array[1] };
+                    }
+                    return result;
 
                 default:
+
+                    // If callsite did not already copy, do so before mutating
+                    var nodes = array;
+                    if (!alreadyCopied)
                     {
-                        // If callsite did not already copy, do so before mutating
-                        var nodes = array;
-                        if (!alreadyCopied)
-                        {
-                            nodes = new TreeNode[array.Length];
-                            array.CopyTo(nodes, 0);
-                        }
-
-                        // Sort: Delegate dispatch faster than interface (https://github.com/dotnet/coreclr/pull/8504)
-                        Array.Sort(nodes, TreeNodeComparer.Default.Compare);
-
-                        // Distinct
-                        var j = 1;
-                        for (var i = 1; i < nodes.Length; i++)
-                        {
-                            // If the Name (alone) is duplicated
-                            if (StringComparer.Ordinal.Equals(nodes[i - 1].Name, nodes[i].Name))
-                            {
-                                // If it's a complete duplicate, silently skip
-                                if (TreeNodeComparer.Default.Equals(nodes[i - 1], nodes[i]))
-                                    continue;
-
-                                // Else throw
-                                throw CreateDuplicateException(nodes[0]);
-                            }
-
-                            nodes[j++] = nodes[i]; // Increment target index iff distinct
-                        }
-
-                        // Assign
-                        var span = new ReadOnlyMemory<TreeNode>(nodes, 0, j);
-                        return span;
+                        nodes = new TreeNode[array.Length];
+                        array.CopyTo(nodes, 0);
                     }
+
+                    // Sort: Delegate dispatch faster than interface (https://github.com/dotnet/coreclr/pull/8504)
+                    Array.Sort(nodes, TreeNodeComparer.Default.Compare);
+
+                    // Distinct
+                    var j = 1;
+                    for (var i = 1; i < nodes.Length; i++)
+                    {
+                        // If the Name (alone) is duplicated
+                        if (StringComparer.Ordinal.Equals(nodes[i - 1].Name, nodes[i].Name))
+                        {
+                            // If it's a complete duplicate, silently skip
+                            if (TreeNodeComparer.Default.Equals(nodes[i - 1], nodes[i]))
+                                continue;
+                            throw CreateDuplicateException(nodes[0]);
+                        }
+                        nodes[j++] = nodes[i]; // Increment target index if distinct
+                    }
+
+                    var span = new ReadOnlyMemory<TreeNode>(nodes, 0, j);
+                    return span;
             }
 
-            // Local functions
             ArgumentException CreateDuplicateException(TreeNode node)
                 => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeMap)}: ({node})");
         }

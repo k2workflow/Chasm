@@ -12,7 +12,7 @@ using Xunit;
 
 namespace SourceCode.Chasm.Tests
 {
-    public static class TreeNodeListTests
+    public static class TreeNodeMapTests
     {
         #region Constants
 
@@ -26,26 +26,26 @@ namespace SourceCode.Chasm.Tests
 
         #region Methods
 
-        private static void AssertEmpty(TreeNodeMap treeNodeList)
+        private static void AssertEmpty(TreeNodeMap treeNodeMap)
         {
-            Assert.Empty(treeNodeList);
-            Assert.Equal(TreeNodeMap.Empty, treeNodeList); // By design
-            Assert.Equal(TreeNodeMap.Empty.GetHashCode(), treeNodeList.GetHashCode());
-            Assert.Empty(treeNodeList.Keys);
+            Assert.Empty(treeNodeMap);
+            Assert.Equal(TreeNodeMap.Empty, treeNodeMap); // By design
+            Assert.Equal(TreeNodeMap.Empty.GetHashCode(), treeNodeMap.GetHashCode());
+            Assert.Empty(treeNodeMap.Keys);
 
-            Assert.Throws<IndexOutOfRangeException>(() => treeNodeList[0]);
-            Assert.Throws<KeyNotFoundException>(() => treeNodeList["x"]);
-            Assert.False(treeNodeList.TryGetValue("x", out _));
-            Assert.False(treeNodeList.TryGetValue("x", NodeKind.Blob, out _));
+            Assert.Throws<IndexOutOfRangeException>(() => treeNodeMap[0]);
+            Assert.Throws<KeyNotFoundException>(() => treeNodeMap["x"]);
+            Assert.False(treeNodeMap.TryGetValue("x", out _));
+            Assert.False(treeNodeMap.TryGetValue("x", NodeKind.Blob, out _));
 
-            Assert.False(treeNodeList.Equals(new object()));
-            Assert.Contains("Count: 0", treeNodeList.ToString());
-            Assert.Equal(-1, treeNodeList.IndexOf(Guid.NewGuid().ToString()));
+            Assert.False(treeNodeMap.Equals(new object()));
+            Assert.Contains("Count: 0", treeNodeMap.ToString());
+            Assert.Equal(-1, treeNodeMap.IndexOf(Guid.NewGuid().ToString()));
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Empty))]
-        public static void TreeNodeList_Empty()
+        [Fact(DisplayName = nameof(TreeNodeMap_Empty))]
+        public static void TreeNodeMap_Empty()
         {
             var noData = new TreeNodeMap();
             AssertEmpty(noData);
@@ -64,8 +64,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Sorting))]
-        public static void TreeNodeList_Sorting()
+        [Fact(DisplayName = nameof(TreeNodeMap_Sorting))]
+        public static void TreeNodeMap_Sorting()
         {
             var nodes = new[] { Node0, Node1 };
             var tree0 = new TreeNodeMap(nodes.OrderBy(n => n.Sha1).ToArray());
@@ -131,8 +131,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_2))]
-        public static void TreeNodeList_Duplicate_Full_2()
+        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_2))]
+        public static void TreeNodeMap_Duplicate_Full_2()
         {
             var nodes = new[] { Node0, Node0 };
 
@@ -144,8 +144,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_3))]
-        public static void TreeNodeList_Duplicate_Full_3()
+        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_3))]
+        public static void TreeNodeMap_Duplicate_Full_3()
         {
             var nodes = new[] { Node0, Node1, Node0 }; // Shuffled
 
@@ -157,8 +157,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_2_Exception))]
-        public static void TreeNodeList_Duplicate_Full_2_Exception()
+        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_2_Exception))]
+        public static void TreeNodeMap_Duplicate_Full_2_Exception()
         {
             // Arrange
             var nodes = new[] { Node0, Node0Blob }; // Shuffled
@@ -172,8 +172,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_3_Exception))]
-        public static void TreeNodeList_Duplicate_Full_3_Exception()
+        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_3_Exception))]
+        public static void TreeNodeMap_Duplicate_Full_3_Exception()
         {
             // Arrange
             var nodes = new[] { Node0, Node0Blob, Node1 }; // Shuffled
@@ -187,8 +187,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_4))]
-        public static void TreeNodeList_Duplicate_Full_4()
+        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_4))]
+        public static void TreeNodeMap_Duplicate_Full_4()
         {
             var nodes = new[] { Node0, Node2, Node1, Node0 }; // Shuffled
 
@@ -200,8 +200,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Full_N))]
-        public static void TreeNodeList_Duplicate_Full_N()
+        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_N))]
+        public static void TreeNodeMap_Duplicate_Full_N()
         {
             var nodes = new[] { Node3, Node1, Node2, Node0, Node3, Node0, Node1, Node0, Node1, Node2, Node0, Node3 }; // Shuffled
 
@@ -213,8 +213,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Name))]
-        public static void TreeNodeList_Duplicate_Name()
+        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Name))]
+        public static void TreeNodeMap_Duplicate_Name()
         {
             var nodes = new[] { new TreeNode(Node0.Name, NodeKind.Tree, Node1.Sha1), Node0 }; // Reversed
 
@@ -223,8 +223,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Duplicate_Sha1))]
-        public static void TreeNodeList_Duplicate_Sha1()
+        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Sha1))]
+        public static void TreeNodeMap_Duplicate_Sha1()
         {
             var nodes = new[] { new TreeNode(Node1.Name, NodeKind.Tree, Node0.Sha1), Node0 }; // Reversed
 
@@ -236,8 +236,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Equality))]
-        public static void TreeNodeList_Equality()
+        [Fact(DisplayName = nameof(TreeNodeMap_Equality))]
+        public static void TreeNodeMap_Equality()
         {
             var expected = new TreeNodeMap(new[] { new TreeNode("c1", NodeKind.Blob, Sha1.Hash("c1")), new TreeNode("c2", NodeKind.Tree, Sha1.Hash("c2")) });
             var node3 = new TreeNode("c3", NodeKind.Tree, Sha1.Hash("c3"));
@@ -275,8 +275,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_IndexOf))]
-        public static void TreeNodeList_IndexOf()
+        [Fact(DisplayName = nameof(TreeNodeMap_IndexOf))]
+        public static void TreeNodeMap_IndexOf()
         {
             // Arrange
             var actual = new TreeNodeMap(new[] { Node0, Node1 });
@@ -289,31 +289,31 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Merge_Empty))]
-        public static void TreeNodeList_Merge_Empty()
+        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Empty))]
+        public static void TreeNodeMap_Merge_Empty()
         {
-            var emptyTreeNodeList = new TreeNodeMap();
+            var emptyTreeNodeMap = new TreeNodeMap();
             var node = new TreeNode("b", NodeKind.Blob, Sha1.Hash("Test1"));
             var list = new TreeNodeMap(node);
 
-            // TreeNodeList
-            var merged = list.Merge(emptyTreeNodeList);
+            // TreeNodeMap
+            var merged = list.Merge(emptyTreeNodeMap);
             Assert.Equal(list, merged);
 
-            merged = emptyTreeNodeList.Merge(list);
+            merged = emptyTreeNodeMap.Merge(list);
             Assert.Equal(list, merged);
 
             // ICollection
             merged = list.Merge(Array.Empty<TreeNode>());
             Assert.Equal(list, merged);
 
-            merged = emptyTreeNodeList.Merge(list.Values.ToArray());
+            merged = emptyTreeNodeMap.Merge(list.Values.ToArray());
             Assert.Equal(list, merged);
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Merge_Null))]
-        public static void TreeNodeList_Merge_Null()
+        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Null))]
+        public static void TreeNodeMap_Merge_Null()
         {
             // Arrange
             var list = new TreeNodeMap(Node0);
@@ -326,8 +326,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Merge_Single))]
-        public static void TreeNodeList_Merge_Single()
+        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Single))]
+        public static void TreeNodeMap_Merge_Single()
         {
             var list = new TreeNodeMap();
 
@@ -348,8 +348,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Merge_Single_Exist))]
-        public static void TreeNodeList_Merge_Single_Exist()
+        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Single_Exist))]
+        public static void TreeNodeMap_Merge_Single_Exist()
         {
             // Arrange
             var list = new TreeNodeMap();
@@ -370,8 +370,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Merge_TreeNodeList))]
-        public static void TreeNodeList_Merge_TreeNodeList()
+        [Fact(DisplayName = nameof(TreeNodeMap_Merge_TreeNodeMap))]
+        public static void TreeNodeMap_Merge_TreeNodeMap()
         {
             var list1 = new TreeNodeMap();
 
@@ -416,8 +416,8 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_Merge_Collection))]
-        public static void TreeNodeList_Merge_Collection()
+        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Collection))]
+        public static void TreeNodeMap_Merge_Collection()
         {
             var list1 = new TreeNodeMap();
 
@@ -473,12 +473,56 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_IReadOnlyDictionary_Empty_GetEnumerator))]
-        public static void TreeNodeList_IReadOnlyDictionary_Empty_GetEnumerator()
+        [Fact(DisplayName = nameof(TreeNodeMap_Delete))]
+        public static void TreeNodeMap_Delete()
+        {
+            var sut = new TreeNodeMap(
+                new TreeNode("a", NodeKind.Blob, Sha1.Hash("a")),
+                new TreeNode("b", NodeKind.Blob, Sha1.Hash("b")),
+                new TreeNode("c", NodeKind.Blob, Sha1.Hash("c"))
+            );
+
+            var removed = sut.Delete("a");
+            Assert.Equal(2, removed.Count);
+            Assert.Equal("b", removed[0].Name);
+            Assert.Equal("c", removed[1].Name);
+
+            removed = sut.Delete("b");
+            Assert.Equal(2, removed.Count);
+            Assert.Equal("a", removed[0].Name);
+            Assert.Equal("c", removed[1].Name);
+
+            removed = sut.Delete("c");
+            Assert.Equal(2, removed.Count);
+            Assert.Equal("a", removed[0].Name);
+            Assert.Equal("b", removed[1].Name);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeMap_Delete_Predicate))]
+        public static void TreeNodeMap_Delete_Predicate()
+        {
+            var sut = new TreeNodeMap(
+                new TreeNode("a", NodeKind.Blob, Sha1.Hash("a")),
+                new TreeNode("b", NodeKind.Blob, Sha1.Hash("b")),
+                new TreeNode("c", NodeKind.Blob, Sha1.Hash("c"))
+            );
+
+            var set = new HashSet<string>(StringComparer.Ordinal)
+            { "a", "b", "d" };
+
+            var removed = sut.Delete(set.Contains);
+            Assert.Single(removed);
+            Assert.Equal("c", removed[0].Name);
+        }
+
+        [Trait("Type", "Unit")]
+        [Fact(DisplayName = nameof(TreeNodeMap_IReadOnlyDictionary_Empty_GetEnumerator))]
+        public static void TreeNodeMap_IReadOnlyDictionary_Empty_GetEnumerator()
         {
             // Arrange
-            var treeNodeList = new TreeNodeMap();
-            var readOnlyDictionary = treeNodeList as IReadOnlyDictionary<string, TreeNode>;
+            var treeNodeMap = new TreeNodeMap();
+            var readOnlyDictionary = treeNodeMap as IReadOnlyDictionary<string, TreeNode>;
 
             // Action
             var enumerator = readOnlyDictionary.GetEnumerator();
@@ -492,13 +536,13 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeList_IReadOnlyDictionary_GetEnumerator))]
-        public static void TreeNodeList_IReadOnlyDictionary_GetEnumerator()
+        [Fact(DisplayName = nameof(TreeNodeMap_IReadOnlyDictionary_GetEnumerator))]
+        public static void TreeNodeMap_IReadOnlyDictionary_GetEnumerator()
         {
             // Arrange
             var nodes = new[] { Node0, Node1 };
-            var treeNodeList = new TreeNodeMap(nodes);
-            var readOnlyDictionary = treeNodeList as IReadOnlyDictionary<string, TreeNode>;
+            var treeNodeMap = new TreeNodeMap(nodes);
+            var readOnlyDictionary = treeNodeMap as IReadOnlyDictionary<string, TreeNode>;
 
             // Action
             var enumerator = readOnlyDictionary.GetEnumerator();

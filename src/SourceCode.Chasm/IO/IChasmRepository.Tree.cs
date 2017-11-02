@@ -20,6 +20,10 @@ namespace SourceCode.Chasm.IO
 
         ValueTask<TreeNodeMap?> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken);
 
+        ValueTask<TreeNodeMap?> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken);
+
+        ValueTask<TreeNodeMap?> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken);
+
         ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken);
 
         #endregion
@@ -27,6 +31,8 @@ namespace SourceCode.Chasm.IO
         #region Write
 
         ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken);
+
+        ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken);
 
         #endregion
     }
