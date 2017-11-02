@@ -127,7 +127,7 @@ namespace SourceCode.Chasm
                 {
                     var a = first[aIndex];
                     var b = second[bIndex];
-                    var cmp = string.CompareOrdinal(a.Name, b.Name);
+                    var cmp = StringComparer.Ordinal.Compare(a.Name, b.Name);
 
                     if (cmp == 0)
                     {
@@ -216,7 +216,7 @@ namespace SourceCode.Chasm
                 {
                     if (i < _nodes.Length - 1)
                         copy[i] = span[i];
-                    found = string.Equals(span[i].Name, key, StringComparison.Ordinal);
+                    found = StringComparer.Ordinal.Equals(span[i].Name, key);
                 }
             }
 
@@ -266,7 +266,7 @@ namespace SourceCode.Chasm
 
             while (r >= l)
             {
-                var cmp = string.CompareOrdinal(span[i].Name, ks);
+                var cmp = StringComparer.Ordinal.Compare(span[i].Name, ks);
                 if (cmp == 0) return i;
                 else if (cmp > 0) r = i - 1;
                 else l = i + 1;
@@ -297,7 +297,7 @@ namespace SourceCode.Chasm
             {
                 value = span[i];
 
-                var cmp = string.CompareOrdinal(value.Name, ks);
+                var cmp = StringComparer.Ordinal.Compare(value.Name, ks);
                 if (cmp == 0) return true;
 
                 if (cmp > 0) r = i - 1;
