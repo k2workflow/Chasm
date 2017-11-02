@@ -6,6 +6,7 @@
 #endregion
 
 using SourceCode.Clay.Collections.Generic;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,6 +52,35 @@ namespace SourceCode.Chasm.IO
             return dict;
         }
 
+        public virtual async ValueTask<TreeNodeMap?> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (string.IsNullOrWhiteSpace(commitRefName)) throw new ArgumentNullException(nameof(commitRefName));
+
+            // CommitRef
+            var commitRef = await ReadCommitRefAsync(branch, commitRefName, cancellationToken).ConfigureAwait(false);
+
+            // NotFound
+            if (commitRef == null) return default;
+
+            // Tree
+            var tree = await ReadTreeAsync(commitRef.Value.CommitId, cancellationToken).ConfigureAwait(false);
+            return tree;
+        }
+
+        public virtual async ValueTask<TreeNodeMap?> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken)
+        {
+            // Commit
+            var commit = await ReadCommitAsync(commitId, cancellationToken).ConfigureAwait(false);
+            if (commit == null) return default;
+
+            // Tree
+            if (commit.Value.TreeId == null) return default;
+            var tree = await ReadTreeAsync(commit.Value.TreeId.Value, cancellationToken).ConfigureAwait(false);
+
+            return tree;
+        }
+
         #endregion
 
         #region Write
@@ -66,6 +96,15 @@ namespace SourceCode.Chasm.IO
                 var model = new TreeId(sha1);
                 return model;
             }
+        }
+
+        public virtual async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken)
+        {
+            var treeId = await WriteTreeAsync(tree, cancellationToken).ConfigureAwait(false);
+            var commit = new Commit(parents, treeId, author, committer, message);
+            var commitId = await WriteCommitAsync(commit, cancellationToken).ConfigureAwait(false);
+
+            return commitId;
         }
 
         #endregion
