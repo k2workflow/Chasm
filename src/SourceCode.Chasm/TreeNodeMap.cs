@@ -345,15 +345,16 @@ namespace SourceCode.Chasm
                     return result;
 
                 case 2:
-                    // If it's a complete duplicate, silently skip
+                    // If the Name (alone) is duplicated
                     if (StringComparer.Ordinal.Equals(array[0].Name, array[1].Name))
                     {
+                        // If it's a complete duplicate, silently skip
                         if (TreeNodeComparer.Default.Equals(array[0], array[1]))
                             result = new TreeNode[1] { array[0] };
                         else
                             throw CreateDuplicateException(array[0]);
                     }
-                    // Sort
+                    // In the wrong order
                     else if (TreeNodeComparer.Default.Compare(array[0], array[1]) > 0)
                     {
                         result = new TreeNode[2] { array[1], array[0] };
