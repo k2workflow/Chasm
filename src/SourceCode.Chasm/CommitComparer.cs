@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
@@ -66,21 +67,13 @@ namespace SourceCode.Chasm
                 return true;
             }
 
-            public override int GetHashCode(Commit obj)
-            {
-                unchecked
-                {
-                    var hc = 17L;
-
-                    hc = (hc * 23) + obj.TreeId.GetHashCode();
-                    hc = (hc * 23) + obj.Author.GetHashCode();
-                    hc = (hc * 23) + obj.Committer.GetHashCode();
-                    hc = (hc * 23) + (obj.Parents?.Count ?? -42);
-                    hc = (hc * 23) + (obj.Message?.Length ?? 0);
-
-                    return ((int)(hc >> 32)) ^ (int)hc;
-                }
-            }
+            public override int GetHashCode(Commit obj) => new HashCode()
+                .Tally(obj.TreeId ?? default, TreeIdComparer.Default)
+                .Tally(obj.Author)
+                .Tally(obj.Committer)
+                .TallyCount(obj.Parents)
+                .Tally(obj.Message ?? string.Empty, StringComparer.Ordinal)
+                .ToHashCode();
 
             #endregion
         }

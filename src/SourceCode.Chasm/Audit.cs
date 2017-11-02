@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System;
 using System.Diagnostics;
 
@@ -69,18 +70,10 @@ namespace SourceCode.Chasm
             => obj is Audit audit
             && Equals(audit);
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hc = 17L;
-
-                hc = (hc * 23) + StringComparer.Ordinal.GetHashCode(Name);
-                hc = (hc * 23) + Timestamp.GetHashCode();
-
-                return ((int)(hc >> 32)) ^ (int)hc;
-            }
-        }
+        public override int GetHashCode() => new HashCode()
+            .Tally(Name ?? string.Empty, StringComparer.Ordinal)
+            .Tally(Timestamp)
+            .ToHashCode();
 
         #endregion
 

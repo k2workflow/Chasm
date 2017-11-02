@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System;
 using System.Diagnostics;
 
@@ -59,18 +60,10 @@ namespace SourceCode.Chasm
             => obj is CommitRef commitRef
             && Equals(commitRef);
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hc = 17L;
-
-                hc = (hc * 23) + CommitId.GetHashCode();
-                hc = (hc * 23) + (Name?.Length ?? 0);
-
-                return ((int)(hc >> 32)) ^ (int)hc;
-            }
-        }
+        public override int GetHashCode() => new HashCode()
+            .Tally(CommitId, CommitIdComparer.Default)
+            .Tally(Name ?? string.Empty, StringComparer.Ordinal)
+            .ToHashCode();
 
         #endregion
 

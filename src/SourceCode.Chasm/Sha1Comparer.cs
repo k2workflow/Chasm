@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -83,19 +84,11 @@ namespace SourceCode.Chasm
                 && x.Blit2 == y.Blit2;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public override int GetHashCode(Sha1 obj)
-            {
-                unchecked
-                {
-                    var hc = 17L;
-
-                    hc = (hc * 23) + (long)obj.Blit0;
-                    hc = (hc * 23) + (long)obj.Blit1;
-                    hc = (hc * 23) + obj.Blit2;
-
-                    return ((int)(hc >> 32)) ^ (int)hc;
-                }
-            }
+            public override int GetHashCode(Sha1 obj) => new HashCode()
+                .Tally(obj.Blit0)
+                .Tally(obj.Blit1)
+                .Tally(obj.Blit2)
+                .ToHashCode();
 
             #endregion
         }
