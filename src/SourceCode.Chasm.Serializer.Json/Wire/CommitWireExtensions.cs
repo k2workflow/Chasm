@@ -29,11 +29,6 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static JsonObject Convert(this Commit model)
         {
-            if (model == Commit.Empty) return default; // null
-
-            // TreeId
-            var treeId = model.TreeId.Sha1.ToString("N");
-
             // Parents
             JsonArray parents = null;
             if (model.Parents != null)
@@ -73,11 +68,13 @@ namespace SourceCode.Chasm.IO.Json.Wire
             var wire = new JsonObject
             {
                 [_parents] = parents,
-                [_treeId] = treeId,
                 [_author] = author,
                 [_committer] = committer,
                 [_message] = msg
             };
+
+            // TreeId
+            if (model.TreeId != null) wire[_treeId] = model.TreeId.Value.ToString();
 
             return wire;
         }
@@ -87,9 +84,9 @@ namespace SourceCode.Chasm.IO.Json.Wire
             if (wire == null) return default;
 
             // TreeId
-            var jv = wire.GetValue(_treeId, JsonType.String, false);
-            var sha1 = Sha1.Parse(jv);
-            var treeId = new TreeId(sha1);
+            TreeId? treeId = default;
+            if (wire.TryGetValue(_treeId, JsonType.String, true, out var jv) && jv != null)
+                treeId = TreeId.Parse(jv);
 
             // Parents
             var parents = Array.Empty<CommitId>();
@@ -98,10 +95,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             {
                 parents = new CommitId[ja.Count];
                 for (var i = 0; i < parents.Length; i++)
-                {
-                    sha1 = Sha1.Parse(ja[i]);
-                    parents[i] = new CommitId(sha1);
-                }
+                    parents[i] = CommitId.Parse(ja[i]);
             }
 
             // Author

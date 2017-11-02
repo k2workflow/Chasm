@@ -15,14 +15,6 @@ namespace SourceCode.Chasm.Tests
         #region Methods
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(BlobId_has_empty_sha1))]
-        public static void BlobId_has_empty_sha1()
-        {
-            Assert.Equal(Sha1.Empty, BlobId.Empty.Sha1);
-            Assert.Equal(Sha1.Empty.ToString(), BlobId.Empty.ToString());
-        }
-
-        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(BlobId_equality))]
         public static void BlobId_equality()
         {
@@ -43,10 +35,6 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(blobId1.GetHashCode(), blobId2.GetHashCode());
             Assert.Equal(blobId1.ToString(), blobId2.ToString());
 
-            Assert.NotEqual(BlobId.Empty, blobId1);
-            Assert.NotEqual(BlobId.Empty.GetHashCode(), blobId1.GetHashCode());
-            Assert.NotEqual(BlobId.Empty.ToString(), blobId1.ToString());
-
             Assert.NotEqual(blobId3, blobId1);
             Assert.NotEqual(blobId3.GetHashCode(), blobId1.GetHashCode());
             Assert.NotEqual(blobId3.ToString(), blobId1.ToString());
@@ -62,9 +50,6 @@ namespace SourceCode.Chasm.Tests
             var blobId2 = new BlobId(Sha1.Hash("abc"));
             var blobId3 = new BlobId(Sha1.Hash("def"));
             var list = new[] { blobId1, blobId2, blobId3 };
-
-            Assert.True(BlobId.Empty < blobId1);
-            Assert.True(blobId1 > BlobId.Empty);
 
             Assert.True(blobId1.CompareTo(blobId2) == 0);
             Assert.True(blobId1.CompareTo(blobId3) != 0);

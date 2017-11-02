@@ -28,7 +28,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Parents_Null(IChasmSerializer ser)
         {
             // Force Commit to be non-default
-            var expected = new Commit(null, default, default, default, "force");
+            var expected = new Commit(new CommitId?(), default, default, default, "force");
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -54,7 +54,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Parents_1_Empty(IChasmSerializer ser)
         {
-            var expected = new Commit(CommitId.Empty, default, default, default, null);
+            var expected = new Commit(new CommitId?(), default, default, default, null);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);

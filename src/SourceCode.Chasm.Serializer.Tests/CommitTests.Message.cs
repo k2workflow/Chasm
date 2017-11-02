@@ -22,7 +22,7 @@ namespace SourceCode.Chasm.IO.Tests
             // Force Commit to be non-default
             var force = new Audit("bob", default);
 
-            var expected = new Commit(null, default, force, default, null);
+            var expected = new Commit(new CommitId?(), default, force, default, null);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -35,7 +35,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Empty(IChasmSerializer ser)
         {
-            var expected = new Commit(null, default, default, default, string.Empty);
+            var expected = new Commit(new CommitId?(), default, default, default, string.Empty);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -48,7 +48,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Whitespace(IChasmSerializer ser)
         {
-            var expected = new Commit(null, default, default, default, " ");
+            var expected = new Commit(new CommitId?(), default, default, default, " ");
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -61,7 +61,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Short(IChasmSerializer ser)
         {
-            var expected = new Commit(null, default, default, default, "hello");
+            var expected = new Commit(new CommitId?(), default, default, default, "hello");
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -74,7 +74,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Long(IChasmSerializer ser)
         {
-            var expected = new Commit(null, default, default, default, TestData.LongStr);
+            var expected = new Commit(new CommitId?(), default, default, default, TestData.LongStr);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -92,7 +92,7 @@ namespace SourceCode.Chasm.IO.Tests
             {
                 str += TestData.SurrogatePair;
 
-                var expected = new Commit(null, default, default, default, TestData.SurrogatePair);
+                var expected = new Commit(new CommitId?(), default, default, default, TestData.SurrogatePair);
                 using (var buf = ser.Serialize(expected))
                 {
                     var actual = ser.DeserializeCommit(buf.Result);

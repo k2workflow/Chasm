@@ -8,6 +8,7 @@
 using SourceCode.Clay.Collections.Generic;
 using SourceCode.Clay.Threading;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,7 +20,7 @@ namespace SourceCode.Chasm.IO
     {
         #region Read
 
-        public abstract ValueTask<ReadOnlyMemory<byte>> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
+        public abstract ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
         public virtual async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
@@ -32,14 +33,12 @@ namespace SourceCode.Chasm.IO
             };
 
             // Enumerate batches
-            var dict = await ParallelAsync.ForEachAsync(objectIds, parallelOptions, async sha1 =>
+            var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>(Sha1Comparer.Default);
+            await ParallelAsync.ForEachAsync(objectIds, parallelOptions, async sha1 =>
             {
                 // Execute batch
                 var buffer = await ReadObjectAsync(sha1, cancellationToken).ConfigureAwait(false);
-
-                // Transform batch result
-                var kvp = new KeyValuePair<Sha1, ReadOnlyMemory<byte>>(sha1, buffer);
-                return kvp;
+                if (buffer.HasValue) dict[sha1] = buffer.Value;
             }).ConfigureAwait(false);
 
             return dict;

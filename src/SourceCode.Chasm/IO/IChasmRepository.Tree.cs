@@ -18,11 +18,11 @@ namespace SourceCode.Chasm.IO
     {
         #region Read
 
-        ValueTask<TreeNodeMap> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken);
+        ValueTask<TreeNodeMap?> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken);
 
-        ValueTask<TreeNodeMap> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken);
+        ValueTask<TreeNodeMap?> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken);
 
-        ValueTask<TreeNodeMap> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken);
+        ValueTask<TreeNodeMap?> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken);
 
         ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken);
 

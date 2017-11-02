@@ -9,7 +9,7 @@ using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static class TreeNodeListTests
+    public static class TreeNodeMapTests
     {
         #region Constants
 
@@ -22,9 +22,9 @@ namespace SourceCode.Chasm.IO.Tests
         #region Methods
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Default))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_Default))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_TreeNodeList_Default(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_TreeNodeMap_Default(IChasmSerializer ser)
         {
             TreeNodeMap expected = default;
             using (var buf = ser.Serialize(expected))
@@ -35,9 +35,9 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Empty))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_Empty))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_TreeNodeList_Empty(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
             using (var buf = ser.Serialize(expected))
@@ -48,9 +48,9 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Null))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_Null))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_TreeNodeList_Null(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_TreeNodeMap_Null(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(null);
             using (var buf = ser.Serialize(expected))
@@ -61,9 +61,9 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_Empty_Array))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_Empty_Array))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_TreeNodeList_Empty_Array(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty_Array(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
             using (var buf = ser.Serialize(expected))
@@ -74,9 +74,9 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_1_Node))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_1_Node))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_TreeNodeList_1_Node(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_TreeNodeMap_1_Node(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1);
             using (var buf = ser.Serialize(expected))
@@ -87,9 +87,9 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_2_Nodes))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_2_Nodes))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_TreeNodeList_2_Nodes(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_TreeNodeMap_2_Nodes(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1, Node2);
             using (var buf = ser.Serialize(expected))
@@ -100,9 +100,9 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeList_3_Nodes))]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_3_Nodes))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_Roundtrip_TreeNodeList_3_Nodes(IChasmSerializer ser)
+        public static void ChasmSerializer_Roundtrip_TreeNodeMap_3_Nodes(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1, Node2, Node3);
             using (var buf = ser.Serialize(expected))

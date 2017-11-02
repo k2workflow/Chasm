@@ -15,13 +15,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static CommitWire Convert(this Commit model)
         {
-            if (model == Commit.Empty)
-                return new CommitWire() { Message = string.Empty };
-
             var wire = new CommitWire
             {
                 // TreeId
-                TreeId = model.TreeId.Sha1.Convert()
+                TreeId = model.TreeId.Convert()
             };
 
             // Parents
@@ -65,8 +62,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             if (wire == null) return default;
 
             // TreeId
-            var sha1 = wire.TreeId.Convert();
-            var treeId = new TreeId(sha1);
+            var treeId = wire.TreeId.ConvertTree();
 
             // Parents
             var parents = Array.Empty<CommitId>();
@@ -76,8 +72,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire
                 parents = new CommitId[wire.Parents.Count];
                 foreach (var parent in wire.Parents)
                 {
-                    sha1 = parent.Convert();
-                    parents[i++] = new CommitId(sha1);
+                    // Parents always have values as you simply
+                    // don't include nulls in the list
+                    parents[i++] = parent.ConvertCommit().Value;
                 }
             }
 

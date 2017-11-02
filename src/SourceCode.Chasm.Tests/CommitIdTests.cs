@@ -15,14 +15,6 @@ namespace SourceCode.Chasm.Tests
         #region Methods
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(CommitId_has_empty_sha1))]
-        public static void CommitId_has_empty_sha1()
-        {
-            Assert.Equal(Sha1.Empty, CommitId.Empty.Sha1);
-            Assert.Equal(Sha1.Empty.ToString(), CommitId.Empty.ToString());
-        }
-
-        [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(CommitId_equality))]
         public static void CommitId_equality()
         {
@@ -42,10 +34,6 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(commitId1.GetHashCode(), commitId2.GetHashCode());
             Assert.Equal(commitId1.ToString(), commitId2.ToString());
 
-            Assert.NotEqual(CommitId.Empty, commitId1);
-            Assert.NotEqual(CommitId.Empty.GetHashCode(), commitId1.GetHashCode());
-            Assert.NotEqual(CommitId.Empty.ToString(), commitId1.ToString());
-
             Assert.NotEqual(commitId3, commitId1);
             Assert.NotEqual(commitId3.GetHashCode(), commitId1.GetHashCode());
             Assert.NotEqual(commitId3.ToString(), commitId1.ToString());
@@ -61,9 +49,6 @@ namespace SourceCode.Chasm.Tests
             var commitId2 = new CommitId(Sha1.Hash("abc"));
             var commitId3 = new CommitId(Sha1.Hash("def"));
             var list = new[] { commitId1, commitId2, commitId3 };
-
-            Assert.True(CommitId.Empty < commitId1);
-            Assert.True(commitId1 > CommitId.Empty);
 
             Assert.True(commitId1.CompareTo(commitId2) == 0);
             Assert.True(commitId1.CompareTo(commitId3) != 0);

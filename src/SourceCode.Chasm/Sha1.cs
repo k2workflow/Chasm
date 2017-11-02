@@ -43,14 +43,12 @@ namespace SourceCode.Chasm
         public const byte CharLen = ByteLen * 2;
 
         /// <summary>
-        /// A singleton representing an empty <see cref="Sha1"/> value.
+        /// A singleton representing an <see cref="Sha1"/> value that is all zeroes.
         /// </summary>
         /// <value>
-        /// The empty.
+        /// The zeroes <see cref="Sha1"/>.
         /// </value>
-        public static Sha1 Empty { get; }
-
-        // 40
+        public static Sha1 Zero { get; }
 
         #endregion
 
@@ -188,7 +186,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(string value)
         {
-            if (value == null) return Empty;
+            if (value == null) return Zero;
             // Note that length=0 should not short-circuit
 
             // Rent buffer
@@ -212,7 +210,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(byte[] bytes)
         {
-            if (bytes == null) return Empty;
+            if (bytes == null) return Zero;
             // Note that length=0 should not short-circuit
 
             var hash = _sha1.Value.ComputeHash(bytes);
@@ -230,7 +228,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(byte[] bytes, int offset, int count)
         {
-            if (bytes == null) return Empty;
+            if (bytes == null) return Zero;
             // Note that length=0 should not short-circuit
 
             if (count < 0)
@@ -252,7 +250,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(ArraySegment<byte> bytes)
         {
-            if (bytes.Array == null) return Empty;
+            if (bytes.Array == null) return Zero;
             // Note that length=0 should not short-circuit
 
             var hash = _sha1.Value.ComputeHash(bytes.Array, bytes.Offset, bytes.Count);
@@ -268,7 +266,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static Sha1 Hash(Stream stream)
         {
-            if (stream == null) return Empty;
+            if (stream == null) return Zero;
             // Note that length=0 should not short-circuit
 
             var hash = _sha1.Value.ComputeHash(stream);
@@ -479,7 +477,7 @@ namespace SourceCode.Chasm
             Debug.Assert(startIndex >= 0);
             Debug.Assert(hex.Length >= CharLen + startIndex);
 
-            value = Empty;
+            value = Zero;
 
             unsafe
             {
@@ -556,7 +554,7 @@ namespace SourceCode.Chasm
         /// <returns></returns>
         public static bool TryParse(string hex, out Sha1 value)
         {
-            value = Empty;
+            value = Zero;
 
             // Length must be at least 40
             if (hex == null || hex.Length < CharLen)

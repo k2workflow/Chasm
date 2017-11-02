@@ -7,7 +7,7 @@
 
 namespace SourceCode.Chasm.Tests.TestObjects
 {
-    public static class TreeNodeListTestObject
+    public static class TreeNodeMapTestObject
     {
         #region Fields
 

@@ -63,7 +63,7 @@ namespace SourceCode.Chasm
 
             public override int Compare(TreeNode x, TreeNode y)
             {
-                // Nodes are always sorted by Name first (see TreeNodeList)
+                // Nodes are always sorted by Name first (see TreeNodeMap)
                 var cmp = string.CompareOrdinal(x.Name, y.Name);
                 if (cmp != 0) return cmp;
 

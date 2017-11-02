@@ -7,6 +7,7 @@
 
 using SourceCode.Clay.Collections.Generic;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,12 +24,11 @@ namespace SourceCode.Chasm.IO.Hybrid
             // TODO: Enable piecemeal reads (404s incur next repo)
 
             // We read from closest to furthest
+            var trees = treeIds.ToArray();
             for (var i = 0; i < Chain.Length; i++)
             {
-                var dict = await Chain[i].ReadTreeBatchAsync(treeIds, cancellationToken).ConfigureAwait(false);
-
-                if (!dict.Equals(default))
-                    return dict;
+                var dict = await Chain[i].ReadTreeBatchAsync(trees, cancellationToken).ConfigureAwait(false);
+                if (dict.Count == trees.Length) return dict;
             }
 
             // NotFound

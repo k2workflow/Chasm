@@ -14,9 +14,9 @@ namespace SourceCode.Chasm.IO.Tests
         #region Methods
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_NullTreeNodeList))]
+        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_NullTreeNodeMap))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_WriteRead_NullTreeNodeList(IChasmSerializer ser)
+        public static void ChasmSerializer_WriteRead_NullTreeNodeMap(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
 
@@ -29,9 +29,9 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_EmptyTreeNodeList))]
+        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_EmptyTreeNodeMap))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_WriteRead_EmptyTreeNodeList(IChasmSerializer ser)
+        public static void ChasmSerializer_WriteRead_EmptyTreeNodeMap(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(new TreeNode[0]);
 
@@ -44,9 +44,9 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_TreeNodeList))]
+        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_TreeNodeMap))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_WriteRead_TreeNodeList(IChasmSerializer ser)
+        public static void ChasmSerializer_WriteRead_TreeNodeMap(IChasmSerializer ser)
         {
             var node0 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
             var node1 = new TreeNode("b", NodeKind.Tree, Sha1.Hash("def"));

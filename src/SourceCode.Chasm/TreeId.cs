@@ -13,18 +13,6 @@ namespace SourceCode.Chasm
     [DebuggerDisplay("{" + nameof(Sha1) + ".ToString(\"D\"),nq,ac}")]
     public struct TreeId : IEquatable<TreeId>, IComparable<TreeId>
     {
-        #region Constants
-
-        /// <summary>
-        /// A singleton representing an empty <see cref="TreeId"/> value.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static TreeId Empty { get; }
-
-        #endregion
-
         #region Properties
 
         public Sha1 Sha1 { get; }
@@ -36,6 +24,19 @@ namespace SourceCode.Chasm
         public TreeId(Sha1 sha1)
         {
             Sha1 = sha1;
+        }
+
+        public static TreeId Parse(string hex) => new TreeId(Sha1.Parse(hex));
+
+        public static bool TryParse(string hex, out TreeId value)
+        {
+            if (Sha1.TryParse(hex, out var sha))
+            {
+                value = new TreeId(sha);
+                return true;
+            }
+            value = default;
+            return false;
         }
 
         #endregion

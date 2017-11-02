@@ -16,15 +16,9 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
-        /// <summary>
-        /// A singleton representing an empty <see cref="Commit"/> value.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
         public static Commit Empty { get; }
 
-        public static CommitId[] Orphaned { get; } = new[] { CommitId.Empty };
+        public static CommitId[] Orphaned { get; } = Array.Empty<CommitId>();
 
         #endregion
 
@@ -39,7 +33,7 @@ namespace SourceCode.Chasm
 
         public IReadOnlyList<CommitId> Parents => _parents ?? Array.Empty<CommitId>(); // May be null due to default ctor
 
-        public TreeId TreeId { get; }
+        public TreeId? TreeId { get; }
 
         public Audit Author { get; }
 
@@ -51,7 +45,7 @@ namespace SourceCode.Chasm
 
         #region De/Constructors
 
-        public Commit(IReadOnlyList<CommitId> parents, TreeId treeId, Audit author, Audit committer, string message)
+        public Commit(IReadOnlyList<CommitId> parents, TreeId? treeId, Audit author, Audit committer, string message)
         {
             TreeId = treeId;
             Author = author;
@@ -123,11 +117,11 @@ namespace SourceCode.Chasm
             }
         }
 
-        public Commit(CommitId parent, TreeId treeId, Audit author, Audit committer, string message)
-            : this(new[] { parent }, treeId, author, committer, message)
+        public Commit(CommitId? parent, TreeId? treeId, Audit author, Audit committer, string message)
+            : this(parent.HasValue ? new[] { parent.Value } : Array.Empty<CommitId>(), treeId, author, committer, message)
         { }
 
-        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId treeId, out Audit author, out Audit committer, out string message)
+        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId? treeId, out Audit author, out Audit committer, out string message)
         {
             parents = Parents;
             treeId = TreeId;
@@ -156,7 +150,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(Commit x, Commit y) => !(x == y);
 
-        public override string ToString() => $"{TreeId.Sha1:D} ({Author})";
+        public override string ToString() => $"{TreeId:D} ({Author})";
 
         #endregion
     }

@@ -19,31 +19,25 @@ namespace SourceCode.Chasm.Tests
         public static void TreeNode_is_empty()
         {
             var noData = new TreeNode();
-            var nullData = new TreeNode("a", NodeKind.Blob, Sha1.Empty);
+            var nullData = new TreeNode("a", NodeKind.Blob, Sha1.Zero);
 
             // Name
             Assert.Null(TreeNode.Empty.Name);
-            Assert.Null(TreeNode.EmptyBlob.Name);
-            Assert.Null(TreeNode.EmptyTree.Name);
             Assert.Null(noData.Name);
             Assert.Equal("a", nullData.Name);
-            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, NodeKind.Blob, Sha1.Empty));
-            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, BlobId.Empty));
-            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, TreeId.Empty));
+            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, NodeKind.Blob, Sha1.Zero));
+            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, new BlobId()));
+            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, new TreeId()));
 
             // NodeKind
             Assert.Equal(NodeKind.Blob, default);
             Assert.Equal(default, TreeNode.Empty.Kind);
             Assert.Equal(default, noData.Kind);
             Assert.Equal(default, nullData.Kind);
-            Assert.Equal(NodeKind.Blob, TreeNode.EmptyBlob.Kind);
-            Assert.Equal(NodeKind.Tree, TreeNode.EmptyTree.Kind);
-            Assert.Throws<ArgumentOutOfRangeException>(() => new TreeNode("a", (NodeKind)2, Sha1.Empty));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new TreeNode("a", (NodeKind)2, Sha1.Zero));
 
             // Sha1
             Assert.Equal(default, TreeNode.Empty.Sha1);
-            Assert.Equal(default, TreeNode.EmptyBlob.Sha1);
-            Assert.Equal(default, TreeNode.EmptyTree.Sha1);
             Assert.Equal(default, noData.Sha1);
             Assert.Equal(default, nullData.Sha1);
         }

@@ -42,7 +42,7 @@ namespace SourceCode.Chasm.IO.Proto
             wire.MergeFrom(span.ToArray()); // TODO: Perf
 
             var model = wire.Convert();
-            return model;
+            return model.Value;
         }
 
         #endregion

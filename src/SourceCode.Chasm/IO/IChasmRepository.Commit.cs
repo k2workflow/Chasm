@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.IO
     {
         #region Methods
 
-        ValueTask<Commit> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken);
+        ValueTask<Commit?> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken);
 
         ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken);
 

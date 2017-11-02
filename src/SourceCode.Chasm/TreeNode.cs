@@ -23,22 +23,6 @@ namespace SourceCode.Chasm
         /// </value>
         public static TreeNode Empty { get; }
 
-        /// <summary>
-        /// A singleton representing an empty <see cref="TreeNode"/> value with <see cref="Kind"/> set to <see cref="NodeKind.Blob"/>.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static TreeNode EmptyBlob { get; } = new TreeNode(null, Sha1.Empty, NodeKind.Blob);
-
-        /// <summary>
-        /// A singleton representing an empty <see cref="TreeNode"/> value with <see cref="Kind"/> set to <see cref="NodeKind.Tree"/>.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static TreeNode EmptyTree { get; } = new TreeNode(null, Sha1.Empty, NodeKind.Tree);
-
         #endregion
 
         #region Properties
@@ -48,6 +32,26 @@ namespace SourceCode.Chasm
         public Sha1 Sha1 { get; }
 
         public NodeKind Kind { get; }
+
+        public TreeId TreeId
+        {
+            get
+            {
+                if (Kind != NodeKind.Tree)
+                    throw new InvalidOperationException($"The node {Name} must be a {nameof(NodeKind.Tree)}.");
+                return new TreeId(Sha1);
+            }
+        }
+
+        public BlobId BlobId
+        {
+            get
+            {
+                if (Kind != NodeKind.Blob)
+                    throw new InvalidOperationException($"The node {Name} must be a {nameof(NodeKind.Blob)}.");
+                return new BlobId(Sha1);
+            }
+        }
 
         #endregion
 
