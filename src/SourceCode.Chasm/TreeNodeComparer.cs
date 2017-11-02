@@ -86,11 +86,16 @@ namespace SourceCode.Chasm
                 return true;
             }
 
-            public override int GetHashCode(TreeNode obj) => new HashCode()
-                .Tally(obj.Name ?? string.Empty, StringComparer.Ordinal)
-                .Tally((int)obj.Kind)
-                .Tally(obj.Sha1, Sha1Comparer.Default)
-                .ToHashCode();
+            public override int GetHashCode(TreeNode obj)
+            {
+                var hc = new HashCode();
+
+                hc.Add(obj.Name ?? string.Empty, StringComparer.Ordinal);
+                hc.Add((int)obj.Kind);
+                hc.Add(obj.Sha1, Sha1Comparer.Default);
+
+                return hc.ToHashCode();
+            }
 
             #endregion
         }

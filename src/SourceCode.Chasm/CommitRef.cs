@@ -60,10 +60,15 @@ namespace SourceCode.Chasm
             => obj is CommitRef commitRef
             && Equals(commitRef);
 
-        public override int GetHashCode() => new HashCode()
-            .Tally(CommitId, CommitIdComparer.Default)
-            .Tally(Name ?? string.Empty, StringComparer.Ordinal)
-            .ToHashCode();
+        public override int GetHashCode()
+        {
+            var hc = new HashCode();
+
+            hc.Add(CommitId, CommitIdComparer.Default);
+            hc.Add(Name ?? string.Empty, StringComparer.Ordinal);
+
+            return hc.ToHashCode();
+        }
 
         #endregion
 

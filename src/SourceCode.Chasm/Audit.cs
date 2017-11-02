@@ -70,10 +70,15 @@ namespace SourceCode.Chasm
             => obj is Audit audit
             && Equals(audit);
 
-        public override int GetHashCode() => new HashCode()
-            .Tally(Name ?? string.Empty, StringComparer.Ordinal)
-            .Tally(Timestamp)
-            .ToHashCode();
+        public override int GetHashCode()
+        {
+            var hc = new HashCode();
+
+            hc.Add(Name ?? string.Empty, StringComparer.Ordinal);
+            hc.Add(Timestamp);
+
+            return hc.ToHashCode();
+        }
 
         #endregion
 

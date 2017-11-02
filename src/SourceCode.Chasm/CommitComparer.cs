@@ -67,13 +67,18 @@ namespace SourceCode.Chasm
                 return true;
             }
 
-            public override int GetHashCode(Commit obj) => new HashCode()
-                .Tally(obj.TreeId ?? default, TreeIdComparer.Default)
-                .Tally(obj.Author)
-                .Tally(obj.Committer)
-                .TallyCount(obj.Parents)
-                .Tally(obj.Message ?? string.Empty, StringComparer.Ordinal)
-                .ToHashCode();
+            public override int GetHashCode(Commit obj)
+            {
+                var hc = new HashCode();
+
+                hc.Add(obj.TreeId ?? default, TreeIdComparer.Default);
+                hc.Add(obj.Author);
+                hc.Add(obj.Committer);
+                hc.Add(obj.Parents == null ? 0 : obj.Parents.Count);
+                hc.Add(obj.Message ?? string.Empty, StringComparer.Ordinal);
+
+                return hc.ToHashCode();
+            }
 
             #endregion
         }

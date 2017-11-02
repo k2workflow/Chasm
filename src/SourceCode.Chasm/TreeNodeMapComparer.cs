@@ -58,9 +58,14 @@ namespace SourceCode.Chasm
             public override bool Equals(TreeNodeMap x, TreeNodeMap y)
                 => x._nodes.MemoryEquals(y._nodes);
 
-            public override int GetHashCode(TreeNodeMap obj) => new HashCode()
-                .Tally(obj._nodes.Length)
-                .ToHashCode();
+            public override int GetHashCode(TreeNodeMap obj)
+            {
+                var hc = new HashCode();
+
+                hc.Add(obj._nodes.Length);
+
+                return hc.ToHashCode();
+            }
 
             #endregion
         }

@@ -84,11 +84,16 @@ namespace SourceCode.Chasm
                 && x.Blit2 == y.Blit2;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public override int GetHashCode(Sha1 obj) => new HashCode()
-                .Tally(obj.Blit0)
-                .Tally(obj.Blit1)
-                .Tally(obj.Blit2)
-                .ToHashCode();
+            public override int GetHashCode(Sha1 obj)
+            {
+                var hc = new HashCode();
+
+                hc.Add(obj.Blit0);
+                hc.Add(obj.Blit1);
+                hc.Add(obj.Blit2);
+
+                return hc.ToHashCode();
+            }
 
             #endregion
         }
