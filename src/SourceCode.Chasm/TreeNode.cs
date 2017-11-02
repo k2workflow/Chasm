@@ -23,22 +23,6 @@ namespace SourceCode.Chasm
         /// </value>
         public static TreeNode Empty { get; }
 
-        /// <summary>
-        /// A singleton representing an empty <see cref="TreeNode"/> value with <see cref="Kind"/> set to <see cref="NodeKind.Blob"/>.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static TreeNode EmptyBlob { get; } = new TreeNode(null, Sha1.Zero, NodeKind.Blob);
-
-        /// <summary>
-        /// A singleton representing an empty <see cref="TreeNode"/> value with <see cref="Kind"/> set to <see cref="NodeKind.Tree"/>.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static TreeNode EmptyTree { get; } = new TreeNode(null, Sha1.Zero, NodeKind.Tree);
-
         #endregion
 
         #region Properties

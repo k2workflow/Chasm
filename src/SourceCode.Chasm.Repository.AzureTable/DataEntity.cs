@@ -59,8 +59,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static DataEntity Create(Sha1 sha1, ArraySegment<byte> content, string etag)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var split = GetPartition(sha1);
 
             var entity = new DataEntity(split.Key, split.Value, content, etag);
@@ -69,8 +67,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static DataEntity Create(Sha1 sha1, ArraySegment<byte> content, bool forceOverwrite)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var split = GetPartition(sha1);
 
             var entity = new DataEntity(split.Key, split.Value, content, forceOverwrite);
@@ -79,8 +75,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static DataEntity Create(Sha1 sha1, ArraySegment<byte> content)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var split = GetPartition(sha1);
 
             var entity = new DataEntity(split.Key, split.Value, content);
@@ -119,8 +113,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static TableOperation BuildExistsOperation(Sha1 sha1)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var partitionKey = GetPartitionKey(sha1);
             var rowKey = GetRowKey(sha1);
 
@@ -134,8 +126,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static TableOperation BuildReadOperation(Sha1 sha1)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var partitionKey = GetPartitionKey(sha1);
             var rowKey = GetRowKey(sha1);
 
@@ -202,8 +192,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> content, bool forceOverwrite)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var entity = Create(sha1, content, forceOverwrite);
 
             var op = TableOperation.InsertOrReplace(entity);
@@ -212,8 +200,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> content, string etag)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var entity = Create(sha1, content, etag);
 
             var op = TableOperation.InsertOrReplace(entity);
@@ -222,8 +208,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static TableOperation BuildWriteOperation(Sha1 sha1, ArraySegment<byte> content)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var entity = Create(sha1, content);
 
             var op = TableOperation.InsertOrReplace(entity);
@@ -283,8 +267,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         internal static TableOperation BuildDeleteOperation(Sha1 sha1)
         {
-            if (sha1 == Sha1.Zero) throw new ArgumentNullException(nameof(sha1));
-
             var split = GetPartition(sha1);
 
             var entity = new DataEntity
