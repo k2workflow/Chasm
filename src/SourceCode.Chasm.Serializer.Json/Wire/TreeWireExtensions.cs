@@ -6,7 +6,6 @@
 #endregion
 
 using SourceCode.Clay.Json;
-using System;
 using System.Json;
 
 namespace SourceCode.Chasm.IO.Json.Wire
@@ -17,7 +16,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static JsonValue Convert(this TreeNodeMap model)
         {
-            if (model.Count == 0) return new JsonArray(Array.Empty<JsonValue>());
+            if (model.Count == 0) return new JsonArray();
 
             var items = new JsonValue[model.Count];
             for (var i = 0; i < items.Length; i++)

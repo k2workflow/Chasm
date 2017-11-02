@@ -36,7 +36,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 switch (model.Parents.Count)
                 {
                     case 0:
-                        parents = new JsonArray(Array.Empty<JsonValue>());
+                        parents = new JsonArray();
                         break;
 
                     case 1:
