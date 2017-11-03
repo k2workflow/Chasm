@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 
@@ -87,16 +88,13 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNode obj)
             {
-                unchecked
-                {
-                    var hc = 17L;
+                var hc = new HashCode();
 
-                    hc = (hc * 23) + (obj.Name == null ? 0 : StringComparer.Ordinal.GetHashCode(obj.Name));
-                    hc = (hc * 23) + (int)obj.Kind;
-                    hc = (hc * 23) + obj.Sha1.GetHashCode();
+                hc.Add(obj.Name ?? string.Empty, StringComparer.Ordinal);
+                hc.Add((int)obj.Kind);
+                hc.Add(obj.Sha1, Sha1Comparer.Default);
 
-                    return ((int)(hc >> 32)) ^ (int)hc;
-                }
+                return hc.ToHashCode();
             }
 
             #endregion

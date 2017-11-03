@@ -5,9 +5,8 @@
 
 #endregion
 
-using SourceCode.Clay.Json;
+using Newtonsoft.Json.Linq;
 using System;
-using System.Json;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -27,45 +26,45 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Methods
 
-        public static JsonObject Convert(this Commit model)
+        public static JObject Convert(this Commit model)
         {
             // Parents
-            JsonArray parents = null;
+            JArray parents = null;
             if (model.Parents != null)
             {
                 switch (model.Parents.Count)
                 {
                     case 0:
-                        parents = new JsonArray();
+                        parents = new JArray();
                         break;
 
                     case 1:
                         var sha1 = model.Parents[0].Sha1;
-                        parents = new JsonArray(new[] { new JsonPrimitive(sha1.ToString("N")) });
+                        parents = new JArray(new[] { new JValue(sha1.ToString("N")) });
                         break;
 
                     default:
                         {
-                            var array = new JsonPrimitive[model.Parents.Count];
+                            var array = new JValue[model.Parents.Count];
                             for (var i = 0; i < array.Length; i++)
-                                array[i] = new JsonPrimitive(model.Parents[i].Sha1.ToString("N"));
+                                array[i] = new JValue(model.Parents[i].Sha1.ToString("N"));
 
-                            parents = new JsonArray(array);
+                            parents = new JArray(array);
                         }
                         break;
                 }
             }
 
             // Author
-            var author = model.Author.Convert();
+            var author = model.Author == default ? null : model.Author.Convert();
 
             // Committer
-            var committer = model.Committer.Convert();
+            var committer = model.Committer == default ? null : model.Committer.Convert();
 
             // Message
-            var msg = model.Message == null ? null : new JsonPrimitive(model.Message);
+            var msg = model.Message == null ? null : new JValue(model.Message);
 
-            var wire = new JsonObject
+            var wire = new JObject
             {
                 [_parents] = parents,
                 [_author] = author,
@@ -74,48 +73,64 @@ namespace SourceCode.Chasm.IO.Json.Wire
             };
 
             // TreeId
-            if (model.TreeId != null) wire[_treeId] = model.TreeId.Value.ToString();
+            if (model.TreeId != null)
+                wire[_treeId] = model.TreeId.Value.ToString();
 
             return wire;
         }
 
-        public static Commit ConvertCommit(this JsonObject wire)
+        public static Commit ConvertCommit(this JObject wire)
         {
             if (wire == null) return default;
 
             // TreeId
             TreeId? treeId = default;
-            if (wire.TryGetValue(_treeId, JsonType.String, true, out var jv) && jv != null)
-                treeId = TreeId.Parse(jv);
+            if (wire.TryGetValue(_treeId, out var jv) && jv != null)
+            {
+                var str = (string)jv;
+                treeId = TreeId.Parse(str);
+            }
 
             // Parents
             var parents = Array.Empty<CommitId>();
-            var ja = wire.GetArray(_parents);
-            if (ja != null && ja.Count > 0)
+            if (wire.TryGetValue(_parents, out jv)
+                && jv != null
+                && jv is JArray ja
+                && ja.Count > 0)
             {
                 parents = new CommitId[ja.Count];
                 for (var i = 0; i < parents.Length; i++)
-                    parents[i] = CommitId.Parse(ja[i]);
+                {
+                    var str = (string)ja[i];
+                    parents[i] = CommitId.Parse(str);
+                }
             }
 
             // Author
             Audit author = default;
-            if (wire.TryGetObject(_author, out var jo))
+            if (wire.TryGetValue(_author, out var jo)
+                && jo != null
+                && jo is JObject jobj1)
             {
-                author = jo.ConvertAudit();
+                author = jobj1.ConvertAudit();
             }
 
             // Committer
             Audit committer = default;
-            if (wire.TryGetObject(_committer, out jo))
+            if (wire.TryGetValue(_committer, out jo)
+                && jo != null
+                && jo is JObject jobj2)
             {
-                committer = jo.ConvertAudit();
+                committer = jobj2.ConvertAudit();
             }
 
             // Message
             string message = null;
-            if (wire.TryGetValue(_message, JsonType.String, true, out jv))
-                message = jv;
+            if (wire.TryGetValue(_message, out jv)
+                && jv != null)
+            {
+                message = (string)jv;
+            }
 
             var model = new Commit(parents, treeId, author, committer, message);
             return model;
@@ -123,9 +138,9 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static Commit ParseCommit(this string json)
         {
-            var wire = json.ParseJsonObject();
+            var wire = JToken.Parse(json);
 
-            var model = wire.ConvertCommit();
+            var model = ((JObject)wire).ConvertCommit();
             return model;
         }
 

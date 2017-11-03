@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System;
 using System.Diagnostics;
 
@@ -71,15 +72,12 @@ namespace SourceCode.Chasm
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hc = 17L;
+            var hc = new HashCode();
 
-                hc = (hc * 23) + StringComparer.Ordinal.GetHashCode(Name);
-                hc = (hc * 23) + Timestamp.GetHashCode();
+            hc.Add(Name ?? string.Empty, StringComparer.Ordinal);
+            hc.Add(Timestamp);
 
-                return ((int)(hc >> 32)) ^ (int)hc;
-            }
+            return hc.ToHashCode();
         }
 
         #endregion

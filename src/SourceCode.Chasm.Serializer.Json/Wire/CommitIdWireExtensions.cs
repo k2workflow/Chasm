@@ -5,8 +5,7 @@
 
 #endregion
 
-using SourceCode.Clay.Json;
-using System.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -22,9 +21,9 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Methods
 
-        public static JsonObject Convert(this CommitId model)
+        public static JObject Convert(this CommitId model)
         {
-            var wire = new JsonObject
+            var wire = new JObject
             {
                 [_id] = model.Sha1.ToString("N")
             };
@@ -32,12 +31,13 @@ namespace SourceCode.Chasm.IO.Json.Wire
             return wire;
         }
 
-        public static CommitId ConvertCommitId(this JsonObject wire)
+        public static CommitId ConvertCommitId(this JObject wire)
         {
             if (wire == null) return default;
 
-            var jv = wire.GetValue(_id, JsonType.String, false);
-            var sha1 = Sha1.Parse(jv);
+            var jv = wire.GetValue(_id);
+            var str = (string)jv;
+            var sha1 = Sha1.Parse(str);
 
             var model = new CommitId(sha1);
             return model;
@@ -45,9 +45,9 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static CommitId ParseCommitId(this string json)
         {
-            var wire = json.ParseJsonObject();
+            var wire = JToken.Parse(json);
 
-            var model = wire.ConvertCommitId();
+            var model = ((JObject)wire).ConvertCommitId();
             return model;
         }
 

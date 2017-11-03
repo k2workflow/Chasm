@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
 using System.Collections.Generic;
 
@@ -59,17 +60,11 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNodeMap obj)
             {
-                unchecked
-                {
-                    var hc = 17L;
+                var hc = new HashCode();
 
-                    hc = (hc * 23) + obj._nodes.Length;
+                hc.Add(obj._nodes.Length);
 
-                    if (obj._nodes.Length > 0)
-                        hc = (hc * 23) + obj._nodes.Span[0].GetHashCode();
-
-                    return ((int)(hc >> 32)) ^ (int)hc;
-                }
+                return hc.ToHashCode();
             }
 
             #endregion

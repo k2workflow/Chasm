@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -85,16 +86,13 @@ namespace SourceCode.Chasm
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override int GetHashCode(Sha1 obj)
             {
-                unchecked
-                {
-                    var hc = 17L;
+                var hc = new HashCode();
 
-                    hc = (hc * 23) + (long)obj.Blit0;
-                    hc = (hc * 23) + (long)obj.Blit1;
-                    hc = (hc * 23) + obj.Blit2;
+                hc.Add(obj.Blit0);
+                hc.Add(obj.Blit1);
+                hc.Add(obj.Blit2);
 
-                    return ((int)(hc >> 32)) ^ (int)hc;
-                }
+                return hc.ToHashCode();
             }
 
             #endregion
