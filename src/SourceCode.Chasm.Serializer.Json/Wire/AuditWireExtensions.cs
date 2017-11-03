@@ -5,10 +5,8 @@
 
 #endregion
 
-using SourceCode.Clay.Json;
+using Newtonsoft.Json.Linq;
 using System;
-using System.Globalization;
-using System.Json;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -25,17 +23,17 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Methods
 
-        public static JsonObject Convert(this Audit model)
+        public static JObject Convert(this Audit model)
         {
             if (model == Audit.Empty) return default; // null
 
             // Name
-            var name = new JsonPrimitive(model.Name);
+            var name = new JValue(model.Name);
 
             // Time
-            var time = model.Timestamp.ToString("o", CultureInfo.InvariantCulture);
+            var time = new JValue(model.Timestamp.UtcDateTime);
 
-            var wire = new JsonObject
+            var wire = new JObject
             {
                 [_name] = name,
                 [_time] = time,
@@ -44,23 +42,31 @@ namespace SourceCode.Chasm.IO.Json.Wire
             return wire;
         }
 
-        public static Audit ConvertAudit(this JsonObject wire)
+        public static Audit ConvertAudit(this JObject wire)
         {
             if (wire == null) return default;
 
             // Name
             string name = null;
-            if (wire.TryGetValue(_name, JsonType.String, true, out var jv))
-                name = jv;
+            if (wire.TryGetValue(_name, out var jv)
+                && jv != null)
+            {
+                name = (string)jv;
+            }
 
             // Time
-            string str = null;
-            if (wire.TryGetValue(_time, JsonType.String, true, out jv))
-                str = jv;
+            DateTime time = default;
+            if (wire.TryGetValue(_time, out jv)
+                && jv != null)
+            {
+                // TODO: Newtonsoft is very opinionated on DateTimeOffset formatting, I can't get it to roundtrip
+                var dt = (DateTime)jv;
+                time = new DateTime(dt.Ticks, DateTimeKind.Utc);
+            }
 
-            var time = DateTimeOffset.ParseExact(str, "o", CultureInfo.InvariantCulture);
+            if (name == null && time == default) return default;
 
-            var model = new Audit(name, time);
+            var model = new Audit(name, new DateTimeOffset(time));
             return model;
         }
 

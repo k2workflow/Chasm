@@ -5,8 +5,7 @@
 
 #endregion
 
-using SourceCode.Clay.Json;
-using System.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -14,26 +13,26 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         #region Methods
 
-        public static JsonValue Convert(this TreeNodeMap model)
+        public static JArray Convert(this TreeNodeMap model)
         {
-            if (model.Count == 0) return new JsonArray();
+            if (model.Count == 0) return new JArray();
 
-            var items = new JsonValue[model.Count];
+            var items = new JObject[model.Count];
             for (var i = 0; i < items.Length; i++)
                 items[i] = model[i].Convert();
 
-            var wire = new JsonArray(items);
+            var wire = new JArray(items);
             return wire;
         }
 
-        public static TreeNodeMap ConvertTree(this JsonArray wire)
+        public static TreeNodeMap ConvertTree(this JArray wire)
         {
             if (wire == null) return default;
             if (wire.Count == 0) return default;
 
             var nodes = new TreeNode[wire.Count];
             for (var i = 0; i < nodes.Length; i++)
-                nodes[i] = ((JsonObject)wire[i]).ConvertTreeNode();
+                nodes[i] = ((JObject)wire[i]).ConvertTreeNode();
 
             var model = new TreeNodeMap(nodes);
             return model;
@@ -41,9 +40,9 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static TreeNodeMap ParseTree(this string json)
         {
-            var wire = json.ParseJsonArray();
+            var wire = JToken.Parse(json);
 
-            var model = wire.ConvertTree();
+            var model = ((JArray)wire).ConvertTree();
             return model;
         }
 

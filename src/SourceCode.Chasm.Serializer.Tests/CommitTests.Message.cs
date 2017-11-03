@@ -5,7 +5,6 @@
 
 #endregion
 
-using System;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests

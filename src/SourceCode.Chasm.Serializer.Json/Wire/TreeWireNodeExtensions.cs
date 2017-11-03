@@ -5,9 +5,8 @@
 
 #endregion
 
-using SourceCode.Clay.Json;
+using Newtonsoft.Json.Linq;
 using System;
-using System.Json;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -25,11 +24,11 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Methods
 
-        public static JsonObject Convert(this TreeNode model)
+        public static JObject Convert(this TreeNode model)
         {
             if (model == TreeNode.Empty) return default;
 
-            var wire = new JsonObject
+            var wire = new JObject
             {
                 [_name] = model.Name,
                 [_kind] = model.Kind.ToString(),
@@ -39,17 +38,19 @@ namespace SourceCode.Chasm.IO.Json.Wire
             return wire;
         }
 
-        public static TreeNode ConvertTreeNode(this JsonObject wire)
+        public static TreeNode ConvertTreeNode(this JObject wire)
         {
             if (wire == null) return default;
 
-            var name = (string)wire.GetValue(_name, JsonType.String, false);
+            var name = (string)wire.GetValue(_name);
 
-            var jv = wire.GetValue(_kind, JsonType.String, false);
-            var kind = (NodeKind)Enum.Parse(typeof(NodeKind), jv, true);
+            var jv = wire.GetValue(_kind);
+            var str = (string)jv;
+            var kind = (NodeKind)Enum.Parse(typeof(NodeKind), str, true);
 
-            jv = wire.GetValue(_nodeId, JsonType.String, false);
-            var sha1 = Sha1.Parse(jv);
+            jv = wire.GetValue(_nodeId);
+            str = (string)jv;
+            var sha1 = Sha1.Parse(str);
 
             var model = new TreeNode(name, kind, sha1);
             return model;
