@@ -5,6 +5,7 @@
 
 #endregion
 
+using System;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
@@ -19,7 +20,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Null(IChasmSerializer ser)
         {
             // Force Commit to be non-default
-            var force = new Audit("bob", default);
+            var force = new Audit("bob", DateTimeOffset.Now);
 
             var expected = new Commit(new CommitId?(), default, force, default, null);
             using (var buf = ser.Serialize(expected))

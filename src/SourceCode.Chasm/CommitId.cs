@@ -26,19 +26,6 @@ namespace SourceCode.Chasm
             Sha1 = sha1;
         }
 
-        public static CommitId Parse(string hex) => new CommitId(Sha1.Parse(hex));
-
-        public static bool TryParse(string hex, out CommitId value)
-        {
-            if (Sha1.TryParse(hex, out var sha))
-            {
-                value = new CommitId(sha);
-                return true;
-            }
-            value = default;
-            return false;
-        }
-
         #endregion
 
         #region IEquatable

@@ -18,8 +18,7 @@ namespace SourceCode.Chasm.IO.Json
 
         public BufferSession Serialize(Commit model)
         {
-            var wire = model.Convert();
-            var json = wire?.ToString() ?? "null";
+            var json = model.Write();
 
             var maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
             var rented = BufferSession.RentBuffer(maxLen);
@@ -48,7 +47,7 @@ namespace SourceCode.Chasm.IO.Json
                 }
             }
 
-            var model = json.ParseCommit();
+            var model = json.ReadCommit();
             return model;
         }
 

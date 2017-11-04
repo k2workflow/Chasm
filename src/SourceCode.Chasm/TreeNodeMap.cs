@@ -80,6 +80,19 @@ namespace SourceCode.Chasm
             _nodes = DistinctSort(nodes, false);
         }
 
+        public TreeNodeMap(IEnumerable<TreeNode> nodes)
+        {
+            // We choose to coerce empty & null, so de/serialization round-trips with fidelity
+            if (nodes == null)
+            {
+                _nodes = default; // ie, same as default struct ctor
+                return;
+            }
+
+            // Sort & de-duplicate
+            _nodes = DistinctSort(nodes);
+        }
+
         public TreeNodeMap(ICollection<TreeNode> nodes)
         {
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
@@ -403,6 +416,18 @@ namespace SourceCode.Chasm
 
             ArgumentException CreateDuplicateException(TreeNode node)
                 => new ArgumentException($"Duplicate {nameof(TreeNode)} arguments passed to {nameof(TreeNodeMap)}: ({node})");
+        }
+
+        private static ReadOnlyMemory<TreeNode> DistinctSort(IEnumerable<TreeNode> nodes)
+        {
+            Debug.Assert(nodes != null); // Already checked at callsites
+
+            if (!System.Linq.Enumerable.Any(nodes)) return default;
+
+            // If callsite did not already copy, do so before mutating
+            var array = new List<TreeNode>(nodes).ToArray();
+
+            return DistinctSort(array, true);
         }
 
         #endregion

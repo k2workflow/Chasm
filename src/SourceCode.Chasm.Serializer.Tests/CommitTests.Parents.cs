@@ -12,7 +12,7 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitTests // .Parents
     {
-        #region Fields
+        #region Constants
 
         private static readonly CommitId Parent1 = new CommitId(Sha1.Hash(nameof(Parent1)));
         private static readonly CommitId Parent2 = new CommitId(Sha1.Hash(nameof(Parent2)));

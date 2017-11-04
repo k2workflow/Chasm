@@ -7,15 +7,12 @@
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
-    internal static class CommitIdWireExtensions
+    internal static class CommitIdExtensions
     {
         #region Methods
 
         public static string Convert(this CommitId model)
-        {
-            var wire = model.Sha1.ToString("N");
-            return wire;
-        }
+            => model.Sha1.ToString("N");
 
         public static CommitId ConvertCommitId(this string wire)
         {

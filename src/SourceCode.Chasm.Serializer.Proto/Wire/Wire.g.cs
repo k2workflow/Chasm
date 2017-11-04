@@ -22,25 +22,26 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     static WireReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgpXaXJlLnByb3RvIkQKCFNoYTFXaXJlEgsKA1NldBgBIAEoCBINCgVCbGl0",
-            "MBgCIAEoBBINCgVCbGl0MRgDIAEoBBINCgVCbGl0MhgEIAEoDSJUCgxUcmVl",
-            "V2lyZU5vZGUSDAoETmFtZRgBIAEoCRIbCgRLaW5kGAIgASgOMg0uTm9kZUtp",
-            "bmRXaXJlEhkKBk5vZGVJZBgDIAEoCzIJLlNoYTFXaXJlIigKCFRyZWVXaXJl",
-            "EhwKBU5vZGVzGAEgAygLMg0uVHJlZVdpcmVOb2RlIjcKCUF1ZGl0V2lyZRIM",
-            "CgROYW1lGAEgASgJEgwKBFRpbWUYAiABKAMSDgoGT2Zmc2V0GAMgASgFIo8B",
-            "CgpDb21taXRXaXJlEhoKB1BhcmVudHMYASADKAsyCS5TaGExV2lyZRIZCgZU",
-            "cmVlSWQYAiABKAsyCS5TaGExV2lyZRIaCgZBdXRob3IYAyABKAsyCi5BdWRp",
-            "dFdpcmUSHQoJQ29tbWl0dGVyGAQgASgLMgouQXVkaXRXaXJlEg8KB01lc3Nh",
-            "Z2UYBSABKAkiJQoMQ29tbWl0SWRXaXJlEhUKAklkGAEgASgLMgkuU2hhMVdp",
-            "cmUqIgoMTm9kZUtpbmRXaXJlEggKBEJsb2IQABIICgRUcmVlEAFCIaoCHlNv",
-            "dXJjZUNvZGUuQ2hhc20uSU8uUHJvdG8uV2lyZWIGcHJvdG8z"));
+            "CgpXaXJlLnByb3RvGg53cmFwcGVycy5wcm90byJECghTaGExV2lyZRILCgNT",
+            "ZXQYASABKAgSDQoFQmxpdDAYAiABKAQSDQoFQmxpdDEYAyABKAQSDQoFQmxp",
+            "dDIYBCABKA0iVAoMVHJlZVdpcmVOb2RlEgwKBE5hbWUYASABKAkSGwoES2lu",
+            "ZBgCIAEoDjINLk5vZGVLaW5kV2lyZRIZCgZOb2RlSWQYAyABKAsyCS5TaGEx",
+            "V2lyZSIoCghUcmVlV2lyZRIcCgVOb2RlcxgBIAMoCzINLlRyZWVXaXJlTm9k",
+            "ZSI7CglBdWRpdFdpcmUSDAoETmFtZRgBIAEoCRIQCghEYXRlVGltZRgCIAEo",
+            "AxIOCgZPZmZzZXQYAyABKAMirQEKCkNvbW1pdFdpcmUSGgoHUGFyZW50cxgB",
+            "IAMoCzIJLlNoYTFXaXJlEhkKBlRyZWVJZBgCIAEoCzIJLlNoYTFXaXJlEhoK",
+            "BkF1dGhvchgDIAEoCzIKLkF1ZGl0V2lyZRIdCglDb21taXR0ZXIYBCABKAsy",
+            "Ci5BdWRpdFdpcmUSLQoHTWVzc2FnZRgFIAEoCzIcLmdvb2dsZS5wcm90b2J1",
+            "Zi5TdHJpbmdWYWx1ZSIlCgxDb21taXRJZFdpcmUSFQoCSWQYASABKAsyCS5T",
+            "aGExV2lyZSoiCgxOb2RlS2luZFdpcmUSCAoEQmxvYhAAEggKBFRyZWUQAUIh",
+            "qgIeU291cmNlQ29kZS5DaGFzbS5JTy5Qcm90by5XaXJlYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { },
+          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.WrappersReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::SourceCode.Chasm.IO.Proto.Wire.NodeKindWire), }, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire), global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire.Parser, new[]{ "Set", "Blit0", "Blit1", "Blit2" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.TreeWireNode), global::SourceCode.Chasm.IO.Proto.Wire.TreeWireNode.Parser, new[]{ "Name", "Kind", "NodeId" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.TreeWire), global::SourceCode.Chasm.IO.Proto.Wire.TreeWire.Parser, new[]{ "Nodes" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.AuditWire), global::SourceCode.Chasm.IO.Proto.Wire.AuditWire.Parser, new[]{ "Name", "Time", "Offset" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.AuditWire), global::SourceCode.Chasm.IO.Proto.Wire.AuditWire.Parser, new[]{ "Name", "DateTime", "Offset" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Author", "Committer", "Message" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire.Parser, new[]{ "Id" }, null, null, null)
           }));
@@ -598,7 +599,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public AuditWire(AuditWire other) : this() {
       name_ = other.name_;
-      time_ = other.time_;
+      dateTime_ = other.dateTime_;
       offset_ = other.offset_;
     }
 
@@ -618,28 +619,28 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       }
     }
 
-    /// <summary>Field number for the "Time" field.</summary>
-    public const int TimeFieldNumber = 2;
-    private long time_;
+    /// <summary>Field number for the "DateTime" field.</summary>
+    public const int DateTimeFieldNumber = 2;
+    private long dateTime_;
     /// <summary>
-    /// Milliseconds
+    /// Ticks
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public long Time {
-      get { return time_; }
+    public long DateTime {
+      get { return dateTime_; }
       set {
-        time_ = value;
+        dateTime_ = value;
       }
     }
 
     /// <summary>Field number for the "Offset" field.</summary>
     public const int OffsetFieldNumber = 3;
-    private int offset_;
+    private long offset_;
     /// <summary>
-    /// Minutes
+    /// Ticks
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int Offset {
+    public long Offset {
       get { return offset_; }
       set {
         offset_ = value;
@@ -660,7 +661,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         return true;
       }
       if (Name != other.Name) return false;
-      if (Time != other.Time) return false;
+      if (DateTime != other.DateTime) return false;
       if (Offset != other.Offset) return false;
       return true;
     }
@@ -669,8 +670,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     public override int GetHashCode() {
       int hash = 1;
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (Time != 0L) hash ^= Time.GetHashCode();
-      if (Offset != 0) hash ^= Offset.GetHashCode();
+      if (DateTime != 0L) hash ^= DateTime.GetHashCode();
+      if (Offset != 0L) hash ^= Offset.GetHashCode();
       return hash;
     }
 
@@ -685,13 +686,13 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         output.WriteRawTag(10);
         output.WriteString(Name);
       }
-      if (Time != 0L) {
+      if (DateTime != 0L) {
         output.WriteRawTag(16);
-        output.WriteInt64(Time);
+        output.WriteInt64(DateTime);
       }
-      if (Offset != 0) {
+      if (Offset != 0L) {
         output.WriteRawTag(24);
-        output.WriteInt32(Offset);
+        output.WriteInt64(Offset);
       }
     }
 
@@ -701,11 +702,11 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      if (Time != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Time);
+      if (DateTime != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(DateTime);
       }
-      if (Offset != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Offset);
+      if (Offset != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Offset);
       }
       return size;
     }
@@ -718,10 +719,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      if (other.Time != 0L) {
-        Time = other.Time;
+      if (other.DateTime != 0L) {
+        DateTime = other.DateTime;
       }
-      if (other.Offset != 0) {
+      if (other.Offset != 0L) {
         Offset = other.Offset;
       }
     }
@@ -739,11 +740,11 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             break;
           }
           case 16: {
-            Time = input.ReadInt64();
+            DateTime = input.ReadInt64();
             break;
           }
           case 24: {
-            Offset = input.ReadInt32();
+            Offset = input.ReadInt64();
             break;
           }
         }
@@ -783,7 +784,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       TreeId = other.treeId_ != null ? other.TreeId.Clone() : null;
       Author = other.author_ != null ? other.Author.Clone() : null;
       Committer = other.committer_ != null ? other.Committer.Clone() : null;
-      message_ = other.message_;
+      Message = other.message_ != null ? other.Message.Clone() : null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -836,12 +837,15 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
 
     /// <summary>Field number for the "Message" field.</summary>
     public const int MessageFieldNumber = 5;
-    private string message_ = "";
+    private global::Google.Protobuf.WellKnownTypes.StringValue message_;
+    /// <summary>
+    /// Nullable
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Message {
+    public global::Google.Protobuf.WellKnownTypes.StringValue Message {
       get { return message_; }
       set {
-        message_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        message_ = value;
       }
     }
 
@@ -862,7 +866,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (!object.Equals(TreeId, other.TreeId)) return false;
       if (!object.Equals(Author, other.Author)) return false;
       if (!object.Equals(Committer, other.Committer)) return false;
-      if (Message != other.Message) return false;
+      if (!object.Equals(Message, other.Message)) return false;
       return true;
     }
 
@@ -873,7 +877,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (treeId_ != null) hash ^= TreeId.GetHashCode();
       if (author_ != null) hash ^= Author.GetHashCode();
       if (committer_ != null) hash ^= Committer.GetHashCode();
-      if (Message.Length != 0) hash ^= Message.GetHashCode();
+      if (message_ != null) hash ^= Message.GetHashCode();
       return hash;
     }
 
@@ -897,9 +901,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         output.WriteRawTag(34);
         output.WriteMessage(Committer);
       }
-      if (Message.Length != 0) {
+      if (message_ != null) {
         output.WriteRawTag(42);
-        output.WriteString(Message);
+        output.WriteMessage(Message);
       }
     }
 
@@ -916,8 +920,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (committer_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Committer);
       }
-      if (Message.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
+      if (message_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Message);
       }
       return size;
     }
@@ -946,8 +950,11 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         }
         Committer.MergeFrom(other.Committer);
       }
-      if (other.Message.Length != 0) {
-        Message = other.Message;
+      if (other.message_ != null) {
+        if (message_ == null) {
+          message_ = new global::Google.Protobuf.WellKnownTypes.StringValue();
+        }
+        Message.MergeFrom(other.Message);
       }
     }
 
@@ -985,7 +992,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             break;
           }
           case 42: {
-            Message = input.ReadString();
+            if (message_ == null) {
+              message_ = new global::Google.Protobuf.WellKnownTypes.StringValue();
+            }
+            input.ReadMessage(message_);
             break;
           }
         }

@@ -5,6 +5,7 @@
 
 #endregion
 
+using Google.Protobuf.WellKnownTypes;
 using System;
 
 namespace SourceCode.Chasm.IO.Proto.Wire
@@ -52,7 +53,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             wire.Committer = model.Committer.Convert();
 
             // Message
-            wire.Message = model.Message;
+            wire.Message = new StringValue { Value = model.Message };
 
             return wire;
         }
@@ -92,7 +93,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire
                 committer = wire.Committer.Convert();
             }
 
-            var model = new Commit(parents, treeId, author, committer, wire.Message);
+            // Message
+            var message = wire.Message?.Value;
+
+            var model = new Commit(parents, treeId, author, committer, message);
             return model;
         }
 

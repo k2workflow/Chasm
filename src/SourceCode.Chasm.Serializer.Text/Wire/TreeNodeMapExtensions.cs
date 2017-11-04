@@ -11,7 +11,7 @@ using System.Text;
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
-    internal static class TreeWireExtensions
+    internal static class TreeNodeMapExtensions
     {
         #region Methods
 
