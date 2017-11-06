@@ -20,10 +20,7 @@
     <PackageReference Include="SonarAnalyzer.CSharp" Version="6.5.0.3766">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <!--<PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00276" />-->
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>10.0.3</Version>
-    </PackageReference>
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00278" />
   </ItemGroup>
 
   <ItemGroup>
