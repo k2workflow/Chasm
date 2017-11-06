@@ -50,7 +50,7 @@ namespace SourceCode.Chasm
             TreeId = treeId;
             Author = author;
             Committer = committer;
-            _message = message ?? string.Empty;
+            _message = message;
 
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (parents == null)

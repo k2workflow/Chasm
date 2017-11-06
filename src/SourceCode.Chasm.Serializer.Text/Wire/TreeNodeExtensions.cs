@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
-    internal static class TreeWireNodeExtensions
+    internal static class TreeNodeExtensions
     {
         #region Methods
 

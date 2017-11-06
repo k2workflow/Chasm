@@ -5,9 +5,9 @@
 
 #endregion
 
-using SourceCode.Chasm.IO.Text;
 using SourceCode.Chasm.IO.Json;
 using SourceCode.Chasm.IO.Proto;
+using SourceCode.Chasm.IO.Text;
 using System.Collections;
 using System.Collections.Generic;
 

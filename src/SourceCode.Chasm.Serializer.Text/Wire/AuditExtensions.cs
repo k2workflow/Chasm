@@ -10,7 +10,7 @@ using System.Globalization;
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
-    internal static class AuditWireExtensions
+    internal static class AuditExtensions
     {
         #region Methods
 
@@ -18,13 +18,13 @@ namespace SourceCode.Chasm.IO.Text.Wire
         {
             // Convert System.DateTimeOffset to Unix ms
 
-            // Time (milliseconds)
-            var ms = model.Timestamp.ToUniversalTime().ToUnixTimeMilliseconds();
+            // DateTime (ticks)
+            var dt = model.Timestamp.UtcDateTime.Ticks; // Convert to Utc
 
-            // Offset (minutes)
-            var tz = model.Timestamp.Offset.TotalMinutes;
+            // Offset (ticks)
+            var tz = model.Timestamp.Offset.Ticks;
 
-            var wire = $"{model.Name} {ms} {tz:0000}";
+            var wire = $"{model.Name} {dt} {tz}";
             return wire;
         }
 
@@ -32,41 +32,43 @@ namespace SourceCode.Chasm.IO.Text.Wire
         {
             if (wire == null) return default;
 
-            DateTimeOffset time = default;
-            TimeSpan offset = default;
+            DateTime dt = default;
+            TimeSpan tz = default;
 
             var len = wire.Length;
-            var foundFirst = false;
+            var foundOffset = false;
+
             var ix = len - 1;
             for (; ix >= 0; ix--)
             {
                 if (wire[ix] != ' ') continue;
 
-                if (foundFirst)
+                if (foundOffset)
                 {
+                    // DateTime (ticks)
                     var str = wire.Substring(ix, len - ix).TrimEnd();
-                    var ms = long.Parse(str, CultureInfo.InvariantCulture);
+                    var tcks = long.Parse(str, CultureInfo.InvariantCulture);
+                    dt = new DateTime(tcks, DateTimeKind.Utc);
 
-                    // Convert Unix ms to System.DateTimeOffset
-
-                    // Time (milliseconds)
-                    time = DateTimeOffset.FromUnixTimeMilliseconds(ms);
-                    time = time.ToOffset(offset);
                     break;
                 }
 
+                // Offset (ticks)
                 var stt = wire.Substring(ix, len - ix).TrimEnd();
-                var minutes = int.Parse(stt, CultureInfo.InvariantCulture);
+                var ticks = long.Parse(stt, CultureInfo.InvariantCulture);
+                tz = new TimeSpan(ticks);
 
-                // Offset (minutes)
-                offset = TimeSpan.FromMinutes(minutes);
-                foundFirst = true;
+                foundOffset = true;
                 len = ix;
             }
 
+            // DateTimeOffset
+            var dto = new DateTimeOffset(dt).ToOffset(tz);
+
+            // Name
             var name = wire.Substring(0, ix);
 
-            return new Audit(name, time);
+            return new Audit(name, dto);
         }
 
         #endregion

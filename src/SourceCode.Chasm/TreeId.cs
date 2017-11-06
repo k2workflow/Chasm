@@ -26,19 +26,6 @@ namespace SourceCode.Chasm
             Sha1 = sha1;
         }
 
-        public static TreeId Parse(string hex) => new TreeId(Sha1.Parse(hex));
-
-        public static bool TryParse(string hex, out TreeId value)
-        {
-            if (Sha1.TryParse(hex, out var sha))
-            {
-                value = new TreeId(sha);
-                return true;
-            }
-            value = default;
-            return false;
-        }
-
         #endregion
 
         #region IEquatable

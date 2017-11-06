@@ -7,12 +7,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text;
 
 namespace SourceCode.Chasm.IO.Text.Wire
 {
-    internal static class CommitWireExtensions
+    internal static class CommitExtensions
     {
         #region Constants
 
