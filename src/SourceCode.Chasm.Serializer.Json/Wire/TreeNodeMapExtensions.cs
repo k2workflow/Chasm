@@ -26,8 +26,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static TreeNodeMap ReadTree(this string json)
         {
-            if (string.IsNullOrEmpty(json)) return default;
-            if (json == JsonExtensions.JsonNull) return default;
+            if (string.IsNullOrEmpty(json) || json == JsonExtensions.JsonNull) return default;
 
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))

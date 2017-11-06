@@ -6,9 +6,8 @@
 #endregion
 
 using Newtonsoft.Json;
-using SourceCode.Chasm;
 
-namespace SourceCode.Clay.Json
+namespace SourceCode.Chasm.IO.Json.Wire
 {
     internal static class JsonExtensions
     {
