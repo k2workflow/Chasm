@@ -60,7 +60,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static string Write(this CommitId model)
         {
-            if (model == default) return Sha1Extensions.JsonNull;
+            if (model == default) return JsonConstants.Null;
 
             // Perf: No need to use JsonWriter for a simple scalar
             var json = "{ \"" + _id + "\": \"" + model.Sha1.ToString("N") + "\" }";

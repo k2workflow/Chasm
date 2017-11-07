@@ -7,6 +7,7 @@
 
 using SourceCode.Chasm.IO.Json.Wire;
 using SourceCode.Clay.Buffers;
+using SourceCode.Clay.Json;
 using System;
 using System.Text;
 
@@ -18,8 +19,7 @@ namespace SourceCode.Chasm.IO.Json
 
         public BufferSession Serialize(CommitId model)
         {
-            var wire = model.Write();
-            var json = wire ?? "null";
+            var json = model.Write();
 
             var maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
             var rented = BufferSession.RentBuffer(maxLen);
@@ -48,7 +48,7 @@ namespace SourceCode.Chasm.IO.Json
                 }
             }
 
-            if (string.IsNullOrEmpty(json) || json == Sha1Extensions.JsonNull) return default;
+            if (string.IsNullOrEmpty(json) || json == JsonConstants.Null) return default;
 
             var model = json.ReadCommitId();
             return model;
