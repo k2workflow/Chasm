@@ -5,15 +5,12 @@
 
 #endregion
 
-using System.Runtime.CompilerServices;
-
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
     internal static class Sha1WireExtensions
     {
         #region Methods
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Sha1Wire Convert(this Sha1 model)
         {
             var wire = new Sha1Wire
@@ -27,7 +24,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return wire;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Sha1Wire Convert(this Sha1? model)
         {
             if (model == null) return new Sha1Wire();
@@ -43,16 +39,12 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return wire;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Sha1Wire Convert(this BlobId? model) => Convert(model?.Sha1);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Sha1Wire Convert(this CommitId? model) => Convert(model?.Sha1);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Sha1Wire Convert(this TreeId? model) => Convert(model?.Sha1);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Sha1? Convert(this Sha1Wire wire)
         {
             if (wire == null) return default;
@@ -62,7 +54,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return model;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BlobId? ConvertBlob(this Sha1Wire wire)
         {
             if (wire == null) return default;
@@ -72,7 +63,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return new BlobId(model);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static CommitId? ConvertCommit(this Sha1Wire wire)
         {
             if (wire == null) return default;
@@ -82,7 +72,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return new CommitId(model);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TreeId? ConvertTree(this Sha1Wire wire)
         {
             if (wire == null) return default;

@@ -6,7 +6,6 @@
 #endregion
 
 using System;
-using System.Runtime.CompilerServices;
 
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
@@ -41,7 +40,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return model;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static NodeKind Convert(this NodeKindWire wire)
         {
             // Do not use direct integer conversion - it may fail silently
@@ -53,7 +51,6 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static NodeKindWire Convert(this NodeKind model)
         {
             // Do not use direct integer conversion - it may fail silently
