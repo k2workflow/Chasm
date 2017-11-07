@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,12 +41,16 @@ namespace SourceCode.Chasm.IO
 
         #region CommitRef
 
-        protected static ChasmConcurrencyException BuildConcurrencyException(string branch, string name, Exception innerException)
-            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {branch}/{name}", innerException);
+        protected static ChasmConcurrencyException BuildConcurrencyException(string name, string branch, Exception innerException)
+            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {name}/{branch}", innerException);
 
-        public abstract ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken);
+        public abstract ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken);
 
-        public abstract Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken);
+        public abstract Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken);
+
+        public abstract ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken);
+
+        public abstract ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken);
 
         #endregion
     }
