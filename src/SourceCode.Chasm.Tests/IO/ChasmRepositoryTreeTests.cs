@@ -44,7 +44,7 @@ namespace SourceCode.Chasm.Tests.IO
                 });
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(RandomHelper.String, CommitRefTestObject.Random.Name, TestValues.CancellationToken);
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(RandomHelper.String, CommitRefTestObject.Random.Branch, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(default, actual);
@@ -80,7 +80,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.ReadTreeAsync(RandomHelper.String, CommitRefTestObject.Random.Name, TestValues.CancellationToken);
+            var actual = await mockChasmRepository.Object.ReadTreeAsync(RandomHelper.String, CommitRefTestObject.Random.Branch, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(default, actual);
@@ -98,7 +98,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = Assert.ThrowsAsync<ArgumentNullException>(async () => await mockChasmRepository.Object.ReadTreeAsync(default, CommitRefTestObject.Random.Name, TestValues.CancellationToken));
+            var actual = Assert.ThrowsAsync<ArgumentNullException>(async () => await mockChasmRepository.Object.ReadTreeAsync(default, CommitRefTestObject.Random.Branch, TestValues.CancellationToken));
 
             // Assert
             Assert.Contains("branch", actual.Result.Message);

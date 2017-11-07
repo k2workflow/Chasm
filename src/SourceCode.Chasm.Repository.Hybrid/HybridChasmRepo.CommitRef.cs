@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,16 +14,30 @@ namespace SourceCode.Chasm.IO.Hybrid
 {
     partial class HybridChasmRepo // .CommitRef
     {
+        #region List
+
+        public override ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken)
+        {
+            return Chain[0].GetBranchesAsync(name, cancellationToken);
+        }
+
+        public override ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
+        {
+            return Chain[0].GetNamesAsync(cancellationToken);
+        }
+
+        #endregion
+
         #region Read
 
-        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
             // We only read from last repo
             var last = Chain[Chain.Length - 1];
-            var commitRef = await last.ReadCommitRefAsync(branch, name, cancellationToken).ConfigureAwait(false);
+            var commitRef = await last.ReadCommitRefAsync(name, branch, cancellationToken).ConfigureAwait(false);
 
             return commitRef;
         }
@@ -31,14 +46,14 @@ namespace SourceCode.Chasm.IO.Hybrid
 
         #region Write
 
-        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
+        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // We only write to last repo
             var last = Chain[Chain.Length - 1];
-            await last.WriteCommitRefAsync(previousCommitId, branch, commitRef, cancellationToken).ConfigureAwait(false);
+            await last.WriteCommitRefAsync(previousCommitId, name, commitRef, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion

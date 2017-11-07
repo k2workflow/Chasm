@@ -193,12 +193,12 @@ namespace SourceCode.Chasm.IO.Disk
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static string DeriveCommitRefFileName(string branch, string name)
+        private static string DeriveCommitRefFileName(string name, string branch)
         {
-            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (branch == null) return name;
 
-            var refName = Path.Combine(branch, $"{name}.commit");
+            var refName = Path.Combine(name, $"{branch}.commit");
             return refName;
         }
 

@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
-    [DebuggerDisplay("{" + nameof(Name) + ",nq} ({" + nameof(CommitId) + "." + nameof(Chasm.CommitId.Sha1) + ".ToString(\"D\"),nq,ac})")]
+    [DebuggerDisplay("{" + nameof(Branch) + ",nq} ({" + nameof(CommitId) + "." + nameof(Chasm.CommitId.Sha1) + ".ToString(\"D\"),nq,ac})")]
     public struct CommitRef : IEquatable<CommitRef>
     {
         #region Constants
@@ -28,7 +28,7 @@ namespace SourceCode.Chasm
 
         #region Properties
 
-        public string Name { get; }
+        public string Branch { get; }
 
         public CommitId CommitId { get; }
 
@@ -36,11 +36,11 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        public CommitRef(string name, CommitId commitId)
+        public CommitRef(string branch, CommitId commitId)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            Name = name;
+            Branch = branch;
             CommitId = commitId;
         }
 
@@ -51,7 +51,7 @@ namespace SourceCode.Chasm
         public bool Equals(CommitRef other)
         {
             if (!CommitIdComparer.Default.Equals(CommitId, other.CommitId)) return false;
-            if (!StringComparer.Ordinal.Equals(Name, other.Name)) return false;
+            if (!StringComparer.Ordinal.Equals(Branch, other.Branch)) return false;
 
             return true;
         }
@@ -65,7 +65,7 @@ namespace SourceCode.Chasm
             var hc = new HashCode();
 
             hc.Add(CommitId, CommitIdComparer.Default);
-            hc.Add(Name ?? string.Empty, StringComparer.Ordinal);
+            hc.Add(Branch ?? string.Empty, StringComparer.Ordinal);
 
             return hc.ToHashCode();
         }
@@ -78,7 +78,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(CommitRef x, CommitRef y) => !(x == y);
 
-        public override string ToString() => $"{CommitId.Sha1:D} ({Name})";
+        public override string ToString() => $"{CommitId.Sha1:D} ({Branch})";
 
         #endregion
     }
