@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.27102.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm", "src\SourceCode.Chasm\SourceCode.Chasm.csproj", "{430F8C16-427D-4756-B788-80C1F41E2B9A}"
 EndProject
@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Serializer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.Hybrid", "src\SourceCode.Chasm.Repository.Hybrid\SourceCode.Chasm.Repository.Hybrid.csproj", "{505E9DC1-437A-46FC-A6DC-3629952A8034}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoruceCode.Chasm.IntegrationTests", "src\SoruceCode.Chasm.IntegrationTests\SoruceCode.Chasm.IntegrationTests.csproj", "{8CA47B3D-D8BD-4C03-97F2-16C56549E9E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceCode.Chasm.IntegrationTests", "src\SoruceCode.Chasm.IntegrationTests\SourceCode.Chasm.IntegrationTests.csproj", "{8CA47B3D-D8BD-4C03-97F2-16C56549E9E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
