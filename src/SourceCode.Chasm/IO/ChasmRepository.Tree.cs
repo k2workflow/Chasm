@@ -98,7 +98,7 @@ namespace SourceCode.Chasm.IO
             }
         }
 
-        public virtual async ValueTask<CommitId> WriteTreeAsync(IList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken)
         {
             var treeId = await WriteTreeAsync(tree, cancellationToken).ConfigureAwait(false);
             var commit = new Commit(parents, treeId, author, committer, message);

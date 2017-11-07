@@ -34,7 +34,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             Audit author = default;
             Audit committer = default;
             TreeId? treeId = default;
-            IList<CommitId> parents = null;
+            IReadOnlyList<CommitId> parents = null;
             string message = null;
 
             // Switch
@@ -69,7 +69,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             // Property
 
-            IList<CommitId> ReadParents() => jr.ReadArray(() =>
+            IReadOnlyList<CommitId> ReadParents() => jr.ReadArray(() =>
             {
                 var sha1 = jr.ReadSha1();
                 return sha1 == null ? default : new CommitId(sha1.Value);

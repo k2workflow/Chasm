@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.IO
 
         ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken);
 
-        ValueTask<CommitId> WriteTreeAsync(IList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken);
+        ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken);
 
         #endregion
     }
