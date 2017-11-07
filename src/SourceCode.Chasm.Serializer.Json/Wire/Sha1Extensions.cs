@@ -9,8 +9,14 @@ using Newtonsoft.Json;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
-    internal static class JsonExtensions
+    internal static class Sha1Extensions
     {
+        #region Constants
+
+        public const string JsonNull = "null";
+
+        #endregion
+
         #region Methods
 
         /// <summary>

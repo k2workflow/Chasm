@@ -47,7 +47,7 @@ namespace SourceCode.Chasm.IO.Json
                 }
             }
 
-            if (string.IsNullOrEmpty(json) || json == JsonExtensions.JsonNull) return default;
+            if (string.IsNullOrEmpty(json) || json == Sha1Extensions.JsonNull) return default;
 
             var model = json.ReadCommit();
             return model;
