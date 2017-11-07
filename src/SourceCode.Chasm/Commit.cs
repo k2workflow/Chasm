@@ -45,7 +45,7 @@ namespace SourceCode.Chasm
 
         #region De/Constructors
 
-        public Commit(IReadOnlyList<CommitId> parents, TreeId? treeId, Audit author, Audit committer, string message)
+        public Commit(IList<CommitId> parents, TreeId? treeId, Audit author, Audit committer, string message)
         {
             TreeId = treeId;
             Author = author;

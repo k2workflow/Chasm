@@ -42,7 +42,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static string Write(this TreeNodeMap model)
         {
-            if (model == default) return JsonExtensions.JsonNull;
+            if (model == default) return JsonReaderExtensions.JsonNull;
 
             var sb = new StringBuilder();
             using (var sw = new StringWriter(sb))
