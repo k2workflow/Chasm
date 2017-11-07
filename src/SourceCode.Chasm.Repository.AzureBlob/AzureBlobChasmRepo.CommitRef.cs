@@ -14,25 +14,106 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace SourceCode.Chasm.IO.AzureBlob
 {
     partial class AzureBlobChasmRepo // .CommitRef
     {
+        #region Fields
+
+        private const string CommitExtension = ".commit";
+
+        #endregion
+
+        #region List
+
+        public override async ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
+
+            var refsContainer = _refsContainer.Value;
+            var results = new List<CommitRef>();
+            name = DeriveCommitRefBlobName(name, null);
+
+            BlobContinuationToken token = null;
+
+            do
+            {
+                var resultSegment = await refsContainer.ListBlobsSegmentedAsync(name, false, BlobListingDetails.None, null, token, null, null).ConfigureAwait(false);
+
+                foreach (var blobItem in resultSegment.Results)
+                {
+                    if (!(blobItem is CloudBlob blob))
+                        continue;
+
+                    if (!blob.Name.EndsWith(CommitExtension, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var branch = blob.Name.Substring(name.Length, blob.Name.Length - CommitExtension.Length - name.Length);
+                    branch = Uri.UnescapeDataString(branch);
+
+                    using (var output = new MemoryStream())
+                    {
+                        await blob.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
+
+                        if (output.Length < Sha1.ByteLen)
+                            throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
+
+                        var commitId = Serializer.DeserializeCommitId(output.ToArray());
+                        results.Add(new CommitRef(branch, commitId));
+                    }
+                }
+
+                token = resultSegment.ContinuationToken;
+            } while (token != null);
+
+            return results;
+        }
+
+        public override async ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
+        {
+            var refsContainer = _refsContainer.Value;
+            var results = new List<string>();
+
+            BlobContinuationToken token = null;
+
+            do
+            {
+                var resultSegment = await refsContainer.ListBlobsSegmentedAsync("", false, BlobListingDetails.None, null, token, null, null).ConfigureAwait(false);
+
+                foreach (var blobItem in resultSegment.Results)
+                {
+                    if (!(blobItem is CloudBlobDirectory dir))
+                        continue;
+
+                    var name = dir.Prefix.Substring(0, dir.Prefix.Length - 1); // Ends with / always.
+                    name = Uri.UnescapeDataString(name);
+                    results.Add(name);
+                }
+
+                token = resultSegment.ContinuationToken;
+            } while (token != null);
+
+            return results;
+        }
+
+        #endregion
+
         #region Read
 
-        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            var (found, commitId, _, _) = await ReadCommitRefImplAsync(branch, name, cancellationToken).ConfigureAwait(false);
+            var (found, commitId, _, _) = await ReadCommitRefImplAsync(name, branch, cancellationToken).ConfigureAwait(false);
 
             // NotFound
             if (!found) return null;
 
             // Found
-            var commitRef = new CommitRef(name, commitId);
+            var commitRef = new CommitRef(branch, commitId);
             return commitRef;
         }
 
@@ -40,25 +121,25 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Write
 
-        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
+        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // Load existing commit ref in order to use its etag
-            var (found, existingCommitId, ifMatchCondition, blobRef) = await ReadCommitRefImplAsync(branch, commitRef.Name, cancellationToken).ConfigureAwait(false);
+            var (found, existingCommitId, ifMatchCondition, blobRef) = await ReadCommitRefImplAsync(name, commitRef.Branch, cancellationToken).ConfigureAwait(false);
 
             // Optimistic concurrency check
             if (found)
             {
                 // We found a previous commit but the caller didn't say to expect one
                 if (!previousCommitId.HasValue)
-                    throw BuildConcurrencyException(branch, commitRef.Name, null); // TODO: May need a different error
+                    throw BuildConcurrencyException(name, commitRef.Branch, null); // TODO: May need a different error
 
                 // Semantics follow Interlocked.Exchange (compare then exchange)
                 if (existingCommitId != previousCommitId.Value)
                 {
-                    throw BuildConcurrencyException(branch, commitRef.Name, null);
+                    throw BuildConcurrencyException(name, commitRef.Branch, null);
                 }
 
                 // Idempotent
@@ -68,7 +149,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             // The caller expected a previous commit, but we didn't find one
             else if (previousCommitId.HasValue)
             {
-                throw BuildConcurrencyException(branch, commitRef.Name, null); // TODO: May need a different error
+                throw BuildConcurrencyException(name, commitRef.Branch, null); // TODO: May need a different error
             }
 
             try
@@ -91,7 +172,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
-                throw BuildConcurrencyException(branch, commitRef.Name, se);
+                throw BuildConcurrencyException(name, commitRef.Branch, se);
             }
         }
 
@@ -99,12 +180,24 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Helpers
 
-        private async ValueTask<(bool found, CommitId, AccessCondition, CloudAppendBlob)> ReadCommitRefImplAsync(string branch, string name, CancellationToken cancellationToken)
+        private static string DeriveCommitRefBlobName(string name, string branch)
+        {
+            if (string.IsNullOrEmpty(branch))
+                return Uri.EscapeDataString(name) + "/";
+
+            name = Uri.EscapeDataString(name);
+            branch = Uri.EscapeDataString(branch);
+
+            var refName = $"{name}/{branch}.commit";
+            return refName;
+        }
+
+        private async ValueTask<(bool found, CommitId, AccessCondition, CloudAppendBlob)> ReadCommitRefImplAsync(string name, string branch, CancellationToken cancellationToken)
         {
             // Callers have already validated parameters
 
             var refsContainer = _refsContainer.Value;
-            var blobName = DeriveCommitRefBlobName(branch, name);
+            var blobName = DeriveCommitRefBlobName(name, branch);
             var blobRef = refsContainer.GetAppendBlobReference(blobName);
 
             try
@@ -120,7 +213,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                     var ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
 
                     if (output.Length < Sha1.ByteLen)
-                        throw new SerializationException($"{nameof(CommitRef)} '{name}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
+                        throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
 
                     // CommitIds are not compressed
                     var commitId = Serializer.DeserializeCommitId(output.ToArray()); // TODO: Perf
@@ -137,15 +230,6 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
             // NotFound
             return (false, default, default, blobRef);
-
-            // Local functions
-            string DeriveCommitRefBlobName(string branchName, string commitName)
-            {
-                var refName = $"{branchName}.{commitName}.commit";
-                refName = Uri.EscapeUriString(refName);
-
-                return refName;
-            }
         }
 
         #endregion

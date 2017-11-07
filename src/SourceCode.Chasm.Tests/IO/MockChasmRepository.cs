@@ -18,7 +18,7 @@ namespace SourceCode.Chasm.Tests.IO
     {
         #region Methods
 
-        internal static ChasmConcurrencyException MockBuildConcurrencyException(string branch, string name, Exception innerException)
+        internal static ChasmConcurrencyException MockBuildConcurrencyException(string name, string branch, Exception innerException)
         {
             return BuildConcurrencyException(branch, name, innerException);
         }
@@ -27,7 +27,7 @@ namespace SourceCode.Chasm.Tests.IO
             : base(serializer, compressionLevel, maxDop)
         { }
 
-        public override ValueTask<CommitRef?> ReadCommitRefAsync(string branch, string name, CancellationToken cancellationToken)
+        public override ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -53,6 +53,16 @@ namespace SourceCode.Chasm.Tests.IO
         }
 
         public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

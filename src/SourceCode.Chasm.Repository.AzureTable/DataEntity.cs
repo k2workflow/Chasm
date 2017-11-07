@@ -15,6 +15,12 @@ namespace SourceCode.Chasm.IO.AzureTable
 {
     public sealed class DataEntity : TableEntity
     {
+        #region Fields
+
+        internal const string CommitSuffix = "-commit";
+
+        #endregion
+
         #region Properties
 
         public byte[] Content { get; set; }
@@ -81,25 +87,25 @@ namespace SourceCode.Chasm.IO.AzureTable
             return entity;
         }
 
-        internal static DataEntity Create(string repo, string name, ArraySegment<byte> content, string etag)
+        internal static DataEntity Create(string name, string branch, ArraySegment<byte> content, string etag)
         {
-            if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            var partitionKey = GetPartitionKey(repo);
-            var rowKey = GetRowKey(name);
+            var partitionKey = GetPartitionKey(name);
+            var rowKey = GetRowKey(branch);
 
             var entity = new DataEntity(partitionKey, rowKey, content, etag);
             return entity;
         }
 
-        internal static DataEntity Create(string repo, string name, ArraySegment<byte> content)
+        internal static DataEntity Create(string name, string branch, ArraySegment<byte> content)
         {
-            if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            var partitionKey = GetPartitionKey(repo);
-            var rowKey = GetRowKey(name);
+            var partitionKey = GetPartitionKey(name);
+            var rowKey = GetRowKey(branch);
 
             var entity = new DataEntity(partitionKey, rowKey, content);
             return entity;
@@ -133,13 +139,35 @@ namespace SourceCode.Chasm.IO.AzureTable
             return op;
         }
 
-        internal static TableOperation BuildReadOperation(string branch, string name)
+        internal static TableQuery<DataEntity> BuildListQuery()
         {
-            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            var query = new TableQuery<DataEntity>()
+            {
+                SelectColumns = new[] { "PartitionKey" }
+            };
+
+            return query;
+        }
+
+        internal static TableQuery<DataEntity> BuildListQuery(string name)
+        {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var partitionKey = GetPartitionKey(branch);
-            var rowKey = GetRowKey(name);
+            var query = new TableQuery<DataEntity>()
+            {
+                SelectColumns = new[] { "RowKey", "Content" }
+            }.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, name));
+
+            return query;
+        }
+
+        internal static TableOperation BuildReadOperation(string name, string branch)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+
+            var partitionKey = GetPartitionKey(name);
+            var rowKey = GetRowKey(branch);
 
             var op = TableOperation.Retrieve<DataEntity>(partitionKey, rowKey);
             return op;
@@ -214,23 +242,23 @@ namespace SourceCode.Chasm.IO.AzureTable
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(string repo, string name, ArraySegment<byte> content, string etag)
+        internal static TableOperation BuildWriteOperation(string name, string branch, ArraySegment<byte> content, string etag)
         {
-            if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            var entity = Create(repo, name, content, etag);
+            var entity = Create(name, branch, content, etag);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(string repo, string name, ArraySegment<byte> content)
+        internal static TableOperation BuildWriteOperation(string name, string branch, ArraySegment<byte> content)
         {
-            if (string.IsNullOrWhiteSpace(repo)) throw new ArgumentNullException(nameof(repo));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            var entity = Create(repo, name, content);
+            var entity = Create(name, branch, content);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
