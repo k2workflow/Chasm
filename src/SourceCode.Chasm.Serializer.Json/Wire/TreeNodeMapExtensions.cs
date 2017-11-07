@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         #region Read
 
-        private static TreeNodeMap ReadTreeImpl(this JsonReader jr)
+        private static TreeNodeMap ReadTreeImpl(JsonReader jr)
         {
             var list = jr.ReadArray(() => jr.ReadNode());
 
@@ -26,14 +26,12 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static TreeNodeMap ReadTree(this string json)
         {
-            if (string.IsNullOrEmpty(json) || json == JsonExtensions.JsonNull) return default;
-
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = jr.ReadTreeImpl();
+                var model = ReadTreeImpl(jr);
                 return model;
             }
         }

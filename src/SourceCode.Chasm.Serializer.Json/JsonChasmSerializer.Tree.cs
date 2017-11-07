@@ -47,6 +47,8 @@ namespace SourceCode.Chasm.IO.Json
                 }
             }
 
+            if (string.IsNullOrEmpty(json) || json == JsonExtensions.JsonNull) return default;
+
             var model = json.ReadTree();
             return model;
         }

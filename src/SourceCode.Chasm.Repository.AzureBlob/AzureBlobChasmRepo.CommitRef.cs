@@ -9,12 +9,12 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace SourceCode.Chasm.IO.AzureBlob
 {
