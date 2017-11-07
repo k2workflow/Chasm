@@ -9,7 +9,6 @@ using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace SourceCode.Chasm.IO.AzureTable
 {
@@ -327,7 +326,6 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         #region Helpers
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static KeyValuePair<string, string> GetPartition(Sha1 sha1) => sha1.Split(2);
 
         private static string GetPartitionKey(Sha1 sha1) => GetPartition(sha1).Key;

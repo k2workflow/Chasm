@@ -7,7 +7,6 @@
 
 using SourceCode.Clay;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace SourceCode.Chasm
 {
@@ -62,7 +61,6 @@ namespace SourceCode.Chasm
 
             #region Methods
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override int Compare(Sha1 x, Sha1 y)
             {
                 // CLR returns [-1, 0, +1] for ulong/uint comparisons (vs arbitrary neg/pos values)
@@ -77,13 +75,11 @@ namespace SourceCode.Chasm
                 return cmp;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override bool Equals(Sha1 x, Sha1 y)
                 => x.Blit0 == y.Blit0
                 && x.Blit1 == y.Blit1
                 && x.Blit2 == y.Blit2;
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override int GetHashCode(Sha1 obj)
             {
                 var hc = new HashCode();

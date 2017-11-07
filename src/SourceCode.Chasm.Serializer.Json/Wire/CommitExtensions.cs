@@ -29,7 +29,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Read
 
-        private static Commit ReadCommitImpl(this JsonReader jr)
+        private static Commit ReadCommitImpl(JsonReader jr)
         {
             Audit author = default;
             Audit committer = default;
@@ -69,7 +69,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             // Property
 
-            List<CommitId> ReadParents() => jr.ReadArray(() =>
+            IReadOnlyList<CommitId> ReadParents() => jr.ReadArray(() =>
             {
                 var sha1 = jr.ReadSha1();
                 return sha1 == null ? default : new CommitId(sha1.Value);
@@ -84,15 +84,12 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static Commit ReadCommit(this string json)
         {
-            if (string.IsNullOrEmpty(json)) return default;
-            if (json == JsonExtensions.JsonNull) return default;
-
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = jr.ReadCommitImpl();
+                var model = ReadCommitImpl(jr);
                 return model;
             }
         }
@@ -103,7 +100,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static string Write(this Commit model)
         {
-            if (model == default) return JsonExtensions.JsonNull;
+            if (model == default) return JsonConstants.Null;
 
             var sb = new StringBuilder();
             using (var sw = new StringWriter(sb))

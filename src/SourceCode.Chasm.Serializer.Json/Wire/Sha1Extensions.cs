@@ -6,25 +6,23 @@
 #endregion
 
 using Newtonsoft.Json;
-using SourceCode.Chasm;
 
-namespace SourceCode.Clay.Json
+namespace SourceCode.Chasm.IO.Json.Wire
 {
-    internal static class JsonExtensions
+    internal static class Sha1Extensions
     {
-        #region Constants
-
-        public const string JsonNull = "null";
-
-        #endregion
-
         #region Methods
 
+        /// <summary>
+        /// Reads a <see cref="string"/> and, if not <see langword="null"/>, parses it as a <see cref="Sha1"/>.
+        /// </summary>
+        /// <param name="jr"></param>
+        /// <returns></returns>
         public static Sha1? ReadSha1(this JsonReader jr)
         {
             var str = (string)jr.Value;
             if (string.IsNullOrEmpty(str))
-                return null; // Caller can decide if they want null
+                return null; // Caller decides how to handle null
 
             var sha1 = Sha1.Parse(str);
             return sha1;

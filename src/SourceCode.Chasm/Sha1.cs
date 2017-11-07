@@ -10,7 +10,6 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
@@ -514,22 +513,23 @@ namespace SourceCode.Chasm
                 value = new Sha1(blit0, blit1, blit2);
                 return true;
             }
-        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryParseHexit(char c, out byte b)
-        {
-            b = 0;
+            // Local functions
 
-            if (c < '0' || c > 'f')
-                return false;
+            bool TryParseHexit(char c, out byte b)
+            {
+                b = 0;
 
-            var bex = Hexits[c - '0'];
-            if (bex == __) // Sentinel value for n/a (128)
-                return false;
+                if (c < '0' || c > 'f')
+                    return false;
 
-            b = bex;
-            return true;
+                var bex = Hexits[c - '0'];
+                if (bex == __) // Sentinel value for n/a (128)
+                    return false;
+
+                b = bex;
+                return true;
+            }
         }
 
         /// <summary>

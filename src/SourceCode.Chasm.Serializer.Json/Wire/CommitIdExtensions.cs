@@ -23,7 +23,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Read
 
-        private static CommitId ReadCommitIdImpl(this JsonReader jr)
+        private static CommitId ReadCommitIdImpl(JsonReader jr)
         {
             Sha1 sha1 = default;
 
@@ -44,15 +44,12 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static CommitId ReadCommitId(this string json)
         {
-            if (string.IsNullOrEmpty(json)) return default;
-            if (json == JsonExtensions.JsonNull) return default;
-
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = jr.ReadCommitIdImpl();
+                var model = ReadCommitIdImpl(jr);
                 return model;
             }
         }
@@ -63,7 +60,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static string Write(this CommitId model)
         {
-            if (model == default) return JsonExtensions.JsonNull;
+            if (model == default) return JsonConstants.Null;
 
             // Perf: No need to use JsonWriter for a simple scalar
             var json = "{ \"" + _id + "\": \"" + model.Sha1.ToString("N") + "\" }";

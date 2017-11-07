@@ -8,7 +8,6 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -192,7 +191,6 @@ namespace SourceCode.Chasm.IO.Disk
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string DeriveCommitRefFileName(string name, string branch)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
@@ -202,7 +200,6 @@ namespace SourceCode.Chasm.IO.Disk
             return refName;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string DeriveFileName(Sha1 sha1)
         {
             var tokens = sha1.Split(2);

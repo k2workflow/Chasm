@@ -142,7 +142,7 @@ namespace SoruceCode.Chasm.IntegrationTests
         )]
         public static async Task AzureBlobChasmRepo_Test()
         {
-            // Use your own ctring here.
+            // Use your own cstring here.
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
             var repo = new AzureBlobChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
             await TestRepository(repo);

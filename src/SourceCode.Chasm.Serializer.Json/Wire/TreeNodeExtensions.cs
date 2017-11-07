@@ -40,7 +40,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
                         break;
 
                     case _kind:
-                        kind = jr.ReadEnum<NodeKind>(true);
+                        kind = jr.ReadEnum<NodeKind>(true) ?? default;
                         break;
 
                     case _nodeId:

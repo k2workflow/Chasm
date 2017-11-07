@@ -6,15 +6,15 @@
 #endregion
 
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Clay;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.WindowsAzure.Storage.Table;
-using System.Linq;
 
 namespace SourceCode.Chasm.IO.AzureTable
 {

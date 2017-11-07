@@ -11,7 +11,6 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -98,7 +97,6 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Helpers
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string DeriveBlobName(Sha1 sha1)
         {
             var tokens = sha1.Split(2);

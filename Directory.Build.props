@@ -13,7 +13,6 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <!-- RS0010	Avoid using cref tags with a prefix -->
-    <!-- S3242 Consider using more general type ... -->
     <!-- CA1707	Remove the underscores from member name ... -->
     <NoWarn>1701;1702;1705;S3242;RS0010;CA1707</NoWarn>
   </PropertyGroup>

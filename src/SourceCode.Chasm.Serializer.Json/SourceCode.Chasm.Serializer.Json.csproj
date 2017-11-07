@@ -11,16 +11,10 @@
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.4.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-25818-01">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="6.5.0.3766">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00278" />
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00283" />
   </ItemGroup>
 
   <ItemGroup>
