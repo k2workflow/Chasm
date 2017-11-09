@@ -61,6 +61,12 @@ namespace SourceCode.Chasm.IO.Json.Wire
         {
             if (model == TreeNode.Empty) return; // null
 
+            if (model == default)
+            {
+                jw.WriteNull();
+                return;
+            }
+
             jw.WriteStartObject();
             {
                 // Name

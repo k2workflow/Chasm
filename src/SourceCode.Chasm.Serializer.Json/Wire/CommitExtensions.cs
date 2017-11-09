@@ -98,16 +98,18 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Write
 
-        public static string Write(this Commit model)
+        public static void Write(this JsonTextWriter jw, Commit model)
         {
-            if (model == default) return JsonConstants.Null;
+            if (jw == null) throw new System.ArgumentNullException(nameof(jw));
 
-            var sb = new StringBuilder();
-            using (var sw = new StringWriter(sb))
-            using (var jw = new JsonTextWriter(sw))
+            if (model == default)
             {
-                jw.WriteStartObject();
+                jw.WriteNull();
+                return;
+            }
 
+            jw.WriteStartObject();
+            {
                 // Parents
                 if (model.Parents != null && model.Parents.Count > 0)
                 {
@@ -147,8 +149,19 @@ namespace SourceCode.Chasm.IO.Json.Wire
                     jw.WritePropertyName(_treeId);
                     jw.WriteValue(model.TreeId.Value.ToString());
                 }
+            }
+            jw.WriteEndObject();
+        }
 
-                jw.WriteEndObject();
+        public static string Write(this Commit model)
+        {
+            if (model == default) return JsonConstants.Null;
+
+            var sb = new StringBuilder();
+            using (var sw = new StringWriter(sb))
+            using (var jw = new JsonTextWriter(sw))
+            {
+                Write(jw, model);
             }
 
             return sb.ToString();
