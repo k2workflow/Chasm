@@ -68,6 +68,12 @@ namespace SourceCode.Chasm.IO.Json.Wire
         {
             if (model == Audit.Empty) return; // null
 
+            if (model == default)
+            {
+                jw.WriteNull();
+                return;
+            }
+
             jw.WriteStartObject();
             {
                 // Name

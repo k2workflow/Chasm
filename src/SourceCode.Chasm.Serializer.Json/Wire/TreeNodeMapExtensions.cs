@@ -40,6 +40,24 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Write
 
+        public static void Write(this JsonTextWriter jw, TreeNodeMap model)
+        {
+            if (jw == null) throw new System.ArgumentNullException(nameof(jw));
+
+            if (model == default)
+            {
+                jw.WriteNull();
+                return;
+            }
+
+            jw.WriteStartArray();
+            {
+                for (var i = 0; i < model.Count; i++)
+                    jw.Write(model[i]);
+            }
+            jw.WriteEndArray();
+        }
+
         public static string Write(this TreeNodeMap model)
         {
             if (model == default) return JsonConstants.Null;
@@ -48,12 +66,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             using (var sw = new StringWriter(sb))
             using (var jw = new JsonTextWriter(sw))
             {
-                jw.WriteStartArray();
-                {
-                    for (var i = 0; i < model.Count; i++)
-                        jw.Write(model[i]);
-                }
-                jw.WriteEndArray();
+                Write(jw, model);
             }
 
             return sb.ToString();
