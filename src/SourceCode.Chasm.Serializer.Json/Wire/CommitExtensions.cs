@@ -7,6 +7,7 @@
 
 using Newtonsoft.Json;
 using SourceCode.Clay.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -29,8 +30,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Read
 
-        private static Commit ReadCommitImpl(JsonReader jr)
+        public static Commit ReadCommit(this JsonReader jr)
         {
+            if (jr == null) throw new ArgumentNullException(nameof(jr));
+
             Audit author = default;
             Audit committer = default;
             TreeId? treeId = default;
@@ -84,12 +87,14 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static Commit ReadCommit(this string json)
         {
+            if (json == null || json == JsonConstants.Null) return default;
+
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = ReadCommitImpl(jr);
+                var model = ReadCommit(jr);
                 return model;
             }
         }
@@ -100,7 +105,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static void Write(this JsonTextWriter jw, Commit model)
         {
-            if (jw == null) throw new System.ArgumentNullException(nameof(jw));
+            if (jw == null) throw new ArgumentNullException(nameof(jw));
 
             if (model == default)
             {

@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using SourceCode.Clay.Json;
 using System;
 using System.Globalization;
+using System.IO;
+using System.Text;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -27,6 +29,8 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static Audit ReadAudit(this JsonReader jr)
         {
+            if (jr == null) throw new ArgumentNullException(nameof(jr));
+
             string name = default;
             DateTimeOffset time = default;
 
@@ -60,13 +64,27 @@ namespace SourceCode.Chasm.IO.Json.Wire
             }
         }
 
+        public static Audit ReadAudit(this string json)
+        {
+            if (json == null || json == JsonConstants.Null) return default;
+
+            using (var tr = new StringReader(json))
+            using (var jr = new JsonTextReader(tr))
+            {
+                jr.DateParseHandling = DateParseHandling.None;
+
+                var model = ReadAudit(jr);
+                return model;
+            }
+        }
+
         #endregion
 
         #region Write
 
         public static void Write(this JsonWriter jw, Audit model)
         {
-            if (model == Audit.Empty) return; // null
+            if (jw == null) throw new ArgumentNullException(nameof(jw));
 
             if (model == default)
             {
@@ -85,6 +103,20 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 jw.WriteValue(model.Timestamp.ToString("o", CultureInfo.InvariantCulture));
             }
             jw.WriteEndObject();
+        }
+
+        public static string Write(this Audit model)
+        {
+            if (model == default) return JsonConstants.Null;
+
+            var sb = new StringBuilder();
+            using (var sw = new StringWriter(sb))
+            using (var jw = new JsonTextWriter(sw))
+            {
+                Write(jw, model);
+            }
+
+            return sb.ToString();
         }
 
         #endregion

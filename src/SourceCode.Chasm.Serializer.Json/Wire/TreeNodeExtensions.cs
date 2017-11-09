@@ -7,6 +7,9 @@
 
 using Newtonsoft.Json;
 using SourceCode.Clay.Json;
+using System;
+using System.IO;
+using System.Text;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -24,8 +27,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Read
 
-        public static TreeNode ReadNode(this JsonReader jr)
+        public static TreeNode ReadTreeNode(this JsonReader jr)
         {
+            if (jr == null) throw new ArgumentNullException(nameof(jr));
+
             string name = default;
             NodeKind kind = default;
             Sha1 sha1 = default;
@@ -53,13 +58,27 @@ namespace SourceCode.Chasm.IO.Json.Wire
             () => name == null && kind == default && sha1 == default ? default : new TreeNode(name, kind, sha1));
         }
 
+        public static TreeNode ReadTreeNode(this string json)
+        {
+            if (json == null || json == JsonConstants.Null) return default;
+
+            using (var tr = new StringReader(json))
+            using (var jr = new JsonTextReader(tr))
+            {
+                jr.DateParseHandling = DateParseHandling.None;
+
+                var model = ReadTreeNode(jr);
+                return model;
+            }
+        }
+
         #endregion
 
         #region Write
 
         public static void Write(this JsonWriter jw, TreeNode model)
         {
-            if (model == TreeNode.Empty) return; // null
+            if (jw == null) throw new ArgumentNullException(nameof(jw));
 
             if (model == default)
             {
@@ -82,6 +101,20 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 jw.WriteValue(model.Sha1.ToString("N"));
             }
             jw.WriteEndObject();
+        }
+
+        public static string Write(this TreeNode model)
+        {
+            if (model == default) return JsonConstants.Null;
+
+            var sb = new StringBuilder();
+            using (var sw = new StringWriter(sb))
+            using (var jw = new JsonTextWriter(sw))
+            {
+                Write(jw, model);
+            }
+
+            return sb.ToString();
         }
 
         #endregion

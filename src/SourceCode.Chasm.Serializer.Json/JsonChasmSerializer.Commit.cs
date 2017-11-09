@@ -48,8 +48,6 @@ namespace SourceCode.Chasm.IO.Json
                 }
             }
 
-            if (string.IsNullOrEmpty(json) || json == JsonConstants.Null) return default;
-
             var model = json.ReadCommit();
             return model;
         }
