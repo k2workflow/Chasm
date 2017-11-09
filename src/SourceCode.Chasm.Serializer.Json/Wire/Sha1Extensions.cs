@@ -6,6 +6,9 @@
 #endregion
 
 using Newtonsoft.Json;
+using SourceCode.Clay.Json;
+using System;
+using System.IO;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
@@ -20,12 +23,28 @@ namespace SourceCode.Chasm.IO.Json.Wire
         /// <returns></returns>
         public static Sha1? ReadSha1(this JsonReader jr)
         {
+            if (jr == null) throw new ArgumentNullException(nameof(jr));
+
             var str = (string)jr.Value;
             if (string.IsNullOrEmpty(str))
                 return null; // Caller decides how to handle null
 
             var sha1 = Sha1.Parse(str);
             return sha1;
+        }
+
+        public static Sha1? ReadSha1(this string json)
+        {
+            if (json == null || json == JsonConstants.Null) return null;
+
+            using (var tr = new StringReader(json))
+            using (var jr = new JsonTextReader(tr))
+            {
+                jr.DateParseHandling = DateParseHandling.None;
+
+                var model = ReadSha1(jr);
+                return model;
+            }
         }
 
         #endregion

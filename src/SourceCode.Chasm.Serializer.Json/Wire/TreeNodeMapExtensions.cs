@@ -7,6 +7,7 @@
 
 using Newtonsoft.Json;
 using SourceCode.Clay.Json;
+using System;
 using System.IO;
 using System.Text;
 
@@ -16,22 +17,26 @@ namespace SourceCode.Chasm.IO.Json.Wire
     {
         #region Read
 
-        private static TreeNodeMap ReadTreeImpl(JsonReader jr)
+        public static TreeNodeMap ReadTreeNodeMap(this JsonReader jr)
         {
-            var list = jr.ReadArray(() => jr.ReadNode());
+            if (jr == null) throw new ArgumentNullException(nameof(jr));
+
+            var list = jr.ReadArray(() => jr.ReadTreeNode());
 
             var tree = new TreeNodeMap(list);
             return tree;
         }
 
-        public static TreeNodeMap ReadTree(this string json)
+        public static TreeNodeMap ReadTreeNodeMap(this string json)
         {
+            if (json == null || json == JsonConstants.Null) return default;
+
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = ReadTreeImpl(jr);
+                var model = ReadTreeNodeMap(jr);
                 return model;
             }
         }
@@ -42,7 +47,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static void Write(this JsonTextWriter jw, TreeNodeMap model)
         {
-            if (jw == null) throw new System.ArgumentNullException(nameof(jw));
+            if (jw == null) throw new ArgumentNullException(nameof(jw));
 
             if (model == default)
             {

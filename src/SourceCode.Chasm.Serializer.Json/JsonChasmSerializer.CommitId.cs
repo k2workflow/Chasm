@@ -7,7 +7,6 @@
 
 using SourceCode.Chasm.IO.Json.Wire;
 using SourceCode.Clay.Buffers;
-using SourceCode.Clay.Json;
 using System;
 using System.Text;
 
@@ -47,8 +46,6 @@ namespace SourceCode.Chasm.IO.Json
                     json = Encoding.UTF8.GetString(ptr, span.Length);
                 }
             }
-
-            if (string.IsNullOrEmpty(json) || json == JsonConstants.Null) return default;
 
             var model = json.ReadCommitId();
             return model;

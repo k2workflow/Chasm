@@ -7,6 +7,7 @@
 
 using Newtonsoft.Json;
 using SourceCode.Clay.Json;
+using System;
 using System.IO;
 
 namespace SourceCode.Chasm.IO.Json.Wire
@@ -23,8 +24,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Read
 
-        private static CommitId ReadCommitIdImpl(JsonReader jr)
+        public static CommitId ReadCommitId(this JsonReader jr)
         {
+            if (jr == null) throw new ArgumentNullException(nameof(jr));
+
             Sha1 sha1 = default;
 
             // Switch
@@ -44,12 +47,14 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static CommitId ReadCommitId(this string json)
         {
+            if (json == null || json == JsonConstants.Null) return default;
+
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = ReadCommitIdImpl(jr);
+                var model = ReadCommitId(jr);
                 return model;
             }
         }
@@ -60,8 +65,6 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static string Write(this CommitId model)
         {
-            if (model == default) return JsonConstants.Null;
-
             // Perf: No need to use JsonWriter for a simple scalar
             var json = "{ \"" + _id + "\": \"" + model.Sha1.ToString("N") + "\" }";
             return json;

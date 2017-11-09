@@ -7,7 +7,6 @@
 
 using SourceCode.Chasm.IO.Json.Wire;
 using SourceCode.Clay.Buffers;
-using SourceCode.Clay.Json;
 using System;
 using System.Text;
 
@@ -48,9 +47,7 @@ namespace SourceCode.Chasm.IO.Json
                 }
             }
 
-            if (string.IsNullOrEmpty(json) || json == JsonConstants.Null) return default;
-
-            var model = json.ReadTree();
+            var model = json.ReadTreeNodeMap();
             return model;
         }
 
