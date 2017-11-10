@@ -41,12 +41,14 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 {
                     case _name:
                         name = (string)jr.Value;
-                        break;
+                        return true;
 
                     case _time:
                         time = ReadTime();
-                        break;
+                        return true;
                 }
+
+                return false;
             },
 
             // Factory

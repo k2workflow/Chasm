@@ -42,16 +42,18 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 {
                     case _name:
                         name = (string)jr.Value;
-                        break;
+                        return true;
 
                     case _kind:
                         kind = jr.ReadEnum<NodeKind>(true) ?? default;
-                        break;
+                        return true;
 
                     case _nodeId:
                         sha1 = jr.ReadSha1() ?? default;
-                        break;
+                        return true;
                 }
+
+                return false;
             },
 
             // Factory

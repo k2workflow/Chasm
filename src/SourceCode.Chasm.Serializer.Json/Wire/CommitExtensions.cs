@@ -47,24 +47,26 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 {
                     case _parents:
                         parents = ReadParents();
-                        break;
+                        return true;
 
                     case _author:
                         author = jr.ReadAudit();
-                        break;
+                        return true;
 
                     case _committer:
                         committer = jr.ReadAudit();
-                        break;
+                        return true;
 
                     case _message:
                         message = (string)jr.Value;
-                        break;
+                        return true;
 
                     case _treeId:
                         treeId = ReadTreeId();
-                        break;
+                        return true;
                 }
+
+                return false;
             },
 
             // Factory
