@@ -36,6 +36,16 @@ namespace SourceCode.Chasm
             return map.Value.TryGetValue(key, out value);
         }
 
+        public static bool TryGetValue(this TreeNodeMap? map, string key, NodeKind kind, out TreeNode value)
+        {
+            if (!map.HasValue)
+            {
+                value = default;
+                return false;
+            }
+            return map.Value.TryGetValue(key, kind, out value);
+        }
+
         #endregion
     }
 }
