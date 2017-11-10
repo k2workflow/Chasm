@@ -37,8 +37,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 {
                     case _id:
                         sha1 = jr.ReadSha1() ?? default;
-                        break;
+                        return true;
                 }
+
+                return false;
             },
 
             // Factory
