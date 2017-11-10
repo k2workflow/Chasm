@@ -26,6 +26,12 @@ namespace SourceCode.Chasm
             return first.Value.Merge(second);
         }
 
+        public static TreeNodeMap? Merge(this TreeNodeMap? first, TreeNode second)
+        {
+            if (!first.HasValue) return new TreeNodeMap(second);
+            return first.Value.Merge(second);
+        }
+
         public static bool TryGetValue(this TreeNodeMap? map, string key, out TreeNode value)
         {
             if (!map.HasValue)
