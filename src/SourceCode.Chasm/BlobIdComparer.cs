@@ -51,13 +51,6 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : BlobIdComparer
         {
-            #region Constructors
-
-            internal DefaultComparer()
-            { }
-
-            #endregion
-
             #region Methods
 
             public override int Compare(BlobId x, BlobId y) => Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);

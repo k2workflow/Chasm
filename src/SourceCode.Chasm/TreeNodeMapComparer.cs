@@ -46,13 +46,6 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : TreeNodeMapComparer
         {
-            #region Constructors
-
-            internal DefaultComparer()
-            { }
-
-            #endregion
-
             #region Methods
 
             public override bool Equals(TreeNodeMap x, TreeNodeMap y)

@@ -53,13 +53,6 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : TreeNodeComparer
         {
-            #region Constructors
-
-            internal DefaultComparer()
-            { }
-
-            #endregion
-
             #region Methods
 
             public override int Compare(TreeNode x, TreeNode y)

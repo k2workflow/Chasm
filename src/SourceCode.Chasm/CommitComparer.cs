@@ -47,13 +47,6 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : CommitComparer
         {
-            #region Constructors
-
-            internal DefaultComparer()
-            { }
-
-            #endregion
-
             #region Methods
 
             public override bool Equals(Commit x, Commit y)

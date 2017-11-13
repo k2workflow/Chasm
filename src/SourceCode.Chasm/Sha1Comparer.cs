@@ -52,13 +52,6 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : Sha1Comparer
         {
-            #region Constructors
-
-            internal DefaultComparer()
-            { }
-
-            #endregion
-
             #region Methods
 
             public override int Compare(Sha1 x, Sha1 y)
