@@ -54,7 +54,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             var refsTable = _refsTable.Value;
             var query = DataEntity.BuildListQuery();
 
-            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var names = new HashSet<string>(StringComparer.Ordinal);
 
             TableContinuationToken token = null;
             do

@@ -62,15 +62,11 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(Commit obj)
             {
-                var hc = new HashCode();
+                var hc = HashCode.Combine(obj.TreeId ?? default, TreeIdComparer.Default);
+                hc = HashCode.Combine(hc, obj.Author, obj.Committer, obj.Parents == null ? 0 : obj.Parents.Count);
+                hc = HashCode.Combine(hc, obj.Message ?? string.Empty, StringComparer.Ordinal);
 
-                hc.Add(obj.TreeId ?? default, TreeIdComparer.Default);
-                hc.Add(obj.Author);
-                hc.Add(obj.Committer);
-                hc.Add(obj.Parents == null ? 0 : obj.Parents.Count);
-                hc.Add(obj.Message ?? string.Empty, StringComparer.Ordinal);
-
-                return hc.ToHashCode();
+                return hc;
             }
 
             #endregion

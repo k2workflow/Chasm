@@ -72,12 +72,10 @@ namespace SourceCode.Chasm
 
         public override int GetHashCode()
         {
-            var hc = new HashCode();
+            var hc = HashCode.Combine(Name ?? string.Empty, StringComparer.Ordinal);
+            hc = HashCode.Combine(hc, Timestamp);
 
-            hc.Add(Name ?? string.Empty, StringComparer.Ordinal);
-            hc.Add(Timestamp);
-
-            return hc.ToHashCode();
+            return hc;
         }
 
         #endregion
