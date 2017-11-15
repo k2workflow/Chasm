@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{" + nameof(Sha1) + ".ToString(\"D\"),nq,ac}")]
-    public struct TreeId : IEquatable<TreeId>, IComparable<TreeId>
+    public readonly struct TreeId : IEquatable<TreeId>, IComparable<TreeId>
     {
         #region Properties
 

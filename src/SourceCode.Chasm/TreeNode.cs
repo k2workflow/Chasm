@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{ToString(),nq,ac}")]
-    public struct TreeNode : IEquatable<TreeNode>, IComparable<TreeNode>
+    public readonly struct TreeNode : IEquatable<TreeNode>, IComparable<TreeNode>
     {
         #region Constants
 

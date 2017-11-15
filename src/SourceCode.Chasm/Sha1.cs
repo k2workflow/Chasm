@@ -24,7 +24,7 @@ namespace SourceCode.Chasm
     /// <seealso cref="System.IEquatable{T}" />
     /// <seealso cref="System.IComparable{T}" />
     [DebuggerDisplay("{ToString(\"D\"),nq,ac}")]
-    public struct Sha1 : IEquatable<Sha1>, IComparable<Sha1>
+    public readonly struct Sha1 : IEquatable<Sha1>, IComparable<Sha1>
     {
         #region Constants
 

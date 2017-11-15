@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{" + nameof(Sha1) + ".ToString(\"D\"),nq,ac}")]
-    public struct CommitId : IEquatable<CommitId>, IComparable<CommitId>
+    public readonly struct CommitId : IEquatable<CommitId>, IComparable<CommitId>
     {
         #region Properties
 

@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{" + nameof(Name) + ".ToString(),nq,ac} ({" + nameof(Timestamp) + ".ToString(\"o\"),nq,ac})")]
-    public struct Audit : IEquatable<Audit>
+    public readonly struct Audit : IEquatable<Audit>
     {
         #region Constants
 
