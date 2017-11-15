@@ -62,12 +62,10 @@ namespace SourceCode.Chasm
 
         public override int GetHashCode()
         {
-            var hc = new HashCode();
+            var hc = HashCode.Combine(CommitId);
+            hc = HashCode.Combine(hc, Branch ?? string.Empty, StringComparer.Ordinal);
 
-            hc.Add(CommitId, CommitIdComparer.Default);
-            hc.Add(Branch ?? string.Empty, StringComparer.Ordinal);
-
-            return hc.ToHashCode();
+            return hc;
         }
 
         #endregion

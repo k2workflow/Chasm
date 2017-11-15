@@ -23,6 +23,11 @@ namespace SourceCode.Chasm
         /// </summary>
         public static TreeNodeComparer Default { get; } = new DefaultComparer();
 
+        /// <summary>
+        /// Gets a <see cref="TreeNodeComparer"/> that only compares the <see cref="TreeNode.Name"/> field of a <see cref="TreeNode"/> value.
+        /// </summary>
+        public static TreeNodeComparer NameOnly { get; } = new NameOnlyComparer();
+
         #endregion
 
         #region Constructors
@@ -53,13 +58,6 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : TreeNodeComparer
         {
-            #region Constructors
-
-            internal DefaultComparer()
-            { }
-
-            #endregion
-
             #region Methods
 
             public override int Compare(TreeNode x, TreeNode y)
@@ -88,14 +86,24 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNode obj)
             {
-                var hc = new HashCode();
+                var hc = HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
+                hc = HashCode.Combine(hc, obj.Kind, obj.Sha1);
 
-                hc.Add(obj.Name ?? string.Empty, StringComparer.Ordinal);
-                hc.Add((int)obj.Kind);
-                hc.Add(obj.Sha1, Sha1Comparer.Default);
-
-                return hc.ToHashCode();
+                return hc;
             }
+
+            #endregion
+        }
+
+        private sealed class NameOnlyComparer : TreeNodeComparer
+        {
+            #region Methods
+
+            public override int Compare(TreeNode x, TreeNode y) => string.CompareOrdinal(x.Name, y.Name);
+
+            public override bool Equals(TreeNode x, TreeNode y) => StringComparer.Ordinal.Equals(x.Name, y.Name);
+
+            public override int GetHashCode(TreeNode obj) => HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
 
             #endregion
         }
