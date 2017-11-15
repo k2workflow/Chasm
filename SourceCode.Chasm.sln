@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27102.0
+VisualStudioVersion = 15.0.27110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm", "src\SourceCode.Chasm\SourceCode.Chasm.csproj", "{430F8C16-427D-4756-B788-80C1F41E2B9A}"
 EndProject
@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".files", ".files", "{557A45
 		codemaid.config = codemaid.config
 		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
+		nuget.config = nuget.config
 		README.md = README.md
 	EndProjectSection
 EndProject
