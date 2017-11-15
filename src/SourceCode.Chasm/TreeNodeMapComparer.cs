@@ -27,7 +27,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        protected TreeNodeMapComparer()
+        private TreeNodeMapComparer()
         { }
 
         #endregion

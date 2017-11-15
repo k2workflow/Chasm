@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{ToString(),nq,ac}")]
-    public struct Blob : IEquatable<Blob>
+    public readonly struct Blob : IEquatable<Blob>
     {
         #region Constants
 

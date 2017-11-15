@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{" + nameof(Author) + ".ToString(),nq,ac} ({" + nameof(TreeId) + "?." + nameof(Chasm.TreeId.Sha1) + ".ToString(\"D\"),nq,ac})")]
-    public struct Commit : IEquatable<Commit>
+    public readonly struct Commit : IEquatable<Commit>
     {
         #region Constants
 

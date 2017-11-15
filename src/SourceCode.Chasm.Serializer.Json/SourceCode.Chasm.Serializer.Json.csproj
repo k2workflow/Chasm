@@ -8,13 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers" Version="2.4.0">
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.0-beta3-62314-05">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00293" />
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00294" />
   </ItemGroup>
 
   <ItemGroup>

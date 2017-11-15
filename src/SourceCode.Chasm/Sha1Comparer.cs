@@ -26,7 +26,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        protected Sha1Comparer()
+        private Sha1Comparer()
         { }
 
         #endregion

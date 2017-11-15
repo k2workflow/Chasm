@@ -32,7 +32,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        protected TreeNodeComparer()
+        private TreeNodeComparer()
         { }
 
         #endregion

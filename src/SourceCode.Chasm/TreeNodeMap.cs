@@ -14,7 +14,7 @@ namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{ToString(),nq,ac}")]
 #pragma warning disable CA1710 // Identifiers should have correct suffix
-    public struct TreeNodeMap : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeMap>
+    public readonly struct TreeNodeMap : IReadOnlyDictionary<string, TreeNode>, IReadOnlyList<TreeNode>, IEquatable<TreeNodeMap>
 #pragma warning restore CA1710 // Identifiers should have correct suffix
     {
         #region Constants

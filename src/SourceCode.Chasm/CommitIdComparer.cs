@@ -25,7 +25,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        protected CommitIdComparer()
+        private CommitIdComparer()
         { }
 
         #endregion
