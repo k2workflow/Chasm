@@ -25,7 +25,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        protected BlobIdComparer()
+        private BlobIdComparer()
         { }
 
         #endregion
