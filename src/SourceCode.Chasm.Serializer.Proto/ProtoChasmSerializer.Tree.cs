@@ -40,7 +40,7 @@ namespace SourceCode.Chasm.IO.Proto
 
         public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
-            if (span.IsEmpty) return default;
+            if (span.Length == 0) return default;
 
             var wire = new TreeWire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf

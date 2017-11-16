@@ -16,13 +16,15 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
+        private static readonly CommitRef _empty;
+
         /// <summary>
         /// A singleton representing an empty <see cref="CommitRef"/> value.
         /// </summary>
         /// <value>
         /// The empty.
         /// </value>
-        public static CommitRef Empty { get; }
+        public static ref readonly CommitRef Empty => ref _empty;
 
         #endregion
 
@@ -36,7 +38,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        public CommitRef(string branch, CommitId commitId)
+        public CommitRef(in string branch, in CommitId commitId)
         {
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 

@@ -21,7 +21,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        public TreeId(Sha1 sha1)
+        public TreeId(in Sha1 sha1)
         {
             Sha1 = sha1;
         }

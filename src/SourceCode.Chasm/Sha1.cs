@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 
@@ -28,8 +27,10 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
+        private static readonly Sha1 _zero;
+
         // Use a thread-local instance of the underlying crypto algorithm.
-        private static readonly ThreadLocal<SHA1> _sha1 = new ThreadLocal<SHA1>(SHA1.Create);
+        private static readonly ThreadLocal<System.Security.Cryptography.SHA1> _sha1 = new ThreadLocal<System.Security.Cryptography.SHA1>(System.Security.Cryptography.SHA1.Create);
 
         /// <summary>
         /// The fixed byte length of a <see cref="Sha1"/> value.
@@ -47,7 +48,7 @@ namespace SourceCode.Chasm
         /// <value>
         /// The zeroes <see cref="Sha1"/>.
         /// </value>
-        public static Sha1 Zero { get; }
+        public static ref readonly Sha1 Zero => ref _zero;
 
         #endregion
 
@@ -105,48 +106,14 @@ namespace SourceCode.Chasm
         }
 
         /// <summary>
-        /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="Byte[]"/> starting at the specified position.
-        /// </summary>
-        /// <param name="buffer">The buffer.</param>
-        /// <param name="offset">The offset.</param>
-        /// <exception cref="ArgumentNullException">buffer</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// buffer - buffer
-        /// or
-        /// offset - buffer
-        /// </exception>
-        [SecuritySafeCritical]
-        public Sha1(byte[] buffer, int offset)
-        {
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
-
-            if (buffer.Length < ByteLen)
-                throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)} must have length at least {ByteLen}");
-
-            if (offset < 0 || offset + ByteLen > buffer.Length)
-                throw new ArgumentOutOfRangeException(nameof(offset), $"{nameof(buffer)} must have length at least {ByteLen}");
-
-            unsafe
-            {
-                fixed (byte* ptr = buffer)
-                {
-                    // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                    Blit0 = *(ulong*)(&ptr[offset + 0]);
-                    Blit1 = *(ulong*)(&ptr[offset + 8]);
-                    Blit2 = *(uint*)(&ptr[offset + 16]);
-                }
-            }
-        }
-
-        /// <summary>
         /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="ReadOnlyMemory{T}"/>.
         /// </summary>
         /// <param name="span">The buffer.</param>
         /// <exception cref="ArgumentOutOfRangeException">buffer - buffer</exception>
         [SecuritySafeCritical]
-        public Sha1(ReadOnlySpan<byte> span)
+        public Sha1(in ReadOnlySpan<byte> span)
         {
-            if (span.IsEmpty || span.Length < ByteLen)
+            if (span.Length < ByteLen)
                 throw new ArgumentOutOfRangeException(nameof(span), $"{nameof(span)} must have length at least {ByteLen}");
 
             unsafe
@@ -183,7 +150,7 @@ namespace SourceCode.Chasm
         /// </summary>
         /// <param name="value">The string to hash.</param>
         /// <returns></returns>
-        public static Sha1 Hash(string value)
+        public static Sha1 Hash(in string value)
         {
             if (value == null) return Zero;
             // Note that length=0 should not short-circuit
@@ -207,12 +174,12 @@ namespace SourceCode.Chasm
         /// </summary>
         /// <param name="bytes">The bytes to hash.</param>
         /// <returns></returns>
-        public static Sha1 Hash(byte[] bytes)
+        public static Sha1 Hash(in byte[] bytes)
         {
             if (bytes == null) return Zero;
             // Note that length=0 should not short-circuit
 
-            var hash = _sha1.Value.ComputeHash(bytes);
+            var hash = _sha1.Value.ComputeHash(bytes); // TODO: Convert method signature to Span once ComputeHash supports Span
 
             var sha1 = new Sha1(hash);
             return sha1;
@@ -225,7 +192,7 @@ namespace SourceCode.Chasm
         /// <param name="offset">The offset.</param>
         /// <param name="count">The count.</param>
         /// <returns></returns>
-        public static Sha1 Hash(byte[] bytes, int offset, int count)
+        public static Sha1 Hash(in byte[] bytes, int offset, int count)
         {
             if (bytes == null) return Zero;
             // Note that length=0 should not short-circuit
@@ -247,7 +214,7 @@ namespace SourceCode.Chasm
         /// </summary>
         /// <param name="bytes">The bytes to hash.</param>
         /// <returns></returns>
-        public static Sha1 Hash(ArraySegment<byte> bytes)
+        public static Sha1 Hash(in ArraySegment<byte> bytes)
         {
             if (bytes.Array == null) return Zero;
             // Note that length=0 should not short-circuit
@@ -287,22 +254,19 @@ namespace SourceCode.Chasm
         /// <exception cref="ArgumentNullException">buffer</exception>
         /// <exception cref="ArgumentOutOfRangeException">offset - buffer</exception>
         [SecuritySafeCritical]
-        public int CopyTo(byte[] buffer, int offset)
+        public int CopyTo(Span<byte> span)
         {
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
-
-            if (offset < 0 || checked(offset + ByteLen) > buffer.Length)
-                throw new ArgumentOutOfRangeException(nameof(offset), $"{nameof(buffer)} must have length at least {ByteLen}");
+            if (span.Length < ByteLen)
+                throw new ArgumentOutOfRangeException(nameof(span), $"{nameof(span)} must have length at least {ByteLen}");
 
             unsafe
             {
-                fixed (byte* ptr = buffer)
+                fixed (byte* ptr = &span.DangerousGetPinnableReference())
                 {
                     // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                    *(ulong*)(&ptr[offset + 0]) = Blit0;
-                    *(ulong*)(&ptr[offset + 8]) = Blit1;
-                    *(uint*)(&ptr[offset + 16]) = Blit2;
+                    *(ulong*)(&ptr[0]) = Blit0;
+                    *(ulong*)(&ptr[8]) = Blit1;
+                    *(uint*)(&ptr[16]) = Blit2;
                 }
             }
 
@@ -454,7 +418,7 @@ namespace SourceCode.Chasm
         #region Parse
 
         // Sentinel value for n/a (128)
-        private const byte __ = 0b1000_0000;
+        private const byte __ = 0b_1000_0000;
 
         // '0'=48, '9'=57
         // 'A'=65, 'F'=70
@@ -469,14 +433,32 @@ namespace SourceCode.Chasm
             11, 12, 13, 14, 15                      // [50-54]       = 98..102= 'b'..'f'
         };
 
+        /// <summary>
+        /// Tries to parse the specified hexadecimal.
+        /// </summary>
+        /// <param name="hex">The hexadecimal.</param>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
         [SecuritySafeCritical]
-        private static bool TryParseImpl(string hex, int startIndex, out Sha1 value)
+        public static bool TryParse(in ReadOnlySpan<char> hex, out Sha1 value)
         {
-            Debug.Assert(hex != null);
-            Debug.Assert(startIndex >= 0);
-            Debug.Assert(hex.Length >= CharLen + startIndex);
-
             value = Zero;
+
+            // Length must be at least 40
+            if (hex.Length < CharLen)
+                return false;
+
+            // Check if the hex specifier '0x' is present
+            var slice = hex;
+            if (slice[0] == '0' && (slice[1] == 'x' || slice[1] == 'X'))
+            {
+                // Length must be at least 42
+                if (slice.Length < 2 + CharLen)
+                    return false;
+
+                // Skip '0x'
+                slice = slice.Slice(2);
+            }
 
             unsafe
             {
@@ -484,25 +466,25 @@ namespace SourceCode.Chasm
 
                 // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
                 // "34aa973c-d4c4daa4-f61eeb2b-dbad2731-6534016f"
-                var pos = startIndex;
+                var pos = 0;
                 for (var i = 0; i < 5; i++)
                 {
                     for (var j = 0; j < 4; j++)
                     {
                         // Two hexits per byte: aaaa bbbb
-                        if (!TryParseHexit(hex[pos++], out var h1)
-                            || !TryParseHexit(hex[pos++], out var h2))
+                        if (!TryParseHexit(slice[pos++], out var h1)
+                            || !TryParseHexit(slice[pos++], out var h2))
                             return false;
 
                         bytes[i * 4 + j] = (byte)((h1 << 4) | h2);
                     }
 
-                    if (pos < CharLen && (hex[pos] == '-' || hex[pos] == ' '))
+                    if (pos < CharLen && (slice[pos] == '-' || slice[pos] == ' '))
                         pos++;
                 }
 
                 // If the string is not fully consumed, it had an invalid length
-                if (pos != hex.Length)
+                if (pos != slice.Length)
                     return false;
 
                 // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
@@ -533,20 +515,6 @@ namespace SourceCode.Chasm
         }
 
         /// <summary>
-        /// Parses the specified hexadecimal.
-        /// </summary>
-        /// <param name="hex">The hexadecimal.</param>
-        /// <returns></returns>
-        /// <exception cref="FormatException">Sha1</exception>
-        public static Sha1 Parse(string hex)
-        {
-            if (!TryParse(hex, out var sha1))
-                throw new FormatException($"String was not recognized as a valid {nameof(Sha1)}");
-
-            return sha1;
-        }
-
-        /// <summary>
         /// Tries to parse the specified hexadecimal.
         /// </summary>
         /// <param name="hex">The hexadecimal.</param>
@@ -555,29 +523,39 @@ namespace SourceCode.Chasm
         public static bool TryParse(string hex, out Sha1 value)
         {
             value = Zero;
-
-            // Length must be at least 40
-            if (hex == null || hex.Length < CharLen)
+            if (hex == null)
                 return false;
 
-            var startIndex = 0;
+            var span = hex.AsReadOnlySpan();
+            return TryParse(span, out value);
+        }
 
-            // Check if the hex specifier '0x' is present
-            if (hex[0] == '0' && (hex[1] == 'x' || hex[1] == 'X'))
-            {
-                // Length must be at least 42
-                if (hex.Length < 2 + CharLen)
-                    return false;
+        /// <summary>
+        /// Parses the specified hexadecimal.
+        /// </summary>
+        /// <param name="hex">The hexadecimal.</param>
+        /// <returns></returns>
+        /// <exception cref="FormatException">Sha1</exception>
+        public static Sha1 Parse(in ReadOnlySpan<char> hex)
+        {
+            if (!TryParse(hex, out var sha1))
+                throw new FormatException($"Input was not recognized as a valid {nameof(Sha1)}");
 
-                // Skip '0x'
-                startIndex = 2;
-            }
+            return sha1;
+        }
 
-            if (!TryParseImpl(hex, startIndex, out var sha1))
-                return false;
+        /// <summary>
+        /// Parses the specified hexadecimal.
+        /// </summary>
+        /// <param name="hex">The hexadecimal.</param>
+        /// <returns></returns>
+        /// <exception cref="FormatException">Sha1</exception>
+        public static Sha1 Parse(string hex)
+        {
+            if (hex == null) throw new ArgumentNullException(nameof(hex));
 
-            value = sha1;
-            return true;
+            var span = hex.AsReadOnlySpan();
+            return Parse(span);
         }
 
         #endregion

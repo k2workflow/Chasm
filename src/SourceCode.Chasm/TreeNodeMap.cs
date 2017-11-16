@@ -19,13 +19,15 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
+        private static readonly TreeNodeMap _empty;
+
         /// <summary>
         /// A singleton representing an empty <see cref="TreeNodeMap"/> value.
         /// </summary>
         /// <value>
         /// The empty.
         /// </value>
-        public static TreeNodeMap Empty { get; }
+        public static ref readonly TreeNodeMap Empty => ref _empty;
 
         #endregion
 
@@ -80,7 +82,7 @@ namespace SourceCode.Chasm
             _nodes = DistinctSort(nodes, false);
         }
 
-        public TreeNodeMap(IEnumerable<TreeNode> nodes)
+        public TreeNodeMap(in IEnumerable<TreeNode> nodes)
         {
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (nodes == null)
@@ -93,7 +95,7 @@ namespace SourceCode.Chasm
             _nodes = DistinctSort(nodes);
         }
 
-        public TreeNodeMap(ICollection<TreeNode> nodes)
+        public TreeNodeMap(in ICollection<TreeNode> nodes)
         {
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (nodes == null || nodes.Count == 0)
@@ -110,16 +112,16 @@ namespace SourceCode.Chasm
             _nodes = DistinctSort(array, true);
         }
 
-        private TreeNodeMap(ReadOnlyMemory<TreeNode> nodes)
+        private TreeNodeMap(in ReadOnlyMemory<TreeNode> nodes)
         {
             _nodes = nodes;
         }
 
         #endregion
 
-        #region Methods
+        #region Merge
 
-        private static ReadOnlyMemory<TreeNode> Merge(TreeNodeMap first, TreeNodeMap second)
+        private static ReadOnlyMemory<TreeNode> Merge(in TreeNodeMap first, in TreeNodeMap second)
         {
             var newArray = new TreeNode[first.Count + second.Count];
 
@@ -164,7 +166,7 @@ namespace SourceCode.Chasm
             return new ReadOnlyMemory<TreeNode>(newArray, 0, i);
         }
 
-        public TreeNodeMap Merge(TreeNode node)
+        public TreeNodeMap Merge(in TreeNode node)
         {
             if (_nodes.IsEmpty) return new TreeNodeMap(node);
 
@@ -192,7 +194,38 @@ namespace SourceCode.Chasm
             return new TreeNodeMap(array);
         }
 
-        public TreeNodeMap Delete(Func<string, bool> predicate)
+        public TreeNodeMap Merge(in TreeNodeMap nodes)
+        {
+            if (nodes == default || nodes.Count == 0)
+                return this;
+
+            if (_nodes.IsEmpty || _nodes.Length == 0)
+                return nodes;
+
+            var set = Merge(this, nodes);
+
+            var tree = new TreeNodeMap(set);
+            return tree;
+        }
+
+        public TreeNodeMap Merge(in ICollection<TreeNode> nodes)
+        {
+            if (nodes == null || nodes.Count == 0)
+                return this;
+
+            if (_nodes.IsEmpty)
+                return new TreeNodeMap(nodes);
+
+            var set = Merge(this, new TreeNodeMap(nodes));
+            var tree = new TreeNodeMap(set);
+            return tree;
+        }
+
+        #endregion
+
+        #region Delete
+
+        public TreeNodeMap Delete(in Func<string, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             if (_nodes.Length == 0) return this;
@@ -239,32 +272,9 @@ namespace SourceCode.Chasm
             return this;
         }
 
-        public TreeNodeMap Merge(TreeNodeMap nodes)
-        {
-            if (nodes == default || nodes.Count == 0)
-                return this;
+        #endregion
 
-            if (_nodes.IsEmpty || _nodes.Length == 0)
-                return nodes;
-
-            var set = Merge(this, nodes);
-
-            var tree = new TreeNodeMap(set);
-            return tree;
-        }
-
-        public TreeNodeMap Merge(ICollection<TreeNode> nodes)
-        {
-            if (nodes == null || nodes.Count == 0)
-                return this;
-
-            if (_nodes.IsEmpty)
-                return new TreeNodeMap(nodes);
-
-            var set = Merge(this, new TreeNodeMap(nodes));
-            var tree = new TreeNodeMap(set);
-            return tree;
-        }
+        #region IReadOnlyDictionary
 
         public int IndexOf(string key)
         {

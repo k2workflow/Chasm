@@ -13,20 +13,20 @@ namespace SourceCode.Chasm
     {
         #region Methods
 
-        public static TreeNodeMap? Merge(this TreeNodeMap? first, TreeNodeMap? second)
+        public static TreeNodeMap? Merge(this TreeNodeMap? first, in TreeNodeMap? second)
         {
             if (!first.HasValue) return second;
             if (!second.HasValue) return first;
             return first.Value.Merge(second.Value);
         }
 
-        public static TreeNodeMap? Merge(this TreeNodeMap? first, ICollection<TreeNode> second)
+        public static TreeNodeMap? Merge(this TreeNodeMap? first, in ICollection<TreeNode> second)
         {
             if (!first.HasValue) return new TreeNodeMap(second);
             return first.Value.Merge(second);
         }
 
-        public static TreeNodeMap? Merge(this TreeNodeMap? first, TreeNode second)
+        public static TreeNodeMap? Merge(this TreeNodeMap? first, in TreeNode second)
         {
             if (!first.HasValue) return new TreeNodeMap(second);
             return first.Value.Merge(second);
