@@ -300,7 +300,7 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                var bytes = stackalloc byte[ByteLen]; // TODO: https://github.com/dotnet/corefx/pull/24212
+                var bytes = stackalloc byte[ByteLen];
                 {
                     // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
                     *(ulong*)(&bytes[0]) = Blit0;
@@ -462,7 +462,7 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                var bytes = stackalloc byte[ByteLen]; // TODO: https://github.com/dotnet/corefx/pull/24212
+                var bytes = stackalloc byte[ByteLen];
 
                 // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
                 // "34aa973c-d4c4daa4-f61eeb2b-dbad2731-6534016f"
@@ -483,6 +483,7 @@ namespace SourceCode.Chasm
                         pos++;
                 }
 
+                // TODO: Is this correct: do we not already permit longer strings to be passed in?
                 // If the string is not fully consumed, it had an invalid length
                 if (pos != slice.Length)
                     return false;

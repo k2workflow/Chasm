@@ -452,11 +452,9 @@ namespace SourceCode.Chasm
                 if (_nodes.IsEmpty)
                     yield break;
 
-                // TODO: Is Span safe under yield?
-                var span = _nodes.Span;
-
+                // Span unsafe under yield, so cannot cache it before iterator
                 for (var i = 0; i < _nodes.Length; i++)
-                    yield return span[i].Name;
+                    yield return _nodes.Span[i].Name;
             }
         }
 
@@ -467,11 +465,9 @@ namespace SourceCode.Chasm
                 if (_nodes.IsEmpty)
                     yield break;
 
-                // TODO: Is Span safe under yield?
-                var span = _nodes.Span;
-
+                // Span unsafe under yield, so cannot cache it before iterator
                 for (var i = 0; i < _nodes.Length; i++)
-                    yield return span[i];
+                    yield return _nodes.Span[i];
             }
         }
 
@@ -484,11 +480,12 @@ namespace SourceCode.Chasm
             if (_nodes.IsEmpty)
                 yield break;
 
-            // TODO: Is Span safe under yield?
-            var span = _nodes.Span;
-
             for (var i = 0; i < _nodes.Length; i++)
-                yield return new KeyValuePair<string, TreeNode>(span[i].Name, span[i]);
+            {
+                // Span unsafe under yield, so cannot cache it before iterator
+                var span = _nodes.Span[i];
+                yield return new KeyValuePair<string, TreeNode>(span.Name, span);
+            }
         }
 
         #endregion
