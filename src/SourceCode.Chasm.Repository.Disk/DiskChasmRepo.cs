@@ -196,7 +196,7 @@ namespace SourceCode.Chasm.IO.Disk
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (branch == null) return name;
 
-            var refName = Path.Combine(name, $"{branch}.commit");
+            var refName = Path.Combine(name, $"{branch}{CommitExtension}");
             return refName;
         }
 

@@ -21,22 +21,9 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        public BlobId(Sha1 sha1)
+        public BlobId(in Sha1 sha1)
         {
             Sha1 = sha1;
-        }
-
-        public static BlobId Parse(string hex) => new BlobId(Sha1.Parse(hex));
-
-        public static bool TryParse(string hex, out BlobId value)
-        {
-            if (Sha1.TryParse(hex, out var sha))
-            {
-                value = new BlobId(sha);
-                return true;
-            }
-            value = default;
-            return false;
         }
 
         #endregion

@@ -188,7 +188,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             name = Uri.EscapeDataString(name);
             branch = Uri.EscapeDataString(branch);
 
-            var refName = $"{name}/{branch}.commit";
+            var refName = $"{name}/{branch}{CommitExtension}";
             return refName;
         }
 

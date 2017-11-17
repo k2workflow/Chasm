@@ -16,8 +16,19 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
-        public static Commit Empty { get; }
+        private static readonly Commit _empty;
 
+        /// <summary>
+        /// A singleton representing an empty <see cref="Commit"/> value.
+        /// </summary>
+        /// <value>
+        /// The empty.
+        /// </value>
+        public static ref readonly Commit Empty => ref _empty;
+
+        /// <summary>
+        /// A singleton representing an empty array of <see cref="CommitId"/>.
+        /// </summary>
         public static CommitId[] Orphaned { get; } = Array.Empty<CommitId>();
 
         #endregion
@@ -45,7 +56,7 @@ namespace SourceCode.Chasm
 
         #region De/Constructors
 
-        public Commit(IReadOnlyList<CommitId> parents, TreeId? treeId, Audit author, Audit committer, string message)
+        public Commit(in IReadOnlyList<CommitId> parents, in TreeId? treeId, in Audit author, in Audit committer, in string message)
         {
             TreeId = treeId;
             Author = author;
@@ -117,7 +128,7 @@ namespace SourceCode.Chasm
             }
         }
 
-        public Commit(CommitId? parent, TreeId? treeId, Audit author, Audit committer, string message)
+        public Commit(in CommitId? parent, in TreeId? treeId, in Audit author, in Audit committer, in string message)
             : this(parent.HasValue ? new[] { parent.Value } : Array.Empty<CommitId>(), treeId, author, committer, message)
         { }
 

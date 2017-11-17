@@ -30,7 +30,7 @@ namespace SourceCode.Chasm.Tests
         {
             var expected = Sha1.Zero;
 
-            Assert.Throws<ArgumentNullException>(() => new Sha1((byte[])null, 0));
+            Assert.Throws<ArgumentNullException>(() => new Sha1((byte[])null));
 
             Assert.True(default == expected);
             Assert.False(default != expected);
@@ -104,29 +104,26 @@ namespace SourceCode.Chasm.Tests
             var expected = Sha1.Hash("abc");
             var buffer = new byte[Sha1.ByteLen + 10];
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(new byte[Sha1.ByteLen - 1], 0)); // Too short
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(new byte[Sha1.ByteLen], 1)); // Bad offset
-
-            Assert.Throws<ArgumentOutOfRangeException>(() => Sha1.Hash(new byte[Sha1.ByteLen], 0, -1)); // Bad count
-            Assert.Throws<ArgumentOutOfRangeException>(() => Sha1.Hash(new byte[Sha1.ByteLen], 1, Sha1.ByteLen)); // Bad offset
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(new byte[Sha1.ByteLen - 1])); // Too short
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(new byte[Sha1.ByteLen].AsSpan().Slice(1))); // Bad offset
 
             // Construct Byte[]
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             var actual = new Sha1(buffer);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Byte[] with offset 0
-            expected.CopyTo(buffer, 0);
-            actual = new Sha1(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
+            actual = new Sha1(buffer);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Byte[] with offset N
-            expected.CopyTo(buffer, 5);
-            actual = new Sha1(buffer, 5);
+            expected.CopyTo(buffer.AsSpan().Slice(5));
+            actual = new Sha1(buffer.AsSpan().Slice(5));
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
@@ -140,14 +137,14 @@ namespace SourceCode.Chasm.Tests
             var buffer = new byte[Sha1.ByteLen + 10];
 
             // Construct Byte[] with offset N
-            expected.CopyTo(buffer, 5);
-            var actual = new Sha1(buffer, 5);
+            expected.CopyTo(buffer.AsSpan().Slice(5));
+            var actual = new Sha1(buffer.AsSpan().Slice(5));
             Assert.Equal(expected, actual);
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Segment
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             var seg = new ArraySegment<byte>(buffer);
             actual = new Sha1(seg);
             Assert.Equal(expected, actual);
@@ -155,7 +152,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Segment with offset 0
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             seg = new ArraySegment<byte>(buffer, 0, Sha1.ByteLen);
             actual = new Sha1(seg);
             Assert.Equal(expected, actual);
@@ -163,7 +160,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Segment with offset N
-            expected.CopyTo(buffer, 5);
+            expected.CopyTo(buffer.AsSpan().Slice(5));
             seg = new ArraySegment<byte>(buffer, 5, Sha1.ByteLen);
             actual = new Sha1(seg);
             Assert.Equal(expected, actual);
@@ -182,7 +179,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1(new Memory<byte>(new byte[Sha1.ByteLen - 1]).Span)); // Too short
 
             // Construct Memory
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             var mem = new Memory<byte>(buffer);
             var actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
@@ -190,7 +187,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Memory with offset 0
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             mem = new Memory<byte>(buffer, 0, Sha1.ByteLen);
             actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
@@ -198,7 +195,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Memory with offset N
-            expected.CopyTo(buffer, 5);
+            expected.CopyTo(buffer.AsSpan().Slice(5));
             mem = new Memory<byte>(buffer, 5, Sha1.ByteLen);
             actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
@@ -214,7 +211,7 @@ namespace SourceCode.Chasm.Tests
             var buffer = new byte[Sha1.ByteLen + 10];
 
             // Construct ReadOnlyMemory
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             var mem = new ReadOnlyMemory<byte>(buffer);
             var actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
@@ -222,7 +219,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct ReadOnlyMemory with offset 0
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             mem = new ReadOnlyMemory<byte>(buffer, 0, Sha1.ByteLen);
             actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
@@ -230,7 +227,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct ReadOnlyMemory with offset N
-            expected.CopyTo(buffer, 5);
+            expected.CopyTo(buffer.AsSpan().Slice(5));
             mem = new ReadOnlyMemory<byte>(buffer, 5, Sha1.ByteLen);
             actual = new Sha1(mem.Span);
             Assert.Equal(expected, actual);
@@ -277,7 +274,7 @@ namespace SourceCode.Chasm.Tests
             var buffer = new byte[Sha1.ByteLen + 10];
 
             // Construct Span
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             var span = new Span<byte>(buffer);
             var actual = new Sha1(span);
             Assert.Equal(expected, actual);
@@ -285,7 +282,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Span with offset 0
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             span = new Span<byte>(buffer, 0, Sha1.ByteLen);
             actual = new Sha1(span);
             Assert.Equal(expected, actual);
@@ -293,7 +290,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct Span with offset N
-            expected.CopyTo(buffer, 5);
+            expected.CopyTo(buffer.AsSpan().Slice(5));
             span = new Span<byte>(buffer, 5, Sha1.ByteLen);
             actual = new Sha1(span);
             Assert.Equal(expected, actual);
@@ -310,55 +307,7 @@ namespace SourceCode.Chasm.Tests
             var sha1 = new Sha1();
 
             // Action
-            var actual = Assert.Throws<ArgumentNullException>(() => sha1.CopyTo(buffer, 0));
-
-            // Assert
-            Assert.Contains(nameof(buffer), actual.Message);
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_copyto_with_null_buffer))]
-        public static void When_copyto_with_negative_offset()
-        {
-            // Arrange
-            var buffer = new byte[0];
-            var offset = int.MinValue;
-            var sha1 = new Sha1();
-
-            // Action
-            var actual = Assert.Throws<ArgumentOutOfRangeException>(() => sha1.CopyTo(buffer, offset));
-
-            // Assert
-            Assert.Contains(nameof(offset), actual.Message);
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_copyto_with_overflow_offset))]
-        public static void When_copyto_with_overflow_offset()
-        {
-            // Arrange
-            var buffer = new byte[0];
-            var offset = int.MaxValue;
-            var sha1 = new Sha1();
-
-            // Action & Assert
-            Assert.Throws<OverflowException>(() => sha1.CopyTo(buffer, offset));
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(When_copyto_with_outofrange_offset))]
-        public static void When_copyto_with_outofrange_offset()
-        {
-            // Arrange
-            var buffer = new byte[0];
-            var offset = Sha1.ByteLen;
-            var sha1 = new Sha1();
-
-            // Action
-            var actual = Assert.Throws<ArgumentOutOfRangeException>(() => sha1.CopyTo(buffer, offset));
-
-            // Assert
-            Assert.Contains(nameof(offset), actual.Message);
+            var actual = Assert.Throws<ArgumentNullException>(() => sha1.CopyTo(buffer.AsSpan()));
         }
 
         [Trait("Type", "Unit")]
@@ -369,7 +318,7 @@ namespace SourceCode.Chasm.Tests
             var buffer = new byte[Sha1.ByteLen + 10];
 
             // Construct ReadOnlySpan
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             var span = new ReadOnlySpan<byte>(buffer);
             var actual = new Sha1(span);
             Assert.Equal(expected, actual);
@@ -377,7 +326,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct ReadOnlySpan with offset 0
-            expected.CopyTo(buffer, 0);
+            expected.CopyTo(buffer.AsSpan());
             span = new ReadOnlySpan<byte>(buffer, 0, Sha1.ByteLen);
             actual = new Sha1(span);
             Assert.Equal(expected, actual);
@@ -385,7 +334,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expected.Memory, actual.Memory, BufferComparer.Memory);
 
             // Construct ReadOnlySpan with offset N
-            expected.CopyTo(buffer, 5);
+            expected.CopyTo(buffer.AsSpan().Slice(5));
             span = new ReadOnlySpan<byte>(buffer, 5, Sha1.ByteLen);
             actual = new Sha1(span);
             Assert.Equal(expected, actual);
@@ -446,7 +395,7 @@ namespace SourceCode.Chasm.Tests
 
                 // Get Byte[]
                 var buffer = new byte[Sha1.ByteLen];
-                sha1.CopyTo(buffer, 0);
+                sha1.CopyTo(buffer.AsSpan());
 
                 // Roundtrip Byte[]
                 actual = new Sha1(buffer).ToString();
@@ -515,7 +464,7 @@ namespace SourceCode.Chasm.Tests
 
                 // Get Byte[]
                 var buffer = new byte[Sha1.ByteLen];
-                sha1.CopyTo(buffer, 0);
+                sha1.CopyTo(buffer.AsSpan());
 
                 // Roundtrip Byte[]
                 actual = new Sha1(buffer).ToString();
@@ -700,7 +649,7 @@ namespace SourceCode.Chasm.Tests
 
             // null
             {
-                Assert.Throws<FormatException>(() => Sha1.Parse(null));
+                Assert.Throws<ArgumentNullException>(() => Sha1.Parse((string)null));
             }
 
             // Empty

@@ -16,7 +16,15 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
-        public static Blob Empty { get; }
+        private static readonly Blob _empty;
+
+        /// <summary>
+        /// A singleton representing an empty <see cref="Blob"/> value.
+        /// </summary>
+        /// <value>
+        /// The empty.
+        /// </value>
+        public static ref readonly Blob Empty => ref _empty;
 
         #endregion
 

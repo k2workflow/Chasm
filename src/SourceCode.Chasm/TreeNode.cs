@@ -15,13 +15,15 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
+        private static readonly TreeNode _empty;
+
         /// <summary>
         /// A singleton representing an empty <see cref="TreeNode"/> value.
         /// </summary>
         /// <value>
         /// The empty.
         /// </value>
-        public static TreeNode Empty { get; }
+        public static ref readonly TreeNode Empty => ref _empty;
 
         #endregion
 
@@ -57,7 +59,7 @@ namespace SourceCode.Chasm
 
         #region De/Constructors
 
-        private TreeNode(string name, Sha1 sha1, NodeKind kind)
+        private TreeNode(string name, in Sha1 sha1, NodeKind kind)
         {
             // Used for .Empty (no validation)
 
@@ -66,18 +68,18 @@ namespace SourceCode.Chasm
             Sha1 = sha1;
         }
 
-        public TreeNode(string name, NodeKind kind, Sha1 sha1)
+        public TreeNode(string name, NodeKind kind, in Sha1 sha1)
             : this(name, sha1, kind)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (!Enum.IsDefined(typeof(NodeKind), kind)) throw new ArgumentOutOfRangeException(nameof(kind));
         }
 
-        public TreeNode(string name, BlobId blobId)
+        public TreeNode(string name, in BlobId blobId)
             : this(name, NodeKind.Blob, blobId.Sha1)
         { }
 
-        public TreeNode(string name, TreeId treeId)
+        public TreeNode(string name, in TreeId treeId)
             : this(name, NodeKind.Tree, treeId.Sha1)
         { }
 
