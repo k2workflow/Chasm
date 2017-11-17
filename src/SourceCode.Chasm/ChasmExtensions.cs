@@ -29,7 +29,7 @@ namespace SourceCode.Chasm
         public static TreeNodeMap? Merge(this TreeNodeMap? first, in TreeNode second)
         {
             if (!first.HasValue) return new TreeNodeMap(second);
-            return first.Value.Merge(second);
+            return first.Value.Add(second);
         }
 
         public static bool TryGetValue(this TreeNodeMap? map, string key, out TreeNode value)

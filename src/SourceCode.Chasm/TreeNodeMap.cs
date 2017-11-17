@@ -45,7 +45,7 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (_nodes.IsEmpty)
+                if (_nodes.Length == 0)
                     return Array.Empty<TreeNode>()[index]; // Throw underlying exception
 
                 var span = _nodes.Span;
@@ -121,7 +121,59 @@ namespace SourceCode.Chasm
 
         #region Merge
 
-        private static ReadOnlyMemory<TreeNode> Merge(in TreeNodeMap first, in TreeNodeMap second)
+        public TreeNodeMap Add(in TreeNode node)
+        {
+            if (_nodes.Length == 0) return new TreeNodeMap(node);
+
+            var index = IndexOf(node.Name);
+
+            var span = _nodes.Span;
+
+            TreeNode[] array;
+            if (index >= 0)
+            {
+                array = new TreeNode[_nodes.Length];
+                span.CopyTo(array);
+                array[index] = node;
+            }
+            else
+            {
+                index = ~index;
+                array = new TreeNode[_nodes.Length + 1];
+
+                var j = 0;
+                for (var i = 0; i < array.Length; i++)
+                    array[i] = i == index ? node : span[j++];
+            }
+
+            return new TreeNodeMap(array);
+        }
+
+        public TreeNodeMap Merge(in TreeNodeMap nodes)
+        {
+            if (nodes.Count == 0)
+                return this;
+
+            if (_nodes.Length == 0)
+                return nodes;
+
+            var tree = MergeImpl(this, nodes);
+            return tree;
+        }
+
+        public TreeNodeMap Merge(in ICollection<TreeNode> nodes)
+        {
+            if (nodes == null || nodes.Count == 0)
+                return this;
+
+            if (_nodes.Length == 0)
+                return new TreeNodeMap(nodes);
+
+            var tree = MergeImpl(this, new TreeNodeMap(nodes));
+            return tree;
+        }
+
+        private static TreeNodeMap MergeImpl(in TreeNodeMap first, in TreeNodeMap second)
         {
             var newArray = new TreeNode[first.Count + second.Count];
 
@@ -163,61 +215,9 @@ namespace SourceCode.Chasm
                 }
             }
 
-            return new ReadOnlyMemory<TreeNode>(newArray, 0, i);
-        }
+            var mem = new ReadOnlyMemory<TreeNode>(newArray, 0, i);
 
-        public TreeNodeMap Merge(in TreeNode node)
-        {
-            if (_nodes.IsEmpty) return new TreeNodeMap(node);
-
-            var index = IndexOf(node.Name);
-
-            var span = _nodes.Span;
-
-            TreeNode[] array;
-            if (index >= 0)
-            {
-                array = new TreeNode[_nodes.Length];
-                span.CopyTo(array);
-                array[index] = node;
-            }
-            else
-            {
-                index = ~index;
-                array = new TreeNode[_nodes.Length + 1];
-
-                var j = 0;
-                for (var i = 0; i < array.Length; i++)
-                    array[i] = i == index ? node : span[j++];
-            }
-
-            return new TreeNodeMap(array);
-        }
-
-        public TreeNodeMap Merge(in TreeNodeMap nodes)
-        {
-            if (nodes == default || nodes.Count == 0)
-                return this;
-
-            if (_nodes.IsEmpty || _nodes.Length == 0)
-                return nodes;
-
-            var set = Merge(this, nodes);
-
-            var tree = new TreeNodeMap(set);
-            return tree;
-        }
-
-        public TreeNodeMap Merge(in ICollection<TreeNode> nodes)
-        {
-            if (nodes == null || nodes.Count == 0)
-                return this;
-
-            if (_nodes.IsEmpty)
-                return new TreeNodeMap(nodes);
-
-            var set = Merge(this, new TreeNodeMap(nodes));
-            var tree = new TreeNodeMap(set);
+            var tree = new TreeNodeMap(mem);
             return tree;
         }
 
@@ -278,7 +278,7 @@ namespace SourceCode.Chasm
 
         public int IndexOf(string key)
         {
-            if (_nodes.IsEmpty || key == null) return -1;
+            if (_nodes.Length == 0 || key == null) return -1;
 
             var l = 0;
             var r = _nodes.Length - 1;
@@ -306,7 +306,7 @@ namespace SourceCode.Chasm
         {
             value = default;
 
-            if (_nodes.IsEmpty || key == null)
+            if (_nodes.Length == 0 || key == null)
                 return false;
 
             var l = 0;
@@ -449,7 +449,7 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (_nodes.IsEmpty)
+                if (_nodes.Length == 0)
                     yield break;
 
                 // Span unsafe under yield, so cannot cache it before iterator
@@ -462,7 +462,7 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (_nodes.IsEmpty)
+                if (_nodes.Length == 0)
                     yield break;
 
                 // Span unsafe under yield, so cannot cache it before iterator
@@ -477,7 +477,7 @@ namespace SourceCode.Chasm
 
         IEnumerator<KeyValuePair<string, TreeNode>> IEnumerable<KeyValuePair<string, TreeNode>>.GetEnumerator()
         {
-            if (_nodes.IsEmpty)
+            if (_nodes.Length == 0)
                 yield break;
 
             for (var i = 0; i < _nodes.Length; i++)
@@ -507,6 +507,8 @@ namespace SourceCode.Chasm
         public static bool operator ==(TreeNodeMap x, TreeNodeMap y) => TreeNodeMapComparer.Default.Equals(x, y);
 
         public static bool operator !=(TreeNodeMap x, TreeNodeMap y) => !(x == y);
+
+        public static TreeNodeMap operator +(TreeNodeMap x, TreeNode y) => x.Add(y);
 
         public override string ToString() => $"{nameof(Count)}: {_nodes.Length}";
 
