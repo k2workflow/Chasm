@@ -43,7 +43,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static Sha1Wire Convert(this CommitId? model) => Convert(model?.Sha1);
 
-        public static Sha1Wire Convert(this TreeId? model) => Convert(model?.Sha1);
+        public static Sha1Wire Convert(this TreeMapId? model) => Convert(model?.Sha1);
 
         public static Sha1? Convert(this Sha1Wire wire)
         {
@@ -72,13 +72,13 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return new CommitId(model);
         }
 
-        public static TreeId? ConvertTree(this Sha1Wire wire)
+        public static TreeMapId? ConvertTree(this Sha1Wire wire)
         {
             if (wire == null) return default;
             if (!wire.Set) return default;
 
             var model = new Sha1(wire.Blit0, wire.Blit1, wire.Blit2);
-            return new TreeId(model);
+            return new TreeMapId(model);
         }
 
         #endregion

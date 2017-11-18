@@ -51,7 +51,7 @@ namespace SourceCode.Chasm
 
             public override bool Equals(Commit x, Commit y)
             {
-                if (!x.TreeId.Equals(y.TreeId)) return false;
+                if (!x.TreeMapId.Equals(y.TreeMapId)) return false;
                 if (x.Author != y.Author) return false;
                 if (x.Committer != y.Committer) return false;
                 if (!StringComparer.Ordinal.Equals(x.Message, y.Message)) return false;
@@ -62,7 +62,7 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(Commit obj)
             {
-                var hc = HashCode.Combine(obj.TreeId ?? default, TreeIdComparer.Default);
+                var hc = HashCode.Combine(obj.TreeMapId ?? default, TreeMapIdComparer.Default);
                 hc = HashCode.Combine(hc, obj.Author, obj.Committer, obj.Parents == null ? 0 : obj.Parents.Count);
                 hc = HashCode.Combine(hc, obj.Message ?? string.Empty, StringComparer.Ordinal);
 

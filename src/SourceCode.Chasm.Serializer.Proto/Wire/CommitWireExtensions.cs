@@ -18,8 +18,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         {
             var wire = new CommitWire
             {
-                // TreeId
-                TreeId = model.TreeId.Convert()
+                // TreeMapId
+                TreeMapId = model.TreeMapId.Convert()
             };
 
             // Parents
@@ -62,8 +62,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         {
             if (wire == null) return default;
 
-            // TreeId
-            var treeId = wire.TreeId.ConvertTree();
+            // TreeMapId
+            var treeMapId = wire.TreeMapId.ConvertTree();
 
             // Parents
             var parents = Array.Empty<CommitId>();
@@ -96,7 +96,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             // Message
             var message = wire.Message?.Value;
 
-            var model = new Commit(parents, treeId, author, committer, message);
+            var model = new Commit(parents, treeMapId, author, committer, message);
             return model;
         }
 

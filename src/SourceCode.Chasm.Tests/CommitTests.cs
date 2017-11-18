@@ -39,10 +39,10 @@ namespace SourceCode.Chasm.Tests
             Assert.Empty(noData.Parents); // Default ctor (explicit)
             Assert.Empty(nullData.Parents); // Custom ctor (with null)
 
-            // TreeId
-            Assert.Equal(default, Commit.Empty.TreeId);
-            Assert.Equal(default, noData.TreeId);
-            Assert.Equal(default, nullData.TreeId);
+            // TreeMapId
+            Assert.Equal(default, Commit.Empty.TreeMapId);
+            Assert.Equal(default, noData.TreeMapId);
+            Assert.Equal(default, nullData.TreeMapId);
 
             // DateTime
             Assert.Equal(default, Commit.Empty.Author.Timestamp);
@@ -59,63 +59,63 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(Commit_Equality))]
         public static void Commit_Equality()
         {
-            var expected = new Commit(new[] { new CommitId(Sha1.Hash("c1")), new CommitId(Sha1.Hash("c2")) }, new TreeId(Sha1.Hash("abc")), new Audit("bob", DateTimeOffset.Now), new Audit("mary", DateTimeOffset.Now), "hello");
+            var expected = new Commit(new[] { new CommitId(Sha1.Hash("c1")), new CommitId(Sha1.Hash("c2")) }, new TreeMapId(Sha1.Hash("abc")), new Audit("bob", DateTimeOffset.Now), new Audit("mary", DateTimeOffset.Now), "hello");
 
             // Equal
-            var actual = new Commit(expected.Parents, expected.TreeId, expected.Author, expected.Committer, expected.Message);
+            var actual = new Commit(expected.Parents, expected.TreeMapId, expected.Author, expected.Committer, expected.Message);
             Assert.Equal(expected, actual);
             Assert.Equal(expected.ToString(), actual.ToString());
             Assert.Equal(expected.GetHashCode(), actual.GetHashCode());
 
             // Parents
-            actual = new Commit(new CommitId?(), expected.TreeId, expected.Author, expected.Committer, expected.Message);
+            actual = new Commit(new CommitId?(), expected.TreeMapId, expected.Author, expected.Committer, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(Array.Empty<CommitId>(), expected.TreeId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
+            actual = new Commit(Array.Empty<CommitId>(), expected.TreeMapId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(Commit.Orphaned, expected.TreeId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
+            actual = new Commit(Commit.Orphaned, expected.TreeMapId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(new[] { expected.Parents[0] }, expected.TreeId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
+            actual = new Commit(new[] { expected.Parents[0] }, expected.TreeMapId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(new[] { expected.Parents[0], expected.Parents[1], new CommitId(Sha1.Hash("c3")) }, expected.TreeId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
+            actual = new Commit(new[] { expected.Parents[0], expected.Parents[1], new CommitId(Sha1.Hash("c3")) }, expected.TreeMapId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            // TreeId
+            // TreeMapId
             actual = new Commit(expected.Parents, default, expected.Author, expected.Committer, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, new TreeId(Sha1.Hash("def")), expected.Author, expected.Committer, expected.Message);
+            actual = new Commit(expected.Parents, new TreeMapId(Sha1.Hash("def")), expected.Author, expected.Committer, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             // DateTime
-            actual = new Commit(expected.Parents, expected.TreeId, default, default, expected.Message);
+            actual = new Commit(expected.Parents, expected.TreeMapId, default, default, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, expected.TreeId, new Audit("bob", DateTimeOffset.MaxValue), new Audit("mary", DateTimeOffset.MaxValue), expected.Message);
+            actual = new Commit(expected.Parents, expected.TreeMapId, new Audit("bob", DateTimeOffset.MaxValue), new Audit("mary", DateTimeOffset.MaxValue), expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, expected.TreeId, new Audit(expected.Author.Name, expected.Author.Timestamp.AddTicks(1)), new Audit(expected.Committer.Name, expected.Committer.Timestamp.AddTicks(1)), expected.Message);
+            actual = new Commit(expected.Parents, expected.TreeMapId, new Audit(expected.Author.Name, expected.Author.Timestamp.AddTicks(1)), new Audit(expected.Committer.Name, expected.Committer.Timestamp.AddTicks(1)), expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
             // Message
-            actual = new Commit(expected.Parents, expected.TreeId, expected.Author, expected.Committer, null);
+            actual = new Commit(expected.Parents, expected.TreeMapId, expected.Author, expected.Committer, null);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, expected.TreeId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
+            actual = new Commit(expected.Parents, expected.TreeMapId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual); // hashcode is the same for upper/lower string
         }
 
@@ -256,10 +256,10 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(Commit_Deconstruct))]
         public static void Commit_Deconstruct()
         {
-            var expected = new Commit(new[] { new CommitId(Sha1.Hash("c1")), new CommitId(Sha1.Hash("c2")) }, new TreeId(Sha1.Hash("abc")), Audit.Empty, Audit.Empty, "hello");
+            var expected = new Commit(new[] { new CommitId(Sha1.Hash("c1")), new CommitId(Sha1.Hash("c2")) }, new TreeMapId(Sha1.Hash("abc")), Audit.Empty, Audit.Empty, "hello");
 
-            var (parents, treeId, author, committer, message) = expected;
-            var actual = new Commit(parents, treeId, author, committer, message);
+            var (parents, treeMapId, author, committer, message) = expected;
+            var actual = new Commit(parents, treeMapId, author, committer, message);
 
             Assert.Equal(expected, actual);
         }

@@ -5,32 +5,34 @@
 
 #endregion
 
+using TreePair = System.Collections.Generic.KeyValuePair<string, SourceCode.Chasm.TreeNode>;
+
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
     internal static class TreeWireNodeExtensions
     {
         #region Methods
 
-        public static TreeNode Convert(this TreeWireNode wire)
+        public static TreePair Convert(this TreeWireNode wire)
         {
             if (wire == null) return default;
 
             var sha1 = wire.NodeId.Convert();
 
-            var model = new TreeNode(wire.Name, wire.Kind.Convert(), sha1.Value);
+            var model = new TreeNode(wire.Kind.Convert(), sha1.Value).CreateMap(wire.Name);
 
             return model;
         }
 
-        public static TreeWireNode Convert(this TreeNode model)
+        public static TreeWireNode Convert(this TreePair model)
         {
-            if (model == TreeNode.Empty) return default;
+            if (model.Key == null) return default;
 
             var wire = new TreeWireNode
             {
-                Name = model.Name,
-                Kind = model.Kind.Convert(),
-                NodeId = model.Sha1.Convert()
+                Name = model.Key,
+                Kind = model.Value.Kind.Convert(),
+                NodeId = model.Value.Sha1.Convert()
             };
 
             return wire;

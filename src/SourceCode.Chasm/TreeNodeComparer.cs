@@ -23,11 +23,6 @@ namespace SourceCode.Chasm
         /// </summary>
         public static TreeNodeComparer Default { get; } = new DefaultComparer();
 
-        /// <summary>
-        /// Gets a <see cref="TreeNodeComparer"/> that only compares the <see cref="TreeNode.Name"/> field of a <see cref="TreeNode"/> value.
-        /// </summary>
-        public static TreeNodeComparer NameOnly { get; } = new NameOnlyComparer();
-
         #endregion
 
         #region Constructors
@@ -62,12 +57,8 @@ namespace SourceCode.Chasm
 
             public override int Compare(TreeNode x, TreeNode y)
             {
-                // Nodes are always sorted by Name first (see TreeNodeMap)
-                var cmp = string.CompareOrdinal(x.Name, y.Name);
-                if (cmp != 0) return cmp;
-
                 // Then by Sha1 (in order to detect duplicate)
-                cmp = Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);
+                var cmp = Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);
                 if (cmp != 0) return cmp;
 
                 // And lastly by Kind
@@ -79,31 +70,14 @@ namespace SourceCode.Chasm
             {
                 if (x.Kind != y.Kind) return false;
                 if (x.Sha1 != y.Sha1) return false;
-                if (!StringComparer.Ordinal.Equals(x.Name, y.Name)) return false;
 
                 return true;
             }
 
-            public override int GetHashCode(TreeNode obj)
-            {
-                var hc = HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
-                hc = HashCode.Combine(hc, obj.Kind, obj.Sha1);
-
-                return hc;
-            }
-
-            #endregion
-        }
-
-        private sealed class NameOnlyComparer : TreeNodeComparer
-        {
-            #region Methods
-
-            public override int Compare(TreeNode x, TreeNode y) => string.CompareOrdinal(x.Name, y.Name);
-
-            public override bool Equals(TreeNode x, TreeNode y) => StringComparer.Ordinal.Equals(x.Name, y.Name);
-
-            public override int GetHashCode(TreeNode obj) => HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
+            public override int GetHashCode(TreeNode obj) => HashCode.Combine(
+                obj.Kind,
+                obj.Sha1
+            );
 
             #endregion
         }

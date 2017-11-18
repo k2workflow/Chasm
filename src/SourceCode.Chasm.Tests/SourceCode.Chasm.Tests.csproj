@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" />
   </ItemGroup>
 
   <ItemGroup>

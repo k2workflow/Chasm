@@ -15,7 +15,7 @@ namespace SourceCode.Chasm.Tests.TestObjects
 
         public static readonly Commit Random = new Commit(
             CommitIdTestObject.Random,
-            TreeIdTestObject.Random,
+            TreeMapIdTestObject.Random,
             AuditTestObject.Random,
             AuditTestObject.Random,
             RandomHelper.String);

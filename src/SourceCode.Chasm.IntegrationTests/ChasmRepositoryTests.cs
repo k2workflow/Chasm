@@ -53,22 +53,22 @@ namespace SoruceCode.Chasm.IntegrationTests
             Assert.False(urdata.HasValue);
 
             // Tree
-            var tree = new TreeNodeMap(
-                new TreeNode("firstItem", NodeKind.Blob, sha),
-                new TreeNode("secondItem", NodeKind.Blob, sha)
+            var tree = new TreeMap(
+                new TreeNode(NodeKind.Blob, sha).CreateMap("firstItem"),
+                new TreeNode(NodeKind.Blob, sha).CreateMap("secondItem")
             );
-            var treeId = await repository.WriteTreeAsync(tree, default);
-            var rtree = await repository.ReadTreeAsync(treeId, default);
+            var treeMapId = await repository.WriteTreeMapAsync(tree, default);
+            var rtree = await repository.ReadTreeMapAsync(treeMapId, default);
             Assert.True(rtree.HasValue);
             Assert.Equal(tree, rtree.Value);
 
-            var urtree = await repository.ReadTreeAsync(new TreeId(usha), default);
+            var urtree = await repository.ReadTreeMapAsync(new TreeMapId(usha), default);
             Assert.False(urtree.HasValue);
 
             // Commit
             var commit = new Commit(
                 new CommitId?(),
-                treeId,
+                treeMapId,
                 new Audit("User1", DateTimeOffset.UtcNow.AddDays(-1)),
                 new Audit("User2", DateTimeOffset.UtcNow),
                 "Initial commit"
