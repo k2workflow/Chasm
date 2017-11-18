@@ -17,21 +17,21 @@ namespace SourceCode.Chasm.IO
     {
         #region Read
 
-        ValueTask<TreeNodeMap?> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken);
+        ValueTask<TreeMap?> ReadTreeMapAsync(TreeMapId treeMapId, CancellationToken cancellationToken);
 
-        ValueTask<TreeNodeMap?> ReadTreeAsync(string branch, string commitRefName, CancellationToken cancellationToken);
+        ValueTask<TreeMap?> ReadTreeMapAsync(string branch, string commitRefName, CancellationToken cancellationToken);
 
-        ValueTask<TreeNodeMap?> ReadTreeAsync(CommitId commitId, CancellationToken cancellationToken);
+        ValueTask<TreeMap?> ReadTreeMapAsync(CommitId commitId, CancellationToken cancellationToken);
 
-        ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken);
+        ValueTask<IReadOnlyDictionary<TreeMapId, TreeMap>> ReadTreeMapBatchAsync(IEnumerable<TreeMapId> treeMapIds, CancellationToken cancellationToken);
 
         #endregion
 
         #region Write
 
-        ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken);
+        ValueTask<TreeMapId> WriteTreeMapAsync(TreeMap tree, CancellationToken cancellationToken);
 
-        ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken);
+        ValueTask<CommitId> WriteTreeMapAsync(IReadOnlyList<CommitId> parents, TreeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken);
 
         #endregion
     }

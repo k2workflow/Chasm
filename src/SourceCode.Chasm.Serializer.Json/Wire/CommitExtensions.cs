@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
         // Naming follows convention in ProtoSerializer
 
         private const string _parents = "parents";
-        private const string _treeId = "treeId";
+        private const string _treeMapId = "treeMapId";
         private const string _author = "author";
         private const string _committer = "committer";
         private const string _message = "message";
@@ -36,7 +36,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             Audit author = default;
             Audit committer = default;
-            TreeId? treeId = default;
+            TreeMapId? treeMapId = default;
             IReadOnlyList<CommitId> parents = null;
             string message = null;
 
@@ -61,8 +61,8 @@ namespace SourceCode.Chasm.IO.Json.Wire
                         message = (string)jr.Value;
                         return true;
 
-                    case _treeId:
-                        treeId = ReadTreeId();
+                    case _treeMapId:
+                        treeMapId = ReadTreeMapId();
                         return true;
                 }
 
@@ -70,7 +70,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             },
 
             // Factory
-            () => new Commit(parents, treeId, author, committer, message));
+            () => new Commit(parents, treeMapId, author, committer, message));
 
             // Property
 
@@ -80,10 +80,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 return sha1 == null ? default : new CommitId(sha1.Value);
             });
 
-            TreeId? ReadTreeId()
+            TreeMapId? ReadTreeMapId()
             {
                 var sha1 = jr.ReadSha1();
-                return sha1 == null ? null : (TreeId?)(new TreeId(sha1.Value));
+                return sha1 == null ? null : (TreeMapId?)(new TreeMapId(sha1.Value));
             }
         }
 
@@ -150,11 +150,11 @@ namespace SourceCode.Chasm.IO.Json.Wire
                     jw.WriteValue(model.Message);
                 }
 
-                // TreeId
-                if (model.TreeId != null)
+                // TreeMapId
+                if (model.TreeMapId != null)
                 {
-                    jw.WritePropertyName(_treeId);
-                    jw.WriteValue(model.TreeId.Value.ToString());
+                    jw.WritePropertyName(_treeMapId);
+                    jw.WriteValue(model.TreeMapId.Value.ToString());
                 }
             }
             jw.WriteEndObject();

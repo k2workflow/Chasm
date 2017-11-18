@@ -28,13 +28,13 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             "ZBgCIAEoDjINLk5vZGVLaW5kV2lyZRIZCgZOb2RlSWQYAyABKAsyCS5TaGEx",
             "V2lyZSIoCghUcmVlV2lyZRIcCgVOb2RlcxgBIAMoCzINLlRyZWVXaXJlTm9k",
             "ZSI7CglBdWRpdFdpcmUSDAoETmFtZRgBIAEoCRIQCghEYXRlVGltZRgCIAEo",
-            "AxIOCgZPZmZzZXQYAyABKAMirQEKCkNvbW1pdFdpcmUSGgoHUGFyZW50cxgB",
-            "IAMoCzIJLlNoYTFXaXJlEhkKBlRyZWVJZBgCIAEoCzIJLlNoYTFXaXJlEhoK",
-            "BkF1dGhvchgDIAEoCzIKLkF1ZGl0V2lyZRIdCglDb21taXR0ZXIYBCABKAsy",
-            "Ci5BdWRpdFdpcmUSLQoHTWVzc2FnZRgFIAEoCzIcLmdvb2dsZS5wcm90b2J1",
-            "Zi5TdHJpbmdWYWx1ZSIlCgxDb21taXRJZFdpcmUSFQoCSWQYASABKAsyCS5T",
-            "aGExV2lyZSoiCgxOb2RlS2luZFdpcmUSCAoEQmxvYhAAEggKBFRyZWUQAUIh",
-            "qgIeU291cmNlQ29kZS5DaGFzbS5JTy5Qcm90by5XaXJlYgZwcm90bzM="));
+            "AxIOCgZPZmZzZXQYAyABKAMisAEKCkNvbW1pdFdpcmUSGgoHUGFyZW50cxgB",
+            "IAMoCzIJLlNoYTFXaXJlEhwKCVRyZWVNYXBJZBgCIAEoCzIJLlNoYTFXaXJl",
+            "EhoKBkF1dGhvchgDIAEoCzIKLkF1ZGl0V2lyZRIdCglDb21taXR0ZXIYBCAB",
+            "KAsyCi5BdWRpdFdpcmUSLQoHTWVzc2FnZRgFIAEoCzIcLmdvb2dsZS5wcm90",
+            "b2J1Zi5TdHJpbmdWYWx1ZSIlCgxDb21taXRJZFdpcmUSFQoCSWQYASABKAsy",
+            "CS5TaGExV2lyZSoiCgxOb2RlS2luZFdpcmUSCAoEQmxvYhAAEggKBFRyZWUQ",
+            "AUIhqgIeU291cmNlQ29kZS5DaGFzbS5JTy5Qcm90by5XaXJlYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.WrappersReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::SourceCode.Chasm.IO.Proto.Wire.NodeKindWire), }, new pbr::GeneratedClrTypeInfo[] {
@@ -42,7 +42,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.TreeWireNode), global::SourceCode.Chasm.IO.Proto.Wire.TreeWireNode.Parser, new[]{ "Name", "Kind", "NodeId" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.TreeWire), global::SourceCode.Chasm.IO.Proto.Wire.TreeWire.Parser, new[]{ "Nodes" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.AuditWire), global::SourceCode.Chasm.IO.Proto.Wire.AuditWire.Parser, new[]{ "Name", "DateTime", "Offset" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Author", "Committer", "Message" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeMapId", "Author", "Committer", "Message" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire.Parser, new[]{ "Id" }, null, null, null)
           }));
     }
@@ -781,7 +781,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public CommitWire(CommitWire other) : this() {
       parents_ = other.parents_.Clone();
-      TreeId = other.treeId_ != null ? other.TreeId.Clone() : null;
+      TreeMapId = other.treeMapId_ != null ? other.TreeMapId.Clone() : null;
       Author = other.author_ != null ? other.Author.Clone() : null;
       Committer = other.committer_ != null ? other.Committer.Clone() : null;
       Message = other.message_ != null ? other.Message.Clone() : null;
@@ -802,14 +802,14 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       get { return parents_; }
     }
 
-    /// <summary>Field number for the "TreeId" field.</summary>
-    public const int TreeIdFieldNumber = 2;
-    private global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire treeId_;
+    /// <summary>Field number for the "TreeMapId" field.</summary>
+    public const int TreeMapIdFieldNumber = 2;
+    private global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire treeMapId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire TreeId {
-      get { return treeId_; }
+    public global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire TreeMapId {
+      get { return treeMapId_; }
       set {
-        treeId_ = value;
+        treeMapId_ = value;
       }
     }
 
@@ -863,7 +863,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         return true;
       }
       if(!parents_.Equals(other.parents_)) return false;
-      if (!object.Equals(TreeId, other.TreeId)) return false;
+      if (!object.Equals(TreeMapId, other.TreeMapId)) return false;
       if (!object.Equals(Author, other.Author)) return false;
       if (!object.Equals(Committer, other.Committer)) return false;
       if (!object.Equals(Message, other.Message)) return false;
@@ -874,7 +874,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     public override int GetHashCode() {
       int hash = 1;
       hash ^= parents_.GetHashCode();
-      if (treeId_ != null) hash ^= TreeId.GetHashCode();
+      if (treeMapId_ != null) hash ^= TreeMapId.GetHashCode();
       if (author_ != null) hash ^= Author.GetHashCode();
       if (committer_ != null) hash ^= Committer.GetHashCode();
       if (message_ != null) hash ^= Message.GetHashCode();
@@ -889,9 +889,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
       parents_.WriteTo(output, _repeated_parents_codec);
-      if (treeId_ != null) {
+      if (treeMapId_ != null) {
         output.WriteRawTag(18);
-        output.WriteMessage(TreeId);
+        output.WriteMessage(TreeMapId);
       }
       if (author_ != null) {
         output.WriteRawTag(26);
@@ -911,8 +911,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
     public int CalculateSize() {
       int size = 0;
       size += parents_.CalculateSize(_repeated_parents_codec);
-      if (treeId_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(TreeId);
+      if (treeMapId_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(TreeMapId);
       }
       if (author_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Author);
@@ -932,11 +932,11 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         return;
       }
       parents_.Add(other.parents_);
-      if (other.treeId_ != null) {
-        if (treeId_ == null) {
-          treeId_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
+      if (other.treeMapId_ != null) {
+        if (treeMapId_ == null) {
+          treeMapId_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
         }
-        TreeId.MergeFrom(other.TreeId);
+        TreeMapId.MergeFrom(other.TreeMapId);
       }
       if (other.author_ != null) {
         if (author_ == null) {
@@ -971,10 +971,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             break;
           }
           case 18: {
-            if (treeId_ == null) {
-              treeId_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
+            if (treeMapId_ == null) {
+              treeMapId_ = new global::SourceCode.Chasm.IO.Proto.Wire.Sha1Wire();
             }
-            input.ReadMessage(treeId_);
+            input.ReadMessage(treeMapId_);
             break;
           }
           case 26: {

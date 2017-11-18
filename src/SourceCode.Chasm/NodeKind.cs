@@ -13,7 +13,7 @@ namespace SourceCode.Chasm
     {
         Blob = 0, // Default
 
-        Tree = 1
+        Map = 1
     }
 
 #pragma warning restore CA1028 // Enum Storage should be Int32

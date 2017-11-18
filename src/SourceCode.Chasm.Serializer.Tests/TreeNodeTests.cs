@@ -6,6 +6,7 @@
 #endregion
 
 using Xunit;
+using TreePair = System.Collections.Generic.KeyValuePair<string, SourceCode.Chasm.TreeNode>;
 
 namespace SourceCode.Chasm.IO.Tests
 {
@@ -14,48 +15,48 @@ namespace SourceCode.Chasm.IO.Tests
         #region Methods
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_NullTreeNodeMap))]
+        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_NullTreeMap))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_WriteRead_NullTreeNodeMap(IChasmSerializer ser)
+        public static void ChasmSerializer_WriteRead_NullTreeMap(IChasmSerializer ser)
         {
-            var expected = new TreeNodeMap();
+            var expected = new TreeMap();
 
             using (var seg = ser.Serialize(expected))
             {
-                var actual = ser.DeserializeTree(seg.Result);
+                var actual = ser.DeserializeTreeMap(seg.Result);
 
                 Assert.Equal(expected, actual);
             }
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_EmptyTreeNodeMap))]
+        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_EmptyTreeMap))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_WriteRead_EmptyTreeNodeMap(IChasmSerializer ser)
+        public static void ChasmSerializer_WriteRead_EmptyTreeMap(IChasmSerializer ser)
         {
-            var expected = new TreeNodeMap(new TreeNode[0]);
+            var expected = new TreeMap(new TreePair[0]);
 
             using (var seg = ser.Serialize(expected))
             {
-                var actual = ser.DeserializeTree(seg.Result);
+                var actual = ser.DeserializeTreeMap(seg.Result);
 
                 Assert.Equal(expected, actual);
             }
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_TreeNodeMap))]
+        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_TreeMap))]
         [ClassData(typeof(TestData))]
-        public static void ChasmSerializer_WriteRead_TreeNodeMap(IChasmSerializer ser)
+        public static void ChasmSerializer_WriteRead_TreeMap(IChasmSerializer ser)
         {
-            var node0 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
-            var node1 = new TreeNode("b", NodeKind.Tree, Sha1.Hash("def"));
-            var node2 = new TreeNode("c", NodeKind.Tree, Sha1.Hash("hij"));
-            var expected = new TreeNodeMap(node0, node1, node2);
+            var node0 = new TreeNode(NodeKind.Blob, Sha1.Hash("abc")).CreateMap("a");
+            var node1 = new TreeNode(NodeKind.Map, Sha1.Hash("def")).CreateMap("b");
+            var node2 = new TreeNode(NodeKind.Map, Sha1.Hash("hij")).CreateMap("c");
+            var expected = new TreeMap(node0, node1, node2);
 
             using (var seg = ser.Serialize(expected))
             {
-                var actual = ser.DeserializeTree(seg.Result);
+                var actual = ser.DeserializeTreeMap(seg.Result);
 
                 Assert.Equal(expected, actual);
             }

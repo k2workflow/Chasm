@@ -6,88 +6,53 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
-    [DebuggerDisplay("{ToString(),nq,ac}")]
+    [DebuggerDisplay("{Kind,nq,ac}({Sha1,nq,ac})")]
     public readonly struct TreeNode : IEquatable<TreeNode>, IComparable<TreeNode>
     {
-        #region Constants
-
-        private static readonly TreeNode _empty;
-
-        /// <summary>
-        /// A singleton representing an empty <see cref="TreeNode"/> value.
-        /// </summary>
-        /// <value>
-        /// The empty.
-        /// </value>
-        public static ref readonly TreeNode Empty => ref _empty;
-
-        #endregion
-
         #region Properties
-
-        public string Name { get; }
-
+        
         public Sha1 Sha1 { get; }
 
         public NodeKind Kind { get; }
 
-        public TreeId TreeId
-        {
-            get
-            {
-                if (Kind != NodeKind.Tree)
-                    throw new InvalidOperationException($"The node {Name} must be a {nameof(NodeKind.Tree)}.");
-                return new TreeId(Sha1);
-            }
-        }
-
-        public BlobId BlobId
-        {
-            get
-            {
-                if (Kind != NodeKind.Blob)
-                    throw new InvalidOperationException($"The node {Name} must be a {nameof(NodeKind.Blob)}.");
-                return new BlobId(Sha1);
-            }
-        }
-
         #endregion
 
         #region De/Constructors
-
-        private TreeNode(string name, in Sha1 sha1, NodeKind kind)
+        
+        public TreeNode(NodeKind kind, in Sha1 sha1)
         {
-            // Used for .Empty (no validation)
-
-            Name = name;
+            if (!Enum.IsDefined(typeof(NodeKind), kind)) throw new ArgumentOutOfRangeException(nameof(kind));
             Kind = kind;
             Sha1 = sha1;
         }
 
-        public TreeNode(string name, NodeKind kind, in Sha1 sha1)
-            : this(name, sha1, kind)
-        {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
-            if (!Enum.IsDefined(typeof(NodeKind), kind)) throw new ArgumentOutOfRangeException(nameof(kind));
-        }
-
-        public TreeNode(string name, in BlobId blobId)
-            : this(name, NodeKind.Blob, blobId.Sha1)
+        public TreeNode(in BlobId blobId)
+            : this(NodeKind.Blob, blobId.Sha1)
         { }
 
-        public TreeNode(string name, in TreeId treeId)
-            : this(name, NodeKind.Tree, treeId.Sha1)
+        public TreeNode(in TreeMapId treeMapId)
+            : this(NodeKind.Map, treeMapId.Sha1)
         { }
 
-        public void Deconstruct(out string name, out NodeKind kind, out Sha1 sha1)
+        public void Deconstruct(out NodeKind kind, out Sha1 sha1)
         {
-            name = Name;
             sha1 = Sha1;
             kind = Kind;
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public KeyValuePair<string, TreeNode> CreateMap(string key)
+        {
+            if (key == null) throw new ArgumentNullException(nameof(key));
+            return new KeyValuePair<string, TreeNode>(key, this);
         }
 
         #endregion
@@ -124,7 +89,20 @@ namespace SourceCode.Chasm
 
         public static bool operator <(TreeNode x, TreeNode y) => TreeNodeComparer.Default.Compare(x, y) < 0;
 
-        public override string ToString() => $"{Name}: {Kind} ({Sha1:D})";
+#pragma warning disable CA2225 // Operator overloads have named alternates
+        // Provided by constructor
+
+        public static implicit operator TreeNode(TreeMapId treeMapId) => new TreeNode(treeMapId);
+
+        public static implicit operator TreeNode(BlobId blobId) => new TreeNode(blobId);
+
+        public static implicit operator TreeNode?(TreeMapId? treeMapId) => treeMapId.HasValue ? new TreeNode(treeMapId.Value) : default;
+
+        public static implicit operator TreeNode?(BlobId? blobId) =>  blobId.HasValue ? new TreeNode(blobId.Value) : default;
+
+#pragma warning restore CA2225 // Operator overloads have named alternates
+
+        public override string ToString() => $"{Kind}({Sha1:D})";
 
         #endregion
     }

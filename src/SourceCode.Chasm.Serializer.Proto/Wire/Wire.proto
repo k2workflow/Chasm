@@ -50,7 +50,7 @@ option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 	{
 		repeated Sha1Wire Parents = 1;
 
-		Sha1Wire TreeId = 2;
+		Sha1Wire TreeMapId = 2;
 		
 		AuditWire Author = 3;
 		

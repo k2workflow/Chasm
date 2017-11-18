@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace SourceCode.Chasm
 {
-    [DebuggerDisplay("{" + nameof(Author) + ".ToString(),nq,ac} ({" + nameof(TreeId) + "?." + nameof(Chasm.TreeId.Sha1) + ".ToString(\"D\"),nq,ac})")]
+    [DebuggerDisplay("{" + nameof(Author) + ".ToString(),nq,ac} ({" + nameof(TreeMapId) + "?." + nameof(Chasm.TreeMapId.Sha1) + ".ToString(\"D\"),nq,ac})")]
     public readonly struct Commit : IEquatable<Commit>
     {
         #region Constants
@@ -44,7 +44,7 @@ namespace SourceCode.Chasm
 
         public IReadOnlyList<CommitId> Parents => _parents ?? Array.Empty<CommitId>(); // May be null due to default ctor
 
-        public TreeId? TreeId { get; }
+        public TreeMapId? TreeMapId { get; }
 
         public Audit Author { get; }
 
@@ -56,9 +56,9 @@ namespace SourceCode.Chasm
 
         #region De/Constructors
 
-        public Commit(in IReadOnlyList<CommitId> parents, in TreeId? treeId, in Audit author, in Audit committer, in string message)
+        public Commit(in IReadOnlyList<CommitId> parents, in TreeMapId? treeMapId, in Audit author, in Audit committer, in string message)
         {
-            TreeId = treeId;
+            TreeMapId = treeMapId;
             Author = author;
             Committer = committer;
             _message = message;
@@ -128,14 +128,14 @@ namespace SourceCode.Chasm
             }
         }
 
-        public Commit(in CommitId? parent, in TreeId? treeId, in Audit author, in Audit committer, in string message)
-            : this(parent.HasValue ? new[] { parent.Value } : Array.Empty<CommitId>(), treeId, author, committer, message)
+        public Commit(in CommitId? parent, in TreeMapId? treeMapId, in Audit author, in Audit committer, in string message)
+            : this(parent.HasValue ? new[] { parent.Value } : Array.Empty<CommitId>(), treeMapId, author, committer, message)
         { }
 
-        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId? treeId, out Audit author, out Audit committer, out string message)
+        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeMapId? treeMapId, out Audit author, out Audit committer, out string message)
         {
             parents = Parents;
-            treeId = TreeId;
+            treeMapId = TreeMapId;
             author = Author;
             committer = Committer;
             message = Message;
@@ -161,7 +161,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(Commit x, Commit y) => !(x == y);
 
-        public override string ToString() => $"{TreeId:D} ({Author})";
+        public override string ToString() => $"{TreeMapId:D} ({Author})";
 
         #endregion
     }

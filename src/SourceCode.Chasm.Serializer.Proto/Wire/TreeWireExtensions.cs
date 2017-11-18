@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using TreePair = System.Collections.Generic.KeyValuePair<string, SourceCode.Chasm.TreeNode>;
 
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
@@ -13,7 +14,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
     {
         #region Methods
 
-        public static TreeWire Convert(this TreeNodeMap model)
+        public static TreeWire Convert(this TreeMap model)
         {
             if (model.Count == 0) return new TreeWire();
 
@@ -27,16 +28,16 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             return wire;
         }
 
-        public static TreeNodeMap Convert(this TreeWire wire)
+        public static TreeMap Convert(this TreeWire wire)
         {
             if (wire == null) return default;
             if (wire.Nodes.Count == 0) return default;
 
-            var nodes = new TreeNode[wire.Nodes?.Count ?? 0];
+            var nodes = new TreePair[wire.Nodes?.Count ?? 0];
             for (var i = 0; i < nodes.Length; i++)
                 nodes[i] = wire.Nodes[i].Convert();
 
-            var model = new TreeNodeMap(nodes);
+            var model = new TreeMap(nodes);
             return model;
         }
 
@@ -46,7 +47,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             switch (wire)
             {
                 case NodeKindWire.Blob: return NodeKind.Blob;
-                case NodeKindWire.Tree: return NodeKind.Tree;
+                case NodeKindWire.Tree: return NodeKind.Map;
                 default: throw new ArgumentOutOfRangeException(nameof(wire));
             }
         }
@@ -57,7 +58,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             switch (model)
             {
                 case NodeKind.Blob: return NodeKindWire.Blob;
-                case NodeKind.Tree: return NodeKindWire.Tree;
+                case NodeKind.Map: return NodeKindWire.Tree;
                 default: throw new ArgumentOutOfRangeException(nameof(model));
             }
         }

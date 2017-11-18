@@ -10,10 +10,11 @@ using SourceCode.Clay.Json;
 using System;
 using System.IO;
 using System.Text;
+using TreePair = System.Collections.Generic.KeyValuePair<string, SourceCode.Chasm.TreeNode>;
 
 namespace SourceCode.Chasm.IO.Json.Wire
 {
-    internal static class TreeNodeExtensions
+    internal static class TreePairExtensions
     {
         #region Constants
 
@@ -27,7 +28,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Read
 
-        public static TreeNode ReadTreeNode(this JsonReader jr)
+        public static TreePair ReadTreeNode(this JsonReader jr)
         {
             if (jr == null) throw new ArgumentNullException(nameof(jr));
 
@@ -57,10 +58,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
             },
 
             // Factory
-            () => name == null && kind == default && sha1 == default ? default : new TreeNode(name, kind, sha1));
+            () => name == null ? default : new TreeNode(kind, sha1).CreateMap(name));
         }
 
-        public static TreeNode ReadTreeNode(this string json)
+        public static TreePair ReadTreeNode(this string json)
         {
             if (json == null || json == JsonConstants.Null) return default;
 
@@ -78,11 +79,11 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         #region Write
 
-        public static void Write(this JsonWriter jw, TreeNode model)
+        public static void Write(this JsonWriter jw, TreePair model)
         {
             if (jw == null) throw new ArgumentNullException(nameof(jw));
 
-            if (model == default)
+            if (model.Key == null)
             {
                 jw.WriteNull();
                 return;
@@ -92,22 +93,22 @@ namespace SourceCode.Chasm.IO.Json.Wire
             {
                 // Name
                 jw.WritePropertyName(_name);
-                jw.WriteValue(model.Name);
+                jw.WriteValue(model.Key);
 
                 // Kind
                 jw.WritePropertyName(_kind);
-                jw.WriteValue(model.Kind.ToString());
+                jw.WriteValue(model.Value.Kind.ToString());
 
                 // NodeId
                 jw.WritePropertyName(_nodeId);
-                jw.WriteValue(model.Sha1.ToString("N"));
+                jw.WriteValue(model.Value.Sha1.ToString("N"));
             }
             jw.WriteEndObject();
         }
 
-        public static string Write(this TreeNode model)
+        public static string Write(this TreePair model)
         {
-            if (model == default) return JsonConstants.Null;
+            if (model.Key == null) return JsonConstants.Null;
 
             var sb = new StringBuilder();
             using (var sw = new StringWriter(sb))

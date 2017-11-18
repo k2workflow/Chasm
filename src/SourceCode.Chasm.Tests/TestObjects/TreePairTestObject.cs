@@ -5,13 +5,18 @@
 
 #endregion
 
+using SourceCode.Chasm.Tests.Helpers;
+using System.Collections.Generic;
+
 namespace SourceCode.Chasm.Tests.TestObjects
 {
-    public static class TreeNodeMapTestObject
+    public static class TreePairTestObject
     {
         #region Fields
 
-        public static readonly TreeNodeMap Random = new TreeNodeMap(TreeNodeTestObject.Random);
+        public static readonly KeyValuePair<string, TreeNode> Random = new KeyValuePair<string, TreeNode>(
+            RandomHelper.String,
+            TreeMapIdTestObject.Random);
 
         #endregion
     }

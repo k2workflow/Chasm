@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace SourceCode.Chasm
 {
     [DebuggerDisplay("{" + nameof(Sha1) + ".ToString(\"D\"),nq,ac}")]
-    public readonly struct BlobId : IEquatable<BlobId>, IComparable<BlobId>
+    public readonly struct TreeMapId : IEquatable<TreeMapId>, IComparable<TreeMapId>
     {
         #region Properties
 
@@ -22,7 +22,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        public BlobId(in Sha1 sha1)
+        public TreeMapId(in Sha1 sha1)
         {
             Sha1 = sha1;
         }
@@ -41,35 +41,35 @@ namespace SourceCode.Chasm
 
         #region IEquatable
 
-        public bool Equals(BlobId other) => BlobIdComparer.Default.Equals(this, other);
+        public bool Equals(TreeMapId other) => TreeMapIdComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is BlobId blobId
-            && BlobIdComparer.Default.Equals(this, blobId);
+            => obj is TreeMapId blobId
+            && TreeMapIdComparer.Default.Equals(this, blobId);
 
-        public override int GetHashCode() => BlobIdComparer.Default.GetHashCode(this);
+        public override int GetHashCode() => TreeMapIdComparer.Default.GetHashCode(this);
 
         #endregion
 
         #region IComparable
 
-        public int CompareTo(BlobId other) => BlobIdComparer.Default.Compare(this, other);
+        public int CompareTo(TreeMapId other) => TreeMapIdComparer.Default.Compare(this, other);
 
         #endregion
 
         #region Operators
 
-        public static bool operator >=(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) >= 0;
+        public static bool operator ==(TreeMapId x, TreeMapId y) => TreeMapIdComparer.Default.Equals(x, y);
 
-        public static bool operator >(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) > 0;
+        public static bool operator !=(TreeMapId x, TreeMapId y) => !(x == y);
 
-        public static bool operator <=(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) <= 0;
+        public static bool operator >=(TreeMapId x, TreeMapId y) => TreeMapIdComparer.Default.Compare(x, y) >= 0;
 
-        public static bool operator <(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) < 0;
+        public static bool operator >(TreeMapId x, TreeMapId y) => TreeMapIdComparer.Default.Compare(x, y) > 0;
 
-        public static bool operator ==(BlobId x, BlobId y) => BlobIdComparer.Default.Equals(x, y);
+        public static bool operator <=(TreeMapId x, TreeMapId y) => TreeMapIdComparer.Default.Compare(x, y) <= 0;
 
-        public static bool operator !=(BlobId x, BlobId y) => !(x == y);
+        public static bool operator <(TreeMapId x, TreeMapId y) => TreeMapIdComparer.Default.Compare(x, y) < 0;
 
         public override string ToString() => Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
 
