@@ -36,7 +36,7 @@ namespace SourceCode.Chasm.IO.Text
 
         public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
-            if (span.IsEmpty) return default;
+            if (span.Length == 0) return default;
 
             string text;
             unsafe

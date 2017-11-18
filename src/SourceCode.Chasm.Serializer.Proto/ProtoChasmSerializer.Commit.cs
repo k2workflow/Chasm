@@ -34,9 +34,13 @@ namespace SourceCode.Chasm.IO.Proto
             }
         }
 
+        #endregion
+
+        #region Deserialize
+
         public Commit DeserializeCommit(ReadOnlySpan<byte> span)
         {
-            if (span.IsEmpty) return default;
+            if (span.Length == 0) return default;
 
             var wire = new CommitWire();
             wire.MergeFrom(span.ToArray()); // TODO: Perf

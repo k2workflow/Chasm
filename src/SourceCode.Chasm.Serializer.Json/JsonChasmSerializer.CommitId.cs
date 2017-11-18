@@ -36,7 +36,7 @@ namespace SourceCode.Chasm.IO.Json
 
         public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
         {
-            if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
+            if (span.Length == 0) throw new ArgumentNullException(nameof(span));
 
             string json;
             unsafe

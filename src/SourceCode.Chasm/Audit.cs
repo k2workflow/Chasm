@@ -16,13 +16,15 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
+        private static readonly Audit _empty;
+
         /// <summary>
         /// A singleton representing an empty <see cref="Audit"/> value.
         /// </summary>
         /// <value>
         /// The empty.
         /// </value>
-        public static Audit Empty { get; }
+        public static ref readonly Audit Empty => ref _empty;
 
         #endregion
 

@@ -32,7 +32,7 @@ namespace SourceCode.Chasm.IO.Text
 
         public Commit DeserializeCommit(ReadOnlySpan<byte> span)
         {
-            if (span.IsEmpty) throw new ArgumentNullException(nameof(span));
+            if (span.Length == 0) throw new ArgumentNullException(nameof(span));
 
             string text;
             unsafe

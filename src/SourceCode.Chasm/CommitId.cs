@@ -21,7 +21,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
-        public CommitId(Sha1 sha1)
+        public CommitId(in Sha1 sha1)
         {
             Sha1 = sha1;
         }
