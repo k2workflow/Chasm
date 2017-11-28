@@ -73,16 +73,7 @@ namespace SourceCode.Chasm
                 && x.Blit1 == y.Blit1
                 && x.Blit2 == y.Blit2;
 
-            public override int GetHashCode(Sha1 obj)
-            {
-                var hc = new HashCode();
-
-                hc.Add(obj.Blit0);
-                hc.Add(obj.Blit1);
-                hc.Add(obj.Blit2);
-
-                return hc.ToHashCode();
-            }
+            public override int GetHashCode(Sha1 obj) => HashCode.Combine(obj.Blit0, obj.Blit1, obj.Blit2);
 
             #endregion
         }

@@ -148,9 +148,12 @@ namespace SoruceCode.Chasm.IntegrationTests
             await TestRepository(repo);
         }
 
-        [Fact(DisplayName = nameof(AzureTableChasmRepo_Test))]
+        [Fact(DisplayName = nameof(AzureTableChasmRepo_Test)
+            , Skip = "Azure Table Storage Emulator *STILL* doesn't support everything."
+        )]
         public static async Task AzureTableChasmRepo_Test()
         {
+            // Use your own cstring here.
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
             var repo = new AzureTableChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
             await TestRepository(repo);

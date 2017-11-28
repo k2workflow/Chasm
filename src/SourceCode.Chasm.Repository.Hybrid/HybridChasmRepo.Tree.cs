@@ -5,8 +5,8 @@
 
 #endregion
 
-using SourceCode.Clay.Collections.Generic;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +19,7 @@ namespace SourceCode.Chasm.IO.Hybrid
 
         public override async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken)
         {
-            if (treeIds == null) return ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>();
+            if (treeIds == null) return ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
 
             // TODO: Enable piecemeal reads (404s incur next repo)
 

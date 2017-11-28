@@ -6,7 +6,7 @@
 #endregion
 
 using SourceCode.Clay;
-using SourceCode.Clay.Collections.Generic;
+using SourceCode.Clay.Buffers;
 using System.Collections.Generic;
 
 namespace SourceCode.Chasm
@@ -48,17 +48,9 @@ namespace SourceCode.Chasm
         {
             #region Methods
 
-            public override bool Equals(TreeNodeMap x, TreeNodeMap y)
-                => x._nodes.MemoryEquals(y._nodes);
+            public override bool Equals(TreeNodeMap x, TreeNodeMap y) => x._nodes.MemoryEquals(y._nodes);
 
-            public override int GetHashCode(TreeNodeMap obj)
-            {
-                var hc = new HashCode();
-
-                hc.Add(obj._nodes.Length);
-
-                return hc.ToHashCode();
-            }
+            public override int GetHashCode(TreeNodeMap obj) => HashCode.Combine(obj._nodes.Length);
 
             #endregion
         }
