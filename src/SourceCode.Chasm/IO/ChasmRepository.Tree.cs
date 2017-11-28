@@ -5,9 +5,9 @@
 
 #endregion
 
-using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,14 +30,14 @@ namespace SourceCode.Chasm.IO
 
         public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken)
         {
-            if (treeIds == null) return ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>();
+            if (treeIds == null) return ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
 
             // Read bytes in batch
             var sha1s = System.Linq.Enumerable.Select(treeIds, n => n.Sha1);
             var kvps = await ReadObjectBatchAsync(sha1s, cancellationToken).ConfigureAwait(false);
 
             // Deserialize batch
-            if (kvps.Count == 0) return ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>();
+            if (kvps.Count == 0) return ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
 
             var dict = new Dictionary<TreeId, TreeNodeMap>(kvps.Count);
 
