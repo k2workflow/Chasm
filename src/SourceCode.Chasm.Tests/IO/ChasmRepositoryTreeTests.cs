@@ -9,9 +9,9 @@ using Moq;
 using SourceCode.Chasm.IO;
 using SourceCode.Chasm.Tests.Helpers;
 using SourceCode.Chasm.Tests.TestObjects;
-using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.IO.Compression;
 using System.Linq;
@@ -238,7 +238,7 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(null, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
-            Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>(), actual);
+            Assert.Equal(ImmutableDictionary<TreeId, TreeNodeMap>.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -256,14 +256,14 @@ namespace SourceCode.Chasm.Tests.IO
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
+                    return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
                 });
 
             // Action
             var actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
-            Assert.Equal(ReadOnlyDictionary.Empty<TreeId, TreeNodeMap>(), actual);
+            Assert.Equal(ImmutableDictionary<TreeId, TreeNodeMap>.Empty, actual);
         }
 
         [Trait("Type", "Unit")]

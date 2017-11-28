@@ -5,11 +5,11 @@
 
 #endregion
 
-using SourceCode.Clay.Collections.Generic;
 using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.IO
 
         public virtual async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
-            if (objectIds == null) return ReadOnlyDictionary.Empty<Sha1, ReadOnlyMemory<byte>>();
+            if (objectIds == null) return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
 
             var parallelOptions = new ParallelOptions
             {
