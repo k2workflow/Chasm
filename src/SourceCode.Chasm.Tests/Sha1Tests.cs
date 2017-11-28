@@ -30,7 +30,7 @@ namespace SourceCode.Chasm.Tests
         {
             var expected = Sha1.Zero;
 
-            Assert.Throws<ArgumentNullException>(() => new Sha1((byte[])null));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Sha1((byte[])null));
 
             Assert.True(default == expected);
             Assert.False(default != expected);
