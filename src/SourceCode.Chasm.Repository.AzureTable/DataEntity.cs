@@ -6,6 +6,7 @@
 #endregion
 
 using Microsoft.WindowsAzure.Storage.Table;
+using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.Linq;

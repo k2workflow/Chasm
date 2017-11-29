@@ -7,6 +7,7 @@
 
 using Moq;
 using SourceCode.Chasm.IO.Json;
+using SourceCode.Clay;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;

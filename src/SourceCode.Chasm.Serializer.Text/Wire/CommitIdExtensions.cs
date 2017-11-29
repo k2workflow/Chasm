@@ -5,14 +5,15 @@
 
 #endregion
 
+using SourceCode.Clay;
+
 namespace SourceCode.Chasm.IO.Text.Wire
 {
     internal static class CommitIdExtensions
     {
         #region Methods
 
-        public static string Convert(this CommitId model)
-            => model.Sha1.ToString("N");
+        public static string Convert(this CommitId model) => model.Sha1.ToString("N");
 
         public static CommitId ConvertCommitId(this string wire)
         {

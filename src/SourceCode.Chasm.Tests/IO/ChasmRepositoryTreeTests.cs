@@ -9,6 +9,7 @@ using Moq;
 using SourceCode.Chasm.IO;
 using SourceCode.Chasm.Tests.Helpers;
 using SourceCode.Chasm.Tests.TestObjects;
+using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

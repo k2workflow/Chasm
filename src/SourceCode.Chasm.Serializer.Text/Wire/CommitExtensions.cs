@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -85,8 +86,8 @@ namespace SourceCode.Chasm.IO.Text.Wire
                 if (index == 0)
                 {
                     index += _treeId.Length;
-                    var curr = wire.Substring(index, Sha1.CharLen);
-                    index += Sha1.CharLen;
+                    var curr = wire.Substring(index, Sha1.HexLength);
+                    index += Sha1.HexLength;
 
                     var sha1 = Sha1.Parse(curr);
                     treeId = new TreeId(sha1);
@@ -104,8 +105,8 @@ namespace SourceCode.Chasm.IO.Text.Wire
                 while (ix >= 0)
                 {
                     index = ix + _parent.Length;
-                    var curr = wire.Substring(index, Sha1.CharLen);
-                    index += Sha1.CharLen;
+                    var curr = wire.Substring(index, Sha1.HexLength);
+                    index += Sha1.HexLength;
 
                     var sha1 = Sha1.Parse(curr);
                     parents.Add(new CommitId(sha1));

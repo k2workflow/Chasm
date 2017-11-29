@@ -57,8 +57,8 @@ namespace SourceCode.Chasm.IO.AzureBlob
                     {
                         await blob.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
 
-                        if (output.Length < Sha1.ByteLen)
-                            throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
+                        if (output.Length < Sha1.ByteLength)
+                            throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {output.Length}");
 
                         var commitId = Serializer.DeserializeCommitId(output.ToArray());
                         results.Add(new CommitRef(branch, commitId));
@@ -212,8 +212,8 @@ namespace SourceCode.Chasm.IO.AzureBlob
                     // Grab the etag - we need it for optimistic concurrency control
                     var ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
 
-                    if (output.Length < Sha1.ByteLen)
-                        throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLen} but has length {output.Length}");
+                    if (output.Length < Sha1.ByteLength)
+                        throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {output.Length}");
 
                     // CommitIds are not compressed
                     var commitId = Serializer.DeserializeCommitId(output.ToArray()); // TODO: Perf

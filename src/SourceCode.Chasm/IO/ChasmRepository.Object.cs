@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Concurrent;

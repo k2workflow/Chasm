@@ -12,6 +12,7 @@ using SourceCode.Chasm.IO.AzureBlob;
 using SourceCode.Chasm.IO.AzureTable;
 using SourceCode.Chasm.IO.Disk;
 using SourceCode.Chasm.IO.Json;
+using SourceCode.Clay;
 using System;
 using System.IO;
 using System.IO.Compression;
