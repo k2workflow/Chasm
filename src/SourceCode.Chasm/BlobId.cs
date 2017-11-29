@@ -21,6 +21,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
+        [DebuggerStepThrough]
         public BlobId(in Sha1 sha1)
         {
             Sha1 = sha1;
@@ -33,8 +34,8 @@ namespace SourceCode.Chasm
         public bool Equals(BlobId other) => BlobIdComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is BlobId blobId
-            && BlobIdComparer.Default.Equals(this, blobId);
+            => obj is BlobId other
+            && Equals(other);
 
         public override int GetHashCode() => BlobIdComparer.Default.GetHashCode(this);
 

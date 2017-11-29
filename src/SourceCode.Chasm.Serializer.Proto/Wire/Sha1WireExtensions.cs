@@ -5,6 +5,8 @@
 
 #endregion
 
+using System.Buffers;
+
 namespace SourceCode.Chasm.IO.Proto.Wire
 {
     internal static class Sha1WireExtensions
@@ -13,31 +15,24 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static Sha1Wire Convert(this Sha1 model)
         {
-            var wire = new Sha1Wire
+            Sha1Wire wire;
+
+            var array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLen);
             {
-                Set = true,
-                Blit0 = model.Blit0,
-                Blit1 = model.Blit1,
-                Blit2 = model.Blit2
-            };
+                model.CopyTo(array);
+
+                wire = new Sha1Wire
+                {
+                    Set = true,
+                    Data = Google.Protobuf.ByteString.CopyFrom(array, 0, Sha1.ByteLen)
+                };
+            }
+            ArrayPool<byte>.Shared.Return(array);
 
             return wire;
         }
 
-        public static Sha1Wire Convert(this Sha1? model)
-        {
-            if (model == null) return new Sha1Wire();
-
-            var wire = new Sha1Wire
-            {
-                Set = true,
-                Blit0 = model.Value.Blit0,
-                Blit1 = model.Value.Blit1,
-                Blit2 = model.Value.Blit2
-            };
-
-            return wire;
-        }
+        public static Sha1Wire Convert(this Sha1? model) => model == null ? new Sha1Wire() : Convert(model.Value);
 
         public static Sha1Wire Convert(this BlobId? model) => Convert(model?.Sha1);
 
@@ -47,38 +42,43 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
         public static Sha1? Convert(this Sha1Wire wire)
         {
-            if (wire == null) return default;
-            if (!wire.Set) return default;
+            if (wire == null || !wire.Set) return default;
 
-            var model = new Sha1(wire.Blit0, wire.Blit1, wire.Blit2);
+            Sha1 model;
+
+            var array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLen);
+            {
+                wire.Data.CopyTo(array, 0);
+
+                model = new Sha1(array);
+            }
+            ArrayPool<byte>.Shared.Return(array);
+
             return model;
         }
 
         public static BlobId? ConvertBlob(this Sha1Wire wire)
         {
-            if (wire == null) return default;
-            if (!wire.Set) return default;
+            if (wire == null || !wire.Set) return default;
 
-            var model = new Sha1(wire.Blit0, wire.Blit1, wire.Blit2);
-            return new BlobId(model);
+            var model = Convert(wire);
+            return new BlobId(model.Value);
         }
 
         public static CommitId? ConvertCommit(this Sha1Wire wire)
         {
-            if (wire == null) return default;
-            if (!wire.Set) return default;
+            if (wire == null || !wire.Set) return default;
 
-            var model = new Sha1(wire.Blit0, wire.Blit1, wire.Blit2);
-            return new CommitId(model);
+            var model = Convert(wire);
+            return new CommitId(model.Value);
         }
 
         public static TreeId? ConvertTree(this Sha1Wire wire)
         {
-            if (wire == null) return default;
-            if (!wire.Set) return default;
+            if (wire == null || !wire.Set) return default;
 
-            var model = new Sha1(wire.Blit0, wire.Blit1, wire.Blit2);
-            return new TreeId(model);
+            var model = Convert(wire);
+            return new TreeId(model.Value);
         }
 
         #endregion

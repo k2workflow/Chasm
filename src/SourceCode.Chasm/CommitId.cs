@@ -21,6 +21,7 @@ namespace SourceCode.Chasm
 
         #region Constructors
 
+        [DebuggerStepThrough]
         public CommitId(in Sha1 sha1)
         {
             Sha1 = sha1;
@@ -33,8 +34,8 @@ namespace SourceCode.Chasm
         public bool Equals(CommitId other) => CommitIdComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is CommitId blobId
-            && CommitIdComparer.Default.Equals(this, blobId);
+            => obj is CommitId other
+            && Equals(other);
 
         public override int GetHashCode() => CommitIdComparer.Default.GetHashCode(this);
 

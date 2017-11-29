@@ -53,11 +53,11 @@ namespace SourceCode.Chasm
         {
             #region Methods
 
-            public override int Compare(BlobId x, BlobId y) => Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);
+            public override int Compare(BlobId x, BlobId y) => x.Sha1.CompareTo(y.Sha1);
 
-            public override bool Equals(BlobId x, BlobId y) => Sha1Comparer.Default.Equals(x.Sha1, y.Sha1);
+            public override bool Equals(BlobId x, BlobId y) => x.Sha1.Equals(y.Sha1);
 
-            public override int GetHashCode(BlobId obj) => Sha1Comparer.Default.GetHashCode(obj.Sha1);
+            public override int GetHashCode(BlobId obj) => obj.Sha1.GetHashCode();
 
             #endregion
         }

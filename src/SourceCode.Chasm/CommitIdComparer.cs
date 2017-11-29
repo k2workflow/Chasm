@@ -53,11 +53,11 @@ namespace SourceCode.Chasm
         {
             #region Methods
 
-            public override int Compare(CommitId x, CommitId y) => Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);
+            public override int Compare(CommitId x, CommitId y) => x.Sha1.CompareTo(y.Sha1);
 
-            public override bool Equals(CommitId x, CommitId y) => Sha1Comparer.Default.Equals(x.Sha1, y.Sha1);
+            public override bool Equals(CommitId x, CommitId y) => x.Sha1.Equals(y.Sha1);
 
-            public override int GetHashCode(CommitId obj) => Sha1Comparer.Default.GetHashCode(obj.Sha1);
+            public override int GetHashCode(CommitId obj) => obj.Sha1.GetHashCode();
 
             #endregion
         }

@@ -97,8 +97,8 @@ namespace SourceCode.Chasm
         public bool Equals(TreeNode other) => TreeNodeComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is TreeNode node
-            && TreeNodeComparer.Default.Equals(this, node);
+            => obj is TreeNode other
+            && Equals(other);
 
         public override int GetHashCode() => TreeNodeComparer.Default.GetHashCode(this);
 
