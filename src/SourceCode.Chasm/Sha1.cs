@@ -8,7 +8,6 @@
 using SourceCode.Clay;
 using System;
 using System.Buffers;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -27,9 +26,7 @@ namespace SourceCode.Chasm
     /// <seealso cref="System.IComparable{T}" />
     [DebuggerDisplay("{ToString(\"D\"),nq,ac}")]
     [StructLayout(LayoutKind.Sequential, Size = ByteLen)]
-#pragma warning disable CA1710 // Identifiers should have correct suffix
-    public readonly struct Sha1 : IReadOnlyList<byte>, IEquatable<Sha1>, IComparable<Sha1>
-#pragma warning restore CA1710 // Identifiers should have correct suffix
+    public readonly struct Sha1 : IEquatable<Sha1>, IComparable<Sha1>
     {
         #region Constants
 
@@ -90,29 +87,7 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Properties
-
-        public int Count => ByteLen;
-
-        public byte this[int i]
-        {
-            get
-            {
-                if (i < 0 || i >= ByteLen) return Array.Empty<byte>()[0]; // Leverage underlying exception
-
-                unsafe
-                {
-                    fixed (byte* ptr = &_a0)
-                    {
-                        return ptr[i];
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region De/Constructors
+        #region Constructors
 
         /// <summary>
         /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="ReadOnlyMemory{T}"/>.
@@ -541,18 +516,6 @@ namespace SourceCode.Chasm
             var span = hex.AsReadOnlySpan();
             return Parse(span);
         }
-
-        #endregion
-
-        #region IReadOnlyList
-
-        public IEnumerator<byte> GetEnumerator()
-        {
-            for (var i = 0; i < ByteLen; i++)
-                yield return this[i];
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
 
