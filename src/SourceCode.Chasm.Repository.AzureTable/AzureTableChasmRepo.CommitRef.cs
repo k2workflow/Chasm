@@ -161,8 +161,8 @@ namespace SourceCode.Chasm.IO.AzureTable
                 var entity = (DataEntity)result.Result;
 
                 var count = entity.Content?.Length ?? 0;
-                if (count < Sha1.ByteLen)
-                    throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLen} but has length {count}");
+                if (count < Sha1.ByteLength)
+                    throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {count}");
 
                 // CommitIds are not compressed
                 var commitId = serializer.DeserializeCommitId(entity.Content);

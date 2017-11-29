@@ -6,6 +6,7 @@
 #endregion
 
 using Newtonsoft.Json;
+using SourceCode.Clay;
 using SourceCode.Clay.Json;
 using System;
 using System.IO;

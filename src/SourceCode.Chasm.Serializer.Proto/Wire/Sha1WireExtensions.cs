@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System.Buffers;
 
 namespace SourceCode.Chasm.IO.Proto.Wire
@@ -17,14 +18,14 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         {
             Sha1Wire wire;
 
-            var array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLen);
+            var array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
             {
                 model.CopyTo(array);
 
                 wire = new Sha1Wire
                 {
                     Set = true,
-                    Data = Google.Protobuf.ByteString.CopyFrom(array, 0, Sha1.ByteLen)
+                    Data = Google.Protobuf.ByteString.CopyFrom(array, 0, Sha1.ByteLength)
                 };
             }
             ArrayPool<byte>.Shared.Return(array);
@@ -46,7 +47,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
             Sha1 model;
 
-            var array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLen);
+            var array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
             {
                 wire.Data.CopyTo(array, 0);
 

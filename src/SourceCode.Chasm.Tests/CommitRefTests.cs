@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Clay;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests
