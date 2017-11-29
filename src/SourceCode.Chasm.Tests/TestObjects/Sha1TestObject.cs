@@ -6,6 +6,7 @@
 #endregion
 
 using SourceCode.Chasm.Tests.Helpers;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Tests.TestObjects
 {
