@@ -48,8 +48,8 @@ namespace SourceCode.Chasm
         public bool Equals(Blob other) => BufferComparer.Array.Equals(Data, other.Data);
 
         public override bool Equals(object obj)
-            => obj is Blob blob
-            && Equals(blob);
+            => obj is Blob other
+            && Equals(other);
 
         public override int GetHashCode() => BufferComparer.Array.GetHashCode(Data);
 

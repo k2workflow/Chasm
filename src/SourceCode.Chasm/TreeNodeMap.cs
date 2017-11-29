@@ -495,8 +495,8 @@ namespace SourceCode.Chasm
         public bool Equals(TreeNodeMap other) => TreeNodeMapComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is TreeNodeMap tree
-            && TreeNodeMapComparer.Default.Equals(this, tree);
+            => obj is TreeNodeMap other
+            && Equals(other);
 
         public override int GetHashCode() => TreeNodeMapComparer.Default.GetHashCode(this);
 

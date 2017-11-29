@@ -69,8 +69,8 @@ namespace SourceCode.Chasm
         }
 
         public override bool Equals(object obj)
-            => obj is Audit audit
-            && Equals(audit);
+            => obj is Audit other
+            && Equals(other);
 
         public override int GetHashCode()
         {

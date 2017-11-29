@@ -5,7 +5,6 @@
 
 #endregion
 
-using SourceCode.Clay;
 using System.Collections.Generic;
 
 namespace SourceCode.Chasm
@@ -54,26 +53,11 @@ namespace SourceCode.Chasm
         {
             #region Methods
 
-            public override int Compare(Sha1 x, Sha1 y)
-            {
-                // CLR returns [-1, 0, +1] for ulong/uint comparisons (vs arbitrary neg/pos values)
+            public override int Compare(Sha1 x, Sha1 y) => x.CompareTo(y);
 
-                var cmp = x.Blit0.CompareTo(y.Blit0);
-                if (cmp != 0) return cmp;
+            public override bool Equals(Sha1 x, Sha1 y) => x.Equals(y);
 
-                cmp = x.Blit1.CompareTo(y.Blit1);
-                if (cmp != 0) return cmp;
-
-                cmp = x.Blit2.CompareTo(y.Blit2);
-                return cmp;
-            }
-
-            public override bool Equals(Sha1 x, Sha1 y)
-                => x.Blit0 == y.Blit0
-                && x.Blit1 == y.Blit1
-                && x.Blit2 == y.Blit2;
-
-            public override int GetHashCode(Sha1 obj) => HashCode.Combine(obj.Blit0, obj.Blit1, obj.Blit2);
+            public override int GetHashCode(Sha1 obj) => obj.GetHashCode();
 
             #endregion
         }

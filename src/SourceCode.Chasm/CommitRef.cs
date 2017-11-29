@@ -59,8 +59,8 @@ namespace SourceCode.Chasm
         }
 
         public override bool Equals(object obj)
-            => obj is CommitRef commitRef
-            && Equals(commitRef);
+            => obj is CommitRef other
+            && Equals(other);
 
         public override int GetHashCode()
         {
