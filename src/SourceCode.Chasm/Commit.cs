@@ -148,8 +148,8 @@ namespace SourceCode.Chasm
         public bool Equals(Commit other) => CommitComparer.Default.Equals(this, other);
 
         public override bool Equals(object obj)
-            => obj is Commit commit
-            && CommitComparer.Default.Equals(this, commit);
+            => obj is Commit other
+            && Equals(other);
 
         public override int GetHashCode() => CommitComparer.Default.GetHashCode(this);
 

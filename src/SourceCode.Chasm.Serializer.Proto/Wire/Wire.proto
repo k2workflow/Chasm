@@ -6,9 +6,7 @@ option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 	message Sha1Wire
 	{
 		bool Set = 1;
-		uint64 Blit0 = 2; // 0..7
-		uint64 Blit1 = 3; // 8..15
-		uint32 Blit2 = 4; // 16..19
+		bytes Data = 2; // Expected to be 20 bytes
 	}
 
 	// NodeKind

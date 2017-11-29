@@ -5,11 +5,14 @@
 
 #endregion
 
+using SourceCode.Clay;
 using System;
 using System.Buffers;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 using System.Threading;
@@ -23,11 +26,12 @@ namespace SourceCode.Chasm
     /// <seealso cref="System.IEquatable{T}" />
     /// <seealso cref="System.IComparable{T}" />
     [DebuggerDisplay("{ToString(\"D\"),nq,ac}")]
-    public readonly struct Sha1 : IEquatable<Sha1>, IComparable<Sha1>
+    [StructLayout(LayoutKind.Sequential, Size = ByteLen)]
+#pragma warning disable CA1710 // Identifiers should have correct suffix
+    public readonly struct Sha1 : IReadOnlyList<byte>, IEquatable<Sha1>, IComparable<Sha1>
+#pragma warning restore CA1710 // Identifiers should have correct suffix
     {
         #region Constants
-
-        private static readonly Sha1 _zero;
 
         // Use a thread-local instance of the underlying crypto algorithm.
         private static readonly ThreadLocal<System.Security.Cryptography.SHA1> _sha1 = new ThreadLocal<System.Security.Cryptography.SHA1>(System.Security.Cryptography.SHA1.Create);
@@ -42,6 +46,8 @@ namespace SourceCode.Chasm
         /// </summary>
         public const byte CharLen = ByteLen * 2;
 
+        private static readonly Sha1 _zero;
+
         /// <summary>
         /// A singleton representing an <see cref="Sha1"/> value that is all zeroes.
         /// </summary>
@@ -52,39 +58,55 @@ namespace SourceCode.Chasm
 
         #endregion
 
-        #region Properties
+        #region Fields
 
         // We choose to use value types for primary storage so that we can live on the stack
         // Using byte[] or String means a dereference to the heap (& fixed byte would require unsafe)
 
-        public ulong Blit0 { get; }
+        private readonly byte _a0;
+        private readonly byte _a1;
+        private readonly byte _a2;
+        private readonly byte _a3;
 
-        public ulong Blit1 { get; }
+        private readonly byte _b0;
+        private readonly byte _b1;
+        private readonly byte _b2;
+        private readonly byte _b3;
 
-        public uint Blit2 { get; }
+        private readonly byte _c0;
+        private readonly byte _c1;
+        private readonly byte _c2;
+        private readonly byte _c3;
 
-        /// <summary>
-        /// Returns a <see cref="Memory{T}"/> from the <see cref="Sha1"/>.
-        /// </summary>
-        public Memory<byte> Memory
+        private readonly byte _d0;
+        private readonly byte _d1;
+        private readonly byte _d2;
+        private readonly byte _d3;
+
+        private readonly byte _e0;
+        private readonly byte _e1;
+        private readonly byte _e2;
+        private readonly byte _e3;
+
+        #endregion
+
+        #region Properties
+
+        public int Count => ByteLen;
+
+        public byte this[int i]
         {
             get
             {
-                var buffer = new byte[ByteLen];
+                if (i < 0 || i >= ByteLen) return Array.Empty<byte>()[0]; // Leverage underlying exception
 
                 unsafe
                 {
-                    fixed (byte* ptr = buffer)
+                    fixed (byte* ptr = &_a0)
                     {
-                        // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                        *(ulong*)(&ptr[0 + 0]) = Blit0;
-                        *(ulong*)(&ptr[0 + 8]) = Blit1;
-                        *(uint*)(&ptr[0 + 16]) = Blit2;
+                        return ptr[i];
                     }
                 }
-
-                var mem = new Memory<byte>(buffer);
-                return mem;
             }
         }
 
@@ -93,57 +115,30 @@ namespace SourceCode.Chasm
         #region De/Constructors
 
         /// <summary>
-        /// Deserializes a <see cref="Sha1"/> value from the provided blits.
-        /// </summary>
-        /// <param name="blit0">The blit0.</param>
-        /// <param name="blit1">The blit1.</param>
-        /// <param name="blit2">The blit2.</param>
-        public Sha1(ulong blit0, ulong blit1, uint blit2)
-        {
-            Blit0 = blit0;
-            Blit1 = blit1;
-            Blit2 = blit2;
-        }
-
-        /// <summary>
         /// Deserializes a <see cref="Sha1"/> value from the provided <see cref="ReadOnlyMemory{T}"/>.
         /// </summary>
         /// <param name="span">The buffer.</param>
         /// <exception cref="ArgumentOutOfRangeException">buffer - buffer</exception>
         [SecuritySafeCritical]
         public Sha1(in ReadOnlySpan<byte> span)
+            : this() // Compiler doesn't know we're indirectly setting all the fields
         {
             if (span.Length < ByteLen)
                 throw new ArgumentOutOfRangeException(nameof(span), $"{nameof(span)} must have length at least {ByteLen}");
 
             unsafe
             {
-                fixed (byte* ptr = &span.DangerousGetPinnableReference())
+                fixed (byte* src = &span.DangerousGetPinnableReference())
+                fixed (byte* dst = &_a0)
                 {
-                    // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                    Blit0 = *(ulong*)(&ptr[0]);
-                    Blit1 = *(ulong*)(&ptr[8]);
-                    Blit2 = *(uint*)(&ptr[16]);
+                    Buffer.MemoryCopy(src, dst, ByteLen, ByteLen);
                 }
             }
         }
 
-        /// <summary>
-        /// Deconstructs the specified <see cref="Sha1"/>.
-        /// </summary>
-        /// <param name="blit0">The blit0.</param>
-        /// <param name="blit1">The blit1.</param>
-        /// <param name="blit2">The blit2.</param>
-        public void Deconstruct(out ulong blit0, out ulong blit1, out uint blit2)
-        {
-            blit0 = Blit0;
-            blit1 = Blit1;
-            blit2 = Blit2;
-        }
-
         #endregion
 
-        #region Factory
+        #region Hash
 
         /// <summary>
         /// Hashes the specified value using utf8 encoding.
@@ -261,12 +256,10 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                fixed (byte* ptr = &span.DangerousGetPinnableReference())
+                fixed (byte* src = &_a0)
+                fixed (byte* dst = &span.DangerousGetPinnableReference())
                 {
-                    // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                    *(ulong*)(&ptr[0]) = Blit0;
-                    *(ulong*)(&ptr[8]) = Blit1;
-                    *(uint*)(&ptr[16]) = Blit2;
+                    Buffer.MemoryCopy(src, dst, ByteLen, ByteLen);
                 }
             }
 
@@ -284,10 +277,9 @@ namespace SourceCode.Chasm
         {
             Debug.Assert(separator == FormatN || separator == '-' || separator == ' ');
 
+            // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
             var sep = 0;
             char[] chars;
-
-            // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
             if (separator == FormatN)
             {
                 chars = new char[CharLen];
@@ -300,33 +292,29 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                var bytes = stackalloc byte[ByteLen];
+                fixed (byte* src = &_a0)
                 {
-                    // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                    *(ulong*)(&bytes[0]) = Blit0;
-                    *(ulong*)(&bytes[8]) = Blit1;
-                    *(uint*)(&bytes[16]) = Blit2;
-                }
-
-                var pos = 0;
-                for (var i = 0; i < ByteLen; i++) // 20
-                {
-                    // Each byte is two hexits (convention is lowercase)
-
-                    var b = bytes[i] >> 4; // == b / 16
-                    chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
-
-                    b = bytes[i] - (b << 4); // == b % 16
-                    chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
-
-                    // Append a separator if required
-                    if (pos == sep) // pos >= 2, sep = 0|N
+                    var pos = 0;
+                    for (var i = 0; i < ByteLen; i++) // 20
                     {
-                        chars[pos++] = separator;
+                        // Each byte is two hexits (convention is lowercase)
+                        var byt = src[i];
 
-                        sep = pos + 8;
-                        if (sep >= chars.Length)
-                            sep = 0;
+                        var b = byt >> 4; // == b / 16
+                        chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
+
+                        b = byt & 0x0F; // == b % 16
+                        chars[pos++] = (char)(b < 10 ? b + '0' : b - 10 + 'a');
+
+                        // Append a separator if required
+                        if (pos == sep) // pos >= 2, sep = 0|N
+                        {
+                            chars[pos++] = separator;
+
+                            sep = pos + 8;
+                            if (sep >= chars.Length)
+                                sep = 0;
+                        }
                     }
                 }
             }
@@ -462,7 +450,7 @@ namespace SourceCode.Chasm
 
             unsafe
             {
-                var bytes = stackalloc byte[ByteLen];
+                Span<byte> span = stackalloc byte[ByteLen];
 
                 // Text is treated as 5 groups of 8 chars (4 bytes); 4 separators optional
                 // "34aa973c-d4c4daa4-f61eeb2b-dbad2731-6534016f"
@@ -476,7 +464,7 @@ namespace SourceCode.Chasm
                             || !TryParseHexit(slice[pos++], out var h2))
                             return false;
 
-                        bytes[i * 4 + j] = (byte)((h1 << 4) | h2);
+                        span[i * 4 + j] = (byte)((h1 << 4) | h2);
                     }
 
                     if (pos < CharLen && (slice[pos] == '-' || slice[pos] == ' '))
@@ -488,12 +476,7 @@ namespace SourceCode.Chasm
                 if (pos != slice.Length)
                     return false;
 
-                // Code is valid per BitConverter.ToInt32|64 (see #1 elsewhere in this class)
-                var blit0 = *(ulong*)(&bytes[0]);
-                var blit1 = *(ulong*)(&bytes[8]);
-                var blit2 = *(uint*)(&bytes[16]);
-
-                value = new Sha1(blit0, blit1, blit2);
+                value = new Sha1(span);
                 return true;
             }
 
@@ -561,37 +544,89 @@ namespace SourceCode.Chasm
 
         #endregion
 
+        #region IReadOnlyList
+
+        public IEnumerator<byte> GetEnumerator()
+        {
+            for (var i = 0; i < ByteLen; i++)
+                yield return this[i];
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        #endregion
+
         #region IEquatable
 
-        public bool Equals(Sha1 other) => Sha1Comparer.Default.Equals(this, other);
+        public bool Equals(Sha1 other)
+        {
+            unsafe
+            {
+                fixed (byte* src = &_a0)
+                {
+                    var dst = &other._a0;
+
+                    for (var i = 0; i < ByteLen; i++)
+                        if (src[i] != dst[i])
+                            return false;
+                }
+
+                return true;
+            }
+        }
 
         public override bool Equals(object obj)
-            => obj is Sha1 sha1
-            && Sha1Comparer.Default.Equals(this, sha1);
+            => obj is Sha1 other
+            && Equals(other);
 
-        public override int GetHashCode() => Sha1Comparer.Default.GetHashCode(this);
+        public override int GetHashCode()
+        {
+            var hc = HashCode.Combine(_a0, _a1, _a2, _a3, _b0, _b1, _b2, _b3);
+            hc = HashCode.Combine(hc, _c0, _c1, _c2, _c3, _d0, _d1);
+            hc = HashCode.Combine(hc, _d2, _d3, _e0, _e1, _e2, _e3);
+
+            return hc;
+        }
 
         #endregion
 
         #region IComparable
 
-        public int CompareTo(Sha1 other) => Sha1Comparer.Default.Compare(this, other);
+        public int CompareTo(Sha1 other)
+        {
+            unsafe
+            {
+                fixed (byte* src = &_a0)
+                {
+                    var dst = &other._a0;
+
+                    for (var i = 0; i < ByteLen; i++)
+                    {
+                        var cmp = src[i].CompareTo(dst[i]); // CLR returns a-b for byte comparisons
+                        if (cmp != 0)
+                            return cmp < 0 ? -1 : 1; // Normalize to [-1, 0, +1]
+                    }
+                }
+            }
+
+            return 0;
+        }
 
         #endregion
 
         #region Operators
 
-        public static bool operator ==(Sha1 x, Sha1 y) => Sha1Comparer.Default.Equals(x, y);
+        public static bool operator ==(Sha1 x, Sha1 y) => x.Equals(y);
 
         public static bool operator !=(Sha1 x, Sha1 y) => !(x == y);
 
-        public static bool operator >=(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) >= 0;
+        public static bool operator >=(Sha1 x, Sha1 y) => x.CompareTo(y) >= 0;
 
-        public static bool operator >(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) > 0;
+        public static bool operator >(Sha1 x, Sha1 y) => x.CompareTo(y) > 0;
 
-        public static bool operator <=(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) <= 0;
+        public static bool operator <=(Sha1 x, Sha1 y) => x.CompareTo(y) <= 0;
 
-        public static bool operator <(Sha1 x, Sha1 y) => Sha1Comparer.Default.Compare(x, y) < 0;
+        public static bool operator <(Sha1 x, Sha1 y) => x.CompareTo(y) < 0;
 
         #endregion
     }
