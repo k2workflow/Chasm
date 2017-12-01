@@ -69,7 +69,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         public static AzureBlobChasmRepo Create(string connectionString, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
         {
-            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException(nameof(connectionString));
+            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
             if (serializer == null) throw new ArgumentNullException(nameof(serializer));
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
