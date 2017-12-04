@@ -280,7 +280,7 @@ namespace SourceCode.Chasm.Tests.IO
             };
 
             // Action
-            var actual = await mockChasmRepository.Object.WriteTreeAsync(parents, TreeNodeMapTestObject.Random, AuditTestObject.Random, AuditTestObject.Random, RandomHelper.String, TestValues.CancellationToken);
+            var actual = await mockChasmRepository.Object.WriteTreeAsync(parents, TreeNodeMapTestObject.Random, AuditTestObject.Random, AuditTestObject.Random, RandomHelper.String, RandomHelper.String, TestValues.CancellationToken);
 
             // Assert
             Assert.Equal(new CommitId(), actual);

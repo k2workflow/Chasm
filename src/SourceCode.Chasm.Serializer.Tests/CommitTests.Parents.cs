@@ -29,7 +29,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Parents_Null(IChasmSerializer ser)
         {
             // Force Commit to be non-default
-            var expected = new Commit(new CommitId?(), default, default, default, "force");
+            var expected = new Commit(new CommitId?(), default, default, default, "force", default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -42,7 +42,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Parents_Empty(IChasmSerializer ser)
         {
-            var expected = new Commit(Array.Empty<CommitId>(), default, default, default, null);
+            var expected = new Commit(Array.Empty<CommitId>(), default, default, default, null, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -55,7 +55,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Parents_1_Empty(IChasmSerializer ser)
         {
-            var expected = new Commit(new CommitId?(), default, default, default, null);
+            var expected = new Commit(new CommitId?(), default, default, default, null, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -68,7 +68,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Parents_1(IChasmSerializer ser)
         {
-            var expected = new Commit(Parent1, default, default, default, null);
+            var expected = new Commit(Parent1, default, default, default, null, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -83,7 +83,7 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var parents = new[] { Parent1, Parent2 };
 
-            var expected = new Commit(parents, default, default, default, null);
+            var expected = new Commit(parents, default, default, default, null, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -98,7 +98,7 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var parents = new[] { Parent1, Parent2, Parent3 };
 
-            var expected = new Commit(parents, default, default, default, null);
+            var expected = new Commit(parents, default, default, default, null, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);

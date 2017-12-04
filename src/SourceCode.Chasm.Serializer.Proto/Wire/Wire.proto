@@ -55,6 +55,8 @@ option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
 		AuditWire Committer = 4;
 		
 		google.protobuf.StringValue Message = 5; // Nullable
+
+		google.protobuf.StringValue TenantId = 6;
 	}
 
 	// CommitId

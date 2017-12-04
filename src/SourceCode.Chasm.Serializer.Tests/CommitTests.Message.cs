@@ -22,7 +22,7 @@ namespace SourceCode.Chasm.IO.Tests
             // Force Commit to be non-default
             var force = new Audit("bob", DateTimeOffset.Now);
 
-            var expected = new Commit(new CommitId?(), default, force, default, null);
+            var expected = new Commit(new CommitId?(), default, force, default, null, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -35,7 +35,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Empty(IChasmSerializer ser)
         {
-            var expected = new Commit(new CommitId?(), default, default, default, string.Empty);
+            var expected = new Commit(new CommitId?(), default, default, default, string.Empty, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -48,7 +48,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Whitespace(IChasmSerializer ser)
         {
-            var expected = new Commit(new CommitId?(), default, default, default, " ");
+            var expected = new Commit(new CommitId?(), default, default, default, " ", default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -61,7 +61,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Short(IChasmSerializer ser)
         {
-            var expected = new Commit(new CommitId?(), default, default, default, "hello");
+            var expected = new Commit(new CommitId?(), default, default, default, "hello", default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -74,7 +74,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Long(IChasmSerializer ser)
         {
-            var expected = new Commit(new CommitId?(), default, default, default, TestData.LongStr);
+            var expected = new Commit(new CommitId?(), default, default, default, TestData.LongStr, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -92,12 +92,54 @@ namespace SourceCode.Chasm.IO.Tests
             {
                 str += TestData.SurrogatePair;
 
-                var expected = new Commit(new CommitId?(), default, default, default, TestData.SurrogatePair);
+                var expected = new Commit(new CommitId?(), default, default, default, TestData.SurrogatePair, default);
                 using (var buf = ser.Serialize(expected))
                 {
                     var actual = ser.DeserializeCommit(buf.Result);
                     Assert.Equal(expected, actual);
                 }
+            }
+        }
+
+        [Trait("Type", "Unit")]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_TenantId_Null))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_TenantId_Null(IChasmSerializer ser)
+        {
+            // Force Commit to be non-default
+            var force = new Audit("bob", DateTimeOffset.Now);
+
+            var expected = new Commit(new CommitId?(), default, force, default, default, null);
+            using (var buf = ser.Serialize(expected))
+            {
+                var actual = ser.DeserializeCommit(buf.Result);
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Trait("Type", "Unit")]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_TenantId_Empty))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_TenantId_Empty(IChasmSerializer ser)
+        {
+            var expected = new Commit(new CommitId?(), default, default, default, default, string.Empty);
+            using (var buf = ser.Serialize(expected))
+            {
+                var actual = ser.DeserializeCommit(buf.Result);
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Trait("Type", "Unit")]
+        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_TenantId_Empty))]
+        [ClassData(typeof(TestData))]
+        public static void ChasmSerializer_Roundtrip_Commit_TenantId_Short(IChasmSerializer ser)
+        {
+            var expected = new Commit(new CommitId?(), default, default, default, default, "hello");
+            using (var buf = ser.Serialize(expected))
+            {
+                var actual = ser.DeserializeCommit(buf.Result);
+                Assert.Equal(expected, actual);
             }
         }
 

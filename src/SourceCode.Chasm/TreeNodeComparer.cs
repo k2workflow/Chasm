@@ -84,13 +84,11 @@ namespace SourceCode.Chasm
                 return true;
             }
 
-            public override int GetHashCode(TreeNode obj)
-            {
-                var hc = HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
-                hc = HashCode.Combine(hc, obj.Kind, obj.Sha1);
-
-                return hc;
-            }
+            public override int GetHashCode(TreeNode obj) => HashCode.Combine(
+                StringComparer.Ordinal.GetHashCode(obj.Name ?? string.Empty),
+                obj.Kind,
+                obj.Sha1
+            );
 
             #endregion
         }
@@ -103,7 +101,9 @@ namespace SourceCode.Chasm
 
             public override bool Equals(TreeNode x, TreeNode y) => StringComparer.Ordinal.Equals(x.Name, y.Name);
 
-            public override int GetHashCode(TreeNode obj) => HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
+            public override int GetHashCode(TreeNode obj) => HashCode.Combine(
+                StringComparer.Ordinal.GetHashCode(obj.Name ?? string.Empty)
+            );
 
             #endregion
         }
