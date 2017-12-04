@@ -72,13 +72,10 @@ namespace SourceCode.Chasm
             => obj is Audit other
             && Equals(other);
 
-        public override int GetHashCode()
-        {
-            var hc = HashCode.Combine(Name ?? string.Empty, StringComparer.Ordinal);
-            hc = HashCode.Combine(hc, Timestamp);
-
-            return hc;
-        }
+        public override int GetHashCode() => HashCode.Combine(
+            StringComparer.Ordinal.GetHashCode(Name ?? string.Empty),
+            Timestamp
+        );
 
         #endregion
 

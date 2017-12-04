@@ -1,10 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <!-- Common properties defined in Directory.Build.props -->
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,14 +14,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm.IO\SourceCode.Chasm.IO.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageId>SourceCode.Chasm.Repository.Disk</PackageId>
+    <PackageId>SourceCode.Chasm.IO</PackageId>
     <Authors>SourceCode</Authors>
-    <Description>CAS - Content Addressable Storage (Local Disk Storage Repository).</Description>
-    <PackageTags>cas content storage sha1 git disk file</PackageTags>
+    <Description>CAS - Content Addressable Storage I/O.</Description>
+    <PackageTags>cas content storage sha1 git model io</PackageTags>
     <Version>1.0.0-local</Version>
     <PackageVersion>1.0.0-local</PackageVersion>
   </PropertyGroup>

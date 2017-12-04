@@ -62,13 +62,10 @@ namespace SourceCode.Chasm
             => obj is CommitRef other
             && Equals(other);
 
-        public override int GetHashCode()
-        {
-            var hc = HashCode.Combine(CommitId);
-            hc = HashCode.Combine(hc, Branch ?? string.Empty, StringComparer.Ordinal);
-
-            return hc;
-        }
+        public override int GetHashCode() => HashCode.Combine(
+            CommitId,
+            StringComparer.Ordinal.GetHashCode(Branch ?? string.Empty)
+        );
 
         #endregion
 
