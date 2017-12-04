@@ -56,18 +56,19 @@ namespace SourceCode.Chasm
                 if (x.Committer != y.Committer) return false;
                 if (!StringComparer.Ordinal.Equals(x.Message, y.Message)) return false;
                 if (!x.Parents.NullableListEquals(y.Parents, CommitIdComparer.Default)) return false;
+                if (!StringComparer.Ordinal.Equals(x.TenantId, y.TenantId)) return false;
 
                 return true;
             }
 
-            public override int GetHashCode(Commit obj)
-            {
-                var hc = HashCode.Combine(obj.TreeId ?? default, TreeIdComparer.Default);
-                hc = HashCode.Combine(hc, obj.Author, obj.Committer, obj.Parents == null ? 0 : obj.Parents.Count);
-                hc = HashCode.Combine(hc, obj.Message ?? string.Empty, StringComparer.Ordinal);
-
-                return hc;
-            }
+            public override int GetHashCode(Commit obj) => HashCode.Combine(
+                TreeIdComparer.Default.GetHashCode(obj.TreeId ?? default),
+                obj.Author,
+                obj.Committer,
+                obj.Parents.Count,
+                StringComparer.Ordinal.GetHashCode(obj.Message ?? string.Empty),
+                StringComparer.Ordinal.GetHashCode(obj.TenantId ?? string.Empty)
+            );
 
             #endregion
         }

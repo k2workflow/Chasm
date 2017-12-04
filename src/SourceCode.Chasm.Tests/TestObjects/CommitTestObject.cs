@@ -18,6 +18,7 @@ namespace SourceCode.Chasm.Tests.TestObjects
             TreeIdTestObject.Random,
             AuditTestObject.Random,
             AuditTestObject.Random,
+            RandomHelper.String,
             RandomHelper.String);
 
         #endregion

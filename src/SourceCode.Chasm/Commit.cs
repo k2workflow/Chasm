@@ -37,6 +37,7 @@ namespace SourceCode.Chasm
 
         private readonly IReadOnlyList<CommitId> _parents; // May be null due to default ctor
         private readonly string _message;
+        private readonly string _tenantId;
 
         #endregion
 
@@ -52,16 +53,19 @@ namespace SourceCode.Chasm
 
         public string Message => _message ?? string.Empty; // May be null due to default ctor
 
+        public string TenantId => _tenantId ?? string.Empty;
+
         #endregion
 
         #region De/Constructors
 
-        public Commit(in IReadOnlyList<CommitId> parents, in TreeId? treeId, in Audit author, in Audit committer, in string message)
+        public Commit(in IReadOnlyList<CommitId> parents, in TreeId? treeId, in Audit author, in Audit committer, string message, string tenantId)
         {
             TreeId = treeId;
             Author = author;
             Committer = committer;
             _message = message;
+            _tenantId = tenantId;
 
             // We choose to coerce empty & null, so de/serialization round-trips with fidelity
             if (parents == null)
@@ -128,17 +132,18 @@ namespace SourceCode.Chasm
             }
         }
 
-        public Commit(in CommitId? parent, in TreeId? treeId, in Audit author, in Audit committer, in string message)
-            : this(parent.HasValue ? new[] { parent.Value } : Array.Empty<CommitId>(), treeId, author, committer, message)
+        public Commit(in CommitId? parent, in TreeId? treeId, in Audit author, in Audit committer, string message, string tenantId)
+            : this(parent.HasValue ? new[] { parent.Value } : Array.Empty<CommitId>(), treeId, author, committer, message, tenantId)
         { }
 
-        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId? treeId, out Audit author, out Audit committer, out string message)
+        public void Deconstruct(out IReadOnlyList<CommitId> parents, out TreeId? treeId, out Audit author, out Audit committer, out string message, out string tenantId)
         {
             parents = Parents;
             treeId = TreeId;
             author = Author;
             committer = Committer;
             message = Message;
+            tenantId = TenantId;
         }
 
         #endregion

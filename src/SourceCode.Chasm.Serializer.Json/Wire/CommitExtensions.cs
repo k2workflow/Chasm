@@ -25,6 +25,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
         private const string _author = "author";
         private const string _committer = "committer";
         private const string _message = "message";
+        private const string _tenantId = "tenantId";
 
         #endregion
 
@@ -39,6 +40,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             TreeId? treeId = default;
             IReadOnlyList<CommitId> parents = null;
             string message = null;
+            string tenantId = null;
 
             // Switch
             return jr.ReadObject(n =>
@@ -61,6 +63,10 @@ namespace SourceCode.Chasm.IO.Json.Wire
                         message = (string)jr.Value;
                         return true;
 
+                    case _tenantId:
+                        tenantId = (string)jr.Value;
+                        return true;
+
                     case _treeId:
                         treeId = ReadTreeId();
                         return true;
@@ -70,7 +76,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
             },
 
             // Factory
-            () => new Commit(parents, treeId, author, committer, message));
+            () => new Commit(parents, treeId, author, committer, message, tenantId));
 
             // Property
 
@@ -144,10 +150,17 @@ namespace SourceCode.Chasm.IO.Json.Wire
                 }
 
                 // Message
-                if (model.Message != null)
+                if (model.Message != string.Empty)
                 {
                     jw.WritePropertyName(_message);
                     jw.WriteValue(model.Message);
+                }
+
+                // TenantId
+                if (model.TenantId != string.Empty)
+                {
+                    jw.WritePropertyName(_tenantId);
+                    jw.WriteValue(model.TenantId);
                 }
 
                 // TreeId

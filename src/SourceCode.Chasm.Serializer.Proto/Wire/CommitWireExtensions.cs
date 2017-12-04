@@ -55,6 +55,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             // Message
             wire.Message = new StringValue { Value = model.Message };
 
+            // TenantId
+            wire.TenantId = new StringValue { Value = model.TenantId };
+
             return wire;
         }
 
@@ -96,7 +99,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             // Message
             var message = wire.Message?.Value;
 
-            var model = new Commit(parents, treeId, author, committer, message);
+            // TenantId
+            var tenantId = wire.TenantId?.Value;
+
+            var model = new Commit(parents, treeId, author, committer, message, tenantId);
             return model;
         }
 

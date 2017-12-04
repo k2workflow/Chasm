@@ -7,7 +7,6 @@
 
 using SourceCode.Chasm.IO.Json;
 using SourceCode.Chasm.IO.Proto;
-using SourceCode.Chasm.IO.Text;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,10 +22,7 @@ namespace SourceCode.Chasm.IO.Tests
             new object[]{ new JsonChasmSerializer() },
 
             // Proto Serializer
-            new object[]{ new ProtoChasmSerializer() },
-
-            // Text Serializer
-            new object[]{ new TextChasmSerializer() }
+            new object[]{ new ProtoChasmSerializer() }
         };
 
         // https://en.wikipedia.org/wiki/Special:CiteThisPage?page=Rick_Astley

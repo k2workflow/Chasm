@@ -35,6 +35,7 @@ namespace SoruceCode.Chasm.IntegrationTests
         private static async Task TestRepository(IChasmRepository repository)
         {
             var g = Guid.NewGuid();
+            var tenant = Guid.NewGuid().ToString();
 
             var data = g.ToByteArray();
             var sha = Sha1.Hash(data);
@@ -72,7 +73,8 @@ namespace SoruceCode.Chasm.IntegrationTests
                 treeId,
                 new Audit("User1", DateTimeOffset.UtcNow.AddDays(-1)),
                 new Audit("User2", DateTimeOffset.UtcNow),
-                "Initial commit"
+                "Initial commit",
+                tenant
             );
             var commitId = await repository.WriteCommitAsync(commit, default);
             var rcommit = await repository.ReadCommitAsync(commitId, default);
@@ -104,20 +106,20 @@ namespace SoruceCode.Chasm.IntegrationTests
             await repository.WriteCommitRefAsync(null, commitRefName + "_1", new CommitRef("production", new CommitId(usha)), default);
 
             var names = await repository.GetNamesAsync(default);
-            Assert.True(names.Contains(commitRefName));
-            Assert.True(names.Contains(commitRefName + "_1"));
+            Assert.Contains(names, x => x == commitRefName);
+            Assert.Contains(names, x => x == commitRefName + "_1");
 
             var branches = await repository.GetBranchesAsync(commitRefName, default);
-            Assert.True(branches.Select(x => x.Branch).Contains("production"));
-            Assert.True(branches.Select(x => x.Branch).Contains("dev"));
-            Assert.True(branches.Select(x => x.Branch).Contains("staging"));
+            Assert.Contains(branches.Select(x => x.Branch), x => x == "production");
+            Assert.Contains(branches.Select(x => x.Branch), x => x == "dev");
+            Assert.Contains(branches.Select(x => x.Branch), x => x == "staging");
 
             Assert.Equal(commitId, branches.First(x => x.Branch == "production").CommitId);
             Assert.Equal(commitId, branches.First(x => x.Branch == "dev").CommitId);
             Assert.Equal(new CommitId(usha), branches.First(x => x.Branch == "staging").CommitId);
 
             branches = await repository.GetBranchesAsync(commitRefName + "_1", default);
-            Assert.True(branches.Select(x => x.Branch).Contains("production"));
+            Assert.Contains(branches.Select(x => x.Branch), x => x == "production");
             Assert.Equal(new CommitId(usha), branches.First(x => x.Branch == "production").CommitId);
         }
 

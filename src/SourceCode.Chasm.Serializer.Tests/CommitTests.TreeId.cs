@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_TreeId_Empty(IChasmSerializer ser)
         {
-            var expected = new Commit(new CommitId?(), default, default, default, null);
+            var expected = new Commit(new CommitId?(), default, default, default, null, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);
@@ -38,7 +38,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_TreeId(IChasmSerializer ser)
         {
-            var expected = new Commit(new CommitId?(), TreeId1, default, default, null);
+            var expected = new Commit(new CommitId?(), TreeId1, default, default, null, default);
             using (var buf = ser.Serialize(expected))
             {
                 var actual = ser.DeserializeCommit(buf.Result);

@@ -27,14 +27,15 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             "ZRgBIAEoCRIbCgRLaW5kGAIgASgOMg0uTm9kZUtpbmRXaXJlEhkKBk5vZGVJ",
             "ZBgDIAEoCzIJLlNoYTFXaXJlIigKCFRyZWVXaXJlEhwKBU5vZGVzGAEgAygL",
             "Mg0uVHJlZVdpcmVOb2RlIjsKCUF1ZGl0V2lyZRIMCgROYW1lGAEgASgJEhAK",
-            "CERhdGVUaW1lGAIgASgDEg4KBk9mZnNldBgDIAEoAyKtAQoKQ29tbWl0V2ly",
+            "CERhdGVUaW1lGAIgASgDEg4KBk9mZnNldBgDIAEoAyLdAQoKQ29tbWl0V2ly",
             "ZRIaCgdQYXJlbnRzGAEgAygLMgkuU2hhMVdpcmUSGQoGVHJlZUlkGAIgASgL",
             "MgkuU2hhMVdpcmUSGgoGQXV0aG9yGAMgASgLMgouQXVkaXRXaXJlEh0KCUNv",
             "bW1pdHRlchgEIAEoCzIKLkF1ZGl0V2lyZRItCgdNZXNzYWdlGAUgASgLMhwu",
-            "Z29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlIiUKDENvbW1pdElkV2lyZRIV",
-            "CgJJZBgBIAEoCzIJLlNoYTFXaXJlKiIKDE5vZGVLaW5kV2lyZRIICgRCbG9i",
-            "EAASCAoEVHJlZRABQiGqAh5Tb3VyY2VDb2RlLkNoYXNtLklPLlByb3RvLldp",
-            "cmViBnByb3RvMw=="));
+            "Z29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCFRlbmFudElkGAYgASgL",
+            "MhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlIiUKDENvbW1pdElkV2ly",
+            "ZRIVCgJJZBgBIAEoCzIJLlNoYTFXaXJlKiIKDE5vZGVLaW5kV2lyZRIICgRC",
+            "bG9iEAASCAoEVHJlZRABQiGqAh5Tb3VyY2VDb2RlLkNoYXNtLklPLlByb3Rv",
+            "LldpcmViBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.WrappersReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::SourceCode.Chasm.IO.Proto.Wire.NodeKindWire), }, new pbr::GeneratedClrTypeInfo[] {
@@ -42,7 +43,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.TreeWireNode), global::SourceCode.Chasm.IO.Proto.Wire.TreeWireNode.Parser, new[]{ "Name", "Kind", "NodeId" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.TreeWire), global::SourceCode.Chasm.IO.Proto.Wire.TreeWire.Parser, new[]{ "Nodes" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.AuditWire), global::SourceCode.Chasm.IO.Proto.Wire.AuditWire.Parser, new[]{ "Name", "DateTime", "Offset" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Author", "Committer", "Message" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Author", "Committer", "Message", "TenantId" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire), global::SourceCode.Chasm.IO.Proto.Wire.CommitIdWire.Parser, new[]{ "Id" }, null, null, null)
           }));
     }
@@ -723,6 +724,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       Author = other.author_ != null ? other.Author.Clone() : null;
       Committer = other.committer_ != null ? other.Committer.Clone() : null;
       Message = other.message_ != null ? other.Message.Clone() : null;
+      TenantId = other.tenantId_ != null ? other.TenantId.Clone() : null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -787,6 +789,17 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       }
     }
 
+    /// <summary>Field number for the "TenantId" field.</summary>
+    public const int TenantIdFieldNumber = 6;
+    private global::Google.Protobuf.WellKnownTypes.StringValue tenantId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public global::Google.Protobuf.WellKnownTypes.StringValue TenantId {
+      get { return tenantId_; }
+      set {
+        tenantId_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as CommitWire);
@@ -805,6 +818,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (!object.Equals(Author, other.Author)) return false;
       if (!object.Equals(Committer, other.Committer)) return false;
       if (!object.Equals(Message, other.Message)) return false;
+      if (!object.Equals(TenantId, other.TenantId)) return false;
       return true;
     }
 
@@ -816,6 +830,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       if (author_ != null) hash ^= Author.GetHashCode();
       if (committer_ != null) hash ^= Committer.GetHashCode();
       if (message_ != null) hash ^= Message.GetHashCode();
+      if (tenantId_ != null) hash ^= TenantId.GetHashCode();
       return hash;
     }
 
@@ -843,6 +858,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
         output.WriteRawTag(42);
         output.WriteMessage(Message);
       }
+      if (tenantId_ != null) {
+        output.WriteRawTag(50);
+        output.WriteMessage(TenantId);
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -860,6 +879,9 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
       }
       if (message_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Message);
+      }
+      if (tenantId_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(TenantId);
       }
       return size;
     }
@@ -893,6 +915,12 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
           message_ = new global::Google.Protobuf.WellKnownTypes.StringValue();
         }
         Message.MergeFrom(other.Message);
+      }
+      if (other.tenantId_ != null) {
+        if (tenantId_ == null) {
+          tenantId_ = new global::Google.Protobuf.WellKnownTypes.StringValue();
+        }
+        TenantId.MergeFrom(other.TenantId);
       }
     }
 
@@ -934,6 +962,13 @@ namespace SourceCode.Chasm.IO.Proto.Wire {
               message_ = new global::Google.Protobuf.WellKnownTypes.StringValue();
             }
             input.ReadMessage(message_);
+            break;
+          }
+          case 50: {
+            if (tenantId_ == null) {
+              tenantId_ = new global::Google.Protobuf.WellKnownTypes.StringValue();
+            }
+            input.ReadMessage(tenantId_);
             break;
           }
         }
