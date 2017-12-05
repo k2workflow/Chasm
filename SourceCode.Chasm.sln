@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27110.0
+VisualStudioVersion = 15.0.27128.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm", "src\SourceCode.Chasm\SourceCode.Chasm.csproj", "{430F8C16-427D-4756-B788-80C1F41E2B9A}"
 EndProject
@@ -38,6 +38,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.Repository.Hybrid", "src\SourceCode.Chasm.Repository.Hybrid\SourceCode.Chasm.Repository.Hybrid.csproj", "{505E9DC1-437A-46FC-A6DC-3629952A8034}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceCode.Chasm.IntegrationTests", "src\SourceCode.Chasm.IntegrationTests\SourceCode.Chasm.IntegrationTests.csproj", "{8EBC52F8-9CFF-45AC-A121-966DEF4174FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceCode.Chasm.IO", "src\SourceCode.Chasm.IO\SourceCode.Chasm.IO.csproj", "{D471EEE2-AAD6-4582-8E3B-1B13FD20705C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,10 @@ Global
 		{8EBC52F8-9CFF-45AC-A121-966DEF4174FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EBC52F8-9CFF-45AC-A121-966DEF4174FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EBC52F8-9CFF-45AC-A121-966DEF4174FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D471EEE2-AAD6-4582-8E3B-1B13FD20705C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D471EEE2-AAD6-4582-8E3B-1B13FD20705C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D471EEE2-AAD6-4582-8E3B-1B13FD20705C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D471EEE2-AAD6-4582-8E3B-1B13FD20705C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

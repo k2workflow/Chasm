@@ -9,7 +9,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
-namespace SourceCode.Chasm.IO
+namespace SourceCode.Chasm
 {
     [Serializable]
     public sealed class ChasmConcurrencyException : System.Data.DataException
