@@ -1,11 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Common properties defined in Directory.Build.props -->
+
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.0-beta3-62314-05">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0-beta1">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="SourceCode.Clay.Threading" Version="1.0.0-preview1-00308" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <PackageId>SourceCode.Chasm.Serializer</PackageId>
+    <Authors>SourceCode</Authors>
+    <Description>CAS - Content Addressable Storage Serializers.</Description>
+    <PackageTags>cas content storage sha1 git model serializer</PackageTags>
+    <Version>1.0.0-local</Version>
+    <PackageVersion>1.0.0-local</PackageVersion>
+  </PropertyGroup>
 </Project>
