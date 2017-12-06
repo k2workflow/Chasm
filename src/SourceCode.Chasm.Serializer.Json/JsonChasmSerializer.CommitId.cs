@@ -21,12 +21,11 @@ namespace SourceCode.Chasm.IO.Json
             var json = model.Write();
 
             var maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
-            var rented = BufferSession.RentBuffer(maxLen);
+            var rented = BufferSession.Rent(maxLen).Result;
 
-            var count = Encoding.UTF8.GetBytes(json, 0, json.Length, rented, 0);
+            var count = Encoding.UTF8.GetBytes(json, 0, json.Length, rented.Array, 0);
 
-            var seg = new ArraySegment<byte>(rented, 0, count);
-            var session = new BufferSession(seg);
+            var session = BufferSession.Rented(rented.Slice(0, count));
             return session;
         }
 
