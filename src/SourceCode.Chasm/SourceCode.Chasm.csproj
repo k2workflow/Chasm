@@ -14,9 +14,9 @@
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0-beta1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00308" />
-    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00308" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00308" />
+    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00309" />
+    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00309" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00309" />
   </ItemGroup>
 
   <PropertyGroup>
