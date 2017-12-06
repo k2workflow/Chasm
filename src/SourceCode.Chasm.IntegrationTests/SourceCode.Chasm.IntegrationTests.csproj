@@ -22,6 +22,5 @@
     <ProjectReference Include="..\SourceCode.Chasm.Repository.AzureTable\SourceCode.Chasm.Repository.AzureTable.csproj" />
     <ProjectReference Include="..\SourceCode.Chasm.Repository.Disk\SourceCode.Chasm.Repository.Disk.csproj" />
     <ProjectReference Include="..\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
 </Project>

@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm.Serializer\SourceCode.Chasm.Serializer.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>SourceCode.Chasm.IO</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
