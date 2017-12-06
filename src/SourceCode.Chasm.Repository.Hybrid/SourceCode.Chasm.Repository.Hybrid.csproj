@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.Repository\SourceCode.Chasm.Repository.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

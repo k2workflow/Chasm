@@ -4,7 +4,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,18 +13,18 @@
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0-beta1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="WindowsAzure.Storage" Version="8.6.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm.Repository\SourceCode.Chasm.Repository.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.Serializer\SourceCode.Chasm.Serializer.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageId>SourceCode.Chasm.Repository.AzureBlob</PackageId>
+    <PackageId>SourceCode.Chasm.IO</PackageId>
     <Authors>SourceCode</Authors>
-    <Description>CAS - Content Addressable Storage (Azure Blob Storage Repository).</Description>
-    <PackageTags>cas content storage sha1 git azure blob</PackageTags>
+    <Description>CAS - Content Addressable Storage I/O.</Description>
+    <PackageTags>cas content storage sha1 git model io</PackageTags>
     <Version>1.0.0-local</Version>
     <PackageVersion>1.0.0-local</PackageVersion>
   </PropertyGroup>
