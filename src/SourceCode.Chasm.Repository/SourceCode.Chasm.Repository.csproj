@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>SourceCode.Chasm.IO</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SourceCode.Chasm.Serializer\SourceCode.Chasm.Serializer.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
