@@ -12,6 +12,7 @@ using SourceCode.Chasm.IO.AzureBlob;
 using SourceCode.Chasm.IO.AzureTable;
 using SourceCode.Chasm.IO.Disk;
 using SourceCode.Chasm.IO.Json;
+using SourceCode.Clay;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -103,20 +104,20 @@ namespace SoruceCode.Chasm.IntegrationTests
             await repository.WriteCommitRefAsync(null, commitRefName + "_1", new CommitRef("production", new CommitId(usha)), default);
 
             var names = await repository.GetNamesAsync(default);
-            Assert.True(names.Contains(commitRefName));
-            Assert.True(names.Contains(commitRefName + "_1"));
+            Assert.Contains(names, x => x == commitRefName);
+            Assert.Contains(names, x => x == commitRefName + "_1");
 
             var branches = await repository.GetBranchesAsync(commitRefName, default);
-            Assert.True(branches.Select(x => x.Branch).Contains("production"));
-            Assert.True(branches.Select(x => x.Branch).Contains("dev"));
-            Assert.True(branches.Select(x => x.Branch).Contains("staging"));
+            Assert.Contains(branches.Select(x => x.Branch), x => x == "production");
+            Assert.Contains(branches.Select(x => x.Branch), x => x == "dev");
+            Assert.Contains(branches.Select(x => x.Branch), x => x == "staging");
 
             Assert.Equal(commitId, branches.First(x => x.Branch == "production").CommitId);
             Assert.Equal(commitId, branches.First(x => x.Branch == "dev").CommitId);
             Assert.Equal(new CommitId(usha), branches.First(x => x.Branch == "staging").CommitId);
 
             branches = await repository.GetBranchesAsync(commitRefName + "_1", default);
-            Assert.True(branches.Select(x => x.Branch).Contains("production"));
+            Assert.Contains(branches.Select(x => x.Branch), x => x == "production");
             Assert.Equal(new CommitId(usha), branches.First(x => x.Branch == "production").CommitId);
         }
 

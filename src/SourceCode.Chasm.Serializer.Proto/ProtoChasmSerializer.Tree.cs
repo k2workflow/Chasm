@@ -21,15 +21,13 @@ namespace SourceCode.Chasm.IO.Proto
             var wire = model.Convert();
 
             var size = wire.CalculateSize();
-            var buffer = BufferSession.RentBuffer(size);
+            var buffer = BufferSession.Rent(size).Result;
 
-            using (var cos = new CodedOutputStream(buffer))
+            using (var cos = new CodedOutputStream(buffer.Array))
             {
                 wire.WriteTo(cos);
 
-                var segment = new ArraySegment<byte>(buffer, 0, (int)cos.Position);
-
-                var session = new BufferSession(buffer, segment);
+                var session = BufferSession.Rented(buffer.Slice(0, (int)cos.Position));
                 return session;
             }
         }

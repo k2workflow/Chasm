@@ -6,6 +6,7 @@
 #endregion
 
 using SourceCode.Chasm.IO;
+using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;

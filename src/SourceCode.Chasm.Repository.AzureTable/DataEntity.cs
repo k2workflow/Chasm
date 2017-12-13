@@ -6,6 +6,7 @@
 #endregion
 
 using Microsoft.WindowsAzure.Storage.Table;
+using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -332,7 +333,7 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         private static string GetRowKey(Sha1 sha1) => GetPartition(sha1).Value;
 
-        private static string GetPartitionKey(string branch) => branch.ToLowerInvariant();
+        private static string GetPartitionKey(string branch) => branch.ToUpperInvariant();
 
         private static string GetRowKey(string name) => $"{name}-commit";
 

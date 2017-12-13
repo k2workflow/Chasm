@@ -11,13 +11,12 @@
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.0-beta3-62314-05">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0-beta1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00304" />
-    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00304" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00304" />
-    <PackageReference Include="SourceCode.Clay.Threading" Version="1.0.0-preview1-00304" />
+    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00309" />
+    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00309" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00309" />
   </ItemGroup>
 
   <PropertyGroup>

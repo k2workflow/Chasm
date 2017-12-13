@@ -11,14 +11,14 @@
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.0-beta3-62314-05">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.3.0-beta1">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0-beta1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00304" />
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00309" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm\SourceCode.Chasm.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.Serializer\SourceCode.Chasm.Serializer.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
