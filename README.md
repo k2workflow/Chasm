@@ -5,6 +5,10 @@
 [![Code Coverage](https://codecov.io/gh/k2workflow/Chasm/coverage.svg)](https://codecov.io/gh/k2workflow/Chasm)
 [![CodeFactor](https://www.codefactor.io/repository/github/k2workflow/chasm/badge)](https://www.codefactor.io/repository/github/k2workflow/chasm)
 
+### This project has been archived
+
+The code is no longer maintained.
+
 ```
    ______  ____  ____       _       ______   ____    ____  
  .' ___  ||_   ||   _|     / \    .' ____ \ |_   \  /   _| 
