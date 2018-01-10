@@ -1,3 +1,4 @@
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/k2workflow/Chasm.png?columns=all)](https://waffle.io/k2workflow/Chasm?utm_source=badge)
 ## Chasm
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
