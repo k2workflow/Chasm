@@ -8,7 +8,7 @@ namespace SourceCode.Chasm.Tests.Helpers
         {
             get
             {
-                var buffer = new byte[Random.Next()];
+                byte[] buffer = new byte[Random.Next()];
                 Random.NextBytes(buffer);
                 return buffer;
             }

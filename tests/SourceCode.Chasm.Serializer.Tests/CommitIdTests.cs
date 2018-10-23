@@ -21,9 +21,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_CommitId_Default(IChasmSerializer ser)
         {
             var expected = new CommitId();
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommitId(buf.Memory.Span.Slice(0, len));
+                CommitId actual = ser.DeserializeCommitId(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -34,9 +34,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_CommitId(IChasmSerializer ser)
         {
             var expected = new CommitId(Sha1.Hash("abc"));
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommitId(buf.Memory.Span.Slice(0, len));
+                CommitId actual = ser.DeserializeCommitId(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }

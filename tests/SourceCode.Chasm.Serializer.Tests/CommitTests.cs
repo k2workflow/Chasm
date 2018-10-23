@@ -20,9 +20,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Default(IChasmSerializer ser)
         {
             var expected = new Commit();
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }

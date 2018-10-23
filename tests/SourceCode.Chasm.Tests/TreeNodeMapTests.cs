@@ -327,8 +327,8 @@ namespace SourceCode.Chasm.Tests
             tree = tree.Add(new TreeNode("e", NodeKind.Tree, Sha1.Hash("Test6")));
             tree = tree.Add(new TreeNode("f", NodeKind.Blob, Sha1.Hash("Test7")));
 
-            var prev = tree.Keys.First();
-            foreach (var cur in tree.Keys.Skip(1))
+            string prev = tree.Keys.First();
+            foreach (string cur in tree.Keys.Skip(1))
             {
                 Assert.True(string.CompareOrdinal(cur, prev) > 0);
                 prev = cur;
@@ -341,7 +341,7 @@ namespace SourceCode.Chasm.Tests
         {
             // Arrange
             var tree = new TreeNodeMap();
-            var expectedName = Guid.NewGuid().ToString();
+            string expectedName = Guid.NewGuid().ToString();
             NodeKind expectedKind = NodeKind.Tree;
             var expectedSha1 = Sha1.Hash(Guid.NewGuid().ToString());
 

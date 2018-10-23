@@ -19,7 +19,7 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
-            using (IMemoryOwner<byte> owner = Serializer.Serialize(commit, out var len))
+            using (IMemoryOwner<byte> owner = Serializer.Serialize(commit, out int len))
             {
                 Memory<byte> mem = owner.Memory.Slice(0, len);
                 var sha1 = Sha1.Hash(mem.Span);

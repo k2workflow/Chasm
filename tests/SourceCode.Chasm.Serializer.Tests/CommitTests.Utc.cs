@@ -27,9 +27,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Utc(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, new Audit("bob", Utc1), new Audit("mary", Utc1), null);
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }

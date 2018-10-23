@@ -247,7 +247,7 @@ namespace SourceCode.Chasm.Tests
         {
             var expected = new Commit(new[] { new CommitId(Sha1.Hash("c1")), new CommitId(Sha1.Hash("c2")) }, new TreeId(Sha1.Hash("abc")), Audit.Empty, Audit.Empty, "hello");
 
-            (IReadOnlyList<CommitId> parents, TreeId? treeId, Audit author, Audit committer, var message) = expected;
+            (IReadOnlyList<CommitId> parents, TreeId? treeId, Audit author, Audit committer, string message) = expected;
             var actual = new Commit(parents, treeId, author, committer, message);
 
             Assert.Equal(expected, actual);

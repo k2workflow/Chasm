@@ -16,8 +16,8 @@ namespace SourceCode.Chasm.Repository.Tests
         public static void ChasmRepository_BuildConcurrencyException()
         {
             // Arrange
-            var expectedBranch = RandomHelper.String;
-            var expectedName = RandomHelper.String;
+            string expectedBranch = RandomHelper.String;
+            string expectedName = RandomHelper.String;
             var expectedInnerException = new Exception(RandomHelper.String);
 
             // Action
@@ -37,7 +37,7 @@ namespace SourceCode.Chasm.Repository.Tests
             // Arrange
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
-            var expectedMaxDop = 5;
+            int expectedMaxDop = 5;
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
 
             // Action
@@ -57,7 +57,7 @@ namespace SourceCode.Chasm.Repository.Tests
             // Arrange
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             var expectedCompressionLevel = (CompressionLevel)int.MaxValue;
-            var expectedMaxDop = default(int);
+            int expectedMaxDop = default(int);
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
 
             // Action
@@ -84,7 +84,7 @@ namespace SourceCode.Chasm.Repository.Tests
             // Arrange
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
-            var expectedMaxDop = int.MinValue;
+            int expectedMaxDop = int.MinValue;
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
 
             // Action
@@ -111,7 +111,7 @@ namespace SourceCode.Chasm.Repository.Tests
             // Arrange
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
-            var expectedMaxDop = default(int);
+            int expectedMaxDop = default(int);
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
 
             // Action
@@ -138,7 +138,7 @@ namespace SourceCode.Chasm.Repository.Tests
             // Arrange
             var chasmSerializer = default(IChasmSerializer);
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
-            var expectedMaxDop = 5;
+            int expectedMaxDop = 5;
             var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedCompressionLevel, expectedMaxDop);
 
             // Action

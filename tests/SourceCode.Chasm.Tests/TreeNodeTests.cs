@@ -84,7 +84,7 @@ namespace SourceCode.Chasm.Tests
         {
             var expected = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
 
-            (var name, NodeKind kind, Sha1 sha) = expected;
+            (string name, NodeKind kind, Sha1 sha) = expected;
             var actual = new TreeNode(name, kind, sha);
 
             Assert.Equal(expected, actual);
@@ -119,7 +119,7 @@ namespace SourceCode.Chasm.Tests
         {
             // Arrange
             var expectedTreeId = new TreeId();
-            var expectedName = Guid.NewGuid().ToString();
+            string expectedName = Guid.NewGuid().ToString();
 
             // Action
             var actual = new TreeNode(expectedName, expectedTreeId);

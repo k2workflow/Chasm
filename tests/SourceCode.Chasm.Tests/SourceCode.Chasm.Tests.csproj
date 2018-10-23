@@ -9,24 +9,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="Moq" Version="4.10.0" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Moq" Version="4.10.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm.Repository.AzureBlob\SourceCode.Chasm.Repository.AzureBlob.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm.Repository.AzureTable\SourceCode.Chasm.Repository.AzureTable.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm.Repository.Disk\SourceCode.Chasm.Repository.Disk.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" />
+    <ProjectReference Include="..\..\src\SourceCode.Chasm.Repository\SourceCode.Chasm.Repository.csproj" />
+    <ProjectReference Include="..\..\src\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 </Project>

@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.Repository.Tests
         public static void ChasmConcurrencyException_Constructor_String()
         {
             // Arrange
-            var expectedMessage = RandomHelper.String;
+            string expectedMessage = RandomHelper.String;
 
             // Action
             var actual = new ChasmConcurrencyException(expectedMessage);
@@ -40,7 +40,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var expectedInnerException = new Exception(RandomHelper.String);
-            var expectedMessage = RandomHelper.String;
+            string expectedMessage = RandomHelper.String;
 
             // Action
             var actual = new ChasmConcurrencyException(expectedMessage, expectedInnerException);

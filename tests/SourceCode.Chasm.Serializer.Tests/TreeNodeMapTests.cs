@@ -29,9 +29,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Default(IChasmSerializer ser)
         {
             TreeNodeMap expected = default;
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -42,9 +42,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -55,9 +55,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Null(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(null);
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -68,9 +68,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty_Array(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -81,9 +81,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_1_Node(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1);
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -94,9 +94,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_2_Nodes(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1, Node2);
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -107,9 +107,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_3_Nodes(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1, Node2, Node3);
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }

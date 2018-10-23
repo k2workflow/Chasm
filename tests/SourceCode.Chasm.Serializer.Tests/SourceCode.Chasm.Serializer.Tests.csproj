@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Common properties defined in Directory.Build.props -->
 
@@ -9,10 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="xunit" Version="2.4.0" />
@@ -23,9 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm.Serializer.Text\SourceCode.Chasm.Serializer.Text.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" />
-    <ProjectReference Include="..\SourceCode.Chasm.Serializer.Proto\SourceCode.Chasm.Serializer.Proto.csproj" />
+    <ProjectReference Include="..\..\src\SourceCode.Chasm.Serializer.Text\SourceCode.Chasm.Serializer.Text.csproj" />
+    <ProjectReference Include="..\..\src\SourceCode.Chasm.Serializer.Json\SourceCode.Chasm.Serializer.Json.csproj" />
+    <ProjectReference Include="..\..\src\SourceCode.Chasm.Serializer.Proto\SourceCode.Chasm.Serializer.Proto.csproj" />
   </ItemGroup>
 
   <ItemGroup>

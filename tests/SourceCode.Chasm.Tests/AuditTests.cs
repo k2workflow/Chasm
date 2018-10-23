@@ -12,12 +12,12 @@ namespace SourceCode.Chasm.Tests
         public static void Audit_Deconstruct()
         {
             // Arrange
-            var expectedName = RandomHelper.String;
+            string expectedName = RandomHelper.String;
             DateTimeOffset expectedDateTimeOffset = RandomHelper.DateTimeOffset;
             var audit = new Audit(expectedName, expectedDateTimeOffset);
 
             // Action
-            audit.Deconstruct(out var actualName, out DateTimeOffset actualDateTimeOffset);
+            audit.Deconstruct(out string actualName, out DateTimeOffset actualDateTimeOffset);
 
             // Assert
             Assert.Equal(expectedName, actualName);

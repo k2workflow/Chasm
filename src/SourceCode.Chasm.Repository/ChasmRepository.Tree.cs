@@ -76,7 +76,7 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken)
         {
-            using (IMemoryOwner<byte> owner = Serializer.Serialize(tree, out var length))
+            using (IMemoryOwner<byte> owner = Serializer.Serialize(tree, out int length))
             {
                 Memory<byte> mem = owner.Memory.Slice(0, length);
                 var sha1 = Sha1.Hash(mem.Span);

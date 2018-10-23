@@ -22,9 +22,9 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap();
 
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
 
                 Assert.Equal(expected, actual);
             }
@@ -37,9 +37,9 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(new TreeNode[0]);
 
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
 
                 Assert.Equal(expected, actual);
             }
@@ -55,9 +55,9 @@ namespace SourceCode.Chasm.IO.Tests
             var node2 = new TreeNode("c", NodeKind.Tree, Sha1.Hash("hij"));
             var expected = new TreeNodeMap(node0, node1, node2);
 
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
 
                 Assert.Equal(expected, actual);
             }

@@ -36,7 +36,7 @@ namespace SoruceCode.Chasm.IntegrationTests
         {
             var g = Guid.NewGuid();
 
-            var data = g.ToByteArray();
+            byte[] data = g.ToByteArray();
             var sha = Sha1.Hash(data);
 
             // Unknown SHA
@@ -45,12 +45,12 @@ namespace SoruceCode.Chasm.IntegrationTests
 
             // Blob
             await repository.WriteObjectAsync(sha, new ArraySegment<byte>(data), false, default);
-            var rdata = (await repository.ReadObjectAsync(sha, default));
+            ReadOnlyMemory<byte>? rdata = (await repository.ReadObjectAsync(sha, default));
             Assert.True(rdata.HasValue);
             Assert.Equal(16, rdata.Value.Length);
             //Assert.Equal(g, rdata.Value.Span.NonPortableCast<byte, Guid>()[0]); // TODO: Fix test
 
-            var urdata = await repository.ReadObjectAsync(usha, default);
+            ReadOnlyMemory<byte>? urdata = await repository.ReadObjectAsync(usha, default);
             Assert.False(urdata.HasValue);
 
             // Tree
@@ -58,12 +58,12 @@ namespace SoruceCode.Chasm.IntegrationTests
                 new TreeNode("firstItem", NodeKind.Blob, sha),
                 new TreeNode("secondItem", NodeKind.Blob, sha)
             );
-            var treeId = await repository.WriteTreeAsync(tree, default);
-            var rtree = await repository.ReadTreeAsync(treeId, default);
+            TreeId treeId = await repository.WriteTreeAsync(tree, default);
+            TreeNodeMap? rtree = await repository.ReadTreeAsync(treeId, default);
             Assert.True(rtree.HasValue);
             Assert.Equal(tree, rtree.Value);
 
-            var urtree = await repository.ReadTreeAsync(new TreeId(usha), default);
+            TreeNodeMap? urtree = await repository.ReadTreeAsync(new TreeId(usha), default);
             Assert.False(urtree.HasValue);
 
             // Commit
@@ -74,23 +74,23 @@ namespace SoruceCode.Chasm.IntegrationTests
                 new Audit("User2", DateTimeOffset.UtcNow),
                 "Initial commit"
             );
-            var commitId = await repository.WriteCommitAsync(commit, default);
-            var rcommit = await repository.ReadCommitAsync(commitId, default);
+            CommitId commitId = await repository.WriteCommitAsync(commit, default);
+            Commit? rcommit = await repository.ReadCommitAsync(commitId, default);
             Assert.True(rcommit.HasValue);
             Assert.Equal(commit, rcommit);
 
-            var urcommit = await repository.ReadCommitAsync(new CommitId(usha), default);
+            Commit? urcommit = await repository.ReadCommitAsync(new CommitId(usha), default);
             Assert.False(urcommit.HasValue);
 
             // CommitRef
-            var commitRefName = Guid.NewGuid().ToString("N");
+            string commitRefName = Guid.NewGuid().ToString("N");
             var commitRef = new CommitRef("production", commitId);
             await repository.WriteCommitRefAsync(null, commitRefName, commitRef, default);
-            var rcommitRef = await repository.ReadCommitRefAsync(commitRefName, commitRef.Branch, default);
+            CommitRef? rcommitRef = await repository.ReadCommitRefAsync(commitRefName, commitRef.Branch, default);
             Assert.True(rcommit.HasValue);
             Assert.Equal(commitRef, rcommitRef);
 
-            var urcommitRef = await repository.ReadCommitRefAsync(commitRefName + "_", commitRef.Branch, default);
+            CommitRef? urcommitRef = await repository.ReadCommitRefAsync(commitRefName + "_", commitRef.Branch, default);
             Assert.False(urcommit.HasValue);
 
             await Assert.ThrowsAsync<ChasmConcurrencyException>(() =>
@@ -103,11 +103,11 @@ namespace SoruceCode.Chasm.IntegrationTests
             await repository.WriteCommitRefAsync(null, commitRefName, new CommitRef("staging", new CommitId(usha)), default);
             await repository.WriteCommitRefAsync(null, commitRefName + "_1", new CommitRef("production", new CommitId(usha)), default);
 
-            var names = await repository.GetNamesAsync(default);
+            System.Collections.Generic.IReadOnlyList<string> names = await repository.GetNamesAsync(default);
             Assert.Contains(names, x => x == commitRefName);
             Assert.Contains(names, x => x == commitRefName + "_1");
 
-            var branches = await repository.GetBranchesAsync(commitRefName, default);
+            System.Collections.Generic.IReadOnlyList<CommitRef> branches = await repository.GetBranchesAsync(commitRefName, default);
             Assert.Contains(branches.Select(x => x.Branch), x => x == "production");
             Assert.Contains(branches.Select(x => x.Branch), x => x == "dev");
             Assert.Contains(branches.Select(x => x.Branch), x => x == "staging");
@@ -124,7 +124,7 @@ namespace SoruceCode.Chasm.IntegrationTests
         [Fact(DisplayName = nameof(DiskChasmRepo_Test))]
         public static async Task DiskChasmRepo_Test()
         {
-            var tmp = Path.GetTempFileName();
+            string tmp = Path.GetTempFileName();
             File.Delete(tmp);
             try
             {

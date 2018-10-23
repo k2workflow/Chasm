@@ -5,25 +5,23 @@
 
 #endregion
 
+using System.Collections;
+using System.Collections.Generic;
 using SourceCode.Chasm.Serializer.Json;
 using SourceCode.Chasm.Serializer.Proto;
 using SourceCode.Chasm.Serializer.Text;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace SourceCode.Chasm.IO.Tests
 {
     internal sealed class TestData : IEnumerable<object[]>
     {
-        #region Constants
-
         private readonly List<object[]> _data = new List<object[]>
         {
             // Json Serializer
             new object[]{ new JsonChasmSerializer() },
 
-            // Proto Serializer
-            new object[]{ new ProtoChasmSerializer() },
+            // TODO: Proto Serializer
+            //new object[]{ new ProtoChasmSerializer() },
 
             // Text Serializer
             new object[]{ new TextChasmSerializer() }
@@ -34,14 +32,8 @@ namespace SourceCode.Chasm.IO.Tests
 
         public const string SurrogatePair = "\uD869\uDE01";
 
-        #endregion
-
-        #region Methods
-
         public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        #endregion
     }
 }

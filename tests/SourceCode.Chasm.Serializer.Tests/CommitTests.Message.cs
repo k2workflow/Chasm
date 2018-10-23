@@ -24,9 +24,9 @@ namespace SourceCode.Chasm.IO.Tests
             var force = new Audit("bob", DateTimeOffset.Now);
 
             var expected = new Commit(new CommitId?(), default, force, default, null);
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -37,9 +37,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, string.Empty);
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -50,9 +50,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Whitespace(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, " ");
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -63,9 +63,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Short(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, "hello");
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -76,9 +76,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Long(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, TestData.LongStr);
-            using (var buf = ser.Serialize(expected, out var len))
+            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
             {
-                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -88,15 +88,15 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Message_Wide(IChasmSerializer ser)
         {
-            var str = string.Empty;
-            for (var i = 0; i < 200; i++)
+            string str = string.Empty;
+            for (int i = 0; i < 200; i++)
             {
                 str += TestData.SurrogatePair;
 
                 var expected = new Commit(new CommitId?(), default, default, default, TestData.SurrogatePair);
-                using (var buf = ser.Serialize(expected, out var len))
+                using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
                 {
-                    var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                    Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                     Assert.Equal(expected, actual);
                 }
             }
