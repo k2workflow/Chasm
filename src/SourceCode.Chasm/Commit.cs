@@ -76,7 +76,7 @@ namespace SourceCode.Chasm
 
                 case 2:
                     {
-                        var cmp = CommitIdComparer.Default.Compare(parents[0], parents[1]);
+                        int cmp = CommitIdComparer.Default.Compare(parents[0], parents[1]);
                         switch (cmp)
                         {
                             // Silently de-duplicate
@@ -94,15 +94,15 @@ namespace SourceCode.Chasm
                     {
                         // Copy
                         var array = new CommitId[parents.Count];
-                        for (var i = 0; i < parents.Count; i++)
+                        for (int i = 0; i < parents.Count; i++)
                             array[i] = parents[i];
 
                         // Sort: Delegate dispatch faster than interface (https://github.com/dotnet/coreclr/pull/8504)
                         Array.Sort(array, CommitIdComparer.Default.Compare);
 
                         // Distinct
-                        var j = 1;
-                        for (var i = 1; i < array.Length; i++)
+                        int j = 1;
+                        for (int i = 1; i < array.Length; i++)
                         {
                             // If it's a duplicate, silently skip
                             if (CommitIdComparer.Default.Equals(array[i - 1], array[i]))

@@ -12,7 +12,7 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
-        private static readonly TreeNodeMap _empty;
+        private static readonly TreeNodeMap s_empty;
 
         /// <summary>
         /// A singleton representing an empty <see cref="TreeNodeMap"/> value.
@@ -20,7 +20,7 @@ namespace SourceCode.Chasm
         /// <value>
         /// The empty.
         /// </value>
-        public static ref readonly TreeNodeMap Empty => ref _empty;
+        public static ref readonly TreeNodeMap Empty => ref s_empty;
 
         #endregion
 
@@ -41,7 +41,7 @@ namespace SourceCode.Chasm
                 if (_nodes.Length == 0)
                     return Array.Empty<TreeNode>()[index]; // Throw underlying exception
 
-                var span = _nodes.Span;
+                ReadOnlySpan<TreeNode> span = _nodes.Span;
 
                 return span[index];
             }
@@ -51,7 +51,7 @@ namespace SourceCode.Chasm
         {
             get
             {
-                if (!TryGetValue(key, out var node))
+                if (!TryGetValue(key, out TreeNode node))
                     throw new KeyNotFoundException(nameof(key));
 
                 return node;
@@ -118,9 +118,9 @@ namespace SourceCode.Chasm
         {
             if (_nodes.Length == 0) return new TreeNodeMap(node);
 
-            var index = IndexOf(node.Name);
+            int index = IndexOf(node.Name);
 
-            var span = _nodes.Span;
+            ReadOnlySpan<TreeNode> span = _nodes.Span;
 
             TreeNode[] array;
             if (index >= 0)
@@ -134,8 +134,8 @@ namespace SourceCode.Chasm
                 index = ~index;
                 array = new TreeNode[_nodes.Length + 1];
 
-                var j = 0;
-                for (var i = 0; i < array.Length; i++)
+                int j = 0;
+                for (int i = 0; i < array.Length; i++)
                     array[i] = i == index ? node : span[j++];
             }
 
@@ -150,7 +150,7 @@ namespace SourceCode.Chasm
             if (_nodes.Length == 0)
                 return nodes;
 
-            var tree = MergeImpl(this, nodes);
+            TreeNodeMap tree = MergeImpl(this, nodes);
             return tree;
         }
 
@@ -162,7 +162,7 @@ namespace SourceCode.Chasm
             if (_nodes.Length == 0)
                 return new TreeNodeMap(nodes);
 
-            var tree = MergeImpl(this, new TreeNodeMap(nodes));
+            TreeNodeMap tree = MergeImpl(this, new TreeNodeMap(nodes));
             return tree;
         }
 
@@ -170,9 +170,9 @@ namespace SourceCode.Chasm
         {
             var newArray = new TreeNode[first.Count + second.Count];
 
-            var i = 0;
-            var aIndex = 0;
-            var bIndex = 0;
+            int i = 0;
+            int aIndex = 0;
+            int bIndex = 0;
             for (; aIndex < first.Count || bIndex < second.Count; i++)
             {
                 if (aIndex >= first.Count)
@@ -185,9 +185,9 @@ namespace SourceCode.Chasm
                 }
                 else
                 {
-                    var a = first[aIndex];
-                    var b = second[bIndex];
-                    var cmp = string.CompareOrdinal(a.Name, b.Name);
+                    TreeNode a = first[aIndex];
+                    TreeNode b = second[bIndex];
+                    int cmp = string.CompareOrdinal(a.Name, b.Name);
 
                     if (cmp == 0)
                     {
@@ -224,9 +224,9 @@ namespace SourceCode.Chasm
             if (_nodes.Length == 0) return this;
 
             var copy = new TreeNode[_nodes.Length - 1];
-            var span = _nodes.Span;
-            var j = 0;
-            for (var i = 0; i < _nodes.Length; i++)
+            ReadOnlySpan<TreeNode> span = _nodes.Span;
+            int j = 0;
+            for (int i = 0; i < _nodes.Length; i++)
             {
                 if (!predicate(span[i].Name))
                     copy[j++] = span[i];
@@ -243,9 +243,9 @@ namespace SourceCode.Chasm
             if (_nodes.Length == 0) return this;
 
             var copy = new TreeNode[_nodes.Length - 1];
-            var span = _nodes.Span;
-            var found = false;
-            for (var i = 0; i < _nodes.Length; i++)
+            ReadOnlySpan<TreeNode> span = _nodes.Span;
+            bool found = false;
+            for (int i = 0; i < _nodes.Length; i++)
             {
                 if (found)
                 {
@@ -273,16 +273,16 @@ namespace SourceCode.Chasm
         {
             if (_nodes.Length == 0 || key == null) return -1;
 
-            var l = 0;
-            var r = _nodes.Length - 1;
-            var i = r / 2;
-            var ks = key;
+            int l = 0;
+            int r = _nodes.Length - 1;
+            int i = r / 2;
+            string ks = key;
 
-            var span = _nodes.Span;
+            ReadOnlySpan<TreeNode> span = _nodes.Span;
 
             while (r >= l)
             {
-                var cmp = string.CompareOrdinal(span[i].Name, ks);
+                int cmp = string.CompareOrdinal(span[i].Name, ks);
                 if (cmp == 0) return i;
                 else if (cmp > 0) r = i - 1;
                 else l = i + 1;
@@ -302,18 +302,18 @@ namespace SourceCode.Chasm
             if (_nodes.Length == 0 || key == null)
                 return false;
 
-            var l = 0;
-            var r = _nodes.Length - 1;
-            var i = r / 2;
-            var ks = key;
+            int l = 0;
+            int r = _nodes.Length - 1;
+            int i = r / 2;
+            string ks = key;
 
-            var span = _nodes.Span;
+            ReadOnlySpan<TreeNode> span = _nodes.Span;
 
             while (r >= l)
             {
                 value = span[i];
 
-                var cmp = string.CompareOrdinal(value.Name, ks);
+                int cmp = string.CompareOrdinal(value.Name, ks);
                 if (cmp == 0) return true;
 
                 if (cmp > 0) r = i - 1;
@@ -330,7 +330,7 @@ namespace SourceCode.Chasm
         {
             value = default;
 
-            if (!TryGetValue(key, out var node))
+            if (!TryGetValue(key, out TreeNode node))
                 return false;
 
             if (node.Kind != kind)
@@ -388,7 +388,7 @@ namespace SourceCode.Chasm
                 default:
 
                     // If callsite did not already copy, do so before mutating
-                    var nodes = array;
+                    TreeNode[] nodes = array;
                     if (!alreadyCopied)
                     {
                         nodes = new TreeNode[array.Length];
@@ -399,8 +399,8 @@ namespace SourceCode.Chasm
                     Array.Sort(nodes, TreeNodeComparer.Default.Compare);
 
                     // Distinct
-                    var j = 1;
-                    for (var i = 1; i < nodes.Length; i++)
+                    int j = 1;
+                    for (int i = 1; i < nodes.Length; i++)
                     {
                         // If the Name (alone) is duplicated
                         if (StringComparer.Ordinal.Equals(nodes[i - 1].Name, nodes[i].Name))
@@ -429,7 +429,7 @@ namespace SourceCode.Chasm
             if (!System.Linq.Enumerable.Any(nodes)) return default;
 
             // If callsite did not already copy, do so before mutating
-            var array = new List<TreeNode>(nodes).ToArray();
+            TreeNode[] array = new List<TreeNode>(nodes).ToArray();
 
             return DistinctSort(array, true);
         }
@@ -446,7 +446,7 @@ namespace SourceCode.Chasm
                     yield break;
 
                 // Span unsafe under yield, so cannot cache it before iterator
-                for (var i = 0; i < _nodes.Length; i++)
+                for (int i = 0; i < _nodes.Length; i++)
                     yield return _nodes.Span[i].Name;
             }
         }
@@ -459,7 +459,7 @@ namespace SourceCode.Chasm
                     yield break;
 
                 // Span unsafe under yield, so cannot cache it before iterator
-                for (var i = 0; i < _nodes.Length; i++)
+                for (int i = 0; i < _nodes.Length; i++)
                     yield return _nodes.Span[i];
             }
         }
@@ -473,10 +473,10 @@ namespace SourceCode.Chasm
             if (_nodes.Length == 0)
                 yield break;
 
-            for (var i = 0; i < _nodes.Length; i++)
+            for (int i = 0; i < _nodes.Length; i++)
             {
                 // Span unsafe under yield, so cannot cache it before iterator
-                var span = _nodes.Span[i];
+                TreeNode span = _nodes.Span[i];
                 yield return new KeyValuePair<string, TreeNode>(span.Name, span);
             }
         }

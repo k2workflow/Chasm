@@ -56,7 +56,7 @@ namespace SourceCode.Chasm
             public override int Compare(TreeNode x, TreeNode y)
             {
                 // Nodes are always sorted by Name first (see TreeNodeMap)
-                var cmp = string.CompareOrdinal(x.Name, y.Name);
+                int cmp = string.CompareOrdinal(x.Name, y.Name);
                 if (cmp != 0) return cmp;
 
                 // Then by Sha1 (in order to detect duplicate)
@@ -79,7 +79,7 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNode obj)
             {
-                var hc = HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
+                int hc = HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
                 hc = HashCode.Combine(hc, obj.Kind, obj.Sha1);
 
                 return hc;
