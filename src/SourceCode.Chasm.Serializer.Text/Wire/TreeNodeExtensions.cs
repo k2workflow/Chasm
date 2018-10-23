@@ -1,20 +1,11 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using System;
 using System.Runtime.Serialization;
 
-namespace SourceCode.Chasm.IO.Text.Wire
+namespace SourceCode.Chasm.Serializer.Text.Wire
 {
     internal static class TreeNodeExtensions
     {
-        #region Methods
-
         public static string Convert(this TreeNode model)
         {
             if (model == TreeNode.Empty) return default;
@@ -27,7 +18,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
                 default: throw new SerializationException();
             }
 
-            var wire = $"{perm} {kind} {model.Sha1:N} {model.Name}";
+            string wire = $"{perm} {kind} {model.Sha1:N} {model.Name}";
             return wire;
         }
 
@@ -35,17 +26,15 @@ namespace SourceCode.Chasm.IO.Text.Wire
         {
             if (string.IsNullOrWhiteSpace(wire)) return default;
 
-            var tokens = wire.Split(' ', 4, StringSplitOptions.None);
+            string[] tokens = wire.Split(' ', 4, StringSplitOptions.None);
             if (tokens.Length != 4) throw new SerializationException();
 
-            var kind = Enum.Parse<NodeKind>(tokens[1], true);
+            NodeKind kind = Enum.Parse<NodeKind>(tokens[1], true);
             var sha1 = Sha1.Parse(tokens[2]);
-            var name = tokens[3];
+            string name = tokens[3];
 
             var model = new TreeNode(name, kind, sha1);
             return model;
         }
-
-        #endregion
     }
 }

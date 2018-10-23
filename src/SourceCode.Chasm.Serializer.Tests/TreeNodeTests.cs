@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
 
@@ -21,9 +22,9 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap();
 
-            using (var seg = ser.Serialize(expected))
+            using (var buf = ser.Serialize(expected, out var len))
             {
-                var actual = ser.DeserializeTree(seg.Result);
+                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
 
                 Assert.Equal(expected, actual);
             }
@@ -36,9 +37,9 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(new TreeNode[0]);
 
-            using (var seg = ser.Serialize(expected))
+            using (var buf = ser.Serialize(expected, out var len))
             {
-                var actual = ser.DeserializeTree(seg.Result);
+                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
 
                 Assert.Equal(expected, actual);
             }
@@ -54,9 +55,9 @@ namespace SourceCode.Chasm.IO.Tests
             var node2 = new TreeNode("c", NodeKind.Tree, Sha1.Hash("hij"));
             var expected = new TreeNodeMap(node0, node1, node2);
 
-            using (var seg = ser.Serialize(expected))
+            using (var buf = ser.Serialize(expected, out var len))
             {
-                var actual = ser.DeserializeTree(seg.Result);
+                var actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
 
                 Assert.Equal(expected, actual);
             }

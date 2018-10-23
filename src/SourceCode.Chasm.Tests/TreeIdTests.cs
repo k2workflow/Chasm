@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using System;
 using Xunit;
@@ -13,8 +6,6 @@ namespace SourceCode.Chasm.Tests
 {
     public static class TreeIdTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeId_equality))]
         public static void TreeId_equality()
@@ -44,12 +35,12 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(TreeId_Compare))]
         public static void TreeId_Compare()
         {
-            var comparer = TreeIdComparer.Default;
+            TreeIdComparer comparer = TreeIdComparer.Default;
 
             var treeId1 = new TreeId(Sha1.Hash("abc"));
             var treeId2 = new TreeId(Sha1.Hash("abc"));
             var treeId3 = new TreeId(Sha1.Hash("def"));
-            var list = new[] { treeId1, treeId2, treeId3 };
+            TreeId[] list = new[] { treeId1, treeId2, treeId3 };
 
             Assert.True(treeId1.CompareTo(treeId2) == 0);
             Assert.True(treeId1.CompareTo(treeId3) != 0);
@@ -59,7 +50,5 @@ namespace SourceCode.Chasm.Tests
             Assert.True(list[0] <= list[1]);
             Assert.True(list[2] >= list[1]);
         }
-
-        #endregion
     }
 }

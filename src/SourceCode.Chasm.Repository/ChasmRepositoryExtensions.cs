@@ -1,21 +1,12 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO
+namespace SourceCode.Chasm.Repository
 {
     public static class ChasmRepositoryExtensions
     {
-        #region Methods
-
         public static ValueTask<Commit?> ReadCommitAsync(this IChasmRepository chasmRepository, CommitId? commitId, CancellationToken cancellationToken)
         {
             if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));
@@ -47,7 +38,5 @@ namespace SourceCode.Chasm.IO
                 ? chasmRepository.ReadTreeAsync(treeId.Value, cancellationToken)
                 : default;
         }
-
-        #endregion
     }
 }

@@ -1,12 +1,6 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -14,15 +8,9 @@ namespace SourceCode.Chasm.Tests
 {
     public static class CommitTests
     {
-        #region Constants
-
         private static readonly CommitId Parent1 = new CommitId(Sha1.Hash(nameof(Parent1)));
         private static readonly CommitId Parent2 = new CommitId(Sha1.Hash(nameof(Parent2)));
         private static readonly CommitId Parent3 = new CommitId(Sha1.Hash(nameof(Parent3)));
-
-        #endregion
-
-        #region Methods
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(Commit_Empty))]
@@ -180,7 +168,7 @@ namespace SourceCode.Chasm.Tests
         public static void Commit_Parents_2_Sorted()
         {
             // Forward
-            var parents = new[] { Parent1, Parent2 }.OrderByDescending(n => n.Sha1).ToArray();
+            CommitId[] parents = new[] { Parent1, Parent2 }.OrderByDescending(n => n.Sha1).ToArray();
 
             var actual = new Commit(parents, default, default, default, null);
             Assert.Collection(actual.Parents, n => Assert.Equal(n, Parent1), n => Assert.Equal(n, Parent2));
@@ -222,7 +210,7 @@ namespace SourceCode.Chasm.Tests
         public static void Commit_Parents_3_Sorted()
         {
             // Forward
-            var parents = new[] { Parent1, Parent2, Parent3 }.OrderByDescending(n => n.Sha1).ToArray();
+            CommitId[] parents = new[] { Parent1, Parent2, Parent3 }.OrderByDescending(n => n.Sha1).ToArray();
 
             var actual = new Commit(parents, default, default, default, null);
             Assert.Collection(actual.Parents, n => Assert.Equal(n, Parent3), n => Assert.Equal(n, Parent1), n => Assert.Equal(n, Parent2));
@@ -240,7 +228,7 @@ namespace SourceCode.Chasm.Tests
         public static void Commit_Parents_N_Duplicated()
         {
             // Forward
-            var parents = new[] { Parent2, Parent1, Parent3, Parent2, Parent3, Parent1, Parent2, Parent3, Parent3, Parent1 };
+            CommitId[] parents = new[] { Parent2, Parent1, Parent3, Parent2, Parent3, Parent1, Parent2, Parent3, Parent3, Parent1 };
 
             var actual = new Commit(parents, default, default, default, null);
             Assert.Collection(actual.Parents, n => Assert.Equal(n, Parent3), n => Assert.Equal(n, Parent1), n => Assert.Equal(n, Parent2));
@@ -259,12 +247,10 @@ namespace SourceCode.Chasm.Tests
         {
             var expected = new Commit(new[] { new CommitId(Sha1.Hash("c1")), new CommitId(Sha1.Hash("c2")) }, new TreeId(Sha1.Hash("abc")), Audit.Empty, Audit.Empty, "hello");
 
-            var (parents, treeId, author, committer, message) = expected;
+            (IReadOnlyList<CommitId> parents, TreeId? treeId, Audit author, Audit committer, var message) = expected;
             var actual = new Commit(parents, treeId, author, committer, message);
 
             Assert.Equal(expected, actual);
         }
-
-        #endregion
     }
 }

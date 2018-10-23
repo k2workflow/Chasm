@@ -1,18 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <RootNamespace>SourceCode.Chasm.IO</RootNamespace>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>SourceCode.Chasm.Repository</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.1">
-      <PrivateAssets>All</PrivateAssets>
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0-beta2">
-      <PrivateAssets>All</PrivateAssets>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
@@ -21,7 +23,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageId>SourceCode.Chasm.IO</PackageId>
+    <PackageId>SourceCode.Chasm.Repository</PackageId>
     <Authors>SourceCode</Authors>
     <Description>CAS - Content Addressable Storage I/O.</Description>
     <PackageTags>cas content storage sha1 git model io</PackageTags>

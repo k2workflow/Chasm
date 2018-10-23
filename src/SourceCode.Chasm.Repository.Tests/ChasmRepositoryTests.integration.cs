@@ -1,42 +1,28 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using Microsoft.WindowsAzure.Storage;
-using SourceCode.Chasm;
-using SourceCode.Chasm.Repository;
 using SourceCode.Chasm.Repository.AzureBlob;
 using SourceCode.Chasm.Repository.AzureTable;
 using SourceCode.Chasm.Repository.Disk;
 using SourceCode.Chasm.Serializer.Json;
 using SourceCode.Clay;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SoruceCode.Chasm.IntegrationTests
+namespace SourceCode.Chasm.Repository.Azure.Tests
 {
-    public class ChasmRepositoryTests
+    public partial class ChasmRepositoryTests
     {
-        #region Fields
-
         private const string DevelopmentStorage = "UseDevelopmentStorage=true";
-
-        #endregion
-
-        #region Methods
 
         private static async Task TestRepository(IChasmRepository repository)
         {
             var g = Guid.NewGuid();
 
-            var data = g.ToByteArray();
+            byte[] data = g.ToByteArray();
             var sha = Sha1.Hash(data);
 
             // Unknown SHA
@@ -45,12 +31,12 @@ namespace SoruceCode.Chasm.IntegrationTests
 
             // Blob
             await repository.WriteObjectAsync(sha, new ArraySegment<byte>(data), false, default);
-            var rdata = (await repository.ReadObjectAsync(sha, default));
+            ReadOnlyMemory<byte>? rdata = (await repository.ReadObjectAsync(sha, default));
             Assert.True(rdata.HasValue);
             Assert.Equal(16, rdata.Value.Length);
-            //Assert.Equal(g, rdata.Value.Span.NonPortableCast<byte, Guid>()[0]); // TODO: Fix test
+            //Assert.Equal(g, rdata.Value.Span.NonPortableCast<byte, Guid>()[0]);
 
-            var urdata = await repository.ReadObjectAsync(usha, default);
+            ReadOnlyMemory<byte>? urdata = await repository.ReadObjectAsync(usha, default);
             Assert.False(urdata.HasValue);
 
             // Tree
@@ -58,12 +44,12 @@ namespace SoruceCode.Chasm.IntegrationTests
                 new TreeNode("firstItem", NodeKind.Blob, sha),
                 new TreeNode("secondItem", NodeKind.Blob, sha)
             );
-            var treeId = await repository.WriteTreeAsync(tree, default);
-            var rtree = await repository.ReadTreeAsync(treeId, default);
+            TreeId treeId = await repository.WriteTreeAsync(tree, default);
+            TreeNodeMap? rtree = await repository.ReadTreeAsync(treeId, default);
             Assert.True(rtree.HasValue);
             Assert.Equal(tree, rtree.Value);
 
-            var urtree = await repository.ReadTreeAsync(new TreeId(usha), default);
+            TreeNodeMap? urtree = await repository.ReadTreeAsync(new TreeId(usha), default);
             Assert.False(urtree.HasValue);
 
             // Commit
@@ -74,23 +60,23 @@ namespace SoruceCode.Chasm.IntegrationTests
                 new Audit("User2", DateTimeOffset.UtcNow),
                 "Initial commit"
             );
-            var commitId = await repository.WriteCommitAsync(commit, default);
-            var rcommit = await repository.ReadCommitAsync(commitId, default);
+            CommitId commitId = await repository.WriteCommitAsync(commit, default);
+            Commit? rcommit = await repository.ReadCommitAsync(commitId, default);
             Assert.True(rcommit.HasValue);
             Assert.Equal(commit, rcommit);
 
-            var urcommit = await repository.ReadCommitAsync(new CommitId(usha), default);
+            Commit? urcommit = await repository.ReadCommitAsync(new CommitId(usha), default);
             Assert.False(urcommit.HasValue);
 
             // CommitRef
-            var commitRefName = Guid.NewGuid().ToString("N");
+            string commitRefName = Guid.NewGuid().ToString("N");
             var commitRef = new CommitRef("production", commitId);
             await repository.WriteCommitRefAsync(null, commitRefName, commitRef, default);
-            var rcommitRef = await repository.ReadCommitRefAsync(commitRefName, commitRef.Branch, default);
+            CommitRef? rcommitRef = await repository.ReadCommitRefAsync(commitRefName, commitRef.Branch, default);
             Assert.True(rcommit.HasValue);
             Assert.Equal(commitRef, rcommitRef);
 
-            var urcommitRef = await repository.ReadCommitRefAsync(commitRefName + "_", commitRef.Branch, default);
+            CommitRef? urcommitRef = await repository.ReadCommitRefAsync(commitRefName + "_", commitRef.Branch, default);
             Assert.False(urcommit.HasValue);
 
             await Assert.ThrowsAsync<ChasmConcurrencyException>(() =>
@@ -103,11 +89,11 @@ namespace SoruceCode.Chasm.IntegrationTests
             await repository.WriteCommitRefAsync(null, commitRefName, new CommitRef("staging", new CommitId(usha)), default);
             await repository.WriteCommitRefAsync(null, commitRefName + "_1", new CommitRef("production", new CommitId(usha)), default);
 
-            var names = await repository.GetNamesAsync(default);
+            IReadOnlyList<string> names = await repository.GetNamesAsync(default);
             Assert.Contains(names, x => x == commitRefName);
             Assert.Contains(names, x => x == commitRefName + "_1");
 
-            var branches = await repository.GetBranchesAsync(commitRefName, default);
+            IReadOnlyList<CommitRef> branches = await repository.GetBranchesAsync(commitRefName, default);
             Assert.Contains(branches.Select(x => x.Branch), x => x == "production");
             Assert.Contains(branches.Select(x => x.Branch), x => x == "dev");
             Assert.Contains(branches.Select(x => x.Branch), x => x == "staging");
@@ -124,7 +110,7 @@ namespace SoruceCode.Chasm.IntegrationTests
         [Fact(DisplayName = nameof(DiskChasmRepo_Test))]
         public static async Task DiskChasmRepo_Test()
         {
-            var tmp = Path.GetTempFileName();
+            string tmp = Path.GetTempFileName();
             File.Delete(tmp);
             try
             {
@@ -159,7 +145,5 @@ namespace SoruceCode.Chasm.IntegrationTests
             var repo = new AzureTableChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
             await TestRepository(repo);
         }
-
-        #endregion
     }
 }

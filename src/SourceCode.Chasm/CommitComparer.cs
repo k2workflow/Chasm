@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
 using System;
@@ -55,7 +48,7 @@ namespace SourceCode.Chasm
                 if (x.Author != y.Author) return false;
                 if (x.Committer != y.Committer) return false;
                 if (!StringComparer.Ordinal.Equals(x.Message, y.Message)) return false;
-                if (!x.Parents.NullableListEquals(y.Parents, CommitIdComparer.Default)) return false;
+                if (!x.Parents.NullableSequenceEqual(y.Parents, CommitIdComparer.Default)) return false;
 
                 return true;
             }

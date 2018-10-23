@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using System;
 using Xunit;
@@ -13,8 +6,6 @@ namespace SourceCode.Chasm.Tests
 {
     public static class CommitIdTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(CommitId_equality))]
         public static void CommitId_equality()
@@ -44,12 +35,12 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(CommitId_Compare))]
         public static void CommitId_Compare()
         {
-            var comparer = CommitIdComparer.Default;
+            CommitIdComparer comparer = CommitIdComparer.Default;
 
             var commitId1 = new CommitId(Sha1.Hash("abc"));
             var commitId2 = new CommitId(Sha1.Hash("abc"));
             var commitId3 = new CommitId(Sha1.Hash("def"));
-            var list = new[] { commitId1, commitId2, commitId3 };
+            CommitId[] list = new[] { commitId1, commitId2, commitId3 };
 
             Assert.True(commitId1.CompareTo(commitId2) == 0);
             Assert.True(commitId1.CompareTo(commitId3) != 0);
@@ -59,7 +50,5 @@ namespace SourceCode.Chasm.Tests
             Assert.True(list[0] <= list[1]);
             Assert.True(list[2] >= list[1]);
         }
-
-        #endregion
     }
 }

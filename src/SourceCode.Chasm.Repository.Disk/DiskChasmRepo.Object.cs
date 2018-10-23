@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using System;
 using System.IO;
@@ -13,21 +6,19 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.Disk
+namespace SourceCode.Chasm.Repository.Disk
 {
     partial class DiskChasmRepo // .Object
     {
-        #region Read
-
         public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            var filename = DeriveFileName(objectId);
-            var path = Path.Combine(_objectsContainer, filename);
+            string filename = DeriveFileName(objectId);
+            string path = Path.Combine(_objectsContainer, filename);
 
-            var bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
+            byte[] bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
             if (bytes == null) return default;
 
-            using (var input = new MemoryStream(bytes.ToArray())) // TODO: Perf
+            using (var input = new MemoryStream(bytes))
             using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
             using (var output = new MemoryStream())
             {
@@ -43,16 +34,12 @@ namespace SourceCode.Chasm.IO.Disk
             return default;
         }
 
-        #endregion
-
-        #region Write
-
-        public override async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            var filename = DeriveFileName(objectId);
-            var path = Path.Combine(_objectsContainer, filename);
+            string filename = DeriveFileName(objectId);
+            string path = Path.Combine(_objectsContainer, filename);
 
-            var dir = Path.GetDirectoryName(path);
+            string dir = Path.GetDirectoryName(path);
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
@@ -65,14 +52,12 @@ namespace SourceCode.Chasm.IO.Disk
             {
                 using (var gz = new GZipStream(output, CompressionLevel, true))
                 {
-                    gz.Write(item.Array, item.Offset, item.Count);
+                    gz.Write(item.Span);
                 }
                 output.Position = 0;
 
                 await WriteFileAsync(path, output, false, cancellationToken).ConfigureAwait(false); // TODO: Perf
             }
         }
-
-        #endregion
     }
 }

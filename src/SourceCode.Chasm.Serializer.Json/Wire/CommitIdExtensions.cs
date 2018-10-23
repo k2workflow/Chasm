@@ -1,29 +1,14 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using Newtonsoft.Json;
 using SourceCode.Clay;
 using SourceCode.Clay.Json;
 using System;
 using System.IO;
 
-namespace SourceCode.Chasm.IO.Json.Wire
+namespace SourceCode.Chasm.Serializer.Json.Wire
 {
     internal static class CommitIdExtensions
     {
-        #region Constants
-
-        // Naming follows convention in ProtoSerializer
-
         private const string _id = "id";
-
-        #endregion
-
-        #region Read
 
         public static CommitId ReadCommitId(this JsonReader jr)
         {
@@ -50,29 +35,23 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static CommitId ReadCommitId(this string json)
         {
-            if (json == null || json == JsonConstants.Null) return default;
+            if (json == null || json == JsonConstants.JsonNull) return default;
 
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = ReadCommitId(jr);
+                CommitId model = ReadCommitId(jr);
                 return model;
             }
         }
 
-        #endregion
-
-        #region Write
-
         public static string Write(this CommitId model)
         {
             // Perf: No need to use JsonWriter for a simple scalar
-            var json = "{ \"" + _id + "\": \"" + model.Sha1.ToString("N") + "\" }";
+            string json = "{ \"" + _id + "\": \"" + model.Sha1.ToString("N") + "\" }";
             return json;
         }
-
-        #endregion
     }
 }

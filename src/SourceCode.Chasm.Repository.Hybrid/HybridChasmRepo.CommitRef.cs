@@ -1,34 +1,17 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.Hybrid
+namespace SourceCode.Chasm.Repository.Hybrid
 {
     partial class HybridChasmRepo // .CommitRef
     {
-        #region List
-
         public override ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken)
-        {
-            return Chain[0].GetBranchesAsync(name, cancellationToken);
-        }
+            => Chain[0].GetBranchesAsync(name, cancellationToken);
 
         public override ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
-        {
-            return Chain[0].GetNamesAsync(cancellationToken);
-        }
-
-        #endregion
-
-        #region Read
+            => Chain[0].GetNamesAsync(cancellationToken);
 
         public override async ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)
         {
@@ -36,15 +19,11 @@ namespace SourceCode.Chasm.IO.Hybrid
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
             // We only read from last repo
-            var last = Chain[Chain.Length - 1];
-            var commitRef = await last.ReadCommitRefAsync(name, branch, cancellationToken).ConfigureAwait(false);
+            IChasmRepository last = Chain[Chain.Length - 1];
+            CommitRef? commitRef = await last.ReadCommitRefAsync(name, branch, cancellationToken).ConfigureAwait(false);
 
             return commitRef;
         }
-
-        #endregion
-
-        #region Write
 
         public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken)
         {
@@ -52,10 +31,8 @@ namespace SourceCode.Chasm.IO.Hybrid
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // We only write to last repo
-            var last = Chain[Chain.Length - 1];
+            IChasmRepository last = Chain[Chain.Length - 1];
             await last.WriteCommitRefAsync(previousCommitId, name, commitRef, cancellationToken).ConfigureAwait(false);
         }
-
-        #endregion
     }
 }

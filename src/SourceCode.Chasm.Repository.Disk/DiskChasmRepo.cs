@@ -1,10 +1,4 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
+using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using System;
 using System.IO;
@@ -12,40 +6,26 @@ using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.Disk
+namespace SourceCode.Chasm.Repository.Disk
 {
     public sealed partial class DiskChasmRepo : ChasmRepository
     {
-        #region Constants
-
         private const int _retryMax = 10;
         private const int _retryMs = 15;
 
-        #endregion
-
-        #region Fields
-
         private readonly string _refsContainer;
         private readonly string _objectsContainer;
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets the root path for the repository.
         /// </summary>
         public string RootPath { get; }
 
-        #endregion
-
-        #region Constructors
-
         public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
             : base(serializer, compressionLevel, maxDop)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length <= 2) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
-            var rootPath = Path.GetFullPath(rootFolder);
+            string rootPath = Path.GetFullPath(rootFolder);
 
             RootPath = rootPath;
 
@@ -58,7 +38,7 @@ namespace SourceCode.Chasm.IO.Disk
             // Refs
             {
                 const string container = "refs";
-                var path = Path.Combine(rootPath, container);
+                string path = Path.Combine(rootPath, container);
 
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
@@ -69,7 +49,7 @@ namespace SourceCode.Chasm.IO.Disk
             // Objects
             {
                 const string container = "objects";
-                var path = Path.Combine(rootPath, container);
+                string path = Path.Combine(rootPath, container);
 
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
@@ -86,22 +66,18 @@ namespace SourceCode.Chasm.IO.Disk
             : this(rootFolder, serializer, CompressionLevel.Optimal)
         { }
 
-        #endregion
-
-        #region Helpers
-
         private static async ValueTask<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
 
-            var dir = Path.GetDirectoryName(path);
+            string dir = Path.GetDirectoryName(path);
             if (!Directory.Exists(dir))
                 return default;
 
             if (!File.Exists(path))
                 return default;
 
-            using (var fileStream = await WaitForFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken).ConfigureAwait(false))
+            using (FileStream fileStream = await WaitForFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken).ConfigureAwait(false))
             {
                 return await ReadFromStreamAsync(fileStream, cancellationToken).ConfigureAwait(false);
             }
@@ -109,13 +85,13 @@ namespace SourceCode.Chasm.IO.Disk
 
         private static async ValueTask<byte[]> ReadFromStreamAsync(Stream fileStream, CancellationToken cancellationToken)
         {
-            var offset = 0;
-            var remaining = (int)fileStream.Length;
+            int offset = 0;
+            int remaining = (int)fileStream.Length;
 
-            var bytes = new byte[remaining];
+            byte[] bytes = new byte[remaining];
             while (remaining > 0)
             {
-                var count = await fileStream.ReadAsync(bytes, offset, remaining, cancellationToken).ConfigureAwait(false);
+                int count = await fileStream.ReadAsync(bytes, offset, remaining, cancellationToken).ConfigureAwait(false);
                 if (count == 0)
                     throw new EndOfStreamException("End of file");
 
@@ -130,14 +106,14 @@ namespace SourceCode.Chasm.IO.Disk
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
 
-            var dir = Path.GetDirectoryName(path);
+            string dir = Path.GetDirectoryName(path);
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            var dataLength = data.Length - data.Position;
+            long dataLength = data.Length - data.Position;
             if (dataLength <= 0) return;
 
-            using (var fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken).ConfigureAwait(false))
+            using (FileStream fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken).ConfigureAwait(false))
             {
                 // Only write to the file if it does not already exist.
                 if ((fileStream.Length != dataLength || forceOverwrite))
@@ -159,7 +135,7 @@ namespace SourceCode.Chasm.IO.Disk
             if (!File.Exists(path))
                 return;
 
-            for (var retryCount = 0; retryCount < _retryMax; retryCount++)
+            for (int retryCount = 0; retryCount < _retryMax; retryCount++)
             {
                 try
                 {
@@ -175,7 +151,7 @@ namespace SourceCode.Chasm.IO.Disk
 
         private static async ValueTask<FileStream> WaitForFileAsync(string path, FileMode mode, FileAccess access, FileShare share, CancellationToken cancellationToken, int bufferSize = 4096)
         {
-            var retryCount = 0;
+            int retryCount = 0;
             while (true)
             {
                 FileStream fs = null;
@@ -197,18 +173,16 @@ namespace SourceCode.Chasm.IO.Disk
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (branch == null) return name;
 
-            var refName = Path.Combine(name, $"{branch}{CommitExtension}");
+            string refName = Path.Combine(name, $"{branch}{CommitExtension}");
             return refName;
         }
 
         public static string DeriveFileName(Sha1 sha1)
         {
-            var tokens = sha1.Split(2);
+            System.Collections.Generic.KeyValuePair<string, string> tokens = sha1.Split(2);
 
-            var fileName = Path.Combine(tokens.Key, tokens.Value);
+            string fileName = Path.Combine(tokens.Key, tokens.Value);
             return fileName;
         }
-
-        #endregion
     }
 }

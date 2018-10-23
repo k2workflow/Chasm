@@ -1,23 +1,13 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using Moq;
-using SourceCode.Chasm.IO;
 using SourceCode.Chasm.Tests.Helpers;
 using System;
 using System.Runtime.Serialization;
 using Xunit;
 
-namespace SourceCode.Chasm.Tests.IO
+namespace SourceCode.Chasm.Repository.Tests
 {
     public static class ChasmConcurrencyExceptionTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(ChasmConcurrencyException_Constructor_Empty))]
         public static void ChasmConcurrencyException_Constructor_Empty()
@@ -74,7 +64,5 @@ namespace SourceCode.Chasm.Tests.IO
             var actual = new ChasmConcurrencyException();
             actual.GetObjectData(mockSerializationInfo, mockStreamingContext);
         }
-
-        #endregion
     }
 }

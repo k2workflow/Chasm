@@ -5,9 +5,9 @@
 
 #endregion
 
-using SourceCode.Chasm.IO.Json;
-using SourceCode.Chasm.IO.Proto;
-using SourceCode.Chasm.IO.Text;
+using SourceCode.Chasm.Serializer.Json;
+using SourceCode.Chasm.Serializer.Proto;
+using SourceCode.Chasm.Serializer.Text;
 using System.Collections;
 using System.Collections.Generic;
 

@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using System;
 using Xunit;
 
@@ -12,8 +5,6 @@ namespace SourceCode.Chasm.Tests
 {
     public static class BlobTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(Blob_is_empty))]
         public static void Blob_is_empty()
@@ -68,7 +59,5 @@ namespace SourceCode.Chasm.Tests
         }
 
 #pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
-
-        #endregion
     }
 }

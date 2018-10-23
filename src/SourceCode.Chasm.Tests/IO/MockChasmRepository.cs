@@ -1,11 +1,5 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using SourceCode.Chasm.IO;
+using SourceCode.Chasm.Repository;
+using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
@@ -13,12 +7,10 @@ using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.Tests.IO
+namespace SourceCode.Chasm.Repository.Tests
 {
     internal class MockChasmRepository : ChasmRepository
     {
-        #region Methods
-
         internal static ChasmConcurrencyException MockBuildConcurrencyException(string name, string branch, Exception innerException)
         {
             return BuildConcurrencyException(branch, name, innerException);
@@ -48,12 +40,12 @@ namespace SourceCode.Chasm.Tests.IO
             throw new NotImplementedException();
         }
 
-        public override Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -67,7 +59,5 @@ namespace SourceCode.Chasm.Tests.IO
         {
             throw new NotImplementedException();
         }
-
-        #endregion
     }
 }

@@ -3,18 +3,20 @@
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Net.Compilers" Version="2.6.1">
-      <PrivateAssets>All</PrivateAssets>
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0-beta2">
-      <PrivateAssets>All</PrivateAssets>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.2" />
   </ItemGroup>
 
   <ItemGroup>

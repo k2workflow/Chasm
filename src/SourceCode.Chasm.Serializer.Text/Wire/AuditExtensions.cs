@@ -1,30 +1,21 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using System;
 using System.Globalization;
 
-namespace SourceCode.Chasm.IO.Text.Wire
+namespace SourceCode.Chasm.Serializer.Text.Wire
 {
     internal static class AuditExtensions
     {
-        #region Methods
-
         public static string Convert(this Audit model)
         {
             // Convert System.DateTimeOffset to Unix ms
 
             // DateTime (ticks)
-            var dt = model.Timestamp.UtcDateTime.Ticks; // Convert to Utc
+            long dt = model.Timestamp.UtcDateTime.Ticks; // Convert to Utc
 
             // Offset (ticks)
-            var tz = model.Timestamp.Offset.Ticks;
+            long tz = model.Timestamp.Offset.Ticks;
 
-            var wire = $"{model.Name} {dt} {tz}";
+            string wire = $"{model.Name} {dt} {tz}";
             return wire;
         }
 
@@ -35,10 +26,10 @@ namespace SourceCode.Chasm.IO.Text.Wire
             DateTime dt = default;
             TimeSpan tz = default;
 
-            var len = wire.Length;
-            var foundOffset = false;
+            int len = wire.Length;
+            bool foundOffset = false;
 
-            var ix = len - 1;
+            int ix = len - 1;
             for (; ix >= 0; ix--)
             {
                 if (wire[ix] != ' ') continue;
@@ -46,16 +37,16 @@ namespace SourceCode.Chasm.IO.Text.Wire
                 if (foundOffset)
                 {
                     // DateTime (ticks)
-                    var str = wire.Substring(ix, len - ix).TrimEnd();
-                    var tcks = long.Parse(str, CultureInfo.InvariantCulture);
+                    string str = wire.Substring(ix, len - ix).TrimEnd();
+                    long tcks = long.Parse(str, CultureInfo.InvariantCulture);
                     dt = new DateTime(tcks, DateTimeKind.Utc);
 
                     break;
                 }
 
                 // Offset (ticks)
-                var stt = wire.Substring(ix, len - ix).TrimEnd();
-                var ticks = long.Parse(stt, CultureInfo.InvariantCulture);
+                string stt = wire.Substring(ix, len - ix).TrimEnd();
+                long ticks = long.Parse(stt, CultureInfo.InvariantCulture);
                 tz = new TimeSpan(ticks);
 
                 foundOffset = true;
@@ -63,14 +54,12 @@ namespace SourceCode.Chasm.IO.Text.Wire
             }
 
             // DateTimeOffset
-            var dto = new DateTimeOffset(dt).ToOffset(tz);
+            DateTimeOffset dto = new DateTimeOffset(dt).ToOffset(tz);
 
             // Name
-            var name = wire.Substring(0, ix);
+            string name = wire.Substring(0, ix);
 
             return new Audit(name, dto);
         }
-
-        #endregion
     }
 }

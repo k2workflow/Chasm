@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Chasm.Serializer;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
@@ -19,9 +20,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Default(IChasmSerializer ser)
         {
             var expected = new Commit();
-            using (var buf = ser.Serialize(expected))
+            using (var buf = ser.Serialize(expected, out var len))
             {
-                var actual = ser.DeserializeCommit(buf.Result);
+                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }

@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using System;
 using Xunit;
@@ -13,8 +6,6 @@ namespace SourceCode.Chasm.Tests
 {
     public static class BlobIdTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(BlobId_equality))]
         public static void BlobId_equality()
@@ -45,12 +36,12 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(BlobId_Compare))]
         public static void BlobId_Compare()
         {
-            var comparer = BlobIdComparer.Default;
+            BlobIdComparer comparer = BlobIdComparer.Default;
 
             var blobId1 = new BlobId(Sha1.Hash("abc"));
             var blobId2 = new BlobId(Sha1.Hash("abc"));
             var blobId3 = new BlobId(Sha1.Hash("def"));
-            var list = new[] { blobId1, blobId2, blobId3 };
+            BlobId[] list = new[] { blobId1, blobId2, blobId3 };
 
             Assert.True(blobId1.CompareTo(blobId2) == 0);
             Assert.True(blobId1.CompareTo(blobId3) != 0);
@@ -60,7 +51,5 @@ namespace SourceCode.Chasm.Tests
             Assert.True(list[0] <= list[1]);
             Assert.True(list[2] >= list[1]);
         }
-
-        #endregion
     }
 }

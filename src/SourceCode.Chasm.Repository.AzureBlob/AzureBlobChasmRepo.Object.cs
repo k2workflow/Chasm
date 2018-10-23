@@ -1,11 +1,5 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
 using System;
 using System.IO;
@@ -14,7 +8,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureBlob
+namespace SourceCode.Chasm.Repository.AzureBlob
 {
     partial class AzureBlobChasmRepo // .Object
     {
@@ -22,10 +16,10 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            var objectsContainer = _objectsContainer.Value;
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
 
-            var blobName = DeriveBlobName(objectId);
-            var blobRef = objectsContainer.GetAppendBlobReference(blobName);
+            string blobName = DeriveBlobName(objectId);
+            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
             try
             {
@@ -40,7 +34,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                         input.Position = 0; // Else gzip returns []
                         gzip.CopyTo(output);
 
-                        var buffer = output.ToArray(); // TODO: Perf
+                        byte[] buffer = output.ToArray(); // TODO: Perf
                         return buffer;
                     }
                 }
@@ -57,15 +51,15 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         #region Write
 
-        public override async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            var objectsContainer = _objectsContainer.Value;
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
 
-            var blobName = DeriveBlobName(objectId);
-            var blobRef = objectsContainer.GetAppendBlobReference(blobName);
+            string blobName = DeriveBlobName(objectId);
+            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
             // Objects are immutable
-            var accessCondition = forceOverwrite ? null : AccessCondition.GenerateIfNotExistsCondition(); // If-None-Match *
+            AccessCondition accessCondition = forceOverwrite ? null : AccessCondition.GenerateIfNotExistsCondition(); // If-None-Match *
 
             try
             {
@@ -83,7 +77,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             {
                 using (var gz = new GZipStream(output, CompressionLevel, true))
                 {
-                    gz.Write(item.Array, item.Offset, item.Count);
+                    gz.Write(item.Span);
                 }
                 output.Position = 0;
 
@@ -99,9 +93,9 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         public static string DeriveBlobName(Sha1 sha1)
         {
-            var tokens = sha1.Split(2);
+            System.Collections.Generic.KeyValuePair<string, string> tokens = sha1.Split(2);
 
-            var blobName = $@"{tokens.Key}/{tokens.Value}";
+            string blobName = $@"{tokens.Key}/{tokens.Value}";
             blobName = Uri.EscapeUriString(blobName);
 
             return blobName;

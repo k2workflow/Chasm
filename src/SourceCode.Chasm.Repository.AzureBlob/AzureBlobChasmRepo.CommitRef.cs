@@ -1,14 +1,8 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -16,7 +10,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureBlob
+namespace SourceCode.Chasm.Repository.AzureBlob
 {
     partial class AzureBlobChasmRepo // .CommitRef
     {
@@ -32,7 +26,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
         {
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
 
-            var refsContainer = _refsContainer.Value;
+            CloudBlobContainer refsContainer = _refsContainer.Value;
             var results = new List<CommitRef>();
             name = DeriveCommitRefBlobName(name, null);
 
@@ -40,9 +34,9 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
             do
             {
-                var resultSegment = await refsContainer.ListBlobsSegmentedAsync(name, false, BlobListingDetails.None, null, token, null, null).ConfigureAwait(false);
+                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync(name, false, BlobListingDetails.None, null, token, null, null).ConfigureAwait(false);
 
-                foreach (var blobItem in resultSegment.Results)
+                foreach (IListBlobItem blobItem in resultSegment.Results)
                 {
                     if (!(blobItem is CloudBlob blob))
                         continue;
@@ -50,7 +44,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                     if (!blob.Name.EndsWith(CommitExtension, StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    var branch = blob.Name.Substring(name.Length, blob.Name.Length - CommitExtension.Length - name.Length);
+                    string branch = blob.Name.Substring(name.Length, blob.Name.Length - CommitExtension.Length - name.Length);
                     branch = Uri.UnescapeDataString(branch);
 
                     using (var output = new MemoryStream())
@@ -60,7 +54,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                         if (output.Length < Sha1.ByteLength)
                             throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {output.Length}");
 
-                        var commitId = Serializer.DeserializeCommitId(output.ToArray());
+                        CommitId commitId = Serializer.DeserializeCommitId(output.ToArray());
                         results.Add(new CommitRef(branch, commitId));
                     }
                 }
@@ -73,21 +67,21 @@ namespace SourceCode.Chasm.IO.AzureBlob
 
         public override async ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
         {
-            var refsContainer = _refsContainer.Value;
+            CloudBlobContainer refsContainer = _refsContainer.Value;
             var results = new List<string>();
 
             BlobContinuationToken token = null;
 
             do
             {
-                var resultSegment = await refsContainer.ListBlobsSegmentedAsync("", false, BlobListingDetails.None, null, token, null, null).ConfigureAwait(false);
+                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync("", false, BlobListingDetails.None, null, token, null, null).ConfigureAwait(false);
 
-                foreach (var blobItem in resultSegment.Results)
+                foreach (IListBlobItem blobItem in resultSegment.Results)
                 {
                     if (!(blobItem is CloudBlobDirectory dir))
                         continue;
 
-                    var name = dir.Prefix.Substring(0, dir.Prefix.Length - 1); // Ends with / always.
+                    string name = dir.Prefix.Substring(0, dir.Prefix.Length - 1); // Ends with / always.
                     name = Uri.UnescapeDataString(name);
                     results.Add(name);
                 }
@@ -107,7 +101,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            var (found, commitId, _, _) = await ReadCommitRefImplAsync(name, branch, cancellationToken).ConfigureAwait(false);
+            (bool found, CommitId commitId, AccessCondition _, CloudAppendBlob _) = await ReadCommitRefImplAsync(name, branch, cancellationToken).ConfigureAwait(false);
 
             // NotFound
             if (!found) return null;
@@ -127,7 +121,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // Load existing commit ref in order to use its etag
-            var (found, existingCommitId, ifMatchCondition, blobRef) = await ReadCommitRefImplAsync(name, commitRef.Branch, cancellationToken).ConfigureAwait(false);
+            (bool found, CommitId existingCommitId, AccessCondition ifMatchCondition, CloudAppendBlob blobRef) = await ReadCommitRefImplAsync(name, commitRef.Branch, cancellationToken).ConfigureAwait(false);
 
             // Optimistic concurrency check
             if (found)
@@ -158,11 +152,12 @@ namespace SourceCode.Chasm.IO.AzureBlob
                 await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
 
                 // CommitIds are not compressed
-                using (var session = Serializer.Serialize(commitRef.CommitId))
+                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int length))
                 using (var output = new MemoryStream())
                 {
-                    var seg = session.Result;
-                    output.Write(seg.Array, seg.Offset, seg.Count);
+                    Memory<byte> mem = owner.Memory.Slice(0, length);
+
+                    output.Write(mem.Span);
                     output.Position = 0;
 
                     // Append blob. Following seems to be the only safe multi-writer method available
@@ -188,7 +183,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             name = Uri.EscapeDataString(name);
             branch = Uri.EscapeDataString(branch);
 
-            var refName = $"{name}/{branch}{CommitExtension}";
+            string refName = $"{name}/{branch}{CommitExtension}";
             return refName;
         }
 
@@ -196,9 +191,9 @@ namespace SourceCode.Chasm.IO.AzureBlob
         {
             // Callers have already validated parameters
 
-            var refsContainer = _refsContainer.Value;
-            var blobName = DeriveCommitRefBlobName(name, branch);
-            var blobRef = refsContainer.GetAppendBlobReference(blobName);
+            CloudBlobContainer refsContainer = _refsContainer.Value;
+            string blobName = DeriveCommitRefBlobName(name, branch);
+            CloudAppendBlob blobRef = refsContainer.GetAppendBlobReference(blobName);
 
             try
             {
@@ -216,7 +211,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
                         throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {output.Length}");
 
                     // CommitIds are not compressed
-                    var commitId = Serializer.DeserializeCommitId(output.ToArray()); // TODO: Perf
+                    CommitId commitId = Serializer.DeserializeCommitId(output.ToArray()); // TODO: Perf
 
                     // Found
                     return (true, commitId, ifMatchCondition, blobRef);

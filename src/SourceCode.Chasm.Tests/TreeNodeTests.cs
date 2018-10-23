@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using System;
 using Xunit;
@@ -13,20 +6,18 @@ namespace SourceCode.Chasm.Tests
 {
     public static class TreeNodeTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeNode_is_empty))]
         public static void TreeNode_is_empty()
         {
             var noData = new TreeNode();
-            var nullData = new TreeNode("a", NodeKind.Blob, Sha1.Zero);
+            var nullData = new TreeNode("a", NodeKind.Blob, default);
 
             // Name
             Assert.Null(TreeNode.Empty.Name);
             Assert.Null(noData.Name);
             Assert.Equal("a", nullData.Name);
-            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, NodeKind.Blob, Sha1.Zero));
+            Assert.Throws<ArgumentNullException>(() => new TreeNode(null, NodeKind.Blob, default));
             Assert.Throws<ArgumentNullException>(() => new TreeNode(null, new BlobId()));
             Assert.Throws<ArgumentNullException>(() => new TreeNode(null, new TreeId()));
 
@@ -35,7 +26,7 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(default, TreeNode.Empty.Kind);
             Assert.Equal(default, noData.Kind);
             Assert.Equal(default, nullData.Kind);
-            Assert.Throws<ArgumentOutOfRangeException>(() => new TreeNode("a", (NodeKind)2, Sha1.Zero));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new TreeNode("a", (NodeKind)2, default));
 
             // Sha1
             Assert.Equal(default, TreeNode.Empty.Sha1);
@@ -93,7 +84,7 @@ namespace SourceCode.Chasm.Tests
         {
             var expected = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
 
-            var (name, kind, sha) = expected;
+            (var name, NodeKind kind, Sha1 sha) = expected;
             var actual = new TreeNode(name, kind, sha);
 
             Assert.Equal(expected, actual);
@@ -103,12 +94,12 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(TreeNode_Compare))]
         public static void TreeNode_Compare()
         {
-            var comparer = TreeNodeComparer.Default;
+            TreeNodeComparer comparer = TreeNodeComparer.Default;
 
             var tree1 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
             var tree2 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
             var tree3 = new TreeNode("d", NodeKind.Blob, Sha1.Hash("def"));
-            var list = new[] { tree1, tree2, tree3 };
+            TreeNode[] list = new[] { tree1, tree2, tree3 };
 
             Assert.True(TreeNode.Empty < tree1);
             Assert.True(tree1 > TreeNode.Empty);
@@ -137,7 +128,5 @@ namespace SourceCode.Chasm.Tests
             Assert.Equal(expectedName, actual.Name);
             Assert.Equal(expectedTreeId.Sha1, actual.Sha1);
         }
-
-        #endregion
     }
 }

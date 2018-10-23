@@ -1,46 +1,34 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
+using System;
+using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO
+namespace SourceCode.Chasm.Repository
 {
     partial class ChasmRepository // .Commit
     {
-        #region Read
-
         public virtual async ValueTask<Commit?> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
-            var buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
+            ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
             if (buffer == null) return default;
 
-            var model = Serializer.DeserializeCommit(buffer.Value.Span);
+            Commit model = Serializer.DeserializeCommit(buffer.Value.Span);
             return model;
         }
 
-        #endregion
-
-        #region Write
-
         public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
-            using (var session = Serializer.Serialize(commit))
+            using (IMemoryOwner<byte> owner = Serializer.Serialize(commit, out var len))
             {
-                var sha1 = Sha1.Hash(session.Result);
+                Memory<byte> mem = owner.Memory.Slice(0, len);
+                var sha1 = Sha1.Hash(mem.Span);
 
-                await WriteObjectAsync(sha1, session.Result, false, cancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(sha1, mem, false, cancellationToken).ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);
                 return commitId;
             }
         }
-
-        #endregion
     }
 }

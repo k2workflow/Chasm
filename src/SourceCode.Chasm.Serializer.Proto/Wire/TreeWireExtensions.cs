@@ -1,26 +1,17 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using System;
 
-namespace SourceCode.Chasm.IO.Proto.Wire
+namespace SourceCode.Chasm.Serializer.Proto.Wire
 {
     internal static class TreeWireExtensions
     {
-        #region Methods
-
         public static TreeWire Convert(this TreeNodeMap model)
         {
             if (model.Count == 0) return new TreeWire();
 
             var wire = new TreeWire();
-            for (var i = 0; i < model.Count; i++)
+            for (int i = 0; i < model.Count; i++)
             {
-                var node = model[i].Convert();
+                TreeWireNode node = model[i].Convert();
                 wire.Nodes.Add(node);
             }
 
@@ -33,7 +24,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             if (wire.Nodes.Count == 0) return default;
 
             var nodes = new TreeNode[wire.Nodes?.Count ?? 0];
-            for (var i = 0; i < nodes.Length; i++)
+            for (int i = 0; i < nodes.Length; i++)
                 nodes[i] = wire.Nodes[i].Convert();
 
             var model = new TreeNodeMap(nodes);
@@ -61,7 +52,5 @@ namespace SourceCode.Chasm.IO.Proto.Wire
                 default: throw new ArgumentOutOfRangeException(nameof(model));
             }
         }
-
-        #endregion
     }
 }

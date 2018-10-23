@@ -5,6 +5,7 @@
 
 #endregion
 
+using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
 
@@ -26,9 +27,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_TreeId_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, null);
-            using (var buf = ser.Serialize(expected))
+            using (var buf = ser.Serialize(expected, out var len))
             {
-                var actual = ser.DeserializeCommit(buf.Result);
+                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
@@ -39,9 +40,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_TreeId(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), TreeId1, default, default, null);
-            using (var buf = ser.Serialize(expected))
+            using (var buf = ser.Serialize(expected, out var len))
             {
-                var actual = ser.DeserializeCommit(buf.Result);
+                var actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
                 Assert.Equal(expected, actual);
             }
         }
