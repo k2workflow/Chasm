@@ -1,13 +1,11 @@
-using SourceCode.Chasm.Serializer;
 using System;
 using System.Buffers;
+using SourceCode.Chasm.Serializer;
 
 namespace SourceCode.Chasm.Tests.TestObjects
 {
     public class RandomChasmSerializer : IChasmSerializer
     {
-        #region Methods
-
         public Commit DeserializeCommit(ReadOnlySpan<byte> span) => CommitTestObject.Random;
 
         public CommitId DeserializeCommitId(ReadOnlySpan<byte> span) => CommitIdTestObject.Random;
@@ -31,7 +29,5 @@ namespace SourceCode.Chasm.Tests.TestObjects
             length = 1;
             return MemoryPool<byte>.Shared.Rent(1);
         }
-
-        #endregion
     }
 }

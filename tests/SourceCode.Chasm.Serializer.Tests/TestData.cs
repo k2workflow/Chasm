@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.IO.Tests
             new object[]{ new JsonChasmSerializer() },
 
             // TODO: Proto Serializer
-            //new object[]{ new ProtoChasmSerializer() },
+            new object[]{ new ProtoChasmSerializer() },
 
             // Text Serializer
             new object[]{ new TextChasmSerializer() }

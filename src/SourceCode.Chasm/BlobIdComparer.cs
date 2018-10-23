@@ -44,15 +44,11 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : BlobIdComparer
         {
-            #region Methods
-
             public override int Compare(BlobId x, BlobId y) => x.Sha1.CompareTo(y.Sha1);
 
             public override bool Equals(BlobId x, BlobId y) => x.Sha1.Equals(y.Sha1);
 
             public override int GetHashCode(BlobId obj) => obj.Sha1.GetHashCode();
-
-            #endregion
         }
 
         #endregion

@@ -5,6 +5,8 @@
 
 #endregion
 
+using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using Xunit;
 
@@ -12,21 +14,19 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Default))]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Default(IChasmSerializer ser)
         {
             var expected = new Commit();
-            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
-                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
             }
         }
-
-        #endregion
     }
 }

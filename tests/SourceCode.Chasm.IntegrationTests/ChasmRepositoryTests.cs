@@ -5,6 +5,11 @@
 
 #endregion
 
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using SourceCode.Chasm;
 using SourceCode.Chasm.Repository;
@@ -13,11 +18,6 @@ using SourceCode.Chasm.Repository.AzureTable;
 using SourceCode.Chasm.Repository.Disk;
 using SourceCode.Chasm.Serializer.Json;
 using SourceCode.Clay;
-using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SoruceCode.Chasm.IntegrationTests

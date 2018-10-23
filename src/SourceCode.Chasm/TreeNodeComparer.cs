@@ -1,6 +1,6 @@
-using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm
 {
@@ -51,8 +51,6 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : TreeNodeComparer
         {
-            #region Methods
-
             public override int Compare(TreeNode x, TreeNode y)
             {
                 // Nodes are always sorted by Name first (see TreeNodeMap)
@@ -84,21 +82,15 @@ namespace SourceCode.Chasm
 
                 return hc;
             }
-
-            #endregion
         }
 
         private sealed class NameOnlyComparer : TreeNodeComparer
         {
-            #region Methods
-
             public override int Compare(TreeNode x, TreeNode y) => string.CompareOrdinal(x.Name, y.Name);
 
             public override bool Equals(TreeNode x, TreeNode y) => StringComparer.Ordinal.Equals(x.Name, y.Name);
 
             public override int GetHashCode(TreeNode obj) => HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
-
-            #endregion
         }
 
         #endregion

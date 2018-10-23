@@ -1,5 +1,5 @@
-using Google.Protobuf.WellKnownTypes;
 using System;
+using Google.Protobuf.WellKnownTypes;
 
 namespace SourceCode.Chasm.Serializer.Proto.Wire
 {

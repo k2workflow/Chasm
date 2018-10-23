@@ -1,7 +1,7 @@
-using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Serializer.Text.Wire
 {

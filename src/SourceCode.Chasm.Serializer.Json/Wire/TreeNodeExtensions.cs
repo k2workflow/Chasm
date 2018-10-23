@@ -1,9 +1,9 @@
-using Newtonsoft.Json;
-using SourceCode.Clay;
-using SourceCode.Clay.Json;
 using System;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
+using SourceCode.Clay;
+using SourceCode.Clay.Json;
 
 namespace SourceCode.Chasm.Serializer.Json.Wire
 {
@@ -45,7 +45,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             // Factory
             () => name == null && kind == default && sha1 == default ? default : new TreeNode(name, kind, sha1));
         }
-        
+
         public static TreeNode ReadTreeNode(this string json)
         {
             if (json == null || json == JsonConstants.JsonNull) return default;

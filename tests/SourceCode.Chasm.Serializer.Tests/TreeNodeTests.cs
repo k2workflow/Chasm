@@ -5,6 +5,8 @@
 
 #endregion
 
+using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
@@ -13,8 +15,6 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static class TreeNodeTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_NullTreeNodeMap))]
         [ClassData(typeof(TestData))]
@@ -22,9 +22,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap();
 
-            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
-                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
 
                 Assert.Equal(expected, actual);
             }
@@ -37,9 +39,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(new TreeNode[0]);
 
-            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
-                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
 
                 Assert.Equal(expected, actual);
             }
@@ -55,14 +59,14 @@ namespace SourceCode.Chasm.IO.Tests
             var node2 = new TreeNode("c", NodeKind.Tree, Sha1.Hash("hij"));
             var expected = new TreeNodeMap(node0, node1, node2);
 
-            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
-                TreeNodeMap actual = ser.DeserializeTree(buf.Memory.Span.Slice(0, len));
+                Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
 
                 Assert.Equal(expected, actual);
             }
         }
-
-        #endregion
     }
 }

@@ -1,6 +1,3 @@
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using SourceCode.Clay;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -9,6 +6,9 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.AzureBlob
 {
@@ -152,10 +152,10 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
 
                 // CommitIds are not compressed
-                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int length))
+                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int len))
                 using (var output = new MemoryStream())
                 {
-                    Memory<byte> mem = owner.Memory.Slice(0, length);
+                    Memory<byte> mem = owner.Memory.Slice(0, len);
 
                     output.Write(mem.Span);
                     output.Position = 0;

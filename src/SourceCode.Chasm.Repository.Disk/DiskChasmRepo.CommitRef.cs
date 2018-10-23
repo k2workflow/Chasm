@@ -74,10 +74,10 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int length))
+            using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int len))
             using (FileStream file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken).ConfigureAwait(false))
             {
-                Memory<byte> mem = owner.Memory.Slice(0, length);
+                Memory<byte> mem = owner.Memory.Slice(0, len);
 
                 if (file.Length == 0)
                 {
@@ -102,8 +102,8 @@ namespace SourceCode.Chasm.Repository.Disk
                 // CommitIds are not compressed
                 await file.WriteAsync(mem, cancellationToken).ConfigureAwait(false);
 
-                if (file.Position != length)
-                    file.Position = length;
+                if (file.Position != len)
+                    file.Position = len;
             }
 
             await TouchFileAsync(path, cancellationToken).ConfigureAwait(false);

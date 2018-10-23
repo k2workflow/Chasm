@@ -1,7 +1,7 @@
-using Google.Protobuf;
-using SourceCode.Chasm.Serializer.Proto.Wire;
 using System;
 using System.Buffers;
+using Google.Protobuf;
+using SourceCode.Chasm.Serializer.Proto.Wire;
 
 namespace SourceCode.Chasm.Serializer.Proto
 {
@@ -14,7 +14,8 @@ namespace SourceCode.Chasm.Serializer.Proto
             length = wire.CalculateSize();
             IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(length);
 
-            using (var cos = new CodedOutputStream(owner.Memory.ToArray()))
+            Memory<byte> mem = owner.Memory.Slice(0, length);
+            using (var cos = new CodedOutputStream(mem.ToArray())) // TODO: Perf
             {
                 wire.WriteTo(cos);
 

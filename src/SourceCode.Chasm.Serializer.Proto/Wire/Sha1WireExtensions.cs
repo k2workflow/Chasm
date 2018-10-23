@@ -1,5 +1,5 @@
-using SourceCode.Clay;
 using System.Buffers;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Serializer.Proto.Wire
 {

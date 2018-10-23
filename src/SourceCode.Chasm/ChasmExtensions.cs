@@ -4,8 +4,6 @@ namespace SourceCode.Chasm
 {
     public static class ChasmExtensions
     {
-        #region Methods
-
         public static TreeNodeMap? Merge(this TreeNodeMap? first, in TreeNodeMap? second)
         {
             if (!first.HasValue) return second;
@@ -44,7 +42,5 @@ namespace SourceCode.Chasm
             }
             return map.Value.TryGetValue(key, kind, out value);
         }
-
-        #endregion
     }
 }

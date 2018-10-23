@@ -1,10 +1,10 @@
-using SourceCode.Clay;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository
 {
@@ -76,9 +76,9 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken)
         {
-            using (IMemoryOwner<byte> owner = Serializer.Serialize(tree, out int length))
+            using (IMemoryOwner<byte> owner = Serializer.Serialize(tree, out int len))
             {
-                Memory<byte> mem = owner.Memory.Slice(0, length);
+                Memory<byte> mem = owner.Memory.Slice(0, len);
                 var sha1 = Sha1.Hash(mem.Span);
 
                 await WriteObjectAsync(sha1, mem, false, cancellationToken).ConfigureAwait(false);

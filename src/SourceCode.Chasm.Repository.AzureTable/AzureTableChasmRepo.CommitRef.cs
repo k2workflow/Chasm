@@ -1,14 +1,15 @@
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
-using SourceCode.Chasm.Serializer;
-using SourceCode.Clay;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using SourceCode.Chasm.Serializer;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.AzureTable
 {
@@ -111,9 +112,11 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 CloudTable refsTable = _refsTable.Value;
 
                 // CommitIds are not compressed
-                using (System.Buffers.IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int length))
+                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int len))
                 {
-                    var segment = new ArraySegment<byte>(owner.Memory.Slice(length).ToArray());
+                    Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                    var segment = new ArraySegment<byte>(mem.ToArray()); // TODO: Perf
                     TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, segment, etag); // Note etag access condition
 
                     await refsTable.ExecuteAsync(op).ConfigureAwait(false);

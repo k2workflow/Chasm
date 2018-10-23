@@ -5,21 +5,16 @@
 
 #endregion
 
-using SourceCode.Chasm.Serializer;
 using System;
+using System.Buffers;
+using SourceCode.Chasm.Serializer;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitTests // .Utc
     {
-        #region Constants
-
         private static readonly DateTimeOffset Utc1 = new DateTimeOffset(new DateTime(new DateTime(2000, 1, 1).Ticks, DateTimeKind.Utc));
-
-        #endregion
-
-        #region Methods
 
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Utc))]
@@ -27,13 +22,13 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Utc(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, new Audit("bob", Utc1), new Audit("mary", Utc1), null);
-            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
-                Commit actual = ser.DeserializeCommit(buf.Memory.Span.Slice(0, len));
+                Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
             }
         }
-
-        #endregion
     }
 }

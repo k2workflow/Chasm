@@ -1,7 +1,7 @@
-using SourceCode.Chasm.Serializer.Json.Wire;
 using System;
 using System.Buffers;
 using System.Text;
+using SourceCode.Chasm.Serializer.Json.Wire;
 
 namespace SourceCode.Chasm.Serializer.Json
 {

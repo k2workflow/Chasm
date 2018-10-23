@@ -1,8 +1,8 @@
-using SourceCode.Clay;
 using System;
 using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository
 {

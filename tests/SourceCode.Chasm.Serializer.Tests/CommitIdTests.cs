@@ -5,6 +5,8 @@
 
 #endregion
 
+using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
@@ -13,17 +15,17 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static partial class CommitIdTests
     {
-        #region Methods
-
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_CommitId_Default))]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_CommitId_Default(IChasmSerializer ser)
         {
             var expected = new CommitId();
-            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
-                CommitId actual = ser.DeserializeCommitId(buf.Memory.Span.Slice(0, len));
+                Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                CommitId actual = ser.DeserializeCommitId(mem.Span);
                 Assert.Equal(expected, actual);
             }
         }
@@ -34,13 +36,13 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_CommitId(IChasmSerializer ser)
         {
             var expected = new CommitId(Sha1.Hash("abc"));
-            using (System.Buffers.IMemoryOwner<byte> buf = ser.Serialize(expected, out int len))
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
-                CommitId actual = ser.DeserializeCommitId(buf.Memory.Span.Slice(0, len));
+                Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                CommitId actual = ser.DeserializeCommitId(mem.Span);
                 Assert.Equal(expected, actual);
             }
         }
-
-        #endregion
     }
 }

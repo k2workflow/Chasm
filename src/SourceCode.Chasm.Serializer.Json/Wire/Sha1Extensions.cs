@@ -1,7 +1,7 @@
-using Newtonsoft.Json;
-using SourceCode.Clay;
 using System;
 using System.IO;
+using Newtonsoft.Json;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Serializer.Json.Wire
 {

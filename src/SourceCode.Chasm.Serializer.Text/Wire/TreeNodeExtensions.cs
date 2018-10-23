@@ -1,6 +1,6 @@
-using SourceCode.Clay;
 using System;
 using System.Runtime.Serialization;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Serializer.Text.Wire
 {

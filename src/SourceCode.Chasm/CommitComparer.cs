@@ -1,7 +1,6 @@
-using SourceCode.Clay;
-using SourceCode.Clay.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using SourceCode.Clay.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -40,8 +39,6 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : CommitComparer
         {
-            #region Methods
-
             public override bool Equals(Commit x, Commit y)
             {
                 if (!x.TreeId.Equals(y.TreeId)) return false;
@@ -60,8 +57,6 @@ namespace SourceCode.Chasm
                 obj.Parents.Count,
                 StringComparer.Ordinal.GetHashCode(obj.Message ?? string.Empty)
             );
-
-            #endregion
         }
 
         #endregion
