@@ -1,10 +1,9 @@
-using Moq;
-using SourceCode.Chasm.Repository;
-using SourceCode.Chasm.Serializer;
-using SourceCode.Chasm.Tests.Helpers;
 using System;
 using System.IO.Compression;
 using System.Reflection;
+using Moq;
+using SourceCode.Chasm.Serializer;
+using SourceCode.Chasm.Tests.Helpers;
 using Xunit;
 
 namespace SourceCode.Chasm.Repository.Tests

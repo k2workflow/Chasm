@@ -1,7 +1,7 @@
-using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SourceCode.Clay;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests

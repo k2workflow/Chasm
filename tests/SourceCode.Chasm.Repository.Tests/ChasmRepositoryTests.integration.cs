@@ -1,15 +1,15 @@
-using Microsoft.WindowsAzure.Storage;
-using SourceCode.Chasm.Repository.AzureBlob;
-using SourceCode.Chasm.Repository.AzureTable;
-using SourceCode.Chasm.Repository.Disk;
-using SourceCode.Chasm.Serializer.Json;
-using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using SourceCode.Chasm.Repository.AzureBlob;
+using SourceCode.Chasm.Repository.AzureTable;
+using SourceCode.Chasm.Repository.Disk;
+using SourceCode.Chasm.Serializer.Json;
+using SourceCode.Clay;
 using Xunit;
 
 namespace SourceCode.Chasm.Repository.Azure.Tests

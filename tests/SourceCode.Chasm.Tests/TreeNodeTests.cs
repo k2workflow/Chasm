@@ -1,5 +1,5 @@
-using SourceCode.Clay;
 using System;
+using SourceCode.Clay;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests

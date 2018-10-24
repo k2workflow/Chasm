@@ -1,11 +1,10 @@
-using SourceCode.Chasm.Repository;
-using SourceCode.Chasm.Serializer;
-using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Chasm.Serializer;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.Tests
 {

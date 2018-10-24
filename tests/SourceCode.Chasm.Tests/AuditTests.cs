@@ -1,6 +1,6 @@
+using System;
 using SourceCode.Chasm.Tests.Helpers;
 using SourceCode.Chasm.Tests.TestObjects;
-using System;
 using Xunit;
 
 namespace SourceCode.Chasm.Tests

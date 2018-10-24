@@ -1,8 +1,8 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Moq;
 using SourceCode.Chasm.Serializer.Json;
 using SourceCode.Clay;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SourceCode.Chasm.Repository.Azure.Tests
