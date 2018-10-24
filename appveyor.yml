@@ -31,14 +31,14 @@ dotnet_csproj:
   file: '**\*.csproj'
   version: $(nuget_version)
   package_version: $(nuget_version)
-
+  
 before_build:
 - appveyor-retry dotnet restore -v Minimal
 
 build:
  project: SourceCode.Chasm.sln
  verbosity: minimal
-
+ 
 test_script:
 - ps: .\GenerateTestSolution.ps1 .\SourceCode.Chasm.sln
 - >-
