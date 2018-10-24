@@ -1,6 +1,5 @@
 using System;
 using System.Buffers;
-using Google.Protobuf;
 using SourceCode.Chasm.Serializer.Proto.Wire;
 
 namespace SourceCode.Chasm.Serializer.Proto
@@ -20,7 +19,7 @@ namespace SourceCode.Chasm.Serializer.Proto
             if (span.Length == 0) return default;
 
             var wire = new TreeWire();
-            wire.MergeFrom(span.ToArray()); // TODO: Perf
+            DeserializeImpl(span, ref wire);
 
             TreeNodeMap model = wire.Convert();
             return model;

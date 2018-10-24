@@ -1,6 +1,5 @@
 using System;
 using System.Buffers;
-using Google.Protobuf;
 using SourceCode.Chasm.Serializer.Proto.Wire;
 
 namespace SourceCode.Chasm.Serializer.Proto
@@ -20,7 +19,7 @@ namespace SourceCode.Chasm.Serializer.Proto
             if (span.Length == 0) return default;
 
             var wire = new CommitIdWire();
-            wire.MergeFrom(span.ToArray()); // TODO: Perf
+            DeserializeImpl(span, ref wire);
 
             CommitId? model = wire.Convert();
             return model.Value;

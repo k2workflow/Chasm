@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -24,6 +25,18 @@ namespace SourceCode.Chasm.Serializer.Proto
             }
 
             return owner;
+        }
+
+        private static unsafe void DeserializeImpl<T>(ReadOnlySpan<byte> span, ref T wire)
+            where T : IMessage<T>
+        {            
+            byte[] rented = ArrayPool<byte>.Shared.Rent(span.Length);
+            {
+                // TODO: Perf
+                span.CopyTo(new Span<byte>(rented, 0, span.Length)); // First copy
+                wire.MergeFrom(rented, 0, span.Length); // Second copy
+            }
+            ArrayPool<byte>.Shared.Return(rented);
         }
     }
 }

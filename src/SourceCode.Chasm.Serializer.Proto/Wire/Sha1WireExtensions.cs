@@ -9,17 +9,17 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
         {
             Sha1Wire wire;
 
-            byte[] array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
+            byte[] rented = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
             {
-                model.CopyTo(array);
+                model.CopyTo(rented);
 
                 wire = new Sha1Wire
                 {
                     Set = true,
-                    Data = Google.Protobuf.ByteString.CopyFrom(array, 0, Sha1.ByteLength)
+                    Data = Google.Protobuf.ByteString.CopyFrom(rented, 0, Sha1.ByteLength)
                 };
             }
-            ArrayPool<byte>.Shared.Return(array);
+            ArrayPool<byte>.Shared.Return(rented);
 
             return wire;
         }
@@ -38,13 +38,13 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
 
             Sha1 model;
 
-            byte[] array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
+            byte[] rented = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
             {
-                wire.Data.CopyTo(array, 0);
+                wire.Data.CopyTo(rented, 0);
 
-                model = new Sha1(array);
+                model = new Sha1(rented);
             }
-            ArrayPool<byte>.Shared.Return(array);
+            ArrayPool<byte>.Shared.Return(rented);
 
             return model;
         }
