@@ -11,16 +11,8 @@ namespace SourceCode.Chasm.Serializer.Proto
         {
             CommitWire wire = model.Convert();
 
-            length = wire.CalculateSize();
-            IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(length);
-
-            Memory<byte> mem = owner.Memory.Slice(0, length);
-            using (var cos = new CodedOutputStream(mem.ToArray())) // TODO: Perf
-            {
-                wire.WriteTo(cos);
-
-                return owner;
-            }
+            IMemoryOwner<byte> owner = SerializeImpl(wire, out length);
+            return owner;
         }
 
         public Commit DeserializeCommit(ReadOnlySpan<byte> span)
