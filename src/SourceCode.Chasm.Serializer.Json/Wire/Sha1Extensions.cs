@@ -1,24 +1,14 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using Newtonsoft.Json;
-using SourceCode.Clay;
-using SourceCode.Clay.Json;
 using System;
 using System.IO;
+using Newtonsoft.Json;
+using SourceCode.Clay;
 
-namespace SourceCode.Chasm.IO.Json.Wire
+namespace SourceCode.Chasm.Serializer.Json.Wire
 {
     internal static class Sha1Extensions
     {
-        #region Methods
-
         /// <summary>
-        /// Reads a <see cref="string"/> and, if not <see langword="null"/>, parses it as a <see cref="Sha1"/>.
+        /// Reads a <see cref="string"/> and, if not <see langword=Constants.JsonNull/>, parses it as a <see cref="Sha1"/>.
         /// </summary>
         /// <param name="jr"></param>
         /// <returns></returns>
@@ -26,7 +16,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
         {
             if (jr == null) throw new ArgumentNullException(nameof(jr));
 
-            var str = (string)jr.Value;
+            string str = (string)jr.Value;
             if (string.IsNullOrEmpty(str))
                 return null; // Caller decides how to handle null
 
@@ -36,18 +26,16 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static Sha1? ReadSha1(this string json)
         {
-            if (json == null || json == JsonConstants.Null) return null;
+            if (json == null || json == JsonConstants.JsonNull) return null;
 
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = ReadSha1(jr);
+                Sha1? model = ReadSha1(jr);
                 return model;
             }
         }
-
-        #endregion
     }
 }

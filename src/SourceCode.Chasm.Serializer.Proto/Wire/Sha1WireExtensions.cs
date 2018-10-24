@@ -1,34 +1,25 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using SourceCode.Clay;
 using System.Buffers;
+using SourceCode.Clay;
 
-namespace SourceCode.Chasm.IO.Proto.Wire
+namespace SourceCode.Chasm.Serializer.Proto.Wire
 {
     internal static class Sha1WireExtensions
     {
-        #region Methods
-
         public static Sha1Wire Convert(this Sha1 model)
         {
             Sha1Wire wire;
 
-            var array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
+            byte[] rented = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
             {
-                model.CopyTo(array);
+                model.CopyTo(rented);
 
                 wire = new Sha1Wire
                 {
                     Set = true,
-                    Data = Google.Protobuf.ByteString.CopyFrom(array, 0, Sha1.ByteLength)
+                    Data = Google.Protobuf.ByteString.CopyFrom(rented, 0, Sha1.ByteLength)
                 };
             }
-            ArrayPool<byte>.Shared.Return(array);
+            ArrayPool<byte>.Shared.Return(rented);
 
             return wire;
         }
@@ -47,13 +38,13 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
             Sha1 model;
 
-            var array = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
+            byte[] rented = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
             {
-                wire.Data.CopyTo(array, 0);
+                wire.Data.CopyTo(rented, 0);
 
-                model = new Sha1(array);
+                model = new Sha1(rented);
             }
-            ArrayPool<byte>.Shared.Return(array);
+            ArrayPool<byte>.Shared.Return(rented);
 
             return model;
         }
@@ -62,7 +53,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         {
             if (wire == null || !wire.Set) return default;
 
-            var model = Convert(wire);
+            Sha1? model = Convert(wire);
             return new BlobId(model.Value);
         }
 
@@ -70,7 +61,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         {
             if (wire == null || !wire.Set) return default;
 
-            var model = Convert(wire);
+            Sha1? model = Convert(wire);
             return new CommitId(model.Value);
         }
 
@@ -78,10 +69,8 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         {
             if (wire == null || !wire.Set) return default;
 
-            var model = Convert(wire);
+            Sha1? model = Convert(wire);
             return new TreeId(model.Value);
         }
-
-        #endregion
     }
 }

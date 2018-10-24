@@ -1,13 +1,6 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm
 {
@@ -58,12 +51,10 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : TreeNodeComparer
         {
-            #region Methods
-
             public override int Compare(TreeNode x, TreeNode y)
             {
                 // Nodes are always sorted by Name first (see TreeNodeMap)
-                var cmp = string.CompareOrdinal(x.Name, y.Name);
+                int cmp = string.CompareOrdinal(x.Name, y.Name);
                 if (cmp != 0) return cmp;
 
                 // Then by Sha1 (in order to detect duplicate)
@@ -86,26 +77,20 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNode obj)
             {
-                var hc = HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
+                int hc = HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
                 hc = HashCode.Combine(hc, obj.Kind, obj.Sha1);
 
                 return hc;
             }
-
-            #endregion
         }
 
         private sealed class NameOnlyComparer : TreeNodeComparer
         {
-            #region Methods
-
             public override int Compare(TreeNode x, TreeNode y) => string.CompareOrdinal(x.Name, y.Name);
 
             public override bool Equals(TreeNode x, TreeNode y) => StringComparer.Ordinal.Equals(x.Name, y.Name);
 
             public override int GetHashCode(TreeNode obj) => HashCode.Combine(obj.Name ?? string.Empty, StringComparer.Ordinal);
-
-            #endregion
         }
 
         #endregion

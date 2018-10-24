@@ -1,11 +1,4 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using SourceCode.Clay;
+using System;
 using SourceCode.Clay.Buffers;
 using System.Collections.Generic;
 
@@ -46,13 +39,9 @@ namespace SourceCode.Chasm
 
         private sealed class DefaultComparer : TreeNodeMapComparer
         {
-            #region Methods
-
             public override bool Equals(TreeNodeMap x, TreeNodeMap y) => x._nodes.MemoryEquals(y._nodes);
 
             public override int GetHashCode(TreeNodeMap obj) => HashCode.Combine(obj._nodes.Length);
-
-            #endregion
         }
 
         #endregion

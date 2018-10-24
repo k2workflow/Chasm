@@ -1,18 +1,9 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 
-namespace SourceCode.Chasm.IO.Text.Wire
+namespace SourceCode.Chasm.Serializer.Text.Wire
 {
     internal static class CommitIdExtensions
     {
-        #region Methods
-
         public static string Convert(this CommitId model) => model.Sha1.ToString("N");
 
         public static CommitId ConvertCommitId(this string wire)
@@ -24,7 +15,5 @@ namespace SourceCode.Chasm.IO.Text.Wire
             var model = new CommitId(sha1);
             return model;
         }
-
-        #endregion
     }
 }

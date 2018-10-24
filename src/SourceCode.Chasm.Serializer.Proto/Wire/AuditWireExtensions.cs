@@ -1,18 +1,9 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using System;
 
-namespace SourceCode.Chasm.IO.Proto.Wire
+namespace SourceCode.Chasm.Serializer.Proto.Wire
 {
     internal static class AuditWireExtensions
     {
-        #region Methods
-
         public static AuditWire Convert(this Audit model)
         {
             var wire = new AuditWire
@@ -33,7 +24,7 @@ namespace SourceCode.Chasm.IO.Proto.Wire
         public static Audit Convert(this AuditWire wire)
         {
             // Name
-            var name = wire.Name ?? string.Empty;
+            string name = wire.Name ?? string.Empty;
 
             // DateTime (ticks)
             var dt = new DateTime(wire.DateTime, DateTimeKind.Utc); // Utc
@@ -42,12 +33,10 @@ namespace SourceCode.Chasm.IO.Proto.Wire
             var tz = new TimeSpan(wire.Offset);
 
             // DateTimeOffset
-            var dto = new DateTimeOffset(dt).ToOffset(tz);
+            DateTimeOffset dto = new DateTimeOffset(dt).ToOffset(tz);
 
             var model = new Audit(name, dto);
             return model;
         }
-
-        #endregion
     }
 }

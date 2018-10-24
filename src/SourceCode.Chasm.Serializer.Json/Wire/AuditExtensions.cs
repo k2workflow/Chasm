@@ -1,31 +1,16 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using Newtonsoft.Json;
-using SourceCode.Clay.Json;
 using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
+using SourceCode.Clay.Json;
 
-namespace SourceCode.Chasm.IO.Json.Wire
+namespace SourceCode.Chasm.Serializer.Json.Wire
 {
     internal static class AuditExtensions
     {
-        #region Constants
-
-        // Naming follows convention in ProtoSerializer
-
         private const string _name = "name";
         private const string _time = "time";
-
-        #endregion
-
-        #region Read
 
         public static Audit ReadAudit(this JsonReader jr)
         {
@@ -58,7 +43,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             DateTimeOffset ReadTime()
             {
-                var str = (string)jr.Value;
+                string str = (string)jr.Value;
                 if (string.IsNullOrEmpty(str))
                     return default;
 
@@ -68,21 +53,17 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static Audit ReadAudit(this string json)
         {
-            if (json == null || json == JsonConstants.Null) return default;
+            if (json == null || json == JsonConstants.JsonNull) return default;
 
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = ReadAudit(jr);
+                Audit model = ReadAudit(jr);
                 return model;
             }
         }
-
-        #endregion
-
-        #region Write
 
         public static void Write(this JsonWriter jw, Audit model)
         {
@@ -109,7 +90,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static string Write(this Audit model)
         {
-            if (model == default) return JsonConstants.Null;
+            if (model == default) return JsonConstants.JsonNull;
 
             var sb = new StringBuilder();
             using (var sw = new StringWriter(sb))
@@ -120,7 +101,5 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             return sb.ToString();
         }
-
-        #endregion
     }
 }

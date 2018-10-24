@@ -1,29 +1,16 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using SourceCode.Clay;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SourceCode.Clay;
 
-namespace SourceCode.Chasm.IO.Text.Wire
+namespace SourceCode.Chasm.Serializer.Text.Wire
 {
     internal static class CommitExtensions
     {
-        #region Constants
-
         private const string _treeId = "tree ";
         private const string _parent = "parent ";
         private const string _author = "author ";
         private const string _committer = "committer ";
-
-        #endregion
-
-        #region Methods
 
         public static string Convert(this Commit model)
         {
@@ -47,7 +34,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
 
                     default:
                         {
-                            for (var i = 0; i < model.Parents.Count; i++)
+                            for (int i = 0; i < model.Parents.Count; i++)
                                 sb.AppendLine($"{_parent}{model.Parents[i].Sha1:N}");
                         }
                         break;
@@ -57,21 +44,21 @@ namespace SourceCode.Chasm.IO.Text.Wire
             // Author
             if (model.Author != Audit.Empty)
             {
-                var author = model.Author.Convert();
+                string author = model.Author.Convert();
                 sb.AppendLine($"{_author}{author}");
             }
 
             // Committer
             if (model.Committer != Audit.Empty)
             {
-                var committer = model.Committer.Convert();
+                string committer = model.Committer.Convert();
                 sb.AppendLine($"{_committer}{committer}");
             }
 
             // Message
             sb.AppendLine().AppendLine(model.Message);
 
-            var wire = sb.ToString();
+            string wire = sb.ToString();
             return wire;
         }
 
@@ -81,12 +68,12 @@ namespace SourceCode.Chasm.IO.Text.Wire
 
             // TreeId
             TreeId? treeId = default;
-            var index = wire.IndexOf(_treeId, StringComparison.Ordinal);
+            int index = wire.IndexOf(_treeId, StringComparison.Ordinal);
             {
                 if (index == 0)
                 {
                     index += _treeId.Length;
-                    var curr = wire.Substring(index, Sha1.HexLength);
+                    string curr = wire.Substring(index, Sha1.HexLength);
                     index += Sha1.HexLength;
 
                     var sha1 = Sha1.Parse(curr);
@@ -101,11 +88,11 @@ namespace SourceCode.Chasm.IO.Text.Wire
             // Parents
             var parents = new List<CommitId>();
             {
-                var ix = wire.IndexOf(_parent, index, StringComparison.Ordinal);
+                int ix = wire.IndexOf(_parent, index, StringComparison.Ordinal);
                 while (ix >= 0)
                 {
                     index = ix + _parent.Length;
-                    var curr = wire.Substring(index, Sha1.HexLength);
+                    string curr = wire.Substring(index, Sha1.HexLength);
                     index += Sha1.HexLength;
 
                     var sha1 = Sha1.Parse(curr);
@@ -118,7 +105,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
             // Author
             Audit author = default;
             {
-                var ix = wire.IndexOf(_author, index, StringComparison.Ordinal);
+                int ix = wire.IndexOf(_author, index, StringComparison.Ordinal);
                 if (ix >= 0)
                 {
                     index = ix + _author.Length;
@@ -126,7 +113,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
                     ix = wire.IndexOf('\n', index);
                     if (ix >= 0)
                     {
-                        var str = wire.Substring(index, ix - index);
+                        string str = wire.Substring(index, ix - index);
                         index = ix;
 
                         author = str.ConvertAudit();
@@ -137,7 +124,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
             // Committer
             Audit committer = default;
             {
-                var ix = wire.IndexOf(_committer, index, StringComparison.Ordinal);
+                int ix = wire.IndexOf(_committer, index, StringComparison.Ordinal);
                 if (ix >= 0)
                 {
                     index = ix + _committer.Length;
@@ -145,7 +132,7 @@ namespace SourceCode.Chasm.IO.Text.Wire
                     ix = wire.IndexOf('\n', index);
                     if (ix >= 0)
                     {
-                        var str = wire.Substring(index, ix - index); ;
+                        string str = wire.Substring(index, ix - index); ;
                         index = ix;
 
                         committer = str.ConvertAudit();
@@ -154,13 +141,11 @@ namespace SourceCode.Chasm.IO.Text.Wire
             }
 
             // Message
-            var message = wire.Substring(index).Trim(new char[] { '\r', '\n' });
+            string message = wire.Substring(index).Trim(new char[] { '\r', '\n' });
 
             // Done
             var model = new Commit(parents, treeId, author, committer, message);
             return model;
         }
-
-        #endregion
     }
 }

@@ -1,41 +1,29 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using SourceCode.Chasm.Serializer;
 using System;
 using System.IO.Compression;
 using System.Threading;
 
-namespace SourceCode.Chasm.IO.AzureTable
+namespace SourceCode.Chasm.Repository.AzureTable
 {
     public sealed partial class AzureTableChasmRepo : ChasmRepository
     {
-        #region Fields
-
         private readonly Lazy<CloudTable> _refsTable;
         private readonly Lazy<CloudTable> _objectsTable;
-
-        #endregion
-
-        #region Constructors
 
         public AzureTableChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
             : base(serializer, compressionLevel, maxDop)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
 
-            var client = storageAccount.CreateCloudTableClient();
+            CloudTableClient client = storageAccount.CreateCloudTableClient();
 
             // Refs
             _refsTable = new Lazy<CloudTable>(() =>
             {
                 const string table = "refs";
-                var tr = client.GetTableReference(table);
+                CloudTable tr = client.GetTableReference(table);
 
                 tr.CreateIfNotExistsAsync().Wait();
 
@@ -46,7 +34,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             _objectsTable = new Lazy<CloudTable>(() =>
             {
                 const string container = "objects";
-                var tr = client.GetTableReference(container);
+                CloudTable tr = client.GetTableReference(container);
 
                 tr.CreateIfNotExistsAsync().Wait();
 
@@ -62,10 +50,6 @@ namespace SourceCode.Chasm.IO.AzureTable
             : this(storageAccount, serializer, CompressionLevel.Optimal)
         { }
 
-        #endregion
-
-        #region Factory
-
         public static AzureTableChasmRepo Create(string connectionString, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
@@ -76,7 +60,5 @@ namespace SourceCode.Chasm.IO.AzureTable
 
             return repo;
         }
-
-        #endregion
     }
 }

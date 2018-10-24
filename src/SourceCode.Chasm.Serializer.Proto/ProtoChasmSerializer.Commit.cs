@@ -1,52 +1,28 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using Google.Protobuf;
-using SourceCode.Chasm.IO.Proto.Wire;
-using SourceCode.Clay.Buffers;
 using System;
+using System.Buffers;
+using SourceCode.Chasm.Serializer.Proto.Wire;
 
-namespace SourceCode.Chasm.IO.Proto
+namespace SourceCode.Chasm.Serializer.Proto
 {
-    partial class ProtoChasmSerializer // .Commit
+    public partial class ProtoChasmSerializer // .Commit
     {
-        #region Serialize
-
-        public BufferSession Serialize(Commit model)
+        public IMemoryOwner<byte> Serialize(Commit model, out int length)
         {
-            var wire = model.Convert();
+            CommitWire wire = model.Convert();
 
-            var size = wire.CalculateSize();
-            var buffer = BufferSession.Rent(size).Result;
-
-            using (var cos = new CodedOutputStream(buffer.Array))
-            {
-                wire.WriteTo(cos);
-
-                var session = BufferSession.Rented(buffer.Slice(0, (int)cos.Position));
-                return session;
-            }
+            IMemoryOwner<byte> owner = SerializeImpl(wire, out length);
+            return owner;
         }
-
-        #endregion
-
-        #region Deserialize
 
         public Commit DeserializeCommit(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) return default;
 
             var wire = new CommitWire();
-            wire.MergeFrom(span.ToArray()); // TODO: Perf
+            DeserializeImpl(span, ref wire);
 
-            var model = wire.Convert();
+            Commit model = wire.Convert();
             return model;
         }
-
-        #endregion
     }
 }

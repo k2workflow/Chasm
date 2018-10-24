@@ -1,55 +1,32 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using SourceCode.Chasm.IO.Text.Wire;
-using SourceCode.Clay.Buffers;
 using System;
+using System.Buffers;
 using System.Text;
+using SourceCode.Chasm.Serializer.Text.Wire;
 
-namespace SourceCode.Chasm.IO.Text
+namespace SourceCode.Chasm.Serializer.Text
 {
     partial class TextChasmSerializer // .Tree
     {
-        #region Serialize
-
-        public BufferSession Serialize(TreeNodeMap model)
+        public IMemoryOwner<byte> Serialize(TreeNodeMap model, out int length)
         {
-            var wire = model.Convert();
+            string wire = model.Convert();
 
-            var maxLen = Encoding.UTF8.GetMaxByteCount(wire.Length); // Utf8 is 1-4 bpc
-            var rented = BufferSession.Rent(maxLen).Result;
+            int maxLen = Encoding.UTF8.GetMaxByteCount(wire.Length); // Utf8 is 1-4 bpc
+            IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(maxLen);
 
-            var count = Encoding.UTF8.GetBytes(wire, 0, wire.Length, rented.Array, 0);
+            length = Encoding.UTF8.GetBytes(wire, owner.Memory.Span);
 
-            var session = BufferSession.Rented(rented.Slice(0, count));
-            return session;
+            return owner;
         }
-
-        #endregion
-
-        #region Deserialize
 
         public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) return default;
 
-            string text;
-            unsafe
-            {
-                fixed (byte* ptr = &span.DangerousGetPinnableReference())
-                {
-                    text = Encoding.UTF8.GetString(ptr, span.Length);
-                }
-            }
+            string text = Encoding.UTF8.GetString(span);
 
-            var model = text.ConvertTree();
+            TreeNodeMap model = text.ConvertTree();
             return model;
         }
-
-        #endregion
     }
 }

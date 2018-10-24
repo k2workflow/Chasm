@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using SourceCode.Clay;
 using SourceCode.Clay.Threading;
 using System;
@@ -14,18 +7,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.Hybrid
+namespace SourceCode.Chasm.Repository.Hybrid
 {
     partial class HybridChasmRepo // .Object
     {
-        #region Read
-
         public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             // We read from closest to furthest
-            for (var i = 0; i < Chain.Length; i++)
+            for (int i = 0; i < Chain.Length; i++)
             {
-                var bytes = await Chain[i].ReadObjectAsync(objectId, cancellationToken).ConfigureAwait(false);
+                ReadOnlyMemory<byte>? bytes = await Chain[i].ReadObjectAsync(objectId, cancellationToken).ConfigureAwait(false);
                 if (bytes != null) return bytes;
             }
 
@@ -40,10 +31,10 @@ namespace SourceCode.Chasm.IO.Hybrid
             // TODO: Perf
 
             // We read from closest to furthest
-            var objects = objectIds.ToArray();
-            for (var i = 0; i < Chain.Length; i++)
+            Sha1[] objects = objectIds.ToArray();
+            for (int i = 0; i < Chain.Length; i++)
             {
-                var dict = await Chain[i].ReadObjectBatchAsync(objects, cancellationToken).ConfigureAwait(false);
+                IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> dict = await Chain[i].ReadObjectBatchAsync(objects, cancellationToken).ConfigureAwait(false);
                 if (dict.Count == objects.Length) return dict;
             }
 
@@ -51,11 +42,7 @@ namespace SourceCode.Chasm.IO.Hybrid
             return default;
         }
 
-        #endregion
-
-        #region Write
-
-        public override async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             // We write all at once
             var parallelOptions = new ParallelOptions
@@ -70,7 +57,7 @@ namespace SourceCode.Chasm.IO.Hybrid
             }).ConfigureAwait(false);
         }
 
-        public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
 
@@ -90,7 +77,5 @@ namespace SourceCode.Chasm.IO.Hybrid
                 await Chain[i].WriteObjectBatchAsync(items, forceOverwrite, cancellationToken).ConfigureAwait(false);
             }).ConfigureAwait(false);
         }
-
-        #endregion
     }
 }

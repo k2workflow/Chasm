@@ -1,18 +1,9 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using System.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
     public static class ChasmExtensions
     {
-        #region Methods
-
         public static TreeNodeMap? Merge(this TreeNodeMap? first, in TreeNodeMap? second)
         {
             if (!first.HasValue) return second;
@@ -51,7 +42,5 @@ namespace SourceCode.Chasm
             }
             return map.Value.TryGetValue(key, kind, out value);
         }
-
-        #endregion
     }
 }

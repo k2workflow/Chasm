@@ -1,17 +1,11 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using SourceCode.Chasm.Serializer;
 using System;
 using System.IO.Compression;
 using System.Threading;
 
-namespace SourceCode.Chasm.IO.AzureBlob
+namespace SourceCode.Chasm.Repository.AzureBlob
 {
     public sealed partial class AzureBlobChasmRepo : ChasmRepository
     {
@@ -29,14 +23,14 @@ namespace SourceCode.Chasm.IO.AzureBlob
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
 
-            var client = storageAccount.CreateCloudBlobClient();
+            CloudBlobClient client = storageAccount.CreateCloudBlobClient();
             client.DefaultRequestOptions.ParallelOperationThreadCount = 4; // Default is 1
 
             // Refs
             _refsContainer = new Lazy<CloudBlobContainer>(() =>
             {
                 const string container = "refs";
-                var tr = client.GetContainerReference(container);
+                CloudBlobContainer tr = client.GetContainerReference(container);
 
                 tr.CreateIfNotExistsAsync().Wait();
 
@@ -47,7 +41,7 @@ namespace SourceCode.Chasm.IO.AzureBlob
             _objectsContainer = new Lazy<CloudBlobContainer>(() =>
             {
                 const string container = "objects";
-                var tr = client.GetContainerReference(container);
+                CloudBlobContainer tr = client.GetContainerReference(container);
 
                 tr.CreateIfNotExistsAsync().Wait();
 

@@ -1,24 +1,12 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
+using SourceCode.Chasm.Serializer;
 using System;
 using System.IO.Compression;
 
-namespace SourceCode.Chasm.IO.Hybrid
+namespace SourceCode.Chasm.Repository.Hybrid
 {
     public sealed partial class HybridChasmRepo : ChasmRepository
     {
-        #region Properties
-
         public IChasmRepository[] Chain { get; }
-
-        #endregion
-
-        #region Constructors
 
         public HybridChasmRepo(IChasmRepository repository1, IChasmRepository repository2, IChasmRepository repository3, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
             : base(serializer, compressionLevel, maxDop)
@@ -52,19 +40,13 @@ namespace SourceCode.Chasm.IO.Hybrid
         {
             if (chain == null || chain.Length == 0) throw new ArgumentNullException(nameof(chain));
 
-            for (var i = 0; i < chain.Length; i++)
+            for (int i = 0; i < chain.Length; i++)
                 if (chain[i] == null) throw new ArgumentNullException(nameof(chain));
 
             Chain = chain;
         }
 
-        #endregion
-
-        #region Factory
-
         // TODO: Provide a builder that enables policy-based hybrid pipelines
         // TODO: Reading from a remote should propagate content to local
-
-        #endregion
     }
 }

@@ -1,6 +1,6 @@
 syntax = "proto3";
 import "wrappers.proto";
-option csharp_namespace = "SourceCode.Chasm.IO.Proto.Wire";
+option csharp_namespace = "SourceCode.Chasm.Serializer.Proto.Wire";
 
 	// Sha1
 	message Sha1Wire

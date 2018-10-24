@@ -1,21 +1,12 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-namespace SourceCode.Chasm.IO.Proto.Wire
+namespace SourceCode.Chasm.Serializer.Proto.Wire
 {
     internal static class TreeWireNodeExtensions
     {
-        #region Methods
-
         public static TreeNode Convert(this TreeWireNode wire)
         {
             if (wire == null) return default;
 
-            var sha1 = wire.NodeId.Convert();
+            Clay.Sha1? sha1 = wire.NodeId.Convert();
 
             var model = new TreeNode(wire.Name, wire.Kind.Convert(), sha1.Value);
 
@@ -35,7 +26,5 @@ namespace SourceCode.Chasm.IO.Proto.Wire
 
             return wire;
         }
-
-        #endregion
     }
 }

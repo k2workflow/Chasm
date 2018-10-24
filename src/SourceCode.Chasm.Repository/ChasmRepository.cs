@@ -1,31 +1,19 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
+using SourceCode.Chasm.Serializer;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO
+namespace SourceCode.Chasm.Repository
 {
     public abstract partial class ChasmRepository : IChasmRepository
     {
-        #region Properties
-
         public IChasmSerializer Serializer { get; }
 
         public CompressionLevel CompressionLevel { get; }
 
         public int MaxDop { get; }
-
-        #endregion
-
-        #region Constructors
 
         protected ChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
         {
@@ -37,10 +25,6 @@ namespace SourceCode.Chasm.IO
             MaxDop = maxDop;
         }
 
-        #endregion
-
-        #region CommitRef
-
         protected static ChasmConcurrencyException BuildConcurrencyException(string name, string branch, Exception innerException)
             => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {name}/{branch}", innerException);
 
@@ -51,7 +35,5 @@ namespace SourceCode.Chasm.IO
         public abstract ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken);
 
         public abstract ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken);
-
-        #endregion
     }
 }

@@ -1,10 +1,3 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Clay;
@@ -20,20 +13,18 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SourceCode.Chasm.IO.AzureTable
+namespace SourceCode.Chasm.Repository.AzureTable
 {
     partial class AzureTableChasmRepo // .Object
     {
-        #region Read
-
         public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            var objectsTable = _objectsTable.Value;
-            var op = DataEntity.BuildReadOperation(objectId);
+            CloudTable objectsTable = _objectsTable.Value;
+            TableOperation op = DataEntity.BuildReadOperation(objectId);
 
             try
             {
-                var result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
+                TableResult result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
 
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                     return default;
@@ -46,7 +37,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                 {
                     gzip.CopyTo(output);
 
-                    var buffer = output.ToArray(); // TODO: Perf
+                    byte[] buffer = output.ToArray(); // TODO: Perf
                     return buffer;
                 }
             }
@@ -65,7 +56,7 @@ namespace SourceCode.Chasm.IO.AzureTable
             var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>();
 
             // Build batches
-            var batches = DataEntity.BuildReadBatches(objectIds);
+            IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildReadBatches(objectIds);
 
             var parallelOptions = new ParallelOptions
             {
@@ -74,20 +65,20 @@ namespace SourceCode.Chasm.IO.AzureTable
             };
 
             // Enumerate batches
-            var objectsTable = _objectsTable.Value;
+            CloudTable objectsTable = _objectsTable.Value;
             await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
-                var results = await objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken).ConfigureAwait(false);
+                IList<TableResult> results = await objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken).ConfigureAwait(false);
 
                 // Transform batch results
-                foreach (var result in results)
+                foreach (TableResult result in results)
                 {
                     if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                         continue;
 
                     var entity = (DataEntity)result.Result;
-                    var sha1 = DataEntity.FromPartition(entity);
+                    Sha1 sha1 = DataEntity.FromPartition(entity);
 
                     // Unzip
                     using (var input = new MemoryStream(entity.Content))
@@ -96,7 +87,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                     {
                         gzip.CopyTo(output);
 
-                        var buffer = output.ToArray(); // TODO: Perf
+                        byte[] buffer = output.ToArray(); // TODO: Perf
                         dict[sha1] = buffer;
                         return;
                     }
@@ -106,16 +97,12 @@ namespace SourceCode.Chasm.IO.AzureTable
             return dict;
         }
 
-        #endregion
-
-        #region Write
-
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
         {
             var zipped = new Dictionary<Sha1, ArraySegment<byte>>();
 
             // Zip
-            foreach (var item in items)
+            foreach (KeyValuePair<Sha1, Memory<byte>> item in items)
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
@@ -123,8 +110,7 @@ namespace SourceCode.Chasm.IO.AzureTable
                 {
                     using (var gz = new GZipStream(output, compressionLevel, true))
                     {
-                        var segment = item.Value;
-                        gz.Write(segment.Array, segment.Offset, segment.Count);
+                        gz.Write(item.Value.Span);
                     }
                     output.Position = 0;
 
@@ -133,13 +119,13 @@ namespace SourceCode.Chasm.IO.AzureTable
                 }
             }
 
-            var batches = DataEntity.BuildWriteBatches(zipped, forceOverwrite);
+            IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildWriteBatches(zipped, forceOverwrite);
             return batches;
         }
 
-        public override async Task WriteObjectAsync(Sha1 objectId, ArraySegment<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            var objectsTable = _objectsTable.Value;
+            CloudTable objectsTable = _objectsTable.Value;
 
             // TODO: Perf: Do not write if row already exists (objects are immutable)
 
@@ -147,25 +133,25 @@ namespace SourceCode.Chasm.IO.AzureTable
             {
                 using (var gz = new GZipStream(output, CompressionLevel, true))
                 {
-                    gz.Write(item.Array, item.Offset, item.Count);
+                    gz.Write(item.Span);
                 }
                 output.Position = 0;
 
                 var seg = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
 
-                var op = DataEntity.BuildWriteOperation(objectId, seg, forceOverwrite);
+                TableOperation op = DataEntity.BuildWriteOperation(objectId, seg, forceOverwrite);
                 await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, ArraySegment<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
 
             // Build batches
-            var batches = BuildWriteBatches(items, forceOverwrite, CompressionLevel, cancellationToken);
+            IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(items, forceOverwrite, CompressionLevel, cancellationToken);
 
-            var objectsTable = _objectsTable.Value;
+            CloudTable objectsTable = _objectsTable.Value;
 
             var parallelOptions = new ParallelOptions
             {
@@ -180,7 +166,5 @@ namespace SourceCode.Chasm.IO.AzureTable
                 await objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken).ConfigureAwait(false);
             }).ConfigureAwait(false);
         }
-
-        #endregion
     }
 }

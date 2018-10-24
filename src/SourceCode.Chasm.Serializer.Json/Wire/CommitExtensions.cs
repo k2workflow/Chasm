@@ -1,34 +1,19 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using Newtonsoft.Json;
-using SourceCode.Clay.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
+using SourceCode.Clay.Json;
 
-namespace SourceCode.Chasm.IO.Json.Wire
+namespace SourceCode.Chasm.Serializer.Json.Wire
 {
     internal static class CommitExtensions
     {
-        #region Constants
-
-        // Naming follows convention in ProtoSerializer
-
         private const string _parents = "parents";
         private const string _treeId = "treeId";
         private const string _author = "author";
         private const string _committer = "committer";
         private const string _message = "message";
-
-        #endregion
-
-        #region Read
 
         public static Commit ReadCommit(this JsonReader jr)
         {
@@ -76,34 +61,30 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             IReadOnlyList<CommitId> ReadParents() => jr.ReadArray(() =>
             {
-                var sha1 = jr.ReadSha1();
+                Clay.Sha1? sha1 = jr.ReadSha1();
                 return sha1 == null ? default : new CommitId(sha1.Value);
             });
 
             TreeId? ReadTreeId()
             {
-                var sha1 = jr.ReadSha1();
+                Clay.Sha1? sha1 = jr.ReadSha1();
                 return sha1 == null ? null : (TreeId?)(new TreeId(sha1.Value));
             }
         }
 
         public static Commit ReadCommit(this string json)
         {
-            if (json == null || json == JsonConstants.Null) return default;
+            if (json == null || json == JsonConstants.JsonNull) return default;
 
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = ReadCommit(jr);
+                Commit model = ReadCommit(jr);
                 return model;
             }
         }
-
-        #endregion
-
-        #region Write
 
         public static void Write(this JsonTextWriter jw, Commit model)
         {
@@ -123,7 +104,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
                     jw.WritePropertyName(_parents);
                     jw.WriteStartArray();
 
-                    for (var i = 0; i < model.Parents.Count; i++)
+                    for (int i = 0; i < model.Parents.Count; i++)
                         jw.WriteValue(model.Parents[i].Sha1.ToString("N"));
 
                     jw.WriteEndArray();
@@ -162,7 +143,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static string Write(this Commit model)
         {
-            if (model == default) return JsonConstants.Null;
+            if (model == default) return JsonConstants.JsonNull;
 
             var sb = new StringBuilder();
             using (var sw = new StringWriter(sb))
@@ -173,7 +154,5 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             return sb.ToString();
         }
-
-        #endregion
     }
 }

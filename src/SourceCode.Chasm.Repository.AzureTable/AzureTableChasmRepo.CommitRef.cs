@@ -1,44 +1,37 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
-using SourceCode.Clay;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using SourceCode.Chasm.Serializer;
+using SourceCode.Clay;
 
-namespace SourceCode.Chasm.IO.AzureTable
+namespace SourceCode.Chasm.Repository.AzureTable
 {
     partial class AzureTableChasmRepo // .CommitRef
     {
-        #region List
-
         public override async ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken)
         {
-            var refsTable = _refsTable.Value;
-            var query = DataEntity.BuildListQuery(name);
+            CloudTable refsTable = _refsTable.Value;
+            TableQuery<DataEntity> query = DataEntity.BuildListQuery(name);
 
             var results = new List<CommitRef>();
 
             TableContinuationToken token = null;
             do
             {
-                var result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken).ConfigureAwait(false);
-                foreach (var entity in result.Results)
+                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken).ConfigureAwait(false);
+                foreach (DataEntity entity in result.Results)
                 {
                     if (entity.RowKey.EndsWith(DataEntity.CommitSuffix, StringComparison.OrdinalIgnoreCase))
                     {
-                        var branch = entity.RowKey.Substring(0, entity.RowKey.Length - DataEntity.CommitSuffix.Length);
-                        var commitId = Serializer.DeserializeCommitId(entity.Content);
+                        string branch = entity.RowKey.Substring(0, entity.RowKey.Length - DataEntity.CommitSuffix.Length);
+                        CommitId commitId = Serializer.DeserializeCommitId(entity.Content);
                         results.Add(new CommitRef(branch, commitId));
                     }
                 }
@@ -51,16 +44,16 @@ namespace SourceCode.Chasm.IO.AzureTable
 
         public override async ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
         {
-            var refsTable = _refsTable.Value;
-            var query = DataEntity.BuildListQuery();
+            CloudTable refsTable = _refsTable.Value;
+            TableQuery<DataEntity> query = DataEntity.BuildListQuery();
 
             var names = new HashSet<string>(StringComparer.Ordinal);
 
             TableContinuationToken token = null;
             do
             {
-                var result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken).ConfigureAwait(false);
-                foreach (var item in result.Results)
+                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken).ConfigureAwait(false);
+                foreach (DataEntity item in result.Results)
                     names.Add(item.PartitionKey);
                 token = result.ContinuationToken;
             } while (token != null);
@@ -68,16 +61,12 @@ namespace SourceCode.Chasm.IO.AzureTable
             return names.ToList();
         }
 
-        #endregion
-
-        #region Read
-
         public override async ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            var (found, commitId, _) = await ReadCommitRefImplAsync(name, branch, Serializer, cancellationToken).ConfigureAwait(false);
+            (bool found, CommitId commitId, string _) = await ReadCommitRefImplAsync(name, branch, Serializer, cancellationToken).ConfigureAwait(false);
 
             // NotFound
             if (!found) return null;
@@ -87,17 +76,13 @@ namespace SourceCode.Chasm.IO.AzureTable
             return commitRef;
         }
 
-        #endregion
-
-        #region Write
-
         public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // Load existing commit ref in order to use its etag
-            var (found, existingCommitId, etag) = await ReadCommitRefImplAsync(name, commitRef.Branch, Serializer, cancellationToken).ConfigureAwait(false);
+            (bool found, CommitId existingCommitId, string etag) = await ReadCommitRefImplAsync(name, commitRef.Branch, Serializer, cancellationToken).ConfigureAwait(false);
 
             // Optimistic concurrency check
             if (found)
@@ -124,12 +109,15 @@ namespace SourceCode.Chasm.IO.AzureTable
 
             try
             {
-                var refsTable = _refsTable.Value;
+                CloudTable refsTable = _refsTable.Value;
 
                 // CommitIds are not compressed
-                using (var session = Serializer.Serialize(commitRef.CommitId))
+                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int len))
                 {
-                    var op = DataEntity.BuildWriteOperation(name, commitRef.Branch, session.Result, etag); // Note etag access condition
+                    Memory<byte> mem = owner.Memory.Slice(0, len);
+
+                    var segment = new ArraySegment<byte>(mem.ToArray()); // TODO: Perf
+                    TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, segment, etag); // Note etag access condition
 
                     await refsTable.ExecuteAsync(op).ConfigureAwait(false);
                 }
@@ -140,19 +128,15 @@ namespace SourceCode.Chasm.IO.AzureTable
             }
         }
 
-        #endregion
-
-        #region Helpers
-
         private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string name, string branch, IChasmSerializer serializer, CancellationToken cancellationToken)
         {
-            var refsTable = _refsTable.Value;
-            var operation = DataEntity.BuildReadOperation(name, branch);
+            CloudTable refsTable = _refsTable.Value;
+            TableOperation operation = DataEntity.BuildReadOperation(name, branch);
 
             try
             {
                 // Read from table
-                var result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken).ConfigureAwait(false);
+                TableResult result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken).ConfigureAwait(false);
 
                 // NotFound
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
@@ -160,12 +144,12 @@ namespace SourceCode.Chasm.IO.AzureTable
 
                 var entity = (DataEntity)result.Result;
 
-                var count = entity.Content?.Length ?? 0;
+                int count = entity.Content?.Length ?? 0;
                 if (count < Sha1.ByteLength)
                     throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {count}");
 
                 // CommitIds are not compressed
-                var commitId = serializer.DeserializeCommitId(entity.Content);
+                CommitId commitId = serializer.DeserializeCommitId(entity.Content);
 
                 // Found
                 return (true, commitId, result.Etag);
@@ -179,7 +163,5 @@ namespace SourceCode.Chasm.IO.AzureTable
             // NotFound
             return (false, default, default);
         }
-
-        #endregion
     }
 }

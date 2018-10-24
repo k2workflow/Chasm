@@ -1,27 +1,19 @@
-#region License
-
-// Copyright (c) K2 Workflow (SourceCode Technology Holdings Inc.). All rights reserved.
-// Licensed under the MIT License. See LICENSE file in the project root for full license information.
-
-#endregion
-
-using Newtonsoft.Json;
-using SourceCode.Clay.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
+using SourceCode.Clay.Json;
 
-namespace SourceCode.Chasm.IO.Json.Wire
+namespace SourceCode.Chasm.Serializer.Json.Wire
 {
     internal static class TreeNodeMapExtensions
     {
-        #region Read
-
         public static TreeNodeMap ReadTreeNodeMap(this JsonReader jr)
         {
             if (jr == null) throw new ArgumentNullException(nameof(jr));
 
-            var list = jr.ReadArray(() => jr.ReadTreeNode());
+            IReadOnlyList<TreeNode> list = jr.ReadArray(() => jr.ReadTreeNode());
 
             var tree = new TreeNodeMap(list);
             return tree;
@@ -29,21 +21,17 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static TreeNodeMap ReadTreeNodeMap(this string json)
         {
-            if (json == null || json == JsonConstants.Null) return default;
+            if (json == null || json == JsonConstants.JsonNull) return default;
 
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                var model = ReadTreeNodeMap(jr);
+                TreeNodeMap model = ReadTreeNodeMap(jr);
                 return model;
             }
         }
-
-        #endregion
-
-        #region Write
 
         public static void Write(this JsonTextWriter jw, TreeNodeMap model)
         {
@@ -57,7 +45,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             jw.WriteStartArray();
             {
-                for (var i = 0; i < model.Count; i++)
+                for (int i = 0; i < model.Count; i++)
                     jw.Write(model[i]);
             }
             jw.WriteEndArray();
@@ -65,7 +53,7 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
         public static string Write(this TreeNodeMap model)
         {
-            if (model == default) return JsonConstants.Null;
+            if (model == default) return JsonConstants.JsonNull;
 
             var sb = new StringBuilder();
             using (var sw = new StringWriter(sb))
@@ -76,7 +64,5 @@ namespace SourceCode.Chasm.IO.Json.Wire
 
             return sb.ToString();
         }
-
-        #endregion
     }
 }
