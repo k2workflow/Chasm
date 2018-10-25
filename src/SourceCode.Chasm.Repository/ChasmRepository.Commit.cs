@@ -11,7 +11,8 @@ namespace SourceCode.Chasm.Repository
         public virtual async ValueTask<Commit?> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
             ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
-            if (buffer == null) return default;
+
+            if (buffer == null || buffer.Value.Length == 0) return default;
 
             Commit model = Serializer.DeserializeCommit(buffer.Value.Span);
             return model;

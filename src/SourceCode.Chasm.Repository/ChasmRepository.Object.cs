@@ -1,5 +1,3 @@
-using SourceCode.Clay;
-using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,6 +5,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Clay;
+using SourceCode.Clay.Threading;
 
 namespace SourceCode.Chasm.Repository
 {
@@ -30,7 +30,10 @@ namespace SourceCode.Chasm.Repository
             {
                 // Execute batch
                 ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(sha1, cancellationToken).ConfigureAwait(false);
-                if (buffer.HasValue) dict[sha1] = buffer.Value;
+
+                if (buffer == null || buffer.Value.Length == 0) return;
+
+                dict[sha1] = buffer.Value;
             }).ConfigureAwait(false);
 
             return dict;

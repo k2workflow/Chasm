@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <Deterministic>false</Deterministic>
+    <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 
   <PropertyGroup>

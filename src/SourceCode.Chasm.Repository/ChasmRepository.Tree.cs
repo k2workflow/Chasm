@@ -14,7 +14,8 @@ namespace SourceCode.Chasm.Repository
         {
             // Read bytes
             ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(treeId.Sha1, cancellationToken).ConfigureAwait(false);
-            if (buffer == null) return default;
+
+            if (buffer == null || buffer.Value.Length == 0) return default;
 
             // Deserialize
             TreeNodeMap tree = Serializer.DeserializeTree(buffer.Value.Span);
