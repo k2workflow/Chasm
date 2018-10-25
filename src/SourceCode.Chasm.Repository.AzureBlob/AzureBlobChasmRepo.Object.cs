@@ -1,12 +1,12 @@
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using SourceCode.Clay;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.AzureBlob
 {

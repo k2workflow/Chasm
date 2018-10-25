@@ -1,9 +1,9 @@
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
-using SourceCode.Chasm.Serializer;
 using System;
 using System.IO.Compression;
 using System.Threading;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using SourceCode.Chasm.Serializer;
 
 namespace SourceCode.Chasm.Repository.AzureTable
 {
