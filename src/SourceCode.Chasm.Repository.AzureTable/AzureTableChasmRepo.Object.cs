@@ -99,7 +99,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
         {
-            var zipped = new Dictionary<Sha1, ArraySegment<byte>>();
+            var zipped = new Dictionary<Sha1, Memory<byte>>();
 
             // Zip
             foreach (KeyValuePair<Sha1, Memory<byte>> item in items)
@@ -114,7 +114,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     }
                     output.Position = 0;
 
-                    var zip = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
+                    var zip = new Memory<byte>(output.ToArray()); // TODO: Perf
                     zipped.Add(item.Key, zip);
                 }
             }
@@ -137,9 +137,9 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 }
                 output.Position = 0;
 
-                var seg = new ArraySegment<byte>(output.ToArray()); // TODO: Perf
+                var mem = new Memory<byte>(output.ToArray()); // TODO: Perf
 
-                TableOperation op = DataEntity.BuildWriteOperation(objectId, seg, forceOverwrite);
+                TableOperation op = DataEntity.BuildWriteOperation(objectId, mem, forceOverwrite);
                 await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
             }
         }

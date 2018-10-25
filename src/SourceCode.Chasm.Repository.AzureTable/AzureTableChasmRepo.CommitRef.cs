@@ -116,8 +116,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 {
                     Memory<byte> mem = owner.Memory.Slice(0, len);
 
-                    var segment = new ArraySegment<byte>(mem.ToArray()); // TODO: Perf
-                    TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, segment, etag); // Note etag access condition
+                    TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, mem, etag); // Note etag access condition
 
                     await refsTable.ExecuteAsync(op).ConfigureAwait(false);
                 }

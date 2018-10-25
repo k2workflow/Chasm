@@ -30,7 +30,7 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
             var usha2 = Sha1.Hash(Guid.NewGuid().ToByteArray());
 
             // Blob
-            await repository.WriteObjectAsync(sha, new ArraySegment<byte>(data), false, default);
+            await repository.WriteObjectAsync(sha, new Memory<byte>(data), false, default);
             ReadOnlyMemory<byte>? rdata = (await repository.ReadObjectAsync(sha, default));
             Assert.True(rdata.HasValue);
             Assert.Equal(16, rdata.Value.Length);
