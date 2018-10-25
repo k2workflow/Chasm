@@ -1,10 +1,9 @@
-using SourceCode.Clay;
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.Disk
 {

@@ -29,7 +29,7 @@ namespace SourceCode.Chasm.Serializer.Proto
 
         private static unsafe void DeserializeImpl<T>(ReadOnlySpan<byte> span, ref T wire)
             where T : IMessage<T>
-        {            
+        {
             byte[] rented = ArrayPool<byte>.Shared.Rent(span.Length);
             {
                 // TODO: Perf

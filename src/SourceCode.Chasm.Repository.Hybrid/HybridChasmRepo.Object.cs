@@ -1,11 +1,11 @@
-using SourceCode.Clay;
-using SourceCode.Clay.Threading;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Clay;
+using SourceCode.Clay.Threading;
 
 namespace SourceCode.Chasm.Repository.Hybrid
 {

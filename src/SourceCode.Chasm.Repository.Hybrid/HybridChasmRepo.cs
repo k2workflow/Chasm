@@ -1,6 +1,6 @@
-using SourceCode.Chasm.Serializer;
 using System;
 using System.IO.Compression;
+using SourceCode.Chasm.Serializer;
 
 namespace SourceCode.Chasm.Repository.Hybrid
 {
