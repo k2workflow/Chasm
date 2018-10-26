@@ -10,11 +10,14 @@ using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.IO.Tests
 {
     public static class TreeNodeTests
     {
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
+
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_NullTreeNodeMap))]
         [ClassData(typeof(TestData))]
@@ -54,9 +57,9 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_WriteRead_TreeNodeMap(IChasmSerializer ser)
         {
-            var node0 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
-            var node1 = new TreeNode("b", NodeKind.Tree, Sha1.Hash("def"));
-            var node2 = new TreeNode("c", NodeKind.Tree, Sha1.Hash("hij"));
+            var node0 = new TreeNode("a", NodeKind.Blob, s_hasher.HashData("abc"));
+            var node1 = new TreeNode("b", NodeKind.Tree, s_hasher.HashData("def"));
+            var node2 = new TreeNode("c", NodeKind.Tree, s_hasher.HashData("hij"));
             var expected = new TreeNodeMap(node0, node1, node2);
 
             using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))

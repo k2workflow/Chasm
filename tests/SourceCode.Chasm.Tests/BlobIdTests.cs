@@ -1,18 +1,21 @@
 using System;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Tests
 {
     public static class BlobIdTests
     {
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
+
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(BlobId_equality))]
         public static void BlobId_equality()
         {
-            var blobId1 = new BlobId(Sha1.Hash("abc"));
-            var blobId2 = new BlobId(Sha1.Hash("abc"));
-            var blobId3 = new BlobId(Sha1.Hash("def"));
+            var blobId1 = new BlobId(s_hasher.HashData("abc"));
+            var blobId2 = new BlobId(s_hasher.HashData("abc"));
+            var blobId3 = new BlobId(s_hasher.HashData("def"));
 
             Assert.True(blobId1 == blobId2);
             Assert.False(blobId1 != blobId2);
@@ -38,9 +41,9 @@ namespace SourceCode.Chasm.Tests
         {
             BlobIdComparer comparer = BlobIdComparer.Default;
 
-            var blobId1 = new BlobId(Sha1.Hash("abc"));
-            var blobId2 = new BlobId(Sha1.Hash("abc"));
-            var blobId3 = new BlobId(Sha1.Hash("def"));
+            var blobId1 = new BlobId(s_hasher.HashData("abc"));
+            var blobId2 = new BlobId(s_hasher.HashData("abc"));
+            var blobId3 = new BlobId(s_hasher.HashData("def"));
             BlobId[] list = new[] { blobId1, blobId2, blobId3 };
 
             Assert.True(blobId1.CompareTo(blobId2) == 0);

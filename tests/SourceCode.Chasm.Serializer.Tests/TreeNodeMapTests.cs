@@ -10,6 +10,7 @@ using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.IO.Tests
 {
@@ -17,9 +18,11 @@ namespace SourceCode.Chasm.IO.Tests
     {
         #region Constants
 
-        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), new BlobId(Sha1.Hash(nameof(Node1))));
-        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), new BlobId(Sha1.Hash(nameof(Node2))));
-        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), new BlobId(Sha1.Hash(nameof(Node3))));
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
+
+        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), new BlobId(s_hasher.HashData(nameof(Node1))));
+        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), new BlobId(s_hasher.HashData(nameof(Node2))));
+        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), new BlobId(s_hasher.HashData(nameof(Node3))));
 
         #endregion
 

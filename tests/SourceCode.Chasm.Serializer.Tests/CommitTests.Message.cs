@@ -12,7 +12,7 @@ using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static partial class CommitTests // .Message
+    partial class CommitTests // .Message
     {
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Message_Null))]

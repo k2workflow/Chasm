@@ -1,6 +1,6 @@
-using SourceCode.Clay;
 using System;
 using System.Diagnostics;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm
 {

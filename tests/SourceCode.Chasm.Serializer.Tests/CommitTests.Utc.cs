@@ -12,16 +12,16 @@ using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static partial class CommitTests // .Utc
+    partial class CommitTests // .Utc
     {
-        private static readonly DateTimeOffset Utc1 = new DateTimeOffset(new DateTime(new DateTime(2000, 1, 1).Ticks, DateTimeKind.Utc));
+        private static readonly DateTimeOffset s_utc1 = new DateTimeOffset(new DateTime(new DateTime(2000, 1, 1).Ticks, DateTimeKind.Utc));
 
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_Utc))]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_Commit_Utc(IChasmSerializer ser)
         {
-            var expected = new Commit(new CommitId?(), default, new Audit("bob", Utc1), new Audit("mary", Utc1), null);
+            var expected = new Commit(new CommitId?(), default, new Audit("bob", s_utc1), new Audit("mary", s_utc1), null);
             using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
                 Memory<byte> mem = owner.Memory.Slice(0, len);

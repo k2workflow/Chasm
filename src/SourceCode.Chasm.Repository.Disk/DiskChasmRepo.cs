@@ -116,7 +116,7 @@ namespace SourceCode.Chasm.Repository.Disk
             using (FileStream fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken).ConfigureAwait(false))
             {
                 // Only write to the file if it does not already exist.
-                if ((fileStream.Length != dataLength || forceOverwrite))
+                if (fileStream.Length != dataLength || forceOverwrite)
                 {
                     fileStream.Position = 0;
 

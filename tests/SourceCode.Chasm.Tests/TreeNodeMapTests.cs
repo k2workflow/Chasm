@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Tests
 {
     public static class TreeNodeMapTests
     {
-        private static readonly TreeNode Node0 = new TreeNode(nameof(Node0), NodeKind.Tree, Sha1.Hash(nameof(Node0)));
-        private static readonly TreeNode Node0Blob = new TreeNode(nameof(Node0), NodeKind.Blob, Sha1.Hash(nameof(Node0Blob)));
-        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Blob, Sha1.Hash(nameof(Node1)));
-        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), NodeKind.Tree, Sha1.Hash(nameof(Node2)));
-        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.Blob, Sha1.Hash(nameof(Node3)));
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
+
+        private static readonly TreeNode Node0 = new TreeNode(nameof(Node0), NodeKind.Tree, s_hasher.HashData(nameof(Node0)));
+        private static readonly TreeNode Node0Blob = new TreeNode(nameof(Node0), NodeKind.Blob, s_hasher.HashData(nameof(Node0Blob)));
+        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Blob, s_hasher.HashData(nameof(Node1)));
+        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), NodeKind.Tree, s_hasher.HashData(nameof(Node2)));
+        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.Blob, s_hasher.HashData(nameof(Node3)));
 
         private static void AssertEmpty(TreeNodeMap tree)
         {
@@ -227,8 +230,8 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(TreeNodeMap_Equality))]
         public static void TreeNodeMap_Equality()
         {
-            var expected = new TreeNodeMap(new[] { new TreeNode("c1", NodeKind.Blob, Sha1.Hash("c1")), new TreeNode("c2", NodeKind.Tree, Sha1.Hash("c2")) });
-            var node3 = new TreeNode("c3", NodeKind.Tree, Sha1.Hash("c3"));
+            var expected = new TreeNodeMap(new[] { new TreeNode("c1", NodeKind.Blob, s_hasher.HashData("c1")), new TreeNode("c2", NodeKind.Tree, s_hasher.HashData("c2")) });
+            var node3 = new TreeNode("c3", NodeKind.Tree, s_hasher.HashData("c3"));
 
             // Equal
             TreeNodeMap actual = new TreeNodeMap().Merge(expected);
@@ -281,7 +284,7 @@ namespace SourceCode.Chasm.Tests
         public static void TreeNodeMap_Merge_Empty()
         {
             var emptyTreeNodeMap = new TreeNodeMap();
-            var node = new TreeNode("b", NodeKind.Blob, Sha1.Hash("Test1"));
+            var node = new TreeNode("b", NodeKind.Blob, s_hasher.HashData("Test1"));
             var tree = new TreeNodeMap(node);
 
             // TreeNodeMap
@@ -319,13 +322,13 @@ namespace SourceCode.Chasm.Tests
         {
             var tree = new TreeNodeMap();
 
-            tree = tree.Add(new TreeNode("b", NodeKind.Blob, Sha1.Hash("Test1")));
-            tree = tree.Add(new TreeNode("a", NodeKind.Tree, Sha1.Hash("Test2")));
-            tree = tree.Add(new TreeNode("c", NodeKind.Blob, Sha1.Hash("Test3")));
-            tree = tree.Add(new TreeNode("d", NodeKind.Tree, Sha1.Hash("Test4")));
-            tree = tree.Add(new TreeNode("g", NodeKind.Blob, Sha1.Hash("Test5")));
-            tree = tree.Add(new TreeNode("e", NodeKind.Tree, Sha1.Hash("Test6")));
-            tree = tree.Add(new TreeNode("f", NodeKind.Blob, Sha1.Hash("Test7")));
+            tree = tree.Add(new TreeNode("b", NodeKind.Blob, s_hasher.HashData("Test1")));
+            tree = tree.Add(new TreeNode("a", NodeKind.Tree, s_hasher.HashData("Test2")));
+            tree = tree.Add(new TreeNode("c", NodeKind.Blob, s_hasher.HashData("Test3")));
+            tree = tree.Add(new TreeNode("d", NodeKind.Tree, s_hasher.HashData("Test4")));
+            tree = tree.Add(new TreeNode("g", NodeKind.Blob, s_hasher.HashData("Test5")));
+            tree = tree.Add(new TreeNode("e", NodeKind.Tree, s_hasher.HashData("Test6")));
+            tree = tree.Add(new TreeNode("f", NodeKind.Blob, s_hasher.HashData("Test7")));
 
             string prev = tree.Keys.First();
             foreach (string cur in tree.Keys.Skip(1))
@@ -343,9 +346,9 @@ namespace SourceCode.Chasm.Tests
             var tree = new TreeNodeMap();
             string expectedName = Guid.NewGuid().ToString();
             NodeKind expectedKind = NodeKind.Tree;
-            var expectedSha1 = Sha1.Hash(Guid.NewGuid().ToString());
+            Sha1 expectedSha1 = s_hasher.HashData(Guid.NewGuid().ToString());
 
-            tree = tree.Add(new TreeNode(expectedName, NodeKind.Blob, Sha1.Hash("Test1")));
+            tree = tree.Add(new TreeNode(expectedName, NodeKind.Blob, s_hasher.HashData("Test1")));
 
             // Action
             TreeNodeMap actual = tree.Add(new TreeNode(expectedName, expectedKind, expectedSha1));
@@ -363,20 +366,20 @@ namespace SourceCode.Chasm.Tests
         {
             var tree1 = new TreeNodeMap();
 
-            tree1 = tree1.Add(new TreeNode("d", NodeKind.Tree, Sha1.Hash("Test4")));
-            tree1 = tree1.Add(new TreeNode("e", NodeKind.Tree, Sha1.Hash("Test5")));
-            tree1 = tree1.Add(new TreeNode("f", NodeKind.Blob, Sha1.Hash("Test6")));
-            tree1 = tree1.Add(new TreeNode("g", NodeKind.Blob, Sha1.Hash("Test7")));
+            tree1 = tree1.Add(new TreeNode("d", NodeKind.Tree, s_hasher.HashData("Test4")));
+            tree1 = tree1.Add(new TreeNode("e", NodeKind.Tree, s_hasher.HashData("Test5")));
+            tree1 = tree1.Add(new TreeNode("f", NodeKind.Blob, s_hasher.HashData("Test6")));
+            tree1 = tree1.Add(new TreeNode("g", NodeKind.Blob, s_hasher.HashData("Test7")));
 
             var tree2 = new TreeNodeMap();
 
-            tree2 = tree2.Add(new TreeNode("a", NodeKind.Tree, Sha1.Hash("Test1")));
-            tree2 = tree2.Add(new TreeNode("b", NodeKind.Blob, Sha1.Hash("Test2")));
-            tree2 = tree2.Add(new TreeNode("c", NodeKind.Blob, Sha1.Hash("Test3")));
-            tree2 = tree2.Add(new TreeNode("d", NodeKind.Tree, Sha1.Hash("Test4 Replace")));
-            tree2 = tree2.Add(new TreeNode("g", NodeKind.Blob, Sha1.Hash("Test5 Replace")));
-            tree2 = tree2.Add(new TreeNode("q", NodeKind.Tree, Sha1.Hash("Test8")));
-            tree2 = tree2.Add(new TreeNode("r", NodeKind.Blob, Sha1.Hash("Test9")));
+            tree2 = tree2.Add(new TreeNode("a", NodeKind.Tree, s_hasher.HashData("Test1")));
+            tree2 = tree2.Add(new TreeNode("b", NodeKind.Blob, s_hasher.HashData("Test2")));
+            tree2 = tree2.Add(new TreeNode("c", NodeKind.Blob, s_hasher.HashData("Test3")));
+            tree2 = tree2.Add(new TreeNode("d", NodeKind.Tree, s_hasher.HashData("Test4 Replace")));
+            tree2 = tree2.Add(new TreeNode("g", NodeKind.Blob, s_hasher.HashData("Test5 Replace")));
+            tree2 = tree2.Add(new TreeNode("q", NodeKind.Tree, s_hasher.HashData("Test8")));
+            tree2 = tree2.Add(new TreeNode("r", NodeKind.Blob, s_hasher.HashData("Test9")));
 
             TreeNodeMap tree3 = tree1.Merge(tree2);
 
@@ -409,20 +412,20 @@ namespace SourceCode.Chasm.Tests
         {
             var tree1 = new TreeNodeMap();
 
-            tree1 = tree1.Add(new TreeNode("d", NodeKind.Tree, Sha1.Hash("Test4")));
-            tree1 = tree1.Add(new TreeNode("e", NodeKind.Tree, Sha1.Hash("Test5")));
-            tree1 = tree1.Add(new TreeNode("f", NodeKind.Blob, Sha1.Hash("Test6")));
-            tree1 = tree1.Add(new TreeNode("g", NodeKind.Blob, Sha1.Hash("Test7")));
+            tree1 = tree1.Add(new TreeNode("d", NodeKind.Tree, s_hasher.HashData("Test4")));
+            tree1 = tree1.Add(new TreeNode("e", NodeKind.Tree, s_hasher.HashData("Test5")));
+            tree1 = tree1.Add(new TreeNode("f", NodeKind.Blob, s_hasher.HashData("Test6")));
+            tree1 = tree1.Add(new TreeNode("g", NodeKind.Blob, s_hasher.HashData("Test7")));
 
             TreeNode[] tree2 = new[]
             {
-                new TreeNode("c", NodeKind.Blob, Sha1.Hash("Test3")),
-                new TreeNode("a", NodeKind.Tree, Sha1.Hash("Test1")),
-                new TreeNode("b", NodeKind.Blob, Sha1.Hash("Test2")),
-                new TreeNode("d", NodeKind.Tree, Sha1.Hash("Test4 Replace")),
-                new TreeNode("g", NodeKind.Blob, Sha1.Hash("Test5 Replace")),
-                new TreeNode("q", NodeKind.Tree, Sha1.Hash("Test8")),
-                new TreeNode("r", NodeKind.Blob, Sha1.Hash("Test9")),
+                new TreeNode("c", NodeKind.Blob, s_hasher.HashData("Test3")),
+                new TreeNode("a", NodeKind.Tree, s_hasher.HashData("Test1")),
+                new TreeNode("b", NodeKind.Blob, s_hasher.HashData("Test2")),
+                new TreeNode("d", NodeKind.Tree, s_hasher.HashData("Test4 Replace")),
+                new TreeNode("g", NodeKind.Blob, s_hasher.HashData("Test5 Replace")),
+                new TreeNode("q", NodeKind.Tree, s_hasher.HashData("Test8")),
+                new TreeNode("r", NodeKind.Blob, s_hasher.HashData("Test9")),
             };
 
             TreeNodeMap tree3 = tree1.Merge(tree2);
@@ -466,9 +469,9 @@ namespace SourceCode.Chasm.Tests
         {
             var tree = new TreeNodeMap
             (
-                new TreeNode("a", NodeKind.Blob, Sha1.Hash("a")),
-                new TreeNode("b", NodeKind.Blob, Sha1.Hash("b")),
-                new TreeNode("c", NodeKind.Blob, Sha1.Hash("c"))
+                new TreeNode("a", NodeKind.Blob, s_hasher.HashData("a")),
+                new TreeNode("b", NodeKind.Blob, s_hasher.HashData("b")),
+                new TreeNode("c", NodeKind.Blob, s_hasher.HashData("c"))
             );
 
             TreeNodeMap removed = tree.Delete("a");
@@ -493,9 +496,9 @@ namespace SourceCode.Chasm.Tests
         {
             var tree = new TreeNodeMap
             (
-                new TreeNode("a", NodeKind.Blob, Sha1.Hash("a")),
-                new TreeNode("b", NodeKind.Blob, Sha1.Hash("b")),
-                new TreeNode("c", NodeKind.Blob, Sha1.Hash("c"))
+                new TreeNode("a", NodeKind.Blob, s_hasher.HashData("a")),
+                new TreeNode("b", NodeKind.Blob, s_hasher.HashData("b")),
+                new TreeNode("c", NodeKind.Blob, s_hasher.HashData("c"))
             );
 
             var set = new HashSet<string>(StringComparer.Ordinal)

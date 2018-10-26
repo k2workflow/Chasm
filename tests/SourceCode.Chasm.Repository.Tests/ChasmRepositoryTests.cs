@@ -4,11 +4,14 @@ using Moq;
 using SourceCode.Chasm.Serializer.Json;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Azure.Tests
 {
-    public static partial class ChasmRepositoryTests
+    public static class ChasmRepositoryTests
     {
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
+
         //[InlineData(null, null, true)]
         //[InlineData(new byte[0], null, false)]
         //[InlineData(new byte[0], new byte[0], true)]
@@ -33,7 +36,7 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
             repo.Setup(r => r.ReadCommitRefAsync(null, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));
             repo.Setup(r => r.ReadCommitRefAsync(string.Empty, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));
 
-            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitRef?>(new CommitRef("branch-name", new CommitId(Sha1.Hash("branch-name")))));
+            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitRef?>(new CommitRef("branch-name", new CommitId(s_hasher.HashData("branch-name")))));
         }
     }
 }

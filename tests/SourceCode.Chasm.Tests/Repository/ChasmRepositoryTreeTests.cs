@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using SourceCode.Chasm.Tests;
-using SourceCode.Chasm.Tests.Helpers;
+using SourceCode.Chasm.Tests.TestObjects;
 using SourceCode.Chasm.Tests.TestObjects;
 using SourceCode.Clay;
 using Xunit;
@@ -22,6 +22,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new Mock<RandomChasmSerializer>();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -47,6 +48,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -65,6 +67,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -83,6 +86,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -101,6 +105,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new Mock<RandomChasmSerializer>();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -126,6 +131,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -144,6 +150,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -169,6 +176,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -187,6 +195,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -220,6 +229,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -238,6 +248,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -264,6 +275,7 @@ namespace SourceCode.Chasm.Repository.Tests
             // Arrange
             var parents = new List<CommitId> { CommitIdTestObject.Random };
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
@@ -284,6 +296,7 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
+
             var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
