@@ -7,15 +7,15 @@ namespace SourceCode.Chasm.Tests
 {
     public static class CommitIdTests
     {
-        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(CommitId_equality))]
         public static void CommitId_equality()
         {
-            var commitId1 = new CommitId(s_sha1.HashData("abc"));
-            var commitId2 = new CommitId(s_sha1.HashData("abc"));
-            var commitId3 = new CommitId(s_sha1.HashData("def"));
+            var commitId1 = new CommitId(s_hasher.HashData("abc"));
+            var commitId2 = new CommitId(s_hasher.HashData("abc"));
+            var commitId3 = new CommitId(s_hasher.HashData("def"));
 
             Assert.True(commitId1 == commitId2);
             Assert.False(commitId1 != commitId2);
@@ -40,9 +40,9 @@ namespace SourceCode.Chasm.Tests
         {
             CommitIdComparer comparer = CommitIdComparer.Default;
 
-            var commitId1 = new CommitId(s_sha1.HashData("abc"));
-            var commitId2 = new CommitId(s_sha1.HashData("abc"));
-            var commitId3 = new CommitId(s_sha1.HashData("def"));
+            var commitId1 = new CommitId(s_hasher.HashData("abc"));
+            var commitId2 = new CommitId(s_hasher.HashData("abc"));
+            var commitId3 = new CommitId(s_hasher.HashData("def"));
             CommitId[] list = new[] { commitId1, commitId2, commitId3 };
 
             Assert.True(commitId1.CompareTo(commitId2) == 0);

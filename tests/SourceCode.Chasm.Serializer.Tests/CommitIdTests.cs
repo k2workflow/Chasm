@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static class CommitIdTests
     {
-        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_CommitId_Default))]
@@ -38,7 +38,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_CommitId(IChasmSerializer ser)
         {
-            var expected = new CommitId(s_sha1.HashData("abc"));
+            var expected = new CommitId(s_hasher.HashData("abc"));
             using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
                 Memory<byte> mem = owner.Memory.Slice(0, len);

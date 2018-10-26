@@ -16,13 +16,13 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static class TreeNodeMapTests
     {
-        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
-
         #region Constants
 
-        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), new BlobId(s_sha1.HashData(nameof(Node1))));
-        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), new BlobId(s_sha1.HashData(nameof(Node2))));
-        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), new BlobId(s_sha1.HashData(nameof(Node3))));
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
+
+        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), new BlobId(s_hasher.HashData(nameof(Node1))));
+        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), new BlobId(s_hasher.HashData(nameof(Node2))));
+        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), new BlobId(s_hasher.HashData(nameof(Node3))));
 
         #endregion
 

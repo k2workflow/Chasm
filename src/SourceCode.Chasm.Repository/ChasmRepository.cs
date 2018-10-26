@@ -1,33 +1,30 @@
-using SourceCode.Chasm.Serializer;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Chasm.Serializer;
 using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository
 {
     public abstract partial class ChasmRepository : IChasmRepository
     {
-        // TODO: Is this a valid approach
-
-        // Use a thread-local instance of the underlying crypto algorithm.
-        [ThreadStatic]
-        protected readonly crypt.SHA1 _hasher;
-
         public IChasmSerializer Serializer { get; }
 
         public CompressionLevel CompressionLevel { get; }
 
         public int MaxDop { get; }
 
-        protected ChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop, crypt.SHA1 hasher)
+        // Use a thread-local instance of the underlying crypto algorithm.
+        private static readonly ThreadLocal<crypt.SHA1> s_hasher = new ThreadLocal<crypt.SHA1>(crypt.SHA1.Create);
+        protected static crypt.SHA1 Hasher => s_hasher.Value;
+
+        protected ChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
         {
             if (!Enum.IsDefined(typeof(CompressionLevel), compressionLevel)) throw new ArgumentOutOfRangeException(nameof(compressionLevel));
             if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
 
-            _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
             Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             CompressionLevel = compressionLevel;
             MaxDop = maxDop;

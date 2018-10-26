@@ -25,25 +25,24 @@ namespace SoruceCode.Chasm.IntegrationTests
 {
     public static class ChasmRepositoryTests
     {
-        private const string DevelopmentStorage = "UseDevelopmentStorage=true";
-        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
-        #region Methods
+        private const string DevelopmentStorage = "UseDevelopmentStorage=true";        
 
         private static async Task TestRepository(IChasmRepository repository)
         {
             var g = Guid.NewGuid();
 
             byte[] data = g.ToByteArray();
-            Sha1 sha = s_sha1.HashData(data);
+            Sha1 sha = s_hasher.HashData(data);
 
             // Unknown SHA
-            Sha1 usha = s_sha1.HashData(Guid.NewGuid().ToByteArray());
-            Sha1 usha2 = s_sha1.HashData(Guid.NewGuid().ToByteArray());
+            Sha1 usha = s_hasher.HashData(Guid.NewGuid().ToByteArray());
+            Sha1 usha2 = s_hasher.HashData(Guid.NewGuid().ToByteArray());
 
             // Blob
             await repository.WriteObjectAsync(sha, new Memory<byte>(data), false, default);
-            ReadOnlyMemory<byte>? rdata = (await repository.ReadObjectAsync(sha, default));
+            ReadOnlyMemory<byte>? rdata = await repository.ReadObjectAsync(sha, default);
             Assert.True(rdata.HasValue);
             Assert.Equal(16, rdata.Value.Length);
             //Assert.Equal(g, rdata.Value.Span.NonPortableCast<byte, Guid>()[0]); // TODO: Fix test
@@ -127,7 +126,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             try
             {
                 if (!tmp.EndsWith('/')) tmp += '/';
-                var repo = new DiskChasmRepo(tmp, new JsonChasmSerializer(), CompressionLevel.Optimal, s_sha1);
+                var repo = new DiskChasmRepo(tmp, new JsonChasmSerializer(), CompressionLevel.Optimal);
                 await TestRepository(repo);
             }
             finally
@@ -143,7 +142,7 @@ namespace SoruceCode.Chasm.IntegrationTests
         {
             // Use your own cstring here.
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
-            var repo = new AzureBlobChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal, s_sha1);
+            var repo = new AzureBlobChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
             await TestRepository(repo);
         }
 
@@ -154,10 +153,8 @@ namespace SoruceCode.Chasm.IntegrationTests
         {
             // Use your own cstring here.
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
-            var repo = new AzureTableChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal, s_sha1);
+            var repo = new AzureTableChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
             await TestRepository(repo);
-        }
-
-        #endregion
+        }        
     }
 }

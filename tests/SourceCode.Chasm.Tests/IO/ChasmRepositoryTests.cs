@@ -5,7 +5,6 @@ using Moq;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Chasm.Tests.Helpers;
 using Xunit;
-using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Tests
 {
@@ -38,8 +37,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = 5;
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop, hasher);
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
 
             // Action
             ChasmRepository actual = mockChasmRepository.Object;
@@ -59,8 +58,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             var expectedCompressionLevel = (CompressionLevel)int.MaxValue;
             int expectedMaxDop = default;
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop, hasher);
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
 
             // Action
             ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -87,8 +86,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = int.MinValue;
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop, hasher);
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
 
             // Action
             ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -115,8 +114,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = default;
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop, hasher);
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
 
             // Action
             ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -143,8 +142,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var chasmSerializer = default(IChasmSerializer);
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = 5;
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedCompressionLevel, expectedMaxDop, hasher);
+
+            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedCompressionLevel, expectedMaxDop);
 
             // Action
             ArgumentNullException actual = Assert.Throws<ArgumentNullException>(() =>

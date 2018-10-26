@@ -68,7 +68,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             TreeId? ReadTreeId()
             {
                 Clay.Sha1? sha1 = jr.ReadSha1();
-                return sha1 == null ? null : (TreeId?)(new TreeId(sha1.Value));
+                return sha1 == null ? null : (TreeId?)new TreeId(sha1.Value);
             }
         }
 

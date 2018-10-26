@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
-using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Disk
 {
@@ -22,8 +21,8 @@ namespace SourceCode.Chasm.Repository.Disk
         /// </summary>
         public string RootPath { get; }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop, crypt.SHA1 hasher)
-            : base(serializer, compressionLevel, maxDop, hasher)
+        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
+            : base(serializer, compressionLevel, maxDop)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length <= 2) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
             string rootPath = Path.GetFullPath(rootFolder);
@@ -59,12 +58,12 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, crypt.SHA1 hasher)
-          : this(rootFolder, serializer, compressionLevel, -1, hasher)
+        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel)
+          : this(rootFolder, serializer, compressionLevel, -1)
         { }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, crypt.SHA1 hasher)
-            : this(rootFolder, serializer, CompressionLevel.Optimal, hasher)
+        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer)
+            : this(rootFolder, serializer, CompressionLevel.Optimal)
         { }
 
         private static async ValueTask<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
@@ -117,7 +116,7 @@ namespace SourceCode.Chasm.Repository.Disk
             using (FileStream fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken).ConfigureAwait(false))
             {
                 // Only write to the file if it does not already exist.
-                if ((fileStream.Length != dataLength || forceOverwrite))
+                if (fileStream.Length != dataLength || forceOverwrite)
                 {
                     fileStream.Position = 0;
 

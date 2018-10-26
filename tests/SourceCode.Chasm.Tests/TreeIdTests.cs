@@ -7,15 +7,15 @@ namespace SourceCode.Chasm.Tests
 {
     public static class TreeIdTests
     {
-        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeId_equality))]
         public static void TreeId_equality()
         {
-            var treeId1 = new TreeId(s_sha1.HashData("abc"));
-            var treeId2 = new TreeId(s_sha1.HashData("abc"));
-            var treeId3 = new TreeId(s_sha1.HashData("def"));
+            var treeId1 = new TreeId(s_hasher.HashData("abc"));
+            var treeId2 = new TreeId(s_hasher.HashData("abc"));
+            var treeId3 = new TreeId(s_hasher.HashData("def"));
 
             Assert.True(treeId1 == treeId2);
             Assert.False(treeId1 != treeId2);
@@ -40,9 +40,9 @@ namespace SourceCode.Chasm.Tests
         {
             TreeIdComparer comparer = TreeIdComparer.Default;
 
-            var treeId1 = new TreeId(s_sha1.HashData("abc"));
-            var treeId2 = new TreeId(s_sha1.HashData("abc"));
-            var treeId3 = new TreeId(s_sha1.HashData("def"));
+            var treeId1 = new TreeId(s_hasher.HashData("abc"));
+            var treeId2 = new TreeId(s_hasher.HashData("abc"));
+            var treeId3 = new TreeId(s_hasher.HashData("def"));
             TreeId[] list = new[] { treeId1, treeId2, treeId3 };
 
             Assert.True(treeId1.CompareTo(treeId2) == 0);

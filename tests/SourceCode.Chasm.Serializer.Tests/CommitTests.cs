@@ -18,12 +18,12 @@ namespace SourceCode.Chasm.IO.Tests
     {
         #region Constants
 
-        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
-        private static readonly CommitId s_parent1 = new CommitId(s_sha1.HashData(nameof(s_parent1)));
-        private static readonly CommitId s_parent2 = new CommitId(s_sha1.HashData(nameof(s_parent2)));
-        private static readonly CommitId s_parent3 = new CommitId(s_sha1.HashData(nameof(s_parent3)));
-        private static readonly TreeId s_treeId1 = new TreeId(s_sha1.HashData(nameof(s_treeId1)));
+        private static readonly CommitId s_parent1 = new CommitId(s_hasher.HashData(nameof(s_parent1)));
+        private static readonly CommitId s_parent2 = new CommitId(s_hasher.HashData(nameof(s_parent2)));
+        private static readonly CommitId s_parent3 = new CommitId(s_hasher.HashData(nameof(s_parent3)));
+        private static readonly TreeId s_treeId1 = new TreeId(s_hasher.HashData(nameof(s_treeId1)));
 
         #endregion
 

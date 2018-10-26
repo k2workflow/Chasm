@@ -6,15 +6,15 @@ namespace SourceCode.Chasm.Tests
 {
     public static class CommitIRefTests
     {
-        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(CommitRef_equality))]
         public static void CommitRef_equality()
         {
-            var commitRef1 = new CommitRef("abc", new CommitId(s_sha1.HashData("abc")));
-            var commitRef2 = new CommitRef("abc", new CommitId(s_sha1.HashData("abc")));
-            var commitRef3 = new CommitRef("def", new CommitId(s_sha1.HashData("def")));
+            var commitRef1 = new CommitRef("abc", new CommitId(s_hasher.HashData("abc")));
+            var commitRef2 = new CommitRef("abc", new CommitId(s_hasher.HashData("abc")));
+            var commitRef3 = new CommitRef("def", new CommitId(s_hasher.HashData("def")));
 
             Assert.True(commitRef1 == commitRef2);
             Assert.False(commitRef1 != commitRef2);

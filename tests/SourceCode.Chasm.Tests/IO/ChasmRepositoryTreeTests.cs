@@ -11,7 +11,6 @@ using SourceCode.Chasm.Tests.Helpers;
 using SourceCode.Chasm.Tests.TestObjects;
 using SourceCode.Clay;
 using Xunit;
-using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Tests
 {
@@ -23,8 +22,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new Mock<RandomChasmSerializer>();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -49,8 +48,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -68,8 +67,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -87,8 +86,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -106,8 +105,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new Mock<RandomChasmSerializer>();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -132,8 +131,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -151,8 +150,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -177,8 +176,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -196,8 +195,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -230,8 +229,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -249,8 +248,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -276,8 +275,8 @@ namespace SourceCode.Chasm.Repository.Tests
             // Arrange
             var parents = new List<CommitId> { CommitIdTestObject.Random };
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };
@@ -297,8 +296,8 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
-            var hasher = crypt.SHA1.Create();
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5, hasher)
+
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, CompressionLevel.NoCompression, 5)
             {
                 CallBase = true
             };

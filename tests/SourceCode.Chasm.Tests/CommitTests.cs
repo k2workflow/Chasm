@@ -9,11 +9,11 @@ namespace SourceCode.Chasm.Tests
 {
     public static class CommitTests
     {
-        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
-        private static readonly CommitId Parent1 = new CommitId(s_sha1.HashData(nameof(Parent1)));
-        private static readonly CommitId Parent2 = new CommitId(s_sha1.HashData(nameof(Parent2)));
-        private static readonly CommitId Parent3 = new CommitId(s_sha1.HashData(nameof(Parent3)));
+        private static readonly CommitId Parent1 = new CommitId(s_hasher.HashData(nameof(Parent1)));
+        private static readonly CommitId Parent2 = new CommitId(s_hasher.HashData(nameof(Parent2)));
+        private static readonly CommitId Parent3 = new CommitId(s_hasher.HashData(nameof(Parent3)));
 
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(Commit_Empty))]
@@ -51,7 +51,7 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(Commit_Equality))]
         public static void Commit_Equality()
         {
-            var expected = new Commit(new[] { new CommitId(s_sha1.HashData("c1")), new CommitId(s_sha1.HashData("c2")) }, new TreeId(s_sha1.HashData("abc")), new Audit("bob", DateTimeOffset.Now), new Audit("mary", DateTimeOffset.Now), "hello");
+            var expected = new Commit(new[] { new CommitId(s_hasher.HashData("c1")), new CommitId(s_hasher.HashData("c2")) }, new TreeId(s_hasher.HashData("abc")), new Audit("bob", DateTimeOffset.Now), new Audit("mary", DateTimeOffset.Now), "hello");
 
             // Equal
             var actual = new Commit(expected.Parents, expected.TreeId, expected.Author, expected.Committer, expected.Message);
@@ -76,7 +76,7 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(new[] { expected.Parents[0], expected.Parents[1], new CommitId(s_sha1.HashData("c3")) }, expected.TreeId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
+            actual = new Commit(new[] { expected.Parents[0], expected.Parents[1], new CommitId(s_hasher.HashData("c3")) }, expected.TreeId, expected.Author, expected.Committer, expected.Message.ToUpperInvariant());
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
@@ -85,7 +85,7 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
-            actual = new Commit(expected.Parents, new TreeId(s_sha1.HashData("def")), expected.Author, expected.Committer, expected.Message);
+            actual = new Commit(expected.Parents, new TreeId(s_hasher.HashData("def")), expected.Author, expected.Committer, expected.Message);
             Assert.NotEqual(expected, actual);
             Assert.NotEqual(expected.GetHashCode(), actual.GetHashCode());
 
@@ -248,7 +248,7 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(Commit_Deconstruct))]
         public static void Commit_Deconstruct()
         {
-            var expected = new Commit(new[] { new CommitId(s_sha1.HashData("c1")), new CommitId(s_sha1.HashData("c2")) }, new TreeId(s_sha1.HashData("abc")), Audit.Empty, Audit.Empty, "hello");
+            var expected = new Commit(new[] { new CommitId(s_hasher.HashData("c1")), new CommitId(s_hasher.HashData("c2")) }, new TreeId(s_hasher.HashData("abc")), Audit.Empty, Audit.Empty, "hello");
 
             (IReadOnlyList<CommitId> parents, TreeId? treeId, Audit author, Audit committer, string message) = expected;
             var actual = new Commit(parents, treeId, author, committer, message);
