@@ -20,14 +20,11 @@ using SourceCode.Chasm.Repository.Disk;
 using SourceCode.Chasm.Serializer.Json;
 using SourceCode.Clay;
 using Xunit;
-using crypt = System.Security.Cryptography;
 
 namespace SoruceCode.Chasm.IntegrationTests
 {
     public static class ChasmRepositoryTests
     {
-        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
-
         private const string DevelopmentStorage = "UseDevelopmentStorage=true";
 
         private static async Task TestRepository(IChasmRepository repository)
@@ -35,11 +32,11 @@ namespace SoruceCode.Chasm.IntegrationTests
             var g = Guid.NewGuid();
 
             byte[] data = g.ToByteArray();
-            Sha1 sha = s_hasher.HashData(data);
+            Sha1 sha = repository.Hasher.HashData(data);
 
             // Unknown SHA
-            Sha1 usha1 = s_hasher.HashData(Guid.NewGuid().ToByteArray());
-            Sha1 usha2 = s_hasher.HashData(Guid.NewGuid().ToByteArray());
+            Sha1 usha1 = repository.Hasher.HashData(Guid.NewGuid().ToByteArray());
+            Sha1 usha2 = repository.Hasher.HashData(Guid.NewGuid().ToByteArray());
 
             // Blob
             await repository.WriteObjectAsync(sha, new Memory<byte>(data), false, default);

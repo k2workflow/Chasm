@@ -10,8 +10,6 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
 {
     public static class ChasmRepositoryTests
     {
-        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
-
         //[InlineData(null, null, true)]
         //[InlineData(new byte[0], null, false)]
         //[InlineData(new byte[0], new byte[0], true)]
@@ -30,13 +28,14 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
             repo.Setup(r => r.Serializer).Returns(new JsonChasmSerializer());
             repo.Setup(r => r.CompressionLevel).Returns(System.IO.Compression.CompressionLevel.NoCompression);
             repo.Setup(r => r.MaxDop).Returns(-1);
+            repo.Setup(r => r.Hasher).Returns(crypt.SHA1.Create());
 
             repo.Setup(r => r.ReadCommitRefAsync(null, null, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));
             repo.Setup(r => r.ReadCommitRefAsync(string.Empty, null, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));
             repo.Setup(r => r.ReadCommitRefAsync(null, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));
             repo.Setup(r => r.ReadCommitRefAsync(string.Empty, string.Empty, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));
 
-            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitRef?>(new CommitRef("branch-name", new CommitId(s_hasher.HashData("branch-name")))));
+            repo.Setup(r => r.ReadCommitRefAsync("branch", "name", CancellationToken.None)).Returns(new ValueTask<CommitRef?>(new CommitRef("branch-name", new CommitId(repo.Object.Hasher.HashData("branch-name")))));
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using SourceCode.Chasm.Serializer;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository
 {
@@ -10,5 +11,7 @@ namespace SourceCode.Chasm.Repository
         CompressionLevel CompressionLevel { get; }
 
         int MaxDop { get; }
+
+        crypt.SHA1 Hasher { get; }
     }
 }
