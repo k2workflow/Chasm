@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Tests
 {
@@ -15,8 +16,8 @@ namespace SourceCode.Chasm.Repository.Tests
             return BuildConcurrencyException(branch, name, innerException);
         }
 
-        public MockChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-            : base(serializer, compressionLevel, maxDop)
+        public MockChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop, crypt.SHA1 hasher)
+            : base(serializer, compressionLevel, maxDop, hasher)
         { }
 
         public override ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)

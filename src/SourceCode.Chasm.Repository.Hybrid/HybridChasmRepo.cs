@@ -1,6 +1,7 @@
 using System;
 using System.IO.Compression;
 using SourceCode.Chasm.Serializer;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Hybrid
 {
@@ -8,8 +9,8 @@ namespace SourceCode.Chasm.Repository.Hybrid
     {
         public IChasmRepository[] Chain { get; }
 
-        public HybridChasmRepo(IChasmRepository repository1, IChasmRepository repository2, IChasmRepository repository3, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-            : base(serializer, compressionLevel, maxDop)
+        public HybridChasmRepo(IChasmRepository repository1, IChasmRepository repository2, IChasmRepository repository3, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop, crypt.SHA1 hasher)
+            : base(serializer, compressionLevel, maxDop, hasher)
         {
             if (repository1 == null) throw new ArgumentNullException(nameof(repository1));
             if (repository2 == null) throw new ArgumentNullException(nameof(repository2));
@@ -18,8 +19,8 @@ namespace SourceCode.Chasm.Repository.Hybrid
             Chain = new IChasmRepository[3] { repository1, repository2, repository3 };
         }
 
-        public HybridChasmRepo(IChasmRepository repository1, IChasmRepository repository2, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-            : base(serializer, compressionLevel, maxDop)
+        public HybridChasmRepo(IChasmRepository repository1, IChasmRepository repository2, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop, crypt.SHA1 hasher)
+            : base(serializer, compressionLevel, maxDop, hasher)
         {
             if (repository1 == null) throw new ArgumentNullException(nameof(repository1));
             if (repository2 == null) throw new ArgumentNullException(nameof(repository2));
@@ -27,16 +28,16 @@ namespace SourceCode.Chasm.Repository.Hybrid
             Chain = new IChasmRepository[2] { repository1, repository2 };
         }
 
-        public HybridChasmRepo(IChasmRepository repository, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-            : base(serializer, compressionLevel, maxDop)
+        public HybridChasmRepo(IChasmRepository repository, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop, crypt.SHA1 hasher)
+            : base(serializer, compressionLevel, maxDop, hasher)
         {
             if (repository == null) throw new ArgumentNullException(nameof(repository));
 
             Chain = new IChasmRepository[1] { repository };
         }
 
-        public HybridChasmRepo(IChasmRepository[] chain, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-            : base(serializer, compressionLevel, maxDop)
+        public HybridChasmRepo(IChasmRepository[] chain, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop, crypt.SHA1 hasher)
+            : base(serializer, compressionLevel, maxDop, hasher)
         {
             if (chain == null || chain.Length == 0) throw new ArgumentNullException(nameof(chain));
 

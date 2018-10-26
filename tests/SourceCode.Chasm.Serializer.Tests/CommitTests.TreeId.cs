@@ -8,15 +8,12 @@
 using System;
 using System.Buffers;
 using SourceCode.Chasm.Serializer;
-using SourceCode.Clay;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static partial class CommitTests // .TreeId
+    partial class CommitTests // .TreeId
     {
-        private static readonly TreeId s_treeId1 = new TreeId(Sha1.Hash(nameof(s_treeId1)));
-
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_Commit_TreeId_Empty))]
         [ClassData(typeof(TestData))]

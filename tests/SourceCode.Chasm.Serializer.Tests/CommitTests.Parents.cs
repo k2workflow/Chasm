@@ -8,21 +8,12 @@
 using System;
 using System.Buffers;
 using SourceCode.Chasm.Serializer;
-using SourceCode.Clay;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static partial class CommitTests // .Parents
+    partial class CommitTests // .Parents
     {
-        #region Constants
-
-        private static readonly CommitId s_parent1 = new CommitId(Sha1.Hash(nameof(s_parent1)));
-        private static readonly CommitId s_parent2 = new CommitId(Sha1.Hash(nameof(s_parent2)));
-        private static readonly CommitId s_parent3 = new CommitId(Sha1.Hash(nameof(s_parent3)));
-
-        #endregion
-
         #region Methods
 
         [Trait("Type", "Unit")]

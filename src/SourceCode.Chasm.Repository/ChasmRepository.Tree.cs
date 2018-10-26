@@ -80,7 +80,7 @@ namespace SourceCode.Chasm.Repository
             using (IMemoryOwner<byte> owner = Serializer.Serialize(tree, out int len))
             {
                 Memory<byte> mem = owner.Memory.Slice(0, len);
-                var sha1 = Sha1.Hash(mem.Span);
+                Sha1 sha1 = _hasher.HashData(mem.Span);
 
                 await WriteObjectAsync(sha1, mem, false, cancellationToken).ConfigureAwait(false);
 

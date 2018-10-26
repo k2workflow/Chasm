@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Disk
 {
@@ -21,8 +22,8 @@ namespace SourceCode.Chasm.Repository.Disk
         /// </summary>
         public string RootPath { get; }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-            : base(serializer, compressionLevel, maxDop)
+        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop, crypt.SHA1 hasher)
+            : base(serializer, compressionLevel, maxDop, hasher)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length <= 2) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
             string rootPath = Path.GetFullPath(rootFolder);
@@ -58,12 +59,12 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel)
-          : this(rootFolder, serializer, compressionLevel, -1)
+        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, crypt.SHA1 hasher)
+          : this(rootFolder, serializer, compressionLevel, -1, hasher)
         { }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer)
-            : this(rootFolder, serializer, CompressionLevel.Optimal)
+        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, crypt.SHA1 hasher)
+            : this(rootFolder, serializer, CompressionLevel.Optimal, hasher)
         { }
 
         private static async ValueTask<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)

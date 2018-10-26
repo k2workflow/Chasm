@@ -10,11 +10,14 @@ using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.IO.Tests
 {
-    public static partial class CommitIdTests
+    public static class CommitIdTests
     {
+        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+
         [Trait("Type", "Unit")]
         [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_CommitId_Default))]
         [ClassData(typeof(TestData))]
@@ -35,7 +38,7 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_CommitId(IChasmSerializer ser)
         {
-            var expected = new CommitId(Sha1.Hash("abc"));
+            var expected = new CommitId(s_sha1.HashData("abc"));
             using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
             {
                 Memory<byte> mem = owner.Memory.Slice(0, len);

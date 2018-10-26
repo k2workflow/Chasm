@@ -11,23 +11,25 @@ using SourceCode.Chasm.Repository.Disk;
 using SourceCode.Chasm.Serializer.Json;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Azure.Tests
 {
-    public partial class ChasmRepositoryTests
+    partial class ChasmRepositoryTests
     {
         private const string DevelopmentStorage = "UseDevelopmentStorage=true";
+        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
 
         private static async Task TestRepository(IChasmRepository repository)
         {
             var g = Guid.NewGuid();
 
             byte[] data = g.ToByteArray();
-            var sha = Sha1.Hash(data);
+            Sha1 sha = s_sha1.HashData(data);
 
             // Unknown SHA
-            var usha = Sha1.Hash(Guid.NewGuid().ToByteArray());
-            var usha2 = Sha1.Hash(Guid.NewGuid().ToByteArray());
+            Sha1 usha = s_sha1.HashData(Guid.NewGuid().ToByteArray());
+            Sha1 usha2 = s_sha1.HashData(Guid.NewGuid().ToByteArray());
 
             // Blob
             await repository.WriteObjectAsync(sha, new Memory<byte>(data), false, default);
@@ -115,7 +117,7 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
             try
             {
                 if (!tmp.EndsWith('/')) tmp += '/';
-                var repo = new DiskChasmRepo(tmp, new JsonChasmSerializer(), CompressionLevel.Optimal);
+                var repo = new DiskChasmRepo(tmp, new JsonChasmSerializer(), CompressionLevel.Optimal, s_sha1);
                 await TestRepository(repo);
             }
             finally
@@ -131,7 +133,7 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
         {
             // Use your own cstring here.
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
-            var repo = new AzureBlobChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
+            var repo = new AzureBlobChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal, s_sha1);
             await TestRepository(repo);
         }
 
@@ -142,7 +144,7 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
         {
             // Use your own cstring here.
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
-            var repo = new AzureTableChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
+            var repo = new AzureTableChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal, s_sha1);
             await TestRepository(repo);
         }
     }

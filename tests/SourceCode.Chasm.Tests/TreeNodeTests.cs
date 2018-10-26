@@ -1,11 +1,14 @@
 using System;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Tests
 {
     public static class TreeNodeTests
     {
+        private static readonly crypt.SHA1 s_sha1 = crypt.SHA1.Create();
+
         [Trait("Type", "Unit")]
         [Fact(DisplayName = nameof(TreeNode_is_empty))]
         public static void TreeNode_is_empty()
@@ -38,8 +41,8 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(TreeNode_equality))]
         public static void TreeNode_equality()
         {
-            var tree1 = new TreeNode("a", NodeKind.Tree, Sha1.Hash("abc"));
-            var tree2 = new TreeNode("a", NodeKind.Tree, Sha1.Hash("abc"));
+            var tree1 = new TreeNode("a", NodeKind.Tree, s_sha1.HashData("abc"));
+            var tree2 = new TreeNode("a", NodeKind.Tree, s_sha1.HashData("abc"));
 
             Assert.True(tree1 == tree2);
             Assert.False(tree1 != tree2);
@@ -73,7 +76,7 @@ namespace SourceCode.Chasm.Tests
             Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
 
             // Sha1
-            actual = new TreeNode(tree1.Name, tree1.Kind, Sha1.Hash("def"));
+            actual = new TreeNode(tree1.Name, tree1.Kind, s_sha1.HashData("def"));
             Assert.NotEqual(tree1, actual);
             Assert.NotEqual(tree1.GetHashCode(), actual.GetHashCode());
         }
@@ -82,7 +85,7 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(TreeNode_Deconstruct))]
         public static void TreeNode_Deconstruct()
         {
-            var expected = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
+            var expected = new TreeNode("a", NodeKind.Blob, s_sha1.HashData("abc"));
 
             (string name, NodeKind kind, Sha1 sha) = expected;
             var actual = new TreeNode(name, kind, sha);
@@ -96,9 +99,9 @@ namespace SourceCode.Chasm.Tests
         {
             TreeNodeComparer comparer = TreeNodeComparer.Default;
 
-            var tree1 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
-            var tree2 = new TreeNode("a", NodeKind.Blob, Sha1.Hash("abc"));
-            var tree3 = new TreeNode("d", NodeKind.Blob, Sha1.Hash("def"));
+            var tree1 = new TreeNode("a", NodeKind.Blob, s_sha1.HashData("abc"));
+            var tree2 = new TreeNode("a", NodeKind.Blob, s_sha1.HashData("abc"));
+            var tree3 = new TreeNode("d", NodeKind.Blob, s_sha1.HashData("def"));
             TreeNode[] list = new[] { tree1, tree2, tree3 };
 
             Assert.True(TreeNode.Empty < tree1);

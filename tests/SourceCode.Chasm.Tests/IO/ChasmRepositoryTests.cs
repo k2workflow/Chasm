@@ -5,6 +5,7 @@ using Moq;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Chasm.Tests.Helpers;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Tests
 {
@@ -37,7 +38,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = 5;
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+            var hasher = crypt.SHA1.Create();
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop, hasher);
 
             // Action
             ChasmRepository actual = mockChasmRepository.Object;
@@ -57,7 +59,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             var expectedCompressionLevel = (CompressionLevel)int.MaxValue;
             int expectedMaxDop = default;
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+            var hasher = crypt.SHA1.Create();
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop, hasher);
 
             // Action
             ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -84,7 +87,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = int.MinValue;
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+            var hasher = crypt.SHA1.Create();
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop, hasher);
 
             // Action
             ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -111,7 +115,8 @@ namespace SourceCode.Chasm.Repository.Tests
             var mockChasmSerializer = new Mock<IChasmSerializer>();
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = default;
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+            var hasher = crypt.SHA1.Create();
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop, hasher);
 
             // Action
             ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -131,14 +136,15 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_Constructor_ChasmSerializer_CompressionLevel_MaxDop))]
-        public static void ChasmRepository_Constructor_SerialzerNull()
+        [Fact(DisplayName = nameof(ChasmRepository_Constructor_SerializerNull))]
+        public static void ChasmRepository_Constructor_SerializerNull()
         {
             // Arrange
             var chasmSerializer = default(IChasmSerializer);
             CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = 5;
-            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedCompressionLevel, expectedMaxDop);
+            var hasher = crypt.SHA1.Create();
+            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedCompressionLevel, expectedMaxDop, hasher);
 
             // Action
             ArgumentNullException actual = Assert.Throws<ArgumentNullException>(() =>
