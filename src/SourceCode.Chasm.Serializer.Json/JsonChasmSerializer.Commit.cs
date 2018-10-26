@@ -7,7 +7,7 @@ namespace SourceCode.Chasm.Serializer.Json
 {
     partial class JsonChasmSerializer // .Commit
     {
-        public Memory<byte> Serialize(Commit model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(Commit model, SessionMemoryPool<byte> pool)
         {
             if (pool == null) throw new ArgumentNullException(nameof(pool));
 

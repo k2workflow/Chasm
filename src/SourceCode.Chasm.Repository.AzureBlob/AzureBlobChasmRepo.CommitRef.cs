@@ -152,7 +152,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
 
                 // CommitIds are not compressed
-                using (var pool = new SessionPool<byte>())
+                using (var pool = new SessionMemoryPool<byte>())
                 {
                     Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 

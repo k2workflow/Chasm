@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap();
 
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -41,7 +41,7 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(new TreeNode[0]);
 
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -61,7 +61,7 @@ namespace SourceCode.Chasm.IO.Tests
             var node2 = new TreeNode("c", NodeKind.Tree, s_hasher.HashData("hij"));
             var expected = new TreeNodeMap(node0, node1, node2);
 
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 

@@ -7,7 +7,7 @@ namespace SourceCode.Chasm.Serializer.Json
 {
     partial class JsonChasmSerializer // .Tree
     {
-        public Memory<byte> Serialize(TreeNodeMap model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(TreeNodeMap model, SessionMemoryPool<byte> pool)
         {
             if (pool == null) throw new ArgumentNullException(nameof(pool));
 

@@ -111,7 +111,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 CloudTable refsTable = _refsTable.Value;
 
                 // CommitIds are not compressed
-                using (var pool = new SessionPool<byte>())
+                using (var pool = new SessionMemoryPool<byte>())
                 {
                     Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 

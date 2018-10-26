@@ -22,7 +22,7 @@ namespace SourceCode.Chasm.IO.Tests
         {
             // Force Commit to be non-default
             var expected = new Commit(new CommitId?(), default, default, default, "force");
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -37,7 +37,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Parents_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(Array.Empty<CommitId>(), default, default, default, null);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -52,7 +52,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Parents_1_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, null);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -67,7 +67,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Parents_1(IChasmSerializer ser)
         {
             var expected = new Commit(s_parent1, default, default, default, null);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -84,7 +84,7 @@ namespace SourceCode.Chasm.IO.Tests
             CommitId[] parents = new[] { s_parent1, s_parent2 };
 
             var expected = new Commit(parents, default, default, default, null);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -101,7 +101,7 @@ namespace SourceCode.Chasm.IO.Tests
             CommitId[] parents = new[] { s_parent1, s_parent2, s_parent3 };
 
             var expected = new Commit(parents, default, default, default, null);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 

@@ -7,7 +7,7 @@ namespace SourceCode.Chasm.Serializer.Text
 {
     partial class TextChasmSerializer // .CommitId
     {
-        public Memory<byte> Serialize(CommitId model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(CommitId model, SessionMemoryPool<byte> pool)
         {
             string wire = model.Convert();
 

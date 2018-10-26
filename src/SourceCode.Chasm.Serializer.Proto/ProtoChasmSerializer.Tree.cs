@@ -5,7 +5,7 @@ namespace SourceCode.Chasm.Serializer.Proto
 {
     partial class ProtoChasmSerializer // .Tree
     {
-        public Memory<byte> Serialize(TreeNodeMap model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(TreeNodeMap model, SessionMemoryPool<byte> pool)
         {
             TreeWire wire = model.Convert();
 

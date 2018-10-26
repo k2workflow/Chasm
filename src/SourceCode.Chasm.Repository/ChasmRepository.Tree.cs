@@ -77,7 +77,7 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken)
         {
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = Serializer.Serialize(tree, pool);
 

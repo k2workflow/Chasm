@@ -33,7 +33,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Default(IChasmSerializer ser)
         {
             TreeNodeMap expected = default;
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -48,7 +48,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -63,7 +63,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Null(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(null);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -78,7 +78,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty_Array(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -93,7 +93,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_1_Node(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -108,7 +108,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_2_Nodes(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1, Node2);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -123,7 +123,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_3_Nodes(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1, Node2, Node3);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 

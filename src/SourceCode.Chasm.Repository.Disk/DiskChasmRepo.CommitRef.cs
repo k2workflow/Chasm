@@ -74,7 +74,7 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 

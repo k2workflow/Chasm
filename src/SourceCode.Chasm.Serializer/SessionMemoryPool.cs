@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SourceCode.Chasm.Serializer
 {
-    public sealed class SessionPool<T> : MemoryPool<T>
+    public sealed class SessionMemoryPool<T> : MemoryPool<T>
     {
         private readonly IList<IMemoryOwner<T>> _rentals;
 
@@ -11,7 +11,7 @@ namespace SourceCode.Chasm.Serializer
 
         public int Count => _rentals.Count;
 
-        public SessionPool()
+        public SessionMemoryPool()
         {
             _rentals = new List<IMemoryOwner<T>>();
         }
@@ -43,7 +43,6 @@ namespace SourceCode.Chasm.Serializer
                 _rentals.Clear();
                 _disposed = true;
             }
-
         }
     }
 }

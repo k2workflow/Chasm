@@ -9,7 +9,7 @@ namespace SourceCode.Chasm.Serializer.Proto
 {
     public sealed partial class ProtoChasmSerializer : IChasmSerializer
     {
-        private static unsafe Memory<byte> SerializeImpl<T>(T wire, SessionPool<byte> pool)
+        private static unsafe Memory<byte> SerializeImpl<T>(T wire, SessionMemoryPool<byte> pool)
             where T : IMessage<T>
         {
             Debug.Assert(pool != null);

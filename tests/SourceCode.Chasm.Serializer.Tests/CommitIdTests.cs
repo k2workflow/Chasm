@@ -23,7 +23,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_CommitId_Default(IChasmSerializer ser)
         {
             var expected = new CommitId();
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -38,7 +38,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_CommitId(IChasmSerializer ser)
         {
             var expected = new CommitId(s_hasher.HashData("abc"));
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 

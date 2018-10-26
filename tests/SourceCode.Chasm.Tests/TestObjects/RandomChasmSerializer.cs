@@ -11,17 +11,17 @@ namespace SourceCode.Chasm.Tests.TestObjects
 
         public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span) => TreeNodeMapTestObject.Random;
 
-        public Memory<byte> Serialize(TreeNodeMap model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(TreeNodeMap model, SessionMemoryPool<byte> pool)
         {
             return pool.Rent(1).Memory;
         }
 
-        public Memory<byte> Serialize(CommitId model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(CommitId model, SessionMemoryPool<byte> pool)
         {
             return pool.Rent(1).Memory;
         }
 
-        public Memory<byte> Serialize(Commit model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(Commit model, SessionMemoryPool<byte> pool)
         {
             return pool.Rent(1).Memory;
         }

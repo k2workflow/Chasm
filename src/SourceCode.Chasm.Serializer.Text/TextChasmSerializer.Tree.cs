@@ -7,7 +7,7 @@ namespace SourceCode.Chasm.Serializer.Text
 {
     partial class TextChasmSerializer // .Tree
     {
-        public Memory<byte> Serialize(TreeNodeMap model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(TreeNodeMap model, SessionMemoryPool<byte> pool)
         {
             string wire = model.Convert();
 

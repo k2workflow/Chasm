@@ -5,7 +5,7 @@ namespace SourceCode.Chasm.Serializer.Proto
 {
     public partial class ProtoChasmSerializer // .Commit
     {
-        public Memory<byte> Serialize(Commit model, SessionPool<byte> pool)
+        public Memory<byte> Serialize(Commit model, SessionMemoryPool<byte> pool)
         {
             CommitWire wire = model.Convert();
 

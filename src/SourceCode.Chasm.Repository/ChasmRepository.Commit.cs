@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = Serializer.Serialize(commit, pool);
 

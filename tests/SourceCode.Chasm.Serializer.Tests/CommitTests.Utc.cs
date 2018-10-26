@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Utc(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, new Audit("bob", s_utc1), new Audit("mary", s_utc1), null);
-            using (var pool = new SessionPool<byte>())
+            using (var pool = new SessionMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
