@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository.Disk
 {
@@ -74,7 +75,7 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            using (var pool = new SessionMemoryPool<byte>())
+            using (var pool = new ArenaMemoryPool<byte>())
             {
                 Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 

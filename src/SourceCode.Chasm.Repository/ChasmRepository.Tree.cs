@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository
 {
@@ -77,7 +78,7 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken)
         {
-            using (var pool = new SessionMemoryPool<byte>())
+            using (var pool = new ArenaMemoryPool<byte>())
             {
                 Memory<byte> mem = Serializer.Serialize(tree, pool);
 

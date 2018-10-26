@@ -8,6 +8,7 @@
 using System;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
+using SourceCode.Clay.Buffers;
 using Xunit;
 using crypt = System.Security.Cryptography;
 
@@ -32,7 +33,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Default(IChasmSerializer ser)
         {
             var expected = new Commit();
-            using (var pool = new SessionMemoryPool<byte>())
+            using (var pool = new ArenaMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 

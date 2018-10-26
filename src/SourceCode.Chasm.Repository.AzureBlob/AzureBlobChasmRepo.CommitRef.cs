@@ -9,6 +9,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository.AzureBlob
 {
@@ -152,7 +153,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
 
                 // CommitIds are not compressed
-                using (var pool = new SessionMemoryPool<byte>())
+                using (var pool = new ArenaMemoryPool<byte>())
                 {
                     Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 

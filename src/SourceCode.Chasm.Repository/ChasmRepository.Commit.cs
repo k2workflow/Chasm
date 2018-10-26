@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository
 {
@@ -20,7 +21,7 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
-            using (var pool = new SessionMemoryPool<byte>())
+            using (var pool = new ArenaMemoryPool<byte>())
             {
                 Memory<byte> mem = Serializer.Serialize(commit, pool);
 

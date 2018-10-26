@@ -9,6 +9,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository.AzureTable
 {
@@ -111,7 +112,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 CloudTable refsTable = _refsTable.Value;
 
                 // CommitIds are not compressed
-                using (var pool = new SessionMemoryPool<byte>())
+                using (var pool = new ArenaMemoryPool<byte>())
                 {
                     Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 

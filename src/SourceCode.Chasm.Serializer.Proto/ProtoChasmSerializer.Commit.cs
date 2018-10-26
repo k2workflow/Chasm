@@ -1,11 +1,12 @@
 using System;
 using SourceCode.Chasm.Serializer.Proto.Wire;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Proto
 {
     public partial class ProtoChasmSerializer // .Commit
     {
-        public Memory<byte> Serialize(Commit model, SessionMemoryPool<byte> pool)
+        public Memory<byte> Serialize(Commit model, ArenaMemoryPool<byte> pool)
         {
             CommitWire wire = model.Convert();
 

@@ -7,6 +7,7 @@
 
 using System;
 using SourceCode.Chasm.Serializer;
+using SourceCode.Clay.Buffers;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
@@ -21,7 +22,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Utc(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, new Audit("bob", s_utc1), new Audit("mary", s_utc1), null);
-            using (var pool = new SessionMemoryPool<byte>())
+            using (var pool = new ArenaMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 

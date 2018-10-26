@@ -7,6 +7,7 @@
 
 using System;
 using SourceCode.Chasm.Serializer;
+using SourceCode.Clay.Buffers;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
@@ -19,7 +20,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_TreeId_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, null);
-            using (var pool = new SessionMemoryPool<byte>())
+            using (var pool = new ArenaMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 
@@ -34,7 +35,7 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_TreeId(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), s_treeId1, default, default, null);
-            using (var pool = new SessionMemoryPool<byte>())
+            using (var pool = new ArenaMemoryPool<byte>())
             {
                 Memory<byte> mem = ser.Serialize(expected, pool);
 

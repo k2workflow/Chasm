@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using Google.Protobuf;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Proto
 {
     public sealed partial class ProtoChasmSerializer : IChasmSerializer
     {
-        private static unsafe Memory<byte> SerializeImpl<T>(T wire, SessionMemoryPool<byte> pool)
+        private static unsafe Memory<byte> SerializeImpl<T>(T wire, ArenaMemoryPool<byte> pool)
             where T : IMessage<T>
         {
             Debug.Assert(pool != null);

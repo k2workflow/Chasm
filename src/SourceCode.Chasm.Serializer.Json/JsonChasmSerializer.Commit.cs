@@ -2,12 +2,13 @@ using System;
 using System.Buffers;
 using System.Text;
 using SourceCode.Chasm.Serializer.Json.Wire;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Json
 {
     partial class JsonChasmSerializer // .Commit
     {
-        public Memory<byte> Serialize(Commit model, SessionMemoryPool<byte> pool)
+        public Memory<byte> Serialize(Commit model, ArenaMemoryPool<byte> pool)
         {
             if (pool == null) throw new ArgumentNullException(nameof(pool));
 

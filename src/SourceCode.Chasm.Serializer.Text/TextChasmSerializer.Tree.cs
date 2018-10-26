@@ -2,12 +2,13 @@ using System;
 using System.Buffers;
 using System.Text;
 using SourceCode.Chasm.Serializer.Text.Wire;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Text
 {
     partial class TextChasmSerializer // .Tree
     {
-        public Memory<byte> Serialize(TreeNodeMap model, SessionMemoryPool<byte> pool)
+        public Memory<byte> Serialize(TreeNodeMap model, ArenaMemoryPool<byte> pool)
         {
             string wire = model.Convert();
 

@@ -16,9 +16,9 @@
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
-    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00611" />
-    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00611" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00611" />
+    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00618" />
+    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00618" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00618" />
   </ItemGroup>
 
   <PropertyGroup>
