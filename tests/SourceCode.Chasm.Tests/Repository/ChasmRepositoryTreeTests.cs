@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using SourceCode.Chasm.Tests;
-using SourceCode.Chasm.Tests.Helpers;
+using SourceCode.Chasm.Tests.TestObjects;
 using SourceCode.Chasm.Tests.TestObjects;
 using SourceCode.Clay;
 using Xunit;

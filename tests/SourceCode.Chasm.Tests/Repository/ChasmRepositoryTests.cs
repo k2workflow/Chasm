@@ -3,7 +3,7 @@ using System.IO.Compression;
 using System.Reflection;
 using Moq;
 using SourceCode.Chasm.Serializer;
-using SourceCode.Chasm.Tests.Helpers;
+using SourceCode.Chasm.Tests.TestObjects;
 using Xunit;
 
 namespace SourceCode.Chasm.Repository.Tests

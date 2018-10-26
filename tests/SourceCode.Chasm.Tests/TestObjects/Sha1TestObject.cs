@@ -1,4 +1,3 @@
-using SourceCode.Chasm.Tests.Helpers;
 using SourceCode.Clay;
 using crypt = System.Security.Cryptography;
 

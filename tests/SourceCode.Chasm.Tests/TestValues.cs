@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SourceCode.Chasm.Tests.Helpers;
+using SourceCode.Chasm.Tests.TestObjects;
 
 namespace SourceCode.Chasm.Tests
 {

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 using Moq;
-using SourceCode.Chasm.Tests.Helpers;
+using SourceCode.Chasm.Tests.TestObjects;
 using Xunit;
 
 namespace SourceCode.Chasm.Repository.Tests

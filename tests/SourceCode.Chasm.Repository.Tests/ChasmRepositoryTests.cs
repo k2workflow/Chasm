@@ -4,11 +4,14 @@ using Moq;
 using SourceCode.Chasm.Serializer.Json;
 using SourceCode.Clay;
 using Xunit;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Azure.Tests
 {
-    public static partial class ChasmRepositoryTests
+    public static class ChasmRepositoryTests
     {
+        private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
+
         //[InlineData(null, null, true)]
         //[InlineData(new byte[0], null, false)]
         //[InlineData(new byte[0], new byte[0], true)]
