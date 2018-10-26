@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -112,9 +111,9 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 CloudTable refsTable = _refsTable.Value;
 
                 // CommitIds are not compressed
-                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int len))
+                using (var pool = new SessionPool<byte>())
                 {
-                    Memory<byte> mem = owner.Memory.Slice(0, len);
+                    Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 
                     TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, mem, etag); // Note etag access condition
 

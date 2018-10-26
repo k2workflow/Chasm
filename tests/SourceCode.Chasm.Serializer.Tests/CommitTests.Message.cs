@@ -6,7 +6,6 @@
 #endregion
 
 using System;
-using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using Xunit;
 
@@ -23,9 +22,9 @@ namespace SourceCode.Chasm.IO.Tests
             var force = new Audit("bob", DateTimeOffset.Now);
 
             var expected = new Commit(new CommitId?(), default, force, default, null);
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -38,9 +37,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, string.Empty);
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -53,9 +52,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Whitespace(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, " ");
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -68,9 +67,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Short(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, "hello");
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -83,9 +82,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Long(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, TestData.LongStr);
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -103,9 +102,9 @@ namespace SourceCode.Chasm.IO.Tests
                 str += TestData.SurrogatePair;
 
                 var expected = new Commit(new CommitId?(), default, default, default, TestData.SurrogatePair);
-                using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+                using (var pool = new SessionPool<byte>())
                 {
-                    Memory<byte> mem = owner.Memory.Slice(0, len);
+                    Memory<byte> mem = ser.Serialize(expected, pool);
 
                     Commit actual = ser.DeserializeCommit(mem.Span);
                     Assert.Equal(expected, actual);

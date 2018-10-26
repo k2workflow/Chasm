@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using SourceCode.Chasm.Serializer;
 
 namespace SourceCode.Chasm.Tests.TestObjects
@@ -12,22 +11,19 @@ namespace SourceCode.Chasm.Tests.TestObjects
 
         public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span) => TreeNodeMapTestObject.Random;
 
-        public IMemoryOwner<byte> Serialize(TreeNodeMap model, out int length)
+        public Memory<byte> Serialize(TreeNodeMap model, SessionPool<byte> pool)
         {
-            length = 1;
-            return MemoryPool<byte>.Shared.Rent(1);
+            return pool.Rent(1).Memory;
         }
 
-        public IMemoryOwner<byte> Serialize(CommitId model, out int length)
+        public Memory<byte> Serialize(CommitId model, SessionPool<byte> pool)
         {
-            length = 1;
-            return MemoryPool<byte>.Shared.Rent(1);
+            return pool.Rent(1).Memory;
         }
 
-        public IMemoryOwner<byte> Serialize(Commit model, out int length)
+        public Memory<byte> Serialize(Commit model, SessionPool<byte> pool)
         {
-            length = 1;
-            return MemoryPool<byte>.Shared.Rent(1);
+            return pool.Rent(1).Memory;
         }
     }
 }

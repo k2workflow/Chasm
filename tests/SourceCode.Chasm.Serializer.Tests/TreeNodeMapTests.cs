@@ -6,7 +6,6 @@
 #endregion
 
 using System;
-using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
@@ -34,9 +33,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Default(IChasmSerializer ser)
         {
             TreeNodeMap expected = default;
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
                 Assert.Equal(expected, actual);
@@ -49,9 +48,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
                 Assert.Equal(expected, actual);
@@ -64,9 +63,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Null(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(null);
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
                 Assert.Equal(expected, actual);
@@ -79,9 +78,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty_Array(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
                 Assert.Equal(expected, actual);
@@ -94,9 +93,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_1_Node(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1);
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
                 Assert.Equal(expected, actual);
@@ -109,9 +108,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_2_Nodes(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1, Node2);
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
                 Assert.Equal(expected, actual);
@@ -124,9 +123,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_3_Nodes(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(Node1, Node2, Node3);
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
                 Assert.Equal(expected, actual);

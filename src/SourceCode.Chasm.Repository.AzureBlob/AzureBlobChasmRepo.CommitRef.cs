@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -8,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.AzureBlob
@@ -152,17 +152,19 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
 
                 // CommitIds are not compressed
-                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int len))
-                using (var output = new MemoryStream())
+                using (var pool = new SessionPool<byte>())
                 {
-                    Memory<byte> mem = owner.Memory.Slice(0, len);
+                    Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 
-                    output.Write(mem.Span);
-                    output.Position = 0;
+                    using (var output = new MemoryStream())
+                    {
+                        output.Write(mem.Span);
+                        output.Position = 0;
 
-                    // Append blob. Following seems to be the only safe multi-writer method available
-                    // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
-                    await blobRef.AppendBlockAsync(output).ConfigureAwait(false);
+                        // Append blob. Following seems to be the only safe multi-writer method available
+                        // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
+                        await blobRef.AppendBlockAsync(output).ConfigureAwait(false);
+                    }
                 }
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)

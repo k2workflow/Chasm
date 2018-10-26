@@ -7,16 +7,19 @@ namespace SourceCode.Chasm.Serializer.Json
 {
     partial class JsonChasmSerializer // .CommitId
     {
-        public IMemoryOwner<byte> Serialize(CommitId model, out int length)
+        public Memory<byte> Serialize(CommitId model, SessionPool<byte> pool)
         {
+            if (pool == null) throw new ArgumentNullException(nameof(pool));
+
             string json = model.Write();
 
             int maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
-            IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(maxLen);
+            IMemoryOwner<byte> owner = pool.Rent(maxLen);
 
-            length = Encoding.UTF8.GetBytes(json, owner.Memory.Span);
+            int length = Encoding.UTF8.GetBytes(json, owner.Memory.Span);
+            Memory<byte> mem = owner.Memory.Slice(0, length);
 
-            return owner;
+            return mem;
         }
 
         public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)

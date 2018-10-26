@@ -7,16 +7,17 @@ namespace SourceCode.Chasm.Serializer.Text
 {
     partial class TextChasmSerializer // .CommitId
     {
-        public IMemoryOwner<byte> Serialize(CommitId model, out int length)
+        public Memory<byte> Serialize(CommitId model, SessionPool<byte> pool)
         {
             string wire = model.Convert();
 
             int maxLen = Encoding.UTF8.GetMaxByteCount(wire.Length); // Utf8 is 1-4 bpc
-            IMemoryOwner<byte> owner = MemoryPool<byte>.Shared.Rent(maxLen);
+            IMemoryOwner<byte> owner = pool.Rent(maxLen);
 
-            length = Encoding.UTF8.GetBytes(wire, owner.Memory.Span);
+            int length = Encoding.UTF8.GetBytes(wire, owner.Memory.Span);
+            Memory<byte> mem = owner.Memory.Slice(0, length);
 
-            return owner;
+            return mem;
         }
 
         public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)

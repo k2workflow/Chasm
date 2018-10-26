@@ -6,7 +6,6 @@
 #endregion
 
 using System;
-using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
@@ -25,9 +24,9 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap();
 
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
 
@@ -42,9 +41,9 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(new TreeNode[0]);
 
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
 
@@ -62,9 +61,9 @@ namespace SourceCode.Chasm.IO.Tests
             var node2 = new TreeNode("c", NodeKind.Tree, s_hasher.HashData("hij"));
             var expected = new TreeNodeMap(node0, node1, node2);
 
-            using (IMemoryOwner<byte> owner = ser.Serialize(expected, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = ser.Serialize(expected, pool);
 
                 TreeNodeMap actual = ser.DeserializeTree(mem.Span);
 

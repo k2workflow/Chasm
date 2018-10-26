@@ -1,9 +1,9 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Chasm.Serializer;
 
 namespace SourceCode.Chasm.Repository.Disk
 {
@@ -74,36 +74,38 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId, out int len))
-            using (FileStream file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken).ConfigureAwait(false))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
+                Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
 
-                if (file.Length == 0)
+                using (FileStream file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken).ConfigureAwait(false))
                 {
-                    if (previousCommitId.HasValue)
-                        throw BuildConcurrencyException(name, commitRef.Branch, null);
-                }
-                else
-                {
+                    if (file.Length == 0)
+                    {
+                        if (previousCommitId.HasValue)
+                            throw BuildConcurrencyException(name, commitRef.Branch, null);
+                    }
+                    else
+                    {
+                        // CommitIds are not compressed
+                        byte[] bytes = await ReadFromStreamAsync(file, cancellationToken).ConfigureAwait(false);
+                        CommitId commitId = Serializer.DeserializeCommitId(bytes);
+
+                        if (!previousCommitId.HasValue)
+                            throw BuildConcurrencyException(name, commitRef.Branch, null);
+
+                        if (previousCommitId.Value != commitId)
+                            throw BuildConcurrencyException(name, commitRef.Branch, null);
+
+                        file.Position = 0;
+                    }
+
                     // CommitIds are not compressed
-                    byte[] bytes = await ReadFromStreamAsync(file, cancellationToken).ConfigureAwait(false);
-                    CommitId commitId = Serializer.DeserializeCommitId(bytes);
+                    await file.WriteAsync(mem, cancellationToken).ConfigureAwait(false);
 
-                    if (!previousCommitId.HasValue)
-                        throw BuildConcurrencyException(name, commitRef.Branch, null);
-
-                    if (previousCommitId.Value != commitId)
-                        throw BuildConcurrencyException(name, commitRef.Branch, null);
-
-                    file.Position = 0;
+                    if (file.Position != mem.Length)
+                        file.Position = mem.Length;
                 }
-
-                // CommitIds are not compressed
-                await file.WriteAsync(mem, cancellationToken).ConfigureAwait(false);
-
-                if (file.Position != len)
-                    file.Position = len;
             }
 
             await TouchFileAsync(path, cancellationToken).ConfigureAwait(false);

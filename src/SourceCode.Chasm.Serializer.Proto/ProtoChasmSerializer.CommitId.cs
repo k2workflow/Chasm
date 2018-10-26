@@ -1,17 +1,16 @@
 using System;
-using System.Buffers;
 using SourceCode.Chasm.Serializer.Proto.Wire;
 
 namespace SourceCode.Chasm.Serializer.Proto
 {
     partial class ProtoChasmSerializer // .CommitId
     {
-        public IMemoryOwner<byte> Serialize(CommitId model, out int length)
+        public Memory<byte> Serialize(CommitId model, SessionPool<byte> pool)
         {
             CommitIdWire wire = model.Convert();
 
-            IMemoryOwner<byte> owner = SerializeImpl(wire, out length);
-            return owner;
+            Memory<byte> mem = SerializeImpl(wire, pool);
+            return mem;
         }
 
         public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)

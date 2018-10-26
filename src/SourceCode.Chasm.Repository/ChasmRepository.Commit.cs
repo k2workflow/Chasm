@@ -1,7 +1,7 @@
 using System;
-using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
+using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository
@@ -20,11 +20,11 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
-            using (IMemoryOwner<byte> owner = Serializer.Serialize(commit, out int len))
+            using (var pool = new SessionPool<byte>())
             {
-                Memory<byte> mem = owner.Memory.Slice(0, len);
-                Sha1 sha1 = Hasher.HashData(mem.Span);
+                Memory<byte> mem = Serializer.Serialize(commit, pool);
 
+                Sha1 sha1 = Hasher.HashData(mem.Span);
                 await WriteObjectAsync(sha1, mem, false, cancellationToken).ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);
