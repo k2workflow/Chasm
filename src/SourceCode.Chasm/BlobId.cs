@@ -55,7 +55,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(BlobId x, BlobId y) => !(x == y);
 
-        public override string ToString() => Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
+        public override string ToString() => Sha1.ToString("n"); // Used by callsites as a proxy for .Sha1.ToString()
 
         #endregion
     }

@@ -55,7 +55,7 @@ namespace SourceCode.Chasm
 
         public static bool operator <(TreeId x, TreeId y) => TreeIdComparer.Default.Compare(x, y) < 0;
 
-        public override string ToString() => Sha1.ToString("N"); // Used by callsites as a proxy for .Sha1.ToString()
+        public override string ToString() => Sha1.ToString("n"); // Used by callsites as a proxy for .Sha1.ToString()
 
         #endregion
     }

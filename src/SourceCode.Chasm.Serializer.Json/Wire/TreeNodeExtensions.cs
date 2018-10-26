@@ -82,7 +82,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
                 // NodeId
                 jw.WritePropertyName(_nodeId);
-                jw.WriteValue(model.Sha1.ToString("N"));
+                jw.WriteValue(model.Sha1.ToString("n"));
             }
             jw.WriteEndObject();
         }

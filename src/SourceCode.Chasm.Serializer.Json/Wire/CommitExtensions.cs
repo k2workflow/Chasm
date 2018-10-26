@@ -105,7 +105,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                     jw.WriteStartArray();
 
                     for (int i = 0; i < model.Parents.Count; i++)
-                        jw.WriteValue(model.Parents[i].Sha1.ToString("N"));
+                        jw.WriteValue(model.Parents[i].Sha1.ToString("n"));
 
                     jw.WriteEndArray();
                 }

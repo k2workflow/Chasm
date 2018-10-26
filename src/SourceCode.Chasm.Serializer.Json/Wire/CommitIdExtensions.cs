@@ -50,7 +50,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
         public static string Write(this CommitId model)
         {
             // Perf: No need to use JsonWriter for a simple scalar
-            string json = "{ \"" + _id + "\": \"" + model.Sha1.ToString("N") + "\" }";
+            string json = "{ \"" + _id + "\": \"" + model.Sha1.ToString("n") + "\" }";
             return json;
         }
     }
