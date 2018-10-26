@@ -7,6 +7,11 @@
     <RootNamespace>SourceCode.Chasm.Repository</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <AssemblyName>SourceCode.Chasm.Repository</AssemblyName>
+    <RootNamespace>SourceCode.Chasm.Repository</RootNamespace>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.2" PrivateAssets="All" />
