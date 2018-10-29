@@ -16,8 +16,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
             Sha1 sha1 = default;
 
-            // Switch
-            return jr.ReadObject(n =>
+            jr.ReadObject(n =>
             {
                 switch (n)
                 {
@@ -27,10 +26,9 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                 }
 
                 return false;
-            },
+            });
 
-            // Factory
-            () => sha1 == default ? default : new CommitId(sha1));
+            return (sha1 == default) ? default : new CommitId(sha1);
         }
 
         public static CommitId ReadCommitId(this string json)

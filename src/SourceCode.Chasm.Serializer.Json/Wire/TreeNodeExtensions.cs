@@ -21,8 +21,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             NodeKind kind = default;
             Sha1 sha1 = default;
 
-            // Switch
-            return jr.ReadObject(n =>
+            jr.ReadObject(n =>
             {
                 switch (n)
                 {
@@ -40,10 +39,9 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                 }
 
                 return false;
-            },
+            });
 
-            // Factory
-            () => name == null && kind == default && sha1 == default ? default : new TreeNode(name, kind, sha1));
+            return (name == null && kind == default && sha1 == default) ? default : new TreeNode(name, kind, sha1);
         }
 
         public static TreeNode ReadTreeNode(this string json)

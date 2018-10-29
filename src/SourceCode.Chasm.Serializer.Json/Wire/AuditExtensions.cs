@@ -19,8 +19,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             string name = default;
             DateTimeOffset time = default;
 
-            // Switch
-            return jr.ReadObject(n =>
+            jr.ReadObject(n =>
             {
                 switch (n)
                 {
@@ -34,12 +33,11 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                 }
 
                 return false;
-            },
+            });
 
-            // Factory
-            () => name == null && time == default ? default : new Audit(name, time));
+            return (name == null && time == default) ? default : new Audit(name, time);
 
-            // Property
+            // Local functions
 
             DateTimeOffset ReadTime()
             {

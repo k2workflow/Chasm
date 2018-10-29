@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using SourceCode.Clay;
 using SourceCode.Clay.Json;
 
 namespace SourceCode.Chasm.Serializer.Json.Wire
@@ -25,8 +26,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             IReadOnlyList<CommitId> parents = null;
             string message = null;
 
-            // Switch
-            return jr.ReadObject(n =>
+            jr.ReadObject(n =>
             {
                 switch (n)
                 {
@@ -52,22 +52,21 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                 }
 
                 return false;
-            },
+            });
 
-            // Factory
-            () => new Commit(parents, treeId, author, committer, message));
+            return new Commit(parents, treeId, author, committer, message);
 
-            // Property
+            // Local functions
 
             IReadOnlyList<CommitId> ReadParents() => jr.ReadArray(() =>
             {
-                Clay.Sha1? sha1 = jr.ReadSha1();
+                Sha1? sha1 = jr.ReadSha1();
                 return sha1 == null ? default : new CommitId(sha1.Value);
             });
 
             TreeId? ReadTreeId()
             {
-                Clay.Sha1? sha1 = jr.ReadSha1();
+                Sha1? sha1 = jr.ReadSha1();
                 return sha1 == null ? null : (TreeId?)new TreeId(sha1.Value);
             }
         }
