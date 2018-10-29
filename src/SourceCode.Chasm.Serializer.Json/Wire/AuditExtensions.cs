@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -14,7 +15,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
         public static Audit ReadAudit(this JsonReader jr)
         {
-            if (jr == null) throw new ArgumentNullException(nameof(jr));
+            Debug.Assert(jr != null);
 
             string name = default;
             DateTimeOffset time = default;
@@ -65,7 +66,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
         public static void Write(this JsonWriter jw, Audit model)
         {
-            if (jw == null) throw new ArgumentNullException(nameof(jw));
+            Debug.Assert(jw != null);
 
             if (model == default)
             {

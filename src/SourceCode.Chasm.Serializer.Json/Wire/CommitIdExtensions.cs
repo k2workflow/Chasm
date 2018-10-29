@@ -1,4 +1,4 @@
-using System;
+using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 using SourceCode.Clay;
@@ -12,7 +12,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
         public static CommitId ReadCommitId(this JsonReader jr)
         {
-            if (jr == null) throw new ArgumentNullException(nameof(jr));
+            Debug.Assert(jr != null);
 
             Sha1 sha1 = default;
 

@@ -1,4 +1,4 @@
-using System;
+using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 using SourceCode.Clay;
@@ -14,17 +14,20 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
         /// <returns></returns>
         public static Sha1? ReadSha1(this JsonReader jr)
         {
-            if (jr == null) throw new ArgumentNullException(nameof(jr));
+            Debug.Assert(jr != null);
+
+            // Caller decides how to handle null
+            if (jr.TokenType == JsonToken.Null) return null;
 
             string str = (string)jr.Value;
             if (string.IsNullOrEmpty(str))
-                return null; // Caller decides how to handle null
+                return null;
 
             var sha1 = Sha1.Parse(str);
             return sha1;
         }
 
-        public static Sha1? ReadSha1(this string json)
+        public static Sha1? ParseSha1(this string json)
         {
             if (json == null || json == JsonConstants.JsonNull) return null;
 

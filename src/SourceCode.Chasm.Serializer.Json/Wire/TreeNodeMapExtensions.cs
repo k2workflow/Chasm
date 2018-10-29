@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -11,7 +11,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
     {
         public static TreeNodeMap ReadTreeNodeMap(this JsonReader jr)
         {
-            if (jr == null) throw new ArgumentNullException(nameof(jr));
+            Debug.Assert(jr != null);
 
             IReadOnlyList<TreeNode> list = jr.ReadArray(() => jr.ReadTreeNode());
 
@@ -35,7 +35,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
         public static void Write(this JsonTextWriter jw, TreeNodeMap model)
         {
-            if (jw == null) throw new ArgumentNullException(nameof(jw));
+            Debug.Assert(jw != null);
 
             if (model.Count == 0)
             {
