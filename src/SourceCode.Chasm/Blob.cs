@@ -1,6 +1,7 @@
-using SourceCode.Clay.Buffers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm
 {
@@ -23,7 +24,9 @@ namespace SourceCode.Chasm
 
         #region Properties
 
-        public byte[] Data { get; }
+        private readonly byte[] _data;
+
+        public IReadOnlyList<byte> Data => _data;
 
         #endregion
 
@@ -31,20 +34,20 @@ namespace SourceCode.Chasm
 
         public Blob(byte[] data)
         {
-            Data = data;
+            _data = data;
         }
 
         #endregion
 
         #region IEquatable
 
-        public bool Equals(Blob other) => BufferComparer.Array.Equals(Data, other.Data);
+        public bool Equals(Blob other) => BufferComparer.Array.Equals(_data, other._data);
 
         public override bool Equals(object obj)
             => obj is Blob other
             && Equals(other);
 
-        public override int GetHashCode() => BufferComparer.Array.GetHashCode(Data);
+        public override int GetHashCode() => BufferComparer.Memory.GetHashCode(_data);
 
         #endregion
 
@@ -54,7 +57,7 @@ namespace SourceCode.Chasm
 
         public static bool operator !=(Blob x, Blob y) => !(x == y);
 
-        public override string ToString() => nameof(Data.Length) + ": " + (Data == null ? "null" : $"{Data.Length}");
+        public override string ToString() => nameof(_data.Length) + ": " + (_data == null ? "null" : $"{_data.Length}");
 
         #endregion
     }

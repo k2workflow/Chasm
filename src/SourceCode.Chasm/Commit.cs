@@ -22,7 +22,7 @@ namespace SourceCode.Chasm
         /// <summary>
         /// A singleton representing an empty array of <see cref="CommitId"/>.
         /// </summary>
-        public static CommitId[] Orphaned { get; } = Array.Empty<CommitId>();
+        public static IReadOnlyList<CommitId> Orphaned { get; } = Array.Empty<CommitId>();
 
         #endregion
 

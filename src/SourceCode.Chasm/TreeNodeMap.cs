@@ -48,15 +48,7 @@ namespace SourceCode.Chasm
         }
 
         public TreeNode this[string key]
-        {
-            get
-            {
-                if (!TryGetValue(key, out TreeNode node))
-                    throw new KeyNotFoundException(nameof(key));
-
-                return node;
-            }
-        }
+            => GetNode(key);
 
         #endregion
 
@@ -343,6 +335,14 @@ namespace SourceCode.Chasm
         #endregion
 
         #region Helpers
+
+        private TreeNode GetNode(string key)
+        {
+            if (!TryGetValue(key, out TreeNode node))
+                throw new KeyNotFoundException(nameof(key));
+
+            return node;
+        }
 
         private static ReadOnlyMemory<TreeNode> DistinctSort(TreeNode[] array, bool alreadyCopied)
         {
