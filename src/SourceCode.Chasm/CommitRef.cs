@@ -9,7 +9,7 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
-        private static readonly CommitRef _empty;
+        private static readonly CommitRef s_empty;
 
         /// <summary>
         /// A singleton representing an empty <see cref="CommitRef"/> value.
@@ -17,7 +17,7 @@ namespace SourceCode.Chasm
         /// <value>
         /// The empty.
         /// </value>
-        public static ref readonly CommitRef Empty => ref _empty;
+        public static ref readonly CommitRef Empty => ref s_empty;
 
         #endregion
 

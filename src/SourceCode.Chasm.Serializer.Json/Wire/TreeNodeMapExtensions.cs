@@ -37,7 +37,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
         {
             if (jw == null) throw new ArgumentNullException(nameof(jw));
 
-            if (model == default)
+            if (model.Count == 0)
             {
                 jw.WriteNull();
                 return;

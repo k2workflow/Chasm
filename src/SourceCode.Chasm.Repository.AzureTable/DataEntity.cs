@@ -16,7 +16,10 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         #region Properties
 
+        // This is an EF dto, which requires such patterns
+#pragma warning disable CA1819 // Properties should not return arrays
         public byte[] Content { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
 
         public string ObjectType { get; set; }
 

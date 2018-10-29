@@ -9,7 +9,7 @@ namespace SourceCode.Chasm
     {
         #region Constants
 
-        private static readonly TreeNode _empty;
+        private static readonly TreeNode s_empty;
 
         /// <summary>
         /// A singleton representing an empty <see cref="TreeNode"/> value.
@@ -17,7 +17,7 @@ namespace SourceCode.Chasm
         /// <value>
         /// The empty.
         /// </value>
-        public static ref readonly TreeNode Empty => ref _empty;
+        public static ref readonly TreeNode Empty => ref s_empty;
 
         #endregion
 
