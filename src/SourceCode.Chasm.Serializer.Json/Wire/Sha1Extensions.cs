@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.IO;
 using Newtonsoft.Json;
 using SourceCode.Clay;
 
@@ -8,11 +7,11 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
     internal static class Sha1Extensions
     {
         /// <summary>
-        /// Reads a <see cref="string"/> and, if not <see langword=Constants.JsonNull/>, parses it as a <see cref="Sha1"/>.
+        /// Reads a <see cref="string"/> and, if not <see langword=Constants.JsonNull/>, parses it as a nullable <see cref="Sha1"/>.
         /// </summary>
         /// <param name="jr"></param>
-        /// <returns></returns>
-        public static Sha1? ReadSha1(this JsonReader jr)
+        /// <returns>The Sha1 value or null.</returns>
+        public static Sha1? ReadSha1Nullable(this JsonReader jr)
         {
             Debug.Assert(jr != null);
 
@@ -27,18 +26,18 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             return sha1;
         }
 
-        public static Sha1? ParseSha1(this string json)
+        /// <summary>
+        /// Reads a <see cref="string"/> and, if not <see langword=Constants.JsonNull/>, parses it as a <see cref="Sha1"/>.
+        /// </summary>
+        /// <param name="jr"></param>
+        /// <returns>The Sha1 value.</returns>
+        public static Sha1 ReadSha1(this JsonReader jr)
         {
-            if (json == null || json == JsonConstants.JsonNull) return null;
+            Debug.Assert(jr != null);
 
-            using (var tr = new StringReader(json))
-            using (var jr = new JsonTextReader(tr))
-            {
-                jr.DateParseHandling = DateParseHandling.None;
-
-                Sha1? model = ReadSha1(jr);
-                return model;
-            }
+            string str = (string)jr.Value;
+            var sha1 = Sha1.Parse(str);
+            return sha1;
         }
     }
 }

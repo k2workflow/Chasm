@@ -50,20 +50,6 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             }
         }
 
-        public static Audit ReadAudit(this string json)
-        {
-            if (json == null || json == JsonConstants.JsonNull) return default;
-
-            using (var tr = new StringReader(json))
-            using (var jr = new JsonTextReader(tr))
-            {
-                jr.DateParseHandling = DateParseHandling.None;
-
-                Audit model = ReadAudit(jr);
-                return model;
-            }
-        }
-
         public static void Write(this JsonWriter jw, Audit model)
         {
             Debug.Assert(jw != null);
@@ -85,20 +71,6 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                 jw.WriteValue(model.Timestamp.ToString("o", CultureInfo.InvariantCulture));
             }
             jw.WriteEndObject();
-        }
-
-        public static string Write(this Audit model)
-        {
-            if (model == default) return JsonConstants.JsonNull;
-
-            var sb = new StringBuilder();
-            using (var sw = new StringWriter(sb))
-            using (var jw = new JsonTextWriter(sw))
-            {
-                Write(jw, model);
-            }
-
-            return sb.ToString();
         }
     }
 }

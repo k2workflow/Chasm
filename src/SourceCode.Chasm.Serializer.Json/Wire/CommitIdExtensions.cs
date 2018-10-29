@@ -21,7 +21,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                 switch (n)
                 {
                     case _id:
-                        sha1 = jr.ReadSha1() ?? default;
+                        sha1 = jr.ReadSha1();
                         return true;
                 }
 

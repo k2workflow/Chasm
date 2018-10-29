@@ -60,13 +60,13 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
             IReadOnlyList<CommitId> ReadParents() => jr.ReadArray(() =>
             {
-                Sha1? sha1 = jr.ReadSha1();
+                Sha1? sha1 = jr.ReadSha1Nullable();
                 return sha1 == null ? default : new CommitId(sha1.Value);
             });
 
             TreeId? ReadTreeId()
             {
-                Sha1? sha1 = jr.ReadSha1();
+                Sha1? sha1 = jr.ReadSha1Nullable();
                 return sha1 == null ? null : (TreeId?)new TreeId(sha1.Value);
             }
         }

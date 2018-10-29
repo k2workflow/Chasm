@@ -30,11 +30,11 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                         return true;
 
                     case _kind:
-                        kind = jr.ParseEnum<NodeKind>(true) ?? default;
+                        kind = jr.AsEnum<NodeKind>(true);
                         return true;
 
                     case _nodeId:
-                        sha1 = jr.ReadSha1() ?? default;
+                        sha1 = jr.ReadSha1();
                         return true;
                 }
 
@@ -42,20 +42,6 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             });
 
             return (name == null && kind == default && sha1 == default) ? default : new TreeNode(name, kind, sha1);
-        }
-
-        public static TreeNode ReadTreeNode(this string json)
-        {
-            if (json == null || json == JsonConstants.JsonNull) return default;
-
-            using (var tr = new StringReader(json))
-            using (var jr = new JsonTextReader(tr))
-            {
-                jr.DateParseHandling = DateParseHandling.None;
-
-                TreeNode model = ReadTreeNode(jr);
-                return model;
-            }
         }
 
         public static void Write(this JsonWriter jw, TreeNode model)
@@ -83,20 +69,6 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
                 jw.WriteValue(model.Sha1.ToString("n"));
             }
             jw.WriteEndObject();
-        }
-
-        public static string Write(this TreeNode model)
-        {
-            if (model == default) return JsonConstants.JsonNull;
-
-            var sb = new StringBuilder();
-            using (var sw = new StringWriter(sb))
-            using (var jw = new JsonTextWriter(sw))
-            {
-                Write(jw, model);
-            }
-
-            return sb.ToString();
         }
     }
 }
