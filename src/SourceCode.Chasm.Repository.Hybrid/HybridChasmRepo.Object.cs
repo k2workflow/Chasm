@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
         public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             // We read from closest to furthest
-            for (int i = 0; i < Chain.Length; i++)
+            for (int i = 0; i < Chain.Count; i++)
             {
                 ReadOnlyMemory<byte>? bytes = await Chain[i].ReadObjectAsync(objectId, cancellationToken).ConfigureAwait(false);
                 if (bytes != null) return bytes;
@@ -32,7 +32,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
 
             // We read from closest to furthest
             Sha1[] objects = objectIds.ToArray();
-            for (int i = 0; i < Chain.Length; i++)
+            for (int i = 0; i < Chain.Count; i++)
             {
                 IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> dict = await Chain[i].ReadObjectBatchAsync(objects, cancellationToken).ConfigureAwait(false);
                 if (dict.Count == objects.Length) return dict;
@@ -51,7 +51,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
                 CancellationToken = cancellationToken
             };
 
-            await ParallelAsync.ForAsync(0, Chain.Length, parallelOptions, async i =>
+            await ParallelAsync.ForAsync(0, Chain.Count, parallelOptions, async i =>
             {
                 await Chain[i].WriteObjectAsync(objectId, item, forceOverwrite, cancellationToken).ConfigureAwait(false);
             }).ConfigureAwait(false);
@@ -71,7 +71,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
             };
 
             // Enumerate batches
-            await ParallelAsync.ForAsync(0, Chain.Length, parallelOptions, async i =>
+            await ParallelAsync.ForAsync(0, Chain.Count, parallelOptions, async i =>
             {
                 // Execute batch
                 await Chain[i].WriteObjectBatchAsync(items, forceOverwrite, cancellationToken).ConfigureAwait(false);

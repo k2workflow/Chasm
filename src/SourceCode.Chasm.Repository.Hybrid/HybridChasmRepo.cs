@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO.Compression;
 using SourceCode.Chasm.Serializer;
 
@@ -6,7 +7,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
 {
     public sealed partial class HybridChasmRepo : ChasmRepository
     {
-        public IChasmRepository[] Chain { get; }
+        public IReadOnlyList<IChasmRepository> Chain { get; }
 
         public HybridChasmRepo(IChasmRepository repository1, IChasmRepository repository2, IChasmRepository repository3, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
             : base(serializer, compressionLevel, maxDop)

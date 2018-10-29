@@ -19,7 +19,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
             // We only read from last repo
-            IChasmRepository last = Chain[Chain.Length - 1];
+            IChasmRepository last = Chain[Chain.Count - 1];
             CommitRef? commitRef = await last.ReadCommitRefAsync(name, branch, cancellationToken).ConfigureAwait(false);
 
             return commitRef;
@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // We only write to last repo
-            IChasmRepository last = Chain[Chain.Length - 1];
+            IChasmRepository last = Chain[Chain.Count - 1];
             await last.WriteCommitRefAsync(previousCommitId, name, commitRef, cancellationToken).ConfigureAwait(false);
         }
     }
