@@ -18,7 +18,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
 
             // Tree
             if (model.TreeId != null)
-                sb.AppendLine($"{_treeId}{model.TreeId.Value.Sha1:N}");
+                sb.AppendLine($"{_treeId}{model.TreeId.Value.Sha1:n}");
 
             // Parents
             if (model.Parents != null)
@@ -29,13 +29,13 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
                         break;
 
                     case 1:
-                        sb.AppendLine($"{_parent}{model.Parents[0].Sha1:N}");
+                        sb.AppendLine($"{_parent}{model.Parents[0].Sha1:n}");
                         break;
 
                     default:
                         {
                             for (int i = 0; i < model.Parents.Count; i++)
-                                sb.AppendLine($"{_parent}{model.Parents[i].Sha1:N}");
+                                sb.AppendLine($"{_parent}{model.Parents[i].Sha1:n}");
                         }
                         break;
                 }
@@ -132,7 +132,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
                     ix = wire.IndexOf('\n', index);
                     if (ix >= 0)
                     {
-                        string str = wire.Substring(index, ix - index); ;
+                        string str = wire.Substring(index, ix - index);
                         index = ix;
 
                         committer = str.ConvertAudit();

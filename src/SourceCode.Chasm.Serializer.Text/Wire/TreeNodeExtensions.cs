@@ -6,6 +6,9 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
 {
     internal static class TreeNodeExtensions
     {
+        private const string TreePerm = "040000";
+        private const string BlobPerm = "100664";
+
         public static string Convert(this TreeNode model)
         {
             if (model == TreeNode.Empty) return default;
@@ -13,12 +16,20 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
             string kind, perm;
             switch (model.Kind)
             {
-                case NodeKind.Tree: kind = "tree"; perm = "040000"; break;
-                case NodeKind.Blob: kind = "blob"; perm = "100664"; break;
+                case NodeKind.Tree:
+                    kind = "tree";
+                    perm = TreePerm;
+                    break;
+
+                case NodeKind.Blob:
+                    kind = "blob";
+                    perm = BlobPerm;
+                    break;
+
                 default: throw new SerializationException();
             }
 
-            string wire = $"{perm} {kind} {model.Sha1:N} {model.Name}";
+            string wire = $"{perm} {kind} {model.Sha1:n} {model.Name}";
             return wire;
         }
 

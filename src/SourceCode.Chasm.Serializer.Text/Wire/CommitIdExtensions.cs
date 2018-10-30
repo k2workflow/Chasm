@@ -4,7 +4,8 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
 {
     internal static class CommitIdExtensions
     {
-        public static string Convert(this CommitId model) => model.Sha1.ToString("n");
+        public static string Convert(this CommitId model)
+            => model.Sha1.ToString("n");
 
         public static CommitId ConvertCommitId(this string wire)
         {

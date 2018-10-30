@@ -39,7 +39,8 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
             if (string.IsNullOrWhiteSpace(wire)) return default;
 
             string[] tokens = wire.Split('\n', StringSplitOptions.None);
-            if (tokens.Length == 0) return TreeNodeMap.Empty;
+            if (tokens.Length == 0)
+                return TreeNodeMap.Empty;
 
             var nodes = new List<TreeNode>(tokens.Length);
             for (int i = 0; i < tokens.Length; i++)
