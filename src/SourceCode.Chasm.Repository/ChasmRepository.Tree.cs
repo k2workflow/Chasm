@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
-using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using SourceCode.Clay.Buffers;
 

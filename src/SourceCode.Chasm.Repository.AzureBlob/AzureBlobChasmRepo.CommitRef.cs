@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using SourceCode.Clay.Buffers;
 
@@ -141,6 +140,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 if (existingCommitId == commitRef.CommitId) // We already know that the name matches
                     return;
             }
+
             // The caller expected a previous commit, but we didn't find one
             else if (previousCommitId.HasValue)
             {

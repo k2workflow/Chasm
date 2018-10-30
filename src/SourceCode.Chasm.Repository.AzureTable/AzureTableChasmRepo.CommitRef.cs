@@ -101,6 +101,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 if (existingCommitId == commitRef.CommitId)
                     return;
             }
+
             // The caller expected a previous commit, but we didn't find one
             else if (previousCommitId.HasValue)
             {

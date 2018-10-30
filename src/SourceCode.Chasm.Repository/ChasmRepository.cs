@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
-using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
 using crypt = System.Security.Cryptography;
 
@@ -24,19 +22,11 @@ namespace SourceCode.Chasm.Repository
         {
             if (!Enum.IsDefined(typeof(CompressionLevel), compressionLevel)) throw new ArgumentOutOfRangeException(nameof(compressionLevel));
             if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
-            
+
             Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             CompressionLevel = compressionLevel;
             MaxDop = maxDop;
         }
-
-        public abstract ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken);
-
-        public abstract Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken);
-
-        public abstract ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken);
-
-        public abstract ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken);
 
         protected static ChasmConcurrencyException BuildConcurrencyException(string name, string branch, Exception innerException)
             => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {name}/{branch}", innerException);
