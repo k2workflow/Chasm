@@ -64,10 +64,15 @@ namespace SourceCode.Chasm
             => obj is Audit other
             && Equals(other);
 
-        public override int GetHashCode() => HashCode.Combine(
-            StringComparer.Ordinal.GetHashCode(Name ?? string.Empty),
-            Timestamp
-        );
+        public override int GetHashCode()
+        {
+            var hc = new HashCode();
+
+            hc.Add(Name ?? string.Empty, StringComparer.Ordinal);
+            hc.Add(Timestamp);
+
+            return hc.ToHashCode();
+        }
 
         #endregion
 
