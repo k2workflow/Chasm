@@ -6,8 +6,8 @@
 #endregion
 
 using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
-using SourceCode.Clay.Buffers;
 using Xunit;
 
 namespace SourceCode.Chasm.IO.Tests
@@ -23,9 +23,9 @@ namespace SourceCode.Chasm.IO.Tests
         {
             // Force Commit to be non-default
             var expected = new Commit(new CommitId?(), default, default, default, "force");
-            using (var pool = new ArenaMemoryPool<byte>())
+            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
             {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+                Memory<byte> mem = ser.Serialize(expected);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -38,9 +38,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Parents_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(Array.Empty<CommitId>(), default, default, default, null);
-            using (var pool = new ArenaMemoryPool<byte>())
+            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
             {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+                Memory<byte> mem = ser.Serialize(expected);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -53,9 +53,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Parents_1_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, null);
-            using (var pool = new ArenaMemoryPool<byte>())
+            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
             {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+                Memory<byte> mem = ser.Serialize(expected);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -68,9 +68,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Parents_1(IChasmSerializer ser)
         {
             var expected = new Commit(s_parent1, default, default, default, null);
-            using (var pool = new ArenaMemoryPool<byte>())
+            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
             {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+                Memory<byte> mem = ser.Serialize(expected);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -85,9 +85,9 @@ namespace SourceCode.Chasm.IO.Tests
             CommitId[] parents = new[] { s_parent1, s_parent2 };
 
             var expected = new Commit(parents, default, default, default, null);
-            using (var pool = new ArenaMemoryPool<byte>())
+            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
             {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+                Memory<byte> mem = ser.Serialize(expected);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
@@ -102,9 +102,9 @@ namespace SourceCode.Chasm.IO.Tests
             CommitId[] parents = new[] { s_parent1, s_parent2, s_parent3 };
 
             var expected = new Commit(parents, default, default, default, null);
-            using (var pool = new ArenaMemoryPool<byte>())
+            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
             {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+                Memory<byte> mem = ser.Serialize(expected);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);

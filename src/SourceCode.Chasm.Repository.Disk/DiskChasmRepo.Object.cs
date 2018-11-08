@@ -14,7 +14,9 @@ namespace SourceCode.Chasm.Repository.Disk
             string filename = DeriveFileName(objectId);
             string path = Path.Combine(_objectsContainer, filename);
 
-            byte[] bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
+            byte[] bytes = await ReadFileAsync(path, cancellationToken)
+                .ConfigureAwait(false);
+
             if (bytes == null) return default;
 
             using (var input = new MemoryStream(bytes))
@@ -55,7 +57,8 @@ namespace SourceCode.Chasm.Repository.Disk
                 }
                 output.Position = 0;
 
-                await WriteFileAsync(path, output, false, cancellationToken).ConfigureAwait(false); // TODO: Perf
+                await WriteFileAsync(path, output, false, cancellationToken)
+                    .ConfigureAwait(false); // TODO: Perf
             }
         }
     }

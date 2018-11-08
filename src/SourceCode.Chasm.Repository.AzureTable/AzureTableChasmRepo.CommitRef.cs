@@ -9,7 +9,6 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
-using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository.AzureTable
 {
@@ -25,7 +24,9 @@ namespace SourceCode.Chasm.Repository.AzureTable
             TableContinuationToken token = null;
             do
             {
-                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken).ConfigureAwait(false);
+                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken)
+                    .ConfigureAwait(false);
+
                 foreach (DataEntity entity in result.Results)
                 {
                     if (entity.RowKey.EndsWith(DataEntity.CommitSuffix, StringComparison.OrdinalIgnoreCase))
@@ -52,7 +53,9 @@ namespace SourceCode.Chasm.Repository.AzureTable
             TableContinuationToken token = null;
             do
             {
-                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken).ConfigureAwait(false);
+                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken)
+                    .ConfigureAwait(false);
+
                 foreach (DataEntity item in result.Results)
                     names.Add(item.PartitionKey);
                 token = result.ContinuationToken;
@@ -66,7 +69,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            (bool found, CommitId commitId, string _) = await ReadCommitRefImplAsync(name, branch, Serializer, cancellationToken).ConfigureAwait(false);
+            (bool found, CommitId commitId, string _) = await ReadCommitRefImplAsync(name, branch, Serializer, cancellationToken)
+                .ConfigureAwait(false);
 
             // NotFound
             if (!found) return null;
@@ -82,7 +86,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // Load existing commit ref in order to use its etag
-            (bool found, CommitId existingCommitId, string etag) = await ReadCommitRefImplAsync(name, commitRef.Branch, Serializer, cancellationToken).ConfigureAwait(false);
+            (bool found, CommitId existingCommitId, string etag) = await ReadCommitRefImplAsync(name, commitRef.Branch, Serializer, cancellationToken)
+                .ConfigureAwait(false);
 
             // Optimistic concurrency check
             if (found)
@@ -113,14 +118,12 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 CloudTable refsTable = _refsTable.Value;
 
                 // CommitIds are not compressed
-                using (var pool = new ArenaMemoryPool<byte>())
-                {
-                    Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
+                Memory<byte> mem = Serializer.Serialize(commitRef.CommitId);
 
-                    TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, mem, etag); // Note etag access condition
+                TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, mem, etag); // Note etag access condition
 
-                    await refsTable.ExecuteAsync(op).ConfigureAwait(false);
-                }
+                await refsTable.ExecuteAsync(op)
+                    .ConfigureAwait(false);
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
@@ -136,7 +139,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
             try
             {
                 // Read from table
-                TableResult result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken).ConfigureAwait(false);
+                TableResult result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken)
+                    .ConfigureAwait(false);
 
                 // NotFound
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)

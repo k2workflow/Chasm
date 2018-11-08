@@ -77,9 +77,11 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!File.Exists(path))
                 return default;
 
-            using (FileStream fileStream = await WaitForFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken).ConfigureAwait(false))
+            using (FileStream fileStream = await WaitForFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
+                .ConfigureAwait(false))
             {
-                return await ReadFromStreamAsync(fileStream, cancellationToken).ConfigureAwait(false);
+                return await ReadFromStreamAsync(fileStream, cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -91,7 +93,9 @@ namespace SourceCode.Chasm.Repository.Disk
             byte[] bytes = new byte[remaining];
             while (remaining > 0)
             {
-                int count = await fileStream.ReadAsync(bytes, offset, remaining, cancellationToken).ConfigureAwait(false);
+                int count = await fileStream.ReadAsync(bytes, offset, remaining, cancellationToken)
+                    .ConfigureAwait(false);
+
                 if (count == 0)
                     throw new EndOfStreamException("End of file");
 
@@ -113,21 +117,24 @@ namespace SourceCode.Chasm.Repository.Disk
             long dataLength = data.Length - data.Position;
             if (dataLength <= 0) return;
 
-            using (FileStream fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken).ConfigureAwait(false))
+            using (FileStream fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken)
+                .ConfigureAwait(false))
             {
                 // Only write to the file if it does not already exist.
                 if (fileStream.Length != dataLength || forceOverwrite)
                 {
                     fileStream.Position = 0;
 
-                    await data.CopyToAsync(fileStream, 81920, cancellationToken).ConfigureAwait(false);
+                    await data.CopyToAsync(fileStream, 81920, cancellationToken)
+                        .ConfigureAwait(false);
 
                     if (fileStream.Position != dataLength)
                         fileStream.SetLength(dataLength);
                 }
             }
 
-            await TouchFileAsync(path, cancellationToken).ConfigureAwait(false);
+            await TouchFileAsync(path, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         private static async Task TouchFileAsync(string path, CancellationToken cancellationToken)
@@ -144,7 +151,8 @@ namespace SourceCode.Chasm.Repository.Disk
                 }
                 catch (IOException)
                 {
-                    await Task.Delay(_retryMs, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(_retryMs, cancellationToken)
+                        .ConfigureAwait(false);
                 }
             }
         }
@@ -163,7 +171,8 @@ namespace SourceCode.Chasm.Repository.Disk
                 catch (IOException) when (++retryCount < _retryMax)
                 {
                     fs?.Dispose();
-                    await Task.Delay(_retryMs, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(_retryMs, cancellationToken)
+                        .ConfigureAwait(false);
                 }
             }
         }

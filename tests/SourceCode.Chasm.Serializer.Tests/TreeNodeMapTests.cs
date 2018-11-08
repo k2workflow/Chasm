@@ -8,7 +8,6 @@
 using System;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
-using SourceCode.Clay.Buffers;
 using Xunit;
 using crypt = System.Security.Cryptography;
 
@@ -20,9 +19,9 @@ namespace SourceCode.Chasm.IO.Tests
 
         private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
-        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), new BlobId(s_hasher.HashData(nameof(Node1))));
-        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), new BlobId(s_hasher.HashData(nameof(Node2))));
-        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), new BlobId(s_hasher.HashData(nameof(Node3))));
+        private static readonly TreeNode s_node1 = new TreeNode(nameof(s_node1), new BlobId(s_hasher.HashData(nameof(s_node1))));
+        private static readonly TreeNode s_node2 = new TreeNode(nameof(s_node2), new BlobId(s_hasher.HashData(nameof(s_node2))));
+        private static readonly TreeNode s_node3 = new TreeNode(nameof(s_node3), new BlobId(s_hasher.HashData(nameof(s_node3))));
 
         #endregion
 
@@ -34,13 +33,11 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Default(IChasmSerializer ser)
         {
             TreeNodeMap expected = default;
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
 
-                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
+            Assert.Equal(expected, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -49,13 +46,11 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
 
-                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
+            Assert.Equal(expected, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -64,13 +59,11 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Null(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap(null);
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
 
-                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
+            Assert.Equal(expected, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -79,13 +72,11 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty_Array(IChasmSerializer ser)
         {
             var expected = new TreeNodeMap();
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
 
-                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
+            Assert.Equal(expected, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -93,14 +84,12 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_1_Node(IChasmSerializer ser)
         {
-            var expected = new TreeNodeMap(Node1); 
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+            var expected = new TreeNodeMap(s_node1);
 
-                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
+            Assert.Equal(expected, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -108,14 +97,12 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_2_Nodes(IChasmSerializer ser)
         {
-            var expected = new TreeNodeMap(Node1, Node2);
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+            var expected = new TreeNodeMap(s_node1, s_node2);
 
-                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
+            Assert.Equal(expected, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -123,14 +110,12 @@ namespace SourceCode.Chasm.IO.Tests
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_3_Nodes(IChasmSerializer ser)
         {
-            var expected = new TreeNodeMap(Node1, Node2, Node3);
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+            var expected = new TreeNodeMap(s_node1, s_node2, s_node3);
 
-                TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
+            Assert.Equal(expected, actual);
         }
 
         #endregion

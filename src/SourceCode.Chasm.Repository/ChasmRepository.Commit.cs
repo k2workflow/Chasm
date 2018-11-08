@@ -1,8 +1,8 @@
 using System;
+using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
-using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository
 {
@@ -10,7 +10,8 @@ namespace SourceCode.Chasm.Repository
     {
         public virtual async ValueTask<Commit?> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
-            ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken).ConfigureAwait(false);
+            ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken)
+                .ConfigureAwait(false);
 
             if (buffer == null || buffer.Value.Length == 0) return default;
 
@@ -20,12 +21,13 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
-            using (var pool = new ArenaMemoryPool<byte>())
+            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
             {
-                Memory<byte> mem = Serializer.Serialize(commit, pool);
+                Memory<byte> mem = Serializer.Serialize(commit);
 
                 Sha1 sha1 = Hasher.HashData(mem.Span);
-                await WriteObjectAsync(sha1, mem, false, cancellationToken).ConfigureAwait(false);
+                await WriteObjectAsync(sha1, mem, false, cancellationToken)
+                    .ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);
                 return commitId;

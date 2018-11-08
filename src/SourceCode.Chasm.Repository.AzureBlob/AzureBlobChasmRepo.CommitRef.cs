@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Clay;
-using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository.AzureBlob
 {
@@ -34,7 +33,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             do
             {
-                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync(name, false, BlobListingDetails.None, null, token, null, null).ConfigureAwait(false);
+                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync(name, false, BlobListingDetails.None, null, token, null, null)
+                    .ConfigureAwait(false);
 
                 foreach (IListBlobItem blobItem in resultSegment.Results)
                 {
@@ -49,7 +49,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                     using (var output = new MemoryStream())
                     {
-                        await blob.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
+                        await blob.DownloadToStreamAsync(output, default, default, default, cancellationToken)
+                            .ConfigureAwait(false);
 
                         if (output.Length < Sha1.ByteLength)
                             throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {output.Length}");
@@ -74,7 +75,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             do
             {
-                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync("", false, BlobListingDetails.None, null, token, null, null).ConfigureAwait(false);
+                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync("", false, BlobListingDetails.None, null, token, null, null)
+                    .ConfigureAwait(false);
 
                 foreach (IListBlobItem blobItem in resultSegment.Results)
                 {
@@ -101,7 +103,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            (bool found, CommitId commitId, AccessCondition _, CloudAppendBlob _) = await ReadCommitRefImplAsync(name, branch, cancellationToken).ConfigureAwait(false);
+            (bool found, CommitId commitId, AccessCondition _, CloudAppendBlob _) = await ReadCommitRefImplAsync(name, branch, cancellationToken)
+                .ConfigureAwait(false);
 
             // NotFound
             if (!found) return null;
@@ -121,7 +124,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
             // Load existing commit ref in order to use its etag
-            (bool found, CommitId existingCommitId, AccessCondition ifMatchCondition, CloudAppendBlob blobRef) = await ReadCommitRefImplAsync(name, commitRef.Branch, cancellationToken).ConfigureAwait(false);
+            (bool found, CommitId existingCommitId, AccessCondition ifMatchCondition, CloudAppendBlob blobRef) = await ReadCommitRefImplAsync(name, commitRef.Branch, cancellationToken)
+                .ConfigureAwait(false);
 
             // Optimistic concurrency check
             if (found)
@@ -150,22 +154,21 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             try
             {
                 // Required to create blob before appending to it
-                await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken).ConfigureAwait(false); // Note etag access condition
+                await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken)
+                    .ConfigureAwait(false); // Note etag access condition
 
                 // CommitIds are not compressed
-                using (var pool = new ArenaMemoryPool<byte>())
+                Memory<byte> mem = Serializer.Serialize(commitRef.CommitId);
+
+                using (var output = new MemoryStream())
                 {
-                    Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
+                    output.Write(mem.Span);
+                    output.Position = 0;
 
-                    using (var output = new MemoryStream())
-                    {
-                        output.Write(mem.Span);
-                        output.Position = 0;
-
-                        // Append blob. Following seems to be the only safe multi-writer method available
-                        // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
-                        await blobRef.AppendBlockAsync(output).ConfigureAwait(false);
-                    }
+                    // Append blob. Following seems to be the only safe multi-writer method available
+                    // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
+                    await blobRef.AppendBlockAsync(output)
+                        .ConfigureAwait(false);
                 }
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
@@ -205,7 +208,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                     // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
                     // Or use blobRef.DownloadToByteArrayAsync() since we already know expected length of data (Sha1.ByteLen)
                     // Keep in mind Azure and/or specific IChasmSerializer may add some overhead: it looks like emperical byte length is 40-52 bytes
-                    await blobRef.DownloadToStreamAsync(output, default, default, default, cancellationToken).ConfigureAwait(false);
+                    await blobRef.DownloadToStreamAsync(output, default, default, default, cancellationToken)
+                        .ConfigureAwait(false);
 
                     // Grab the etag - we need it for optimistic concurrency control
                     var ifMatchCondition = AccessCondition.GenerateIfMatchCondition(blobRef.Properties.ETag);
