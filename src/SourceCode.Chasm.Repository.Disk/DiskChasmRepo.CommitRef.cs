@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using SourceCode.Chasm.Serializer;
-using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Repository.Disk
 {
@@ -21,7 +19,8 @@ namespace SourceCode.Chasm.Repository.Disk
             var results = new CommitRef[files.Length];
             for (int i = 0; i < results.Length; i++)
             {
-                byte[] bytes = await ReadFileAsync(files[i], cancellationToken).ConfigureAwait(false);
+                byte[] bytes = await ReadFileAsync(files[i], cancellationToken)
+                    .ConfigureAwait(false);
 
                 string branch = Path.ChangeExtension(Path.GetFileName(files[i]), null);
 
@@ -50,7 +49,8 @@ namespace SourceCode.Chasm.Repository.Disk
             string filename = DeriveCommitRefFileName(name, branch);
             string path = Path.Combine(_refsContainer, filename);
 
-            byte[] bytes = await ReadFileAsync(path, cancellationToken).ConfigureAwait(false);
+            byte[] bytes = await ReadFileAsync(path, cancellationToken)
+                .ConfigureAwait(false);
 
             // NotFound
             if (bytes == null || bytes.Length == 0)
@@ -75,41 +75,43 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            using (var pool = new ArenaMemoryPool<byte>())
+            Memory<byte> mem = Serializer.Serialize(commitRef.CommitId);
+
+            using (FileStream file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken)
+                .ConfigureAwait(false))
             {
-                Memory<byte> mem = Serializer.Serialize(commitRef.CommitId, pool);
-
-                using (FileStream file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken).ConfigureAwait(false))
+                if (file.Length == 0)
                 {
-                    if (file.Length == 0)
-                    {
-                        if (previousCommitId.HasValue)
-                            throw BuildConcurrencyException(name, commitRef.Branch, null);
-                    }
-                    else
-                    {
-                        // CommitIds are not compressed
-                        byte[] bytes = await ReadFromStreamAsync(file, cancellationToken).ConfigureAwait(false);
-                        CommitId commitId = Serializer.DeserializeCommitId(bytes);
-
-                        if (!previousCommitId.HasValue)
-                            throw BuildConcurrencyException(name, commitRef.Branch, null);
-
-                        if (previousCommitId.Value != commitId)
-                            throw BuildConcurrencyException(name, commitRef.Branch, null);
-
-                        file.Position = 0;
-                    }
-
-                    // CommitIds are not compressed
-                    await file.WriteAsync(mem, cancellationToken).ConfigureAwait(false);
-
-                    if (file.Position != mem.Length)
-                        file.Position = mem.Length;
+                    if (previousCommitId.HasValue)
+                        throw BuildConcurrencyException(name, commitRef.Branch, null);
                 }
+                else
+                {
+                    // CommitIds are not compressed
+                    byte[] bytes = await ReadFromStreamAsync(file, cancellationToken)
+                        .ConfigureAwait(false);
+
+                    CommitId commitId = Serializer.DeserializeCommitId(bytes);
+
+                    if (!previousCommitId.HasValue)
+                        throw BuildConcurrencyException(name, commitRef.Branch, null);
+
+                    if (previousCommitId.Value != commitId)
+                        throw BuildConcurrencyException(name, commitRef.Branch, null);
+
+                    file.Position = 0;
+                }
+
+                // CommitIds are not compressed
+                await file.WriteAsync(mem, cancellationToken)
+                    .ConfigureAwait(false);
+
+                if (file.Position != mem.Length)
+                    file.Position = mem.Length;
             }
 
-            await TouchFileAsync(path, cancellationToken).ConfigureAwait(false);
+            await TouchFileAsync(path, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

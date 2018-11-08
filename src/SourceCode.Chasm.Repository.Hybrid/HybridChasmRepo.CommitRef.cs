@@ -20,7 +20,8 @@ namespace SourceCode.Chasm.Repository.Hybrid
 
             // We only read from last repo
             IChasmRepository last = Chain[Chain.Count - 1];
-            CommitRef? commitRef = await last.ReadCommitRefAsync(name, branch, cancellationToken).ConfigureAwait(false);
+            CommitRef? commitRef = await last.ReadCommitRefAsync(name, branch, cancellationToken)
+                .ConfigureAwait(false);
 
             return commitRef;
         }
@@ -32,7 +33,8 @@ namespace SourceCode.Chasm.Repository.Hybrid
 
             // We only write to last repo
             IChasmRepository last = Chain[Chain.Count - 1];
-            await last.WriteCommitRefAsync(previousCommitId, name, commitRef, cancellationToken).ConfigureAwait(false);
+            await last.WriteCommitRefAsync(previousCommitId, name, commitRef, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

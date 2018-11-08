@@ -18,7 +18,9 @@ namespace SourceCode.Chasm.Repository.Hybrid
             TreeId[] trees = treeIds.ToArray();
             for (int i = 0; i < Chain.Count; i++)
             {
-                IReadOnlyDictionary<TreeId, TreeNodeMap> dict = await Chain[i].ReadTreeBatchAsync(trees, cancellationToken).ConfigureAwait(false);
+                IReadOnlyDictionary<TreeId, TreeNodeMap> dict = await Chain[i].ReadTreeBatchAsync(trees, cancellationToken)
+                    .ConfigureAwait(false);
+
                 if (dict.Count == trees.Length) return dict;
             }
 

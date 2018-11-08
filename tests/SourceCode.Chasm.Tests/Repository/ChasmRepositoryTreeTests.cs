@@ -302,7 +302,8 @@ namespace SourceCode.Chasm.Repository.Tests
             };
 
             // Action
-            TreeId actual = await mockChasmRepository.Object.WriteTreeAsync(TreeNodeMap.Empty, TestValues.CancellationToken).ConfigureAwait(false);
+            TreeId actual = await mockChasmRepository.Object.WriteTreeAsync(TreeNodeMap.Empty, TestValues.CancellationToken)
+                .ConfigureAwait(false);
 
             // Assert
             Assert.NotEqual(new TreeId(), actual);

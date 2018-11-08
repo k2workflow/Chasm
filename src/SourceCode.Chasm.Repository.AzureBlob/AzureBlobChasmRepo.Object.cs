@@ -27,7 +27,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
                 {
                     // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
-                    await blobRef.DownloadToStreamAsync(input).ConfigureAwait(false);
+                    await blobRef.DownloadToStreamAsync(input)
+                        .ConfigureAwait(false);
 
                     using (var output = new MemoryStream())
                     {
@@ -64,7 +65,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             try
             {
                 // Required to create blob header before appending to it
-                await blobRef.CreateOrReplaceAsync(accessCondition, default, default).ConfigureAwait(false);
+                await blobRef.CreateOrReplaceAsync(accessCondition, default, default)
+                    .ConfigureAwait(false);
             }
             // Try-catch is cheaper than a separate (latent) exists check
             catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
@@ -83,7 +85,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                 // Append blob. Following seems to be the only safe multi-writer method available
                 // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
-                await blobRef.AppendBlockAsync(output).ConfigureAwait(false);
+                await blobRef.AppendBlockAsync(output)
+                    .ConfigureAwait(false);
             }
         }
 

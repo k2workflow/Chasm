@@ -24,7 +24,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             try
             {
-                TableResult result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
+                TableResult result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                    .ConfigureAwait(false);
 
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                     return default;
@@ -69,7 +70,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
             await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
-                IList<TableResult> results = await objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken).ConfigureAwait(false);
+                IList<TableResult> results = await objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken)
+                    .ConfigureAwait(false);
 
                 // Transform batch results
                 foreach (TableResult result in results)
@@ -92,7 +94,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
                         return;
                     }
                 }
-            }).ConfigureAwait(false);
+            })
+            .ConfigureAwait(false);
 
             return dict;
         }
@@ -140,7 +143,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 var mem = new Memory<byte>(output.ToArray()); // TODO: Perf
 
                 TableOperation op = DataEntity.BuildWriteOperation(objectId, mem, forceOverwrite);
-                await objectsTable.ExecuteAsync(op, default, default, cancellationToken).ConfigureAwait(false);
+                await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -163,8 +167,10 @@ namespace SourceCode.Chasm.Repository.AzureTable
             await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
             {
                 // Execute batch
-                await objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+                await objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken)
+                    .ConfigureAwait(false);
+            })
+            .ConfigureAwait(false);
         }
     }
 }

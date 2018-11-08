@@ -29,12 +29,14 @@ namespace SourceCode.Chasm.Repository
             await ParallelAsync.ForEachAsync(objectIds, parallelOptions, async sha1 =>
             {
                 // Execute batch
-                ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(sha1, cancellationToken).ConfigureAwait(false);
+                ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(sha1, cancellationToken)
+                    .ConfigureAwait(false);
 
                 if (buffer == null || buffer.Value.Length == 0) return;
 
                 dict[sha1] = buffer.Value;
-            }).ConfigureAwait(false);
+            })
+            .ConfigureAwait(false);
 
             return dict;
         }
@@ -55,8 +57,10 @@ namespace SourceCode.Chasm.Repository
             await ParallelAsync.ForEachAsync(items, parallelOptions, async item =>
             {
                 // Execute batch
-                await WriteObjectAsync(item.Key, item.Value, forceOverwrite, cancellationToken).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+                await WriteObjectAsync(item.Key, item.Value, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
+            })
+            .ConfigureAwait(false);
         }
     }
 }
