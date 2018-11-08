@@ -2,28 +2,25 @@ using System;
 using System.Buffers;
 using System.Text;
 using SourceCode.Chasm.Serializer.Json.Wire;
-using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Json
 {
     partial class JsonChasmSerializer // .Tree
     {
-        public Memory<byte> Serialize(TreeNodeMap model, ArenaMemoryPool<byte> pool)
+        public override Memory<byte> Serialize(TreeNodeMap model)
         {
-            if (pool == null) throw new ArgumentNullException(nameof(pool));
-
             string json = model.Write();
 
-            int maxLen = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
-            IMemoryOwner<byte> owner = pool.Rent(maxLen);
+            int length = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
 
-            int length = Encoding.UTF8.GetBytes(json, owner.Memory.Span);
-            Memory<byte> mem = owner.Memory.Slice(0, length);
+            Memory<byte> rented = Rent(length);
+            length = Encoding.UTF8.GetBytes(json, rented.Span);
 
-            return mem;
+            Memory<byte> slice = rented.Slice(0, length);
+            return slice;
         }
 
-        public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
+        public override TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) throw new ArgumentNullException(nameof(span));
 

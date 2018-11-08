@@ -1,11 +1,10 @@
 using System;
-using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer
 {
     partial interface IChasmSerializer // .Commit
     {
-        Memory<byte> Serialize(Commit model, ArenaMemoryPool<byte> pool);
+        Memory<byte> Serialize(Commit model);
 
         Commit DeserializeCommit(ReadOnlySpan<byte> span);
     }

@@ -8,7 +8,6 @@
 using System;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
-using SourceCode.Clay.Buffers;
 using Xunit;
 using crypt = System.Security.Cryptography;
 
@@ -24,13 +23,11 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_CommitId_Default(IChasmSerializer ser)
         {
             var expected = new CommitId();
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
 
-                CommitId actual = ser.DeserializeCommitId(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            CommitId actual = ser.DeserializeCommitId(mem.Span);
+            Assert.Equal(expected, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -39,13 +36,11 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_CommitId(IChasmSerializer ser)
         {
             var expected = new CommitId(s_hasher.HashData("abc"));
-            using (var pool = new ArenaMemoryPool<byte>())
-            {
-                Memory<byte> mem = ser.Serialize(expected, pool);
 
-                CommitId actual = ser.DeserializeCommitId(mem.Span);
-                Assert.Equal(expected, actual);
-            }
+            Memory<byte> mem = ser.Serialize(expected);
+
+            CommitId actual = ser.DeserializeCommitId(mem.Span);
+            Assert.Equal(expected, actual);
         }
     }
 }

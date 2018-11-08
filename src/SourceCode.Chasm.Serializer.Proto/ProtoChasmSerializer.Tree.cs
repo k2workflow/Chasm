@@ -1,20 +1,19 @@
 using System;
 using SourceCode.Chasm.Serializer.Proto.Wire;
-using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Proto
 {
     partial class ProtoChasmSerializer // .Tree
     {
-        public Memory<byte> Serialize(TreeNodeMap model, ArenaMemoryPool<byte> pool)
+        public override Memory<byte> Serialize(TreeNodeMap model)
         {
             TreeWire wire = model.Convert();
 
-            Memory<byte> mem = SerializeImpl(wire, pool);
-            return mem;
+            Memory<byte> slice = SerializeImpl(wire);
+            return slice;
         }
 
-        public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
+        public override TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) return default;
 

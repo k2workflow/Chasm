@@ -124,8 +124,11 @@ namespace SoruceCode.Chasm.IntegrationTests
             try
             {
                 if (!tmp.EndsWith('/')) tmp += '/';
-                var repo = new DiskChasmRepo(tmp, new JsonChasmSerializer(), CompressionLevel.Optimal);
-                await TestRepository(repo);
+                using (var serializer = new JsonChasmSerializer())
+                {
+                    var repo = new DiskChasmRepo(tmp, serializer, CompressionLevel.Optimal);
+                    await TestRepository(repo);
+                }
             }
             finally
             {
@@ -140,8 +143,11 @@ namespace SoruceCode.Chasm.IntegrationTests
         {
             // Use your own cstring here.
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
-            var repo = new AzureBlobChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
-            await TestRepository(repo);
+            using (var serializer = new JsonChasmSerializer())
+            {
+                var repo = new AzureBlobChasmRepo(csa, serializer, CompressionLevel.Optimal);
+                await TestRepository(repo);
+            }
         }
 
         [Fact(DisplayName = nameof(AzureTableChasmRepo_Test)
@@ -151,8 +157,11 @@ namespace SoruceCode.Chasm.IntegrationTests
         {
             // Use your own cstring here.
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
-            var repo = new AzureTableChasmRepo(csa, new JsonChasmSerializer(), CompressionLevel.Optimal);
-            await TestRepository(repo);
+            using (var serializer = new JsonChasmSerializer())
+            {
+                var repo = new AzureTableChasmRepo(csa, serializer, CompressionLevel.Optimal);
+                await TestRepository(repo);
+            }
         }
     }
 }

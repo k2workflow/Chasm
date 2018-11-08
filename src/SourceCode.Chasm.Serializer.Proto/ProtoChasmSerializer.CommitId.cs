@@ -1,20 +1,19 @@
 using System;
 using SourceCode.Chasm.Serializer.Proto.Wire;
-using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Proto
 {
     partial class ProtoChasmSerializer // .CommitId
     {
-        public Memory<byte> Serialize(CommitId model, ArenaMemoryPool<byte> pool)
+        public override Memory<byte> Serialize(CommitId model)
         {
             CommitIdWire wire = model.Convert();
 
-            Memory<byte> mem = SerializeImpl(wire, pool);
-            return mem;
+            Memory<byte> slice = SerializeImpl(wire);
+            return slice;
         }
 
-        public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
+        public override CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) return default;
 

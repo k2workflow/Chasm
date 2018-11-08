@@ -6,9 +6,9 @@
 #endregion
 
 using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
-using SourceCode.Clay.Buffers;
 using Xunit;
 using crypt = System.Security.Cryptography;
 
@@ -33,9 +33,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Default(IChasmSerializer ser)
         {
             var expected = new Commit();
-            using (var pool = new ArenaMemoryPool<byte>())
+            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
             {
-                Memory<byte> mem = ser.Serialize(expected, pool);
+                Memory<byte> mem = ser.Serialize(expected);
 
                 Commit actual = ser.DeserializeCommit(mem.Span);
                 Assert.Equal(expected, actual);
