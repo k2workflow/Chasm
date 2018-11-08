@@ -20,25 +20,27 @@ namespace SourceCode.Chasm.Serializer
     /// <summary>
     /// A specialized <see cref="MemoryPool{T}"/>.
     /// </summary>
-    internal sealed class OwnerTrackingPool<T> : MemoryPool<T>
+    internal sealed class OwnerTrackingBytePool : MemoryPool<byte>
     {
-        private readonly IList<IMemoryOwner<T>> _owners;
+        private readonly IList<IMemoryOwner<byte>> _owners;
 
         public override int MaxBufferSize => Int32.MaxValue;
 
-        public OwnerTrackingPool(int capacity)
+        public int Count => _owners?.Count ?? 0;
+
+        public OwnerTrackingBytePool(int capacity)
         {
-            _owners = new List<IMemoryOwner<T>>(capacity);
+            _owners = new List<IMemoryOwner<byte>>(capacity);
         }
 
-        public OwnerTrackingPool()
+        public OwnerTrackingBytePool()
         {
-            _owners = new List<IMemoryOwner<T>>();
+            _owners = new List<IMemoryOwner<byte>>();
         }
 
-        public override IMemoryOwner<T> Rent(int minBufferSize)
+        public override IMemoryOwner<byte> Rent(int minBufferSize)
         {
-            IMemoryOwner<T> owner = Shared.Rent(minBufferSize);
+            IMemoryOwner<byte> owner = Shared.Rent(minBufferSize);
             _owners.Add(owner);
 
             return owner;
@@ -48,13 +50,13 @@ namespace SourceCode.Chasm.Serializer
         {
             if (disposing)
             {
-                IList<IMemoryOwner<T>> owners = _owners;
+                IList<IMemoryOwner<byte>> owners = _owners;
 
                 if (owners != null)
                 {
                     for (int i = 0; i < owners.Count; i++)
                     {
-                        IMemoryOwner<T> owner = owners[i];
+                        IMemoryOwner<byte> owner = owners[i];
                         if (owner != null)
                         {
                             owner.Dispose();

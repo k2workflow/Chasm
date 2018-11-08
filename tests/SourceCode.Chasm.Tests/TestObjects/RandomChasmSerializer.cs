@@ -5,7 +5,7 @@ namespace SourceCode.Chasm.Tests.TestObjects
 {
     public class RandomChasmSerializer : IChasmSerializer
     {
-        private readonly OwnerTrackingPool<byte> _pool = new OwnerTrackingPool<byte>();
+        private readonly OwnerTrackingBytePool _pool = new OwnerTrackingBytePool();
 
         public Commit DeserializeCommit(ReadOnlySpan<byte> span)
             => CommitTestObject.Random;
