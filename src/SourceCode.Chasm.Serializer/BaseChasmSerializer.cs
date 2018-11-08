@@ -23,12 +23,15 @@ namespace SourceCode.Chasm.Serializer
             return owner.Memory;
         }
 
+        // Commit
         public abstract Memory<byte> Serialize(Commit model);
         public abstract Commit DeserializeCommit(ReadOnlySpan<byte> span);
 
+        // CommitId
         public abstract Memory<byte> Serialize(CommitId model);
         public abstract CommitId DeserializeCommitId(ReadOnlySpan<byte> span);
 
+        // TreeNodeMap
         public abstract Memory<byte> Serialize(TreeNodeMap model);
         public abstract TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span);
 
