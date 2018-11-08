@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.Serializer
     /// <summary>
     /// A specialized <see cref="MemoryPool{T}"/>.
     /// </summary>
-    internal sealed class OwnerTrackingBytePool : MemoryPool<byte>
+    public sealed class TrackedBytePool : MemoryPool<byte>
     {
         private readonly IList<IMemoryOwner<byte>> _owners;
 
@@ -28,12 +28,12 @@ namespace SourceCode.Chasm.Serializer
 
         public int Count => _owners?.Count ?? 0;
 
-        public OwnerTrackingBytePool(int capacity)
+        public TrackedBytePool(int capacity)
         {
             _owners = new List<IMemoryOwner<byte>>(capacity);
         }
 
-        public OwnerTrackingBytePool()
+        public TrackedBytePool()
         {
             _owners = new List<IMemoryOwner<byte>>();
         }

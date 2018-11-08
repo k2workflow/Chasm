@@ -17,9 +17,9 @@ namespace SourceCode.Clay.Buffers.Tests
         [Fact(DisplayName = nameof(OwnerTrackingBytePool_Rent))]
         public static void OwnerTrackingBytePool_Rent()
         {
-            OwnerTrackingBytePool pool;
+            TrackedBytePool pool;
 
-            using (pool = new OwnerTrackingBytePool())
+            using (pool = new TrackedBytePool())
             {
                 Assert.Equal(0, pool.Count);
 

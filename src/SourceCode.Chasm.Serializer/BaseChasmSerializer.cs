@@ -5,16 +5,16 @@ namespace SourceCode.Chasm.Serializer
 {
     public abstract class BaseChasmSerializer : IChasmSerializer, IDisposable
     {
-        private readonly OwnerTrackingBytePool _pool;
+        private readonly TrackedBytePool _pool;
 
         protected BaseChasmSerializer(int capacity)
         {
-            _pool = new OwnerTrackingBytePool(capacity);
+            _pool = new TrackedBytePool(capacity);
         }
 
         protected BaseChasmSerializer()
         {
-            _pool = new OwnerTrackingBytePool();
+            _pool = new TrackedBytePool();
         }
 
         protected Memory<byte> Rent(int minBufferSize)
