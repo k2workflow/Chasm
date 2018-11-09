@@ -5,7 +5,7 @@
 
 #endregion
 
-using System.Buffers;
+using System;
 using SourceCode.Chasm.Serializer;
 using Xunit;
 
@@ -17,18 +17,18 @@ namespace SourceCode.Clay.Buffers.Tests
         [Fact(DisplayName = nameof(OwnerTrackingBytePool_Rent))]
         public static void OwnerTrackingBytePool_Rent()
         {
-            TrackedBytePool pool;
+            OwnerTrackedPool<byte> pool;
 
-            using (pool = new TrackedBytePool())
+            using (pool = new OwnerTrackedPool<byte>())
             {
                 Assert.Equal(0, pool.Count);
 
-                IMemoryOwner<byte> owner1 = pool.Rent(100);
-                Assert.True(owner1.Memory.Length >= 100);
+                Memory<byte> mem1 = pool.Rent(100);
+                Assert.True(mem1.Length >= 100);
                 Assert.Equal(1, pool.Count);
 
-                IMemoryOwner<byte> owner2 = pool.Rent(200);
-                Assert.True(owner2.Memory.Length >= 200);
+                Memory<byte> mem2 = pool.Rent(200);
+                Assert.True(mem2.Length >= 200);
                 Assert.Equal(2, pool.Count);
             }
 

@@ -5,7 +5,7 @@ namespace SourceCode.Chasm.Serializer.Proto
 {
     partial class ProtoChasmSerializer // .CommitId
     {
-        public override Memory<byte> Serialize(CommitId model)
+        public Memory<byte> Serialize(CommitId model)
         {
             CommitIdWire wire = model.Convert();
 
@@ -13,7 +13,7 @@ namespace SourceCode.Chasm.Serializer.Proto
             return slice;
         }
 
-        public override CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
+        public CommitId DeserializeCommitId(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) return default;
 

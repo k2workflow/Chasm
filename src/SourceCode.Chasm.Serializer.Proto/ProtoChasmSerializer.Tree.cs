@@ -5,7 +5,7 @@ namespace SourceCode.Chasm.Serializer.Proto
 {
     partial class ProtoChasmSerializer // .Tree
     {
-        public override Memory<byte> Serialize(TreeNodeMap model)
+        public Memory<byte> Serialize(TreeNodeMap model)
         {
             TreeWire wire = model.Convert();
 
@@ -13,7 +13,7 @@ namespace SourceCode.Chasm.Serializer.Proto
             return slice;
         }
 
-        public override TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
+        public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) return default;
 
