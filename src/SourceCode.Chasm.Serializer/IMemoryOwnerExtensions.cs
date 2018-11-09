@@ -28,14 +28,13 @@ namespace SourceCode.Chasm.Serializer
         public static IMemoryOwner<T> WrapSlice<T>(this IMemoryOwner<T> owner, int start, int length)
         {
             if (owner == null) throw new ArgumentNullException(nameof(owner));
-            if (start < 0) throw new ArgumentOutOfRangeException(nameof(start));
-            if (length < 0) throw new ArgumentOutOfRangeException(nameof(length));
 
-            if (start == 0 && length == 0 && owner.Memory.Length == 0)
+            // Fast path for no-op
+            if (start == 0 && length == owner.Memory.Length)
                 return owner;
 
-            if (start >= owner.Memory.Length) throw new ArgumentOutOfRangeException(nameof(start));
-            if (length > owner.Memory.Length - start) throw new ArgumentOutOfRangeException(nameof(length));
+            if ((uint)start >= (uint)owner.Memory.Length) throw new ArgumentOutOfRangeException(nameof(start));
+            if ((uint)length > (uint)(owner.Memory.Length - start)) throw new ArgumentOutOfRangeException(nameof(length));
 
             return new SliceOwner<T>(owner, start, length);
         }
@@ -49,12 +48,12 @@ namespace SourceCode.Chasm.Serializer
         public static IMemoryOwner<T> WrapSlice<T>(this IMemoryOwner<T> owner, int start)
         {
             if (owner == null) throw new ArgumentNullException(nameof(owner));
-            if (start < 0) throw new ArgumentOutOfRangeException(nameof(start));
 
-            if (start == 0 && owner.Memory.Length == 0)
+            // Fast path for no-op
+            if (start == 0)
                 return owner;
 
-            if (start >= owner.Memory.Length) throw new ArgumentOutOfRangeException(nameof(start));
+            if ((uint)start >= (uint)owner.Memory.Length) throw new ArgumentOutOfRangeException(nameof(start));
 
             return new SliceOwner<T>(owner, start);
         }

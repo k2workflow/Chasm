@@ -40,6 +40,10 @@ namespace SourceCode.Clay.Buffers.Tests
             IMemoryOwner<byte> owner3 = pool.Rent(0);
             IMemoryOwner<byte> owner4 = owner3.WrapSlice(0, 0);
             Assert.True(ReferenceEquals(owner3, owner4));
+
+            IMemoryOwner<byte> owner5 = pool.Rent(10);
+            IMemoryOwner<byte> owner6 = owner5.WrapSlice(0, owner5.Memory.Length);
+            Assert.True(ReferenceEquals(owner5, owner6));
         }
 
         [Trait("Type", "Unit")]
