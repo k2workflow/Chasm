@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
 using Google.Protobuf;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Proto
 {

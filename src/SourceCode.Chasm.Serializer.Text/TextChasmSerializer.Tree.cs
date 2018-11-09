@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.Text;
 using SourceCode.Chasm.Serializer.Text.Wire;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Text
 {
