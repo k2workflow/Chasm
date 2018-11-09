@@ -30,7 +30,7 @@ namespace SourceCode.Chasm.Serializer.Proto
                 }
             }
 
-            IMemoryOwner<byte> slice = new SlicedMemoryOwner<byte>(rented, 0, length);
+            IMemoryOwner<byte> slice = rented.Slice(0, length);
             return slice;
         }
 

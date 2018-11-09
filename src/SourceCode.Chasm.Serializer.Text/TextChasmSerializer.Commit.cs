@@ -15,7 +15,7 @@ namespace SourceCode.Chasm.Serializer.Text
             IMemoryOwner<byte> rented = _pool.Rent(length);
             length = Encoding.UTF8.GetBytes(wire, rented.Memory.Span);
 
-            var slice = new SlicedMemoryOwner<byte>(rented, 0, length);
+            IMemoryOwner<byte> slice = rented.Slice(0, length);
             return slice;
         }
 
