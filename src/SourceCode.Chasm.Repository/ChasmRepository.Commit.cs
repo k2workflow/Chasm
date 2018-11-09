@@ -21,12 +21,10 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
         {
-            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
+            using (IMemoryOwner<byte> owner = Serializer.Serialize(commit))
             {
-                Memory<byte> mem = Serializer.Serialize(commit);
-
-                Sha1 sha1 = Hasher.HashData(mem.Span);
-                await WriteObjectAsync(sha1, mem, false, cancellationToken)
+                Sha1 sha1 = Hasher.HashData(owner.Memory.Span);
+                await WriteObjectAsync(sha1, owner.Memory, false, cancellationToken)
                     .ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);

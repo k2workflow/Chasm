@@ -8,34 +8,29 @@ namespace SourceCode.Chasm.Serializer.Proto
 {
     public sealed partial class ProtoChasmSerializer : IChasmSerializer, IDisposable
     {
-        private readonly OwnerTrackedPool<byte> _pool;
+        private readonly MemoryPool<byte> _pool;
 
-        public ProtoChasmSerializer(int capacity)
+        public ProtoChasmSerializer(MemoryPool<byte> pool = null)
         {
-            _pool = new OwnerTrackedPool<byte>(capacity);
+            _pool = pool ?? MemoryPool<byte>.Shared;
         }
 
-        public ProtoChasmSerializer()
-        {
-            _pool = new OwnerTrackedPool<byte>();
-        }
-
-        private unsafe Memory<byte> SerializeImpl<T>(T wire)
+        private unsafe IMemoryOwner<byte> SerializeImpl<T>(T wire)
             where T : IMessage<T>
         {
             int length = wire.CalculateSize();
-            Memory<byte> rented = _pool.Rent(length);
+            IMemoryOwner<byte> rented = _pool.Rent(length);
 
             // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
-            fixed (byte* rf = &MemoryMarshal.GetReference(rented.Span))
+            fixed (byte* rf = &MemoryMarshal.GetReference(rented.Memory.Span))
             {
-                using (var strm = new UnmanagedMemoryStream(rf, length, rented.Length, FileAccess.Write))
+                using (var strm = new UnmanagedMemoryStream(rf, length, rented.Memory.Length, FileAccess.Write))
                 {
                     wire.WriteTo(strm);
                 }
             }
 
-            Memory<byte> slice = rented.Slice(0, length);
+            IMemoryOwner<byte> slice = new SlicedMemoryOwner<byte>(rented, 0, length);
             return slice;
         }
 
@@ -61,6 +56,8 @@ namespace SourceCode.Chasm.Serializer.Proto
             {
                 if (disposing)
                 {
+                    // This is a no-op for MemoryPool.Shared
+                    // See https://github.com/dotnet/corefx/blob/master/src/System.Memory/src/System/Buffers/ArrayMemoryPool.cs
                     _pool.Dispose();
                 }
 
@@ -68,7 +65,6 @@ namespace SourceCode.Chasm.Serializer.Proto
             }
         }
 
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
             Dispose(true);

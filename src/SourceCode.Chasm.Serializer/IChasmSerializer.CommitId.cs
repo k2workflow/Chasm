@@ -1,10 +1,11 @@
 using System;
+using System.Buffers;
 
 namespace SourceCode.Chasm.Serializer
 {
     partial interface IChasmSerializer // .CommitId
     {
-        Memory<byte> Serialize(CommitId model);
+        IMemoryOwner<byte> Serialize(CommitId model);
 
         CommitId DeserializeCommitId(ReadOnlySpan<byte> span);
     }

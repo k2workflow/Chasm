@@ -7,16 +7,15 @@ namespace SourceCode.Chasm.Serializer.Json
 {
     partial class JsonChasmSerializer // .Commit
     {
-        public Memory<byte> Serialize(Commit model)
+        public IMemoryOwner<byte> Serialize(Commit model)
         {
             string json = model.Write();
-
             int length = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
 
-            Memory<byte> rented = _pool.Rent(length);
-            length = Encoding.UTF8.GetBytes(json, rented.Span);
+            IMemoryOwner<byte> rented = _pool.Rent(length);
+            length = Encoding.UTF8.GetBytes(json, rented.Memory.Span);
 
-            Memory<byte> slice = rented.Slice(0, length);
+            var slice = new SlicedMemoryOwner<byte>(rented, 0, length);
             return slice;
         }
 

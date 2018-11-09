@@ -5,7 +5,6 @@
 
 #endregion
 
-using System;
 using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
@@ -33,11 +32,9 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Default(IChasmSerializer ser)
         {
             var expected = new Commit();
-            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
             {
-                Memory<byte> mem = ser.Serialize(expected);
-
-                Commit actual = ser.DeserializeCommit(mem.Span);
+                Commit actual = ser.DeserializeCommit(owner.Memory.Span);
                 Assert.Equal(expected, actual);
             }
         }

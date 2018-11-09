@@ -22,11 +22,10 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Utc(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, new Audit("bob", s_utc1), new Audit("mary", s_utc1), null);
-            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
-            {
-                Memory<byte> mem = ser.Serialize(expected);
 
-                Commit actual = ser.DeserializeCommit(mem.Span);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                Commit actual = ser.DeserializeCommit(owner.Memory.Span);
                 Assert.Equal(expected, actual);
             }
         }

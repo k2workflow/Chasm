@@ -1,15 +1,16 @@
 using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer.Proto.Wire;
 
 namespace SourceCode.Chasm.Serializer.Proto
 {
     partial class ProtoChasmSerializer // .Tree
     {
-        public Memory<byte> Serialize(TreeNodeMap model)
+        public IMemoryOwner<byte> Serialize(TreeNodeMap model)
         {
             TreeWire wire = model.Convert();
 
-            Memory<byte> slice = SerializeImpl(wire);
+            IMemoryOwner<byte> slice = SerializeImpl(wire);
             return slice;
         }
 

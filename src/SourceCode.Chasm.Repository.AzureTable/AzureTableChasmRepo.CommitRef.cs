@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -118,12 +119,13 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 CloudTable refsTable = _refsTable.Value;
 
                 // CommitIds are not compressed
-                Memory<byte> mem = Serializer.Serialize(commitRef.CommitId);
+                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
+                {
+                    TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, owner.Memory, etag); // Note etag access condition
 
-                TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, mem, etag); // Note etag access condition
-
-                await refsTable.ExecuteAsync(op)
-                    .ConfigureAwait(false);
+                    await refsTable.ExecuteAsync(op)
+                        .ConfigureAwait(false);
+                }
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {

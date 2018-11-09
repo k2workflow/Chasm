@@ -5,7 +5,7 @@
 
 #endregion
 
-using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
@@ -24,11 +24,12 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap();
 
-            Memory<byte> mem = ser.Serialize(expected);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
 
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-
-            Assert.Equal(expected, actual);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -38,11 +39,12 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(new TreeNode[0]);
 
-            Memory<byte> mem = ser.Serialize(expected);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
 
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-
-            Assert.Equal(expected, actual);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -55,11 +57,12 @@ namespace SourceCode.Chasm.IO.Tests
             var node2 = new TreeNode("c", NodeKind.Tree, s_hasher.HashData("hij"));
             var expected = new TreeNodeMap(node0, node1, node2);
 
-            Memory<byte> mem = ser.Serialize(expected);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
 
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-
-            Assert.Equal(expected, actual);
+                Assert.Equal(expected, actual);
+            }
         }
     }
 }

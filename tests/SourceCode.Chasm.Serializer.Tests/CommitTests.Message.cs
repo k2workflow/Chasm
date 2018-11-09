@@ -23,11 +23,10 @@ namespace SourceCode.Chasm.IO.Tests
             var force = new Audit("bob", DateTimeOffset.Now);
 
             var expected = new Commit(new CommitId?(), default, force, default, null);
-            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
-            {
-                Memory<byte> mem = ser.Serialize(expected);
 
-                Commit actual = ser.DeserializeCommit(mem.Span);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                Commit actual = ser.DeserializeCommit(owner.Memory.Span);
                 Assert.Equal(expected, actual);
             }
         }
@@ -38,11 +37,10 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Empty(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, string.Empty);
-            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
-            {
-                Memory<byte> mem = ser.Serialize(expected);
 
-                Commit actual = ser.DeserializeCommit(mem.Span);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                Commit actual = ser.DeserializeCommit(owner.Memory.Span);
                 Assert.Equal(expected, actual);
             }
         }
@@ -53,11 +51,11 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Whitespace(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, " ");
-            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
-            {
-                Memory<byte> mem = ser.Serialize(expected);
 
-                Commit actual = ser.DeserializeCommit(mem.Span);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+
+                Commit actual = ser.DeserializeCommit(owner.Memory.Span);
                 Assert.Equal(expected, actual);
             }
         }
@@ -68,11 +66,10 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Short(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, "hello");
-            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
-            {
-                Memory<byte> mem = ser.Serialize(expected);
 
-                Commit actual = ser.DeserializeCommit(mem.Span);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                Commit actual = ser.DeserializeCommit(owner.Memory.Span);
                 Assert.Equal(expected, actual);
             }
         }
@@ -83,11 +80,10 @@ namespace SourceCode.Chasm.IO.Tests
         public static void ChasmSerializer_Roundtrip_Commit_Message_Long(IChasmSerializer ser)
         {
             var expected = new Commit(new CommitId?(), default, default, default, TestData.LongStr);
-            using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
-            {
-                Memory<byte> mem = ser.Serialize(expected);
 
-                Commit actual = ser.DeserializeCommit(mem.Span);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                Commit actual = ser.DeserializeCommit(owner.Memory.Span);
                 Assert.Equal(expected, actual);
             }
         }
@@ -103,11 +99,10 @@ namespace SourceCode.Chasm.IO.Tests
                 str += TestData.SurrogatePair;
 
                 var expected = new Commit(new CommitId?(), default, default, default, TestData.SurrogatePair);
-                using (MemoryPool<byte> pool = MemoryPool<byte>.Shared)
-                {
-                    Memory<byte> mem = ser.Serialize(expected);
 
-                    Commit actual = ser.DeserializeCommit(mem.Span);
+                using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+                {
+                    Commit actual = ser.DeserializeCommit(owner.Memory.Span);
                     Assert.Equal(expected, actual);
                 }
             }

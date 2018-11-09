@@ -5,7 +5,7 @@
 
 #endregion
 
-using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
@@ -34,10 +34,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             TreeNodeMap expected = default;
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -47,10 +48,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap();
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -60,10 +62,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(null);
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -73,10 +76,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap();
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -86,10 +90,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(s_node1);
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -99,10 +104,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(s_node1, s_node2);
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -112,10 +118,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new TreeNodeMap(s_node1, s_node2, s_node3);
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            TreeNodeMap actual = ser.DeserializeTree(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                TreeNodeMap actual = ser.DeserializeTree(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
 
         #endregion

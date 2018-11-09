@@ -1,19 +1,15 @@
 using System;
+using System.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Text
 {
     public sealed partial class TextChasmSerializer : IChasmSerializer, IDisposable
     {
-        private readonly OwnerTrackedPool<byte> _pool;
+        private readonly MemoryPool<byte> _pool;
 
-        public TextChasmSerializer(int capacity)
+        public TextChasmSerializer(MemoryPool<byte> pool = null)
         {
-            _pool = new OwnerTrackedPool<byte>(capacity);
-        }
-
-        public TextChasmSerializer()
-        {
-            _pool = new OwnerTrackedPool<byte>();
+            _pool = pool ?? MemoryPool<byte>.Shared;
         }
 
         #region IDisposable
@@ -26,6 +22,8 @@ namespace SourceCode.Chasm.Serializer.Text
             {
                 if (disposing)
                 {
+                    // This is a no-op for MemoryPool.Shared
+                    // See https://github.com/dotnet/corefx/blob/master/src/System.Memory/src/System/Buffers/ArrayMemoryPool.cs
                     _pool.Dispose();
                 }
 
@@ -33,7 +31,6 @@ namespace SourceCode.Chasm.Serializer.Text
             }
         }
 
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
             Dispose(true);

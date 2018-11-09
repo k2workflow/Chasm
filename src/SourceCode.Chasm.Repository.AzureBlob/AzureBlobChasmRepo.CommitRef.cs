@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -158,11 +159,10 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                     .ConfigureAwait(false); // Note etag access condition
 
                 // CommitIds are not compressed
-                Memory<byte> mem = Serializer.Serialize(commitRef.CommitId);
-
+                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
                 using (var output = new MemoryStream())
                 {
-                    output.Write(mem.Span);
+                    output.Write(owner.Memory.Span);
                     output.Position = 0;
 
                     // Append blob. Following seems to be the only safe multi-writer method available

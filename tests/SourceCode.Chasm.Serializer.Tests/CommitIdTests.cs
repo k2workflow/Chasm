@@ -5,7 +5,7 @@
 
 #endregion
 
-using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
 using SourceCode.Clay;
 using Xunit;
@@ -24,10 +24,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new CommitId();
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            CommitId actual = ser.DeserializeCommitId(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                CommitId actual = ser.DeserializeCommitId(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Trait("Type", "Unit")]
@@ -37,10 +38,11 @@ namespace SourceCode.Chasm.IO.Tests
         {
             var expected = new CommitId(s_hasher.HashData("abc"));
 
-            Memory<byte> mem = ser.Serialize(expected);
-
-            CommitId actual = ser.DeserializeCommitId(mem.Span);
-            Assert.Equal(expected, actual);
+            using (IMemoryOwner<byte> owner = ser.Serialize(expected))
+            {
+                CommitId actual = ser.DeserializeCommitId(owner.Memory.Span);
+                Assert.Equal(expected, actual);
+            }
         }
     }
 }

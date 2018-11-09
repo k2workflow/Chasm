@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -75,8 +76,7 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            Memory<byte> mem = Serializer.Serialize(commitRef.CommitId);
-
+            using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
             using (FileStream file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken)
                 .ConfigureAwait(false))
             {
@@ -103,11 +103,11 @@ namespace SourceCode.Chasm.Repository.Disk
                 }
 
                 // CommitIds are not compressed
-                await file.WriteAsync(mem, cancellationToken)
+                await file.WriteAsync(owner.Memory, cancellationToken)
                     .ConfigureAwait(false);
 
-                if (file.Position != mem.Length)
-                    file.Position = mem.Length;
+                if (file.Position != owner.Memory.Length)
+                    file.Position = owner.Memory.Length;
             }
 
             await TouchFileAsync(path, cancellationToken)

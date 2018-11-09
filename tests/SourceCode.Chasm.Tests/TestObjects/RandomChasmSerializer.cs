@@ -1,11 +1,12 @@
 using System;
+using System.Buffers;
 using SourceCode.Chasm.Serializer;
 
 namespace SourceCode.Chasm.Tests.TestObjects
 {
     public class RandomChasmSerializer : IChasmSerializer
     {
-        private readonly OwnerTrackedPool<byte> _pool = new OwnerTrackedPool<byte>();
+        private static readonly MemoryPool<byte> _pool = MemoryPool<byte>.Shared;
 
         public Commit DeserializeCommit(ReadOnlySpan<byte> span)
             => CommitTestObject.Random;
@@ -16,13 +17,13 @@ namespace SourceCode.Chasm.Tests.TestObjects
         public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
             => TreeNodeMapTestObject.Random;
 
-        public Memory<byte> Serialize(TreeNodeMap model)
+        public IMemoryOwner<byte> Serialize(TreeNodeMap model)
             => _pool.Rent(1);
 
-        public Memory<byte> Serialize(CommitId model)
+        public IMemoryOwner<byte> Serialize(CommitId model)
             => _pool.Rent(1);
 
-        public Memory<byte> Serialize(Commit model)
+        public IMemoryOwner<byte> Serialize(Commit model)
             => _pool.Rent(1);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
@@ -84,14 +85,15 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, CancellationToken cancellationToken)
         {
-            Memory<byte> mem = Serializer.Serialize(tree);
+            using (IMemoryOwner<byte> owner = Serializer.Serialize(tree))
+            {
+                Sha1 sha1 = Hasher.HashData(owner.Memory.Span);
+                await WriteObjectAsync(sha1, owner.Memory, false, cancellationToken)
+                    .ConfigureAwait(false);
 
-            Sha1 sha1 = Hasher.HashData(mem.Span);
-            await WriteObjectAsync(sha1, mem, false, cancellationToken)
-                .ConfigureAwait(false);
-
-            var model = new TreeId(sha1);
-            return model;
+                var model = new TreeId(sha1);
+                return model;
+            }
         }
 
         public virtual async ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, CancellationToken cancellationToken)
