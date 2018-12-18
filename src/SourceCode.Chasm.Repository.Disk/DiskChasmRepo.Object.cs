@@ -100,7 +100,7 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        public override async Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             string tempPath = GetTempPath(); // Note that an empty file is created
             try
@@ -148,7 +148,7 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        public override async Task<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async ValueTask<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 

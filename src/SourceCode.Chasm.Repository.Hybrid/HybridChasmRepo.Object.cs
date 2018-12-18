@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
-using SourceCode.Clay.Threading;
 
 namespace SourceCode.Chasm.Repository.Hybrid
 {
@@ -52,24 +51,14 @@ namespace SourceCode.Chasm.Repository.Hybrid
 
         public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            // We write all at once
-            var parallelOptions = new ParallelOptions
+            var tasks = new Task[Chain.Count];
+            for (var i = 0; i < tasks.Length; i++)
             {
-                MaxDegreeOfParallelism = MaxDop,
-                CancellationToken = cancellationToken
-            };
+                tasks[i] = Chain[i].WriteObjectAsync(objectId, item, forceOverwrite, cancellationToken);
+            }
 
-            await ParallelAsync.ForAsync(0, Chain.Count, parallelOptions, async i =>
-            {
-                await Chain[i].WriteObjectAsync(objectId, item, forceOverwrite, cancellationToken)
+            await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
-            })
-            .ConfigureAwait(false);
-        }
-
-        public override Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
         }
 
         public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
@@ -78,24 +67,22 @@ namespace SourceCode.Chasm.Repository.Hybrid
 
             // TODO: Enable piecemeal writes (404s incur next repo)
 
-            // We write all at once
-            var parallelOptions = new ParallelOptions
+            var tasks = new Task[Chain.Count];
+            for (var i = 0; i < tasks.Length; i++)
             {
-                MaxDegreeOfParallelism = MaxDop,
-                CancellationToken = cancellationToken
-            };
+                tasks[i] = Chain[i].WriteObjectBatchAsync(items, forceOverwrite, cancellationToken);
+            }
 
-            // Enumerate batches
-            await ParallelAsync.ForAsync(0, Chain.Count, parallelOptions, async i =>
-            {
-                // Execute batch
-                await Chain[i].WriteObjectBatchAsync(items, forceOverwrite, cancellationToken)
+            await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
-            })
-            .ConfigureAwait(false);
         }
 
-        public override Task<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        public override ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ValueTask<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

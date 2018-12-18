@@ -50,7 +50,7 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -60,7 +60,7 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<Sha1> HashObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override ValueTask<Sha1> HashObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

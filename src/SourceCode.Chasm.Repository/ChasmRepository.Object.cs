@@ -46,7 +46,7 @@ namespace SourceCode.Chasm.Repository
 
         public abstract Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public abstract Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
 
         public virtual async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
@@ -68,6 +68,6 @@ namespace SourceCode.Chasm.Repository
             .ConfigureAwait(false);
         }
 
-        public abstract Task<Sha1> HashObjectAsync(Stream item, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract ValueTask<Sha1> HashObjectAsync(Stream item, bool forceOverwrite, CancellationToken cancellationToken);
     }
 }

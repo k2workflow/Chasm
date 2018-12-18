@@ -117,12 +117,12 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             }
         }
 
-        public override Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        public override ValueTask<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

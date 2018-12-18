@@ -17,10 +17,10 @@ namespace SourceCode.Chasm.Repository
 
         Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
 
-        Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
+        ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
 
         Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken);
 
-        Task<Sha1> HashObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
+        ValueTask<Sha1> HashObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
     }
 }
