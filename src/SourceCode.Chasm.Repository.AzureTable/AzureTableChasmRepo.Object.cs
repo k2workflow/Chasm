@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Clay;
-using SourceCode.Clay.Threading;
 
 namespace SourceCode.Chasm.Repository.AzureTable
 {
@@ -59,27 +58,27 @@ namespace SourceCode.Chasm.Repository.AzureTable
         {
             if (objectIds == null) return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
 
-            var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>();
-
             // Build batches
             IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildReadBatches(objectIds);
 
-            var parallelOptions = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = MaxDop,
-                CancellationToken = cancellationToken
-            };
-
             // Enumerate batches
             CloudTable objectsTable = _objectsTable.Value;
-            await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
+            var tasks = new List<Task<IList<TableResult>>>(batches.Count);
+            foreach (TableBatchOperation batch in batches)
             {
                 // Execute batch
-                IList<TableResult> results = await objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken)
-                    .ConfigureAwait(false);
+                Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken);
+                tasks.Add(task);
+            }
 
-                // Transform batch results
-                foreach (TableResult result in results)
+            await Task.WhenAll(tasks)
+                .ConfigureAwait(false);
+
+            // Transform batch results
+            var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>();
+            foreach (Task<IList<TableResult>> task in tasks)
+            {
+                foreach (TableResult result in task.Result)
                 {
                     if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                         continue;
@@ -96,11 +95,9 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
                         byte[] buffer = output.ToArray(); // TODO: Perf
                         dict[sha1] = buffer;
-                        return;
                     }
                 }
-            })
-            .ConfigureAwait(false);
+            }
 
             return dict;
         }
@@ -171,20 +168,16 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             CloudTable objectsTable = _objectsTable.Value;
 
-            var parallelOptions = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = MaxDop,
-                CancellationToken = cancellationToken
-            };
-
             // Enumerate batches
-            await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
+            var tasks = new List<Task>();
+            foreach (TableBatchOperation batch in batches)
             {
-                // Execute batch
-                await objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken)
-                    .ConfigureAwait(false);
-            })
-            .ConfigureAwait(false);
+                Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken);
+                tasks.Add(task);
+            }
+
+            await Task.WhenAll(tasks)
+                .ConfigureAwait(false);
         }
     }
 }

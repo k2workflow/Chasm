@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -21,7 +20,7 @@ namespace SourceCode.Chasm.Repository
             if (objectIds == null) return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
 
             // Enumerate batches
-            var dict = new ConcurrentDictionary<Sha1, Task<ReadOnlyMemory<byte>?>>(Sha1Comparer.Default);
+            var dict = new Dictionary<Sha1, Task<ReadOnlyMemory<byte>?>>(Sha1Comparer.Default);
             foreach (Sha1 objectId in objectIds)
             {
                 dict[objectId] = ReadObjectAsync(objectId, cancellationToken);
@@ -30,7 +29,7 @@ namespace SourceCode.Chasm.Repository
             await Task.WhenAll(dict.Values.ToList())
                 .ConfigureAwait(false);
 
-            var dict2 = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>(Sha1Comparer.Default);
+            var dict2 = new Dictionary<Sha1, ReadOnlyMemory<byte>>(Sha1Comparer.Default);
             foreach (var task in dict)
             {
                 if (task.Value == null || task.Value.Result.Value.Length == 0)
