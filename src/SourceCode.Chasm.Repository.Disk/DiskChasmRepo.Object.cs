@@ -10,7 +10,7 @@ namespace SourceCode.Chasm.Repository.Disk
 {
     partial class DiskChasmRepo // .Object
     {
-        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             string filename = DeriveFileName(objectId);
             string path = Path.Combine(_objectsContainer, filename);
@@ -55,52 +55,7 @@ namespace SourceCode.Chasm.Repository.Disk
             return gzip;
         }
 
-        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            string filename = DeriveFileName(objectId);
-            string path = Path.Combine(_objectsContainer, filename);
-
-            string dir = Path.GetDirectoryName(path);
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            // Objects are immutable
-            if (File.Exists(path)
-                && !forceOverwrite)
-                return;
-
-            // TODO: Do we need intermediate memory stream
-            using (var output = new MemoryStream())
-            {
-                using (var gz = new GZipStream(output, CompressionLevel, true))
-                {
-                    gz.Write(item.Span);
-                }
-                output.Position = 0;
-                if (output.Length <= 0) return;
-
-                using (FileStream fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken)
-                    .ConfigureAwait(false))
-                {
-                    // Only write to the file if it does not already exist.
-                    if (fileStream.Length != output.Length || forceOverwrite)
-                    {
-                        fileStream.Position = 0;
-
-                        await output.CopyToAsync(fileStream, 81920, cancellationToken)
-                            .ConfigureAwait(false);
-
-                        if (fileStream.Position != output.Length)
-                            fileStream.SetLength(output.Length);
-                    }
-                }
-
-                await TouchFileAsync(path, cancellationToken)
-                    .ConfigureAwait(false);
-            }
-        }
-
-        public override async ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             string tempPath = GetTempPath(); // Note that an empty file is created
             try
@@ -148,7 +103,7 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        public override async ValueTask<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 

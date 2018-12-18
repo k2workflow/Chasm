@@ -7,67 +7,58 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
-using SourceCode.Clay.Threading;
 
 namespace SourceCode.Chasm.Repository
 {
     partial class ChasmRepository // .Object
     {
-        public abstract ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
+        public abstract Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
         public abstract Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken);
 
-        public virtual async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public virtual async Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             if (objectIds == null) return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
 
-            var parallelOptions = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = MaxDop,
-                CancellationToken = cancellationToken
-            };
-
             // Enumerate batches
-            var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>(Sha1Comparer.Default);
-            await ParallelAsync.ForEachAsync(objectIds, parallelOptions, async sha1 =>
+            var dict = new ConcurrentDictionary<Sha1, Task<ReadOnlyMemory<byte>?>>(Sha1Comparer.Default);
+            foreach (Sha1 objectId in objectIds)
             {
-                // Execute batch
-                ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(sha1, cancellationToken)
-                    .ConfigureAwait(false);
+                dict[objectId] = ReadObjectAsync(objectId, cancellationToken);
+            }
 
-                if (buffer == null || buffer.Value.Length == 0) return;
+            await Task.WhenAll(dict.Values.ToList())
+                .ConfigureAwait(false);
 
-                dict[sha1] = buffer.Value;
-            })
-            .ConfigureAwait(false);
+            var dict2 = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>(Sha1Comparer.Default);
+            foreach (var task in dict)
+            {
+                if (task.Value == null || task.Value.Result.Value.Length == 0)
+                    continue;
 
-            return dict;
+                dict2[task.Key] = task.Value.Result.Value;
+            }
+
+            return dict2;
         }
 
-        public abstract Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public abstract ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<Sha1> WriteObjectAsync(Stream item, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public virtual async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public virtual async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
 
-            var parallelOptions = new ParallelOptions
+            var tasks = new List<Task>();
+            foreach (Memory<byte> item in items)
             {
-                MaxDegreeOfParallelism = MaxDop,
-                CancellationToken = cancellationToken
-            };
+                Task<Sha1> task = WriteObjectAsync(item, forceOverwrite, cancellationToken);
+                tasks.Add(task);
+            }
 
-            // Enumerate batches
-            await ParallelAsync.ForEachAsync(items, parallelOptions, async item =>
-            {
-                // Execute batch
-                await WriteObjectAsync(item.Key, item.Value, forceOverwrite, cancellationToken)
+            await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
-            })
-            .ConfigureAwait(false);
         }
-
-        public abstract ValueTask<Sha1> HashObjectAsync(Stream item, bool forceOverwrite, CancellationToken cancellationToken);
     }
 }

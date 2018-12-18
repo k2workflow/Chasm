@@ -26,20 +26,22 @@ namespace SoruceCode.Chasm.IntegrationTests
     public static class ChasmRepositoryTests
     {
         private const string DevelopmentStorage = "UseDevelopmentStorage=true";
+        private static readonly System.Security.Cryptography.SHA1 s_hasher = System.Security.Cryptography.SHA1.Create();
 
         private static async Task TestRepository(IChasmRepository repository)
         {
             var g = Guid.NewGuid();
 
             byte[] data = g.ToByteArray();
-            Sha1 sha = repository.Hasher.HashData(data);
+            Sha1 sha = s_hasher.HashData(data);
 
             // Unknown SHA
-            Sha1 usha1 = repository.Hasher.HashData(Guid.NewGuid().ToByteArray());
-            Sha1 usha2 = repository.Hasher.HashData(Guid.NewGuid().ToByteArray());
+            Sha1 usha1 = s_hasher.HashData(Guid.NewGuid().ToByteArray());
+            Sha1 usha2 = s_hasher.HashData(Guid.NewGuid().ToByteArray());
 
             // Blob
-            await repository.WriteObjectAsync(sha, new Memory<byte>(data), false, default);
+            Sha1 sha2 = await repository.WriteObjectAsync(new Memory<byte>(data), false, default);
+            Assert.Equal(sha, sha2);
             ReadOnlyMemory<byte>? rdata = await repository.ReadObjectAsync(sha, default);
             Assert.True(rdata.HasValue);
             Assert.Equal(16, rdata.Value.Length);
@@ -49,7 +51,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             Assert.False(urdata.HasValue);
 
             //
-            Sha1 sha2 = await repository.HashObjectAsync(data, true, default);
+            sha2 = await repository.WriteObjectAsync(data, true, default);
             Assert.Equal(sha, sha2);
 
             ReadOnlyMemory<byte>? cnt2 = await repository.ReadObjectAsync(sha2, default);
@@ -64,7 +66,7 @@ namespace SoruceCode.Chasm.IntegrationTests
 
             using (Stream stream2 = new MemoryStream(data))
             {
-                sha2 = await repository.HashObjectAsync(stream2, true, default);
+                sha2 = await repository.WriteObjectAsync(stream2, true, default);
             }
             Assert.Equal(sha, sha2);
 

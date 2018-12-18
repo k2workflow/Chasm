@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
     {
         #region Read
 
-        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
 
@@ -79,11 +79,12 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         #region Write
 
-        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
 
-            string blobName = DeriveBlobName(objectId);
+            Sha1 sha1 = Hasher.HashData(item.Span);
+            string blobName = DeriveBlobName(sha1);
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
             // Objects are immutable
@@ -99,7 +100,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
                 se.Suppress();
-                return;
+                return sha1;
             }
 
             using (var output = new MemoryStream())
@@ -115,14 +116,11 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.AppendBlockAsync(output)
                     .ConfigureAwait(false);
             }
+
+            return sha1;
         }
 
-        public override ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override ValueTask<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
