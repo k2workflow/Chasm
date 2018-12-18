@@ -48,6 +48,33 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             }
         }
 
+        public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
+
+            string blobName = DeriveBlobName(objectId);
+            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
+
+            try
+            {
+                using (var input = new MemoryStream())
+                using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
+                {
+                    // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
+                    await blobRef.DownloadToStreamAsync(input)
+                        .ConfigureAwait(false);
+
+                    return gzip;
+                }
+            }
+            // Try-catch is cheaper than a separate (latent) exists check
+            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
+            {
+                se.Suppress();
+                return default;
+            }
+        }
+
         #endregion
 
         #region Write
@@ -88,6 +115,16 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.AppendBlockAsync(output)
                     .ConfigureAwait(false);
             }
+        }
+
+        public override Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

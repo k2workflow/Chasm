@@ -50,6 +50,11 @@ namespace SourceCode.Chasm.Repository.AzureTable
             }
         }
 
+        public override Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public override async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             if (objectIds == null) return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
@@ -148,6 +153,11 @@ namespace SourceCode.Chasm.Repository.AzureTable
             }
         }
 
+        public override Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
@@ -171,6 +181,11 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     .ConfigureAwait(false);
             })
             .ConfigureAwait(false);
+        }
+
+        public override Task<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

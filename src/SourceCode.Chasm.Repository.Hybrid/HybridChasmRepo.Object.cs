@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,11 @@ namespace SourceCode.Chasm.Repository.Hybrid
 
             // NotFound
             return default;
+        }
+
+        public override Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         public override async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
@@ -61,6 +67,11 @@ namespace SourceCode.Chasm.Repository.Hybrid
             .ConfigureAwait(false);
         }
 
+        public override Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
@@ -82,6 +93,11 @@ namespace SourceCode.Chasm.Repository.Hybrid
                 .ConfigureAwait(false);
             })
             .ConfigureAwait(false);
+        }
+
+        public override Task<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

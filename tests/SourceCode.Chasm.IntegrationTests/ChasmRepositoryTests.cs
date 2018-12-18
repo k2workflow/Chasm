@@ -48,6 +48,33 @@ namespace SoruceCode.Chasm.IntegrationTests
             ReadOnlyMemory<byte>? urdata = await repository.ReadObjectAsync(usha1, default);
             Assert.False(urdata.HasValue);
 
+            //
+            Sha1 sha2 = await repository.HashObjectAsync(data, true, default);
+            Assert.Equal(sha, sha2);
+
+            ReadOnlyMemory<byte>? cnt2 = await repository.ReadObjectAsync(sha2, default);
+            Assert.Equal(data, cnt2.Value.ToArray());
+
+            using (Stream stream2 = await repository.ReadStreamAsync(sha2, default))
+            using (var ms = new MemoryStream())
+            {
+                stream2.CopyTo(ms);
+                Assert.Equal(data, ms.ToArray());
+            }
+
+            using (Stream stream2 = new MemoryStream(data))
+            {
+                sha2 = await repository.HashObjectAsync(stream2, true, default);
+            }
+            Assert.Equal(sha, sha2);
+
+            using (Stream stream2 = await repository.ReadStreamAsync(sha2, default))
+            using (var ms = new MemoryStream())
+            {
+                stream2.CopyTo(ms);
+                Assert.Equal(data, ms.ToArray());
+            }
+
             // Tree
             var tree = new TreeNodeMap(
                 new TreeNode("firstItem", NodeKind.Blob, sha),

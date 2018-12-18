@@ -106,37 +106,6 @@ namespace SourceCode.Chasm.Repository.Disk
             return bytes;
         }
 
-        private static async Task WriteFileAsync(string path, Stream data, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
-
-            string dir = Path.GetDirectoryName(path);
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            long dataLength = data.Length - data.Position;
-            if (dataLength <= 0) return;
-
-            using (FileStream fileStream = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None, cancellationToken)
-                .ConfigureAwait(false))
-            {
-                // Only write to the file if it does not already exist.
-                if (fileStream.Length != dataLength || forceOverwrite)
-                {
-                    fileStream.Position = 0;
-
-                    await data.CopyToAsync(fileStream, 81920, cancellationToken)
-                        .ConfigureAwait(false);
-
-                    if (fileStream.Position != dataLength)
-                        fileStream.SetLength(dataLength);
-                }
-            }
-
-            await TouchFileAsync(path, cancellationToken)
-                .ConfigureAwait(false);
-        }
-
         private static async Task TouchFileAsync(string path, CancellationToken cancellationToken)
         {
             if (!File.Exists(path))
@@ -193,5 +162,9 @@ namespace SourceCode.Chasm.Repository.Disk
             string fileName = Path.Combine(tokens.Key, tokens.Value);
             return fileName;
         }
+
+        // Note that an empty file is created
+        private static string GetTempPath()
+            => Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
     }
 }

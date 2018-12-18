@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +30,11 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
+        public override Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public override ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -44,7 +50,17 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
+        public override Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<Sha1> HashObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
