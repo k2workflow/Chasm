@@ -10,9 +10,9 @@ namespace SourceCode.Chasm.Repository.Disk
 {
     public sealed partial class DiskChasmRepo : ChasmRepository
     {
+        public const int PrefixLength = 2;
         private const int _retryMax = 10;
         private const int _retryMs = 15;
-
         private readonly string _refsContainer;
         private readonly string _objectsContainer;
         private readonly string _scratchPath;
@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.Repository.Disk
         public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
             : base(serializer, compressionLevel, maxDop)
         {
-            if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length <= 2) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
+            if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length < 3) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
             string rootPath = Path.GetFullPath(rootFolder);
 
             RootPath = rootPath;
@@ -70,7 +70,7 @@ namespace SourceCode.Chasm.Repository.Disk
             : this(rootFolder, serializer, CompressionLevel.Optimal)
         { }
 
-        private static async ValueTask<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
+        private static async Task<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path));
 
@@ -89,7 +89,7 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        private static async ValueTask<byte[]> ReadFromStreamAsync(Stream fileStream, CancellationToken cancellationToken)
+        private static async Task<byte[]> ReadFromStreamAsync(Stream fileStream, CancellationToken cancellationToken)
         {
             int offset = 0;
             int remaining = (int)fileStream.Length;
@@ -130,7 +130,7 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        private static async ValueTask<FileStream> WaitForFileAsync(string path, FileMode mode, FileAccess access, FileShare share, CancellationToken cancellationToken, int bufferSize = 4096)
+        private static async Task<FileStream> WaitForFileAsync(string path, FileMode mode, FileAccess access, FileShare share, CancellationToken cancellationToken, int bufferSize = 4096)
         {
             int retryCount = 0;
             while (true)
@@ -161,7 +161,7 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public static string DeriveFileName(Sha1 sha1)
         {
-            System.Collections.Generic.KeyValuePair<string, string> tokens = sha1.Split(2);
+            System.Collections.Generic.KeyValuePair<string, string> tokens = sha1.Split(PrefixLength);
 
             string fileName = Path.Combine(tokens.Key, tokens.Value);
             return fileName;

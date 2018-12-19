@@ -56,7 +56,7 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, item, forceOverwrite, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, item, CompressionLevel, cancellationToken)
                 .ConfigureAwait(false);
 
             RenameScratchFile(forceOverwrite, sha1, scratchFile);
@@ -68,7 +68,7 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, stream, forceOverwrite, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, CompressionLevel, cancellationToken)
                 .ConfigureAwait(false);
 
             RenameScratchFile(forceOverwrite, sha1, scratchFile);

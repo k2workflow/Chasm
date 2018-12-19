@@ -131,7 +131,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, memory, forceOverwrite, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, CompressionLevel, cancellationToken)
                 .ConfigureAwait(false);
 
             try
@@ -160,7 +160,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, stream, forceOverwrite, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, CompressionLevel, cancellationToken)
                 .ConfigureAwait(false);
 
             try
