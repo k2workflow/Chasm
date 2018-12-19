@@ -83,36 +83,43 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         {
             (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, CompressionLevel, cancellationToken)
                 .ConfigureAwait(false);
-
-            string blobName = DeriveBlobName(sha1);
-            CloudBlobContainer objectsContainer = _objectsContainer.Value;
-            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
-
-            // Objects are immutable
-            AccessCondition accessCondition = forceOverwrite ? null : AccessCondition.GenerateIfNotExistsCondition(); // If-None-Match *
-
             try
             {
-                // Required to create blob header before appending to it
-                await blobRef.CreateOrReplaceAsync(accessCondition, default, default)
-                    .ConfigureAwait(false);
-            }
-            // Try-catch is cheaper than a separate (latent) exists check
-            catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
-            {
-                se.Suppress();
+                string blobName = DeriveBlobName(sha1);
+                CloudBlobContainer objectsContainer = _objectsContainer.Value;
+                CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
+
+                // Objects are immutable
+                AccessCondition accessCondition = forceOverwrite ? null : AccessCondition.GenerateIfNotExistsCondition(); // If-None-Match *
+
+                try
+                {
+                    // Required to create blob header before appending to it
+                    await blobRef.CreateOrReplaceAsync(accessCondition, default, default)
+                        .ConfigureAwait(false);
+                }
+                // Try-catch is cheaper than a separate (latent) exists check
+                catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
+                {
+                    se.Suppress();
+                    return sha1;
+                }
+
+                using (var output = new FileStream(scratchFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    // Append blob. Following seems to be the only safe multi-writer method available
+                    // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
+                    await blobRef.AppendBlockAsync(output)
+                        .ConfigureAwait(false);
+                }
+
                 return sha1;
             }
-
-            using (var output = new FileStream(scratchFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+            finally
             {
-                // Append blob. Following seems to be the only safe multi-writer method available
-                // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
-                await blobRef.AppendBlockAsync(output)
-                    .ConfigureAwait(false);
+                if (File.Exists(scratchFile))
+                    File.Delete(scratchFile);
             }
-
-            return sha1;
         }
 
         public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
