@@ -1,5 +1,4 @@
 using System;
-using System.IO.Compression;
 using System.Reflection;
 using Moq;
 using SourceCode.Chasm.Serializer;
@@ -30,15 +29,14 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_Constructor_ChasmSerializer_CompressionLevel_MaxDop))]
-        public static void ChasmRepository_Constructor_ChasmSerializer_CompressionLevel_MaxDop()
+        [Fact(DisplayName = nameof(ChasmRepository_Constructor_ChasmSerializer_MaxDop))]
+        public static void ChasmRepository_Constructor_ChasmSerializer_MaxDop()
         {
             // Arrange
             var mockChasmSerializer = new Mock<IChasmSerializer>();
-            CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = 5;
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedMaxDop);
 
             // Action
             ChasmRepository actual = mockChasmRepository.Object;
@@ -46,36 +44,7 @@ namespace SourceCode.Chasm.Repository.Tests
             // Assert
             Assert.NotNull(actual);
             Assert.Equal(mockChasmSerializer.Object, actual.Serializer);
-            Assert.Equal(expectedCompressionLevel, actual.CompressionLevel);
             Assert.Equal(expectedMaxDop, actual.MaxDop);
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_Constructor_OutOfRange_CompressionLevel))]
-        public static void ChasmRepository_Constructor_OutOfRange_CompressionLevel()
-        {
-            // Arrange
-            var mockChasmSerializer = new Mock<IChasmSerializer>();
-            var expectedCompressionLevel = (CompressionLevel)int.MaxValue;
-            int expectedMaxDop = default;
-
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
-
-            // Action
-            ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                try
-                {
-                    ChasmRepository obj = mockChasmRepository.Object;
-                }
-                catch (TargetInvocationException targetInvocationException)
-                {
-                    throw targetInvocationException.InnerException;
-                }
-            });
-
-            // Assert
-            Assert.Contains("compressionLevel", actual.Message);
         }
 
         [Trait("Type", "Unit")]
@@ -84,10 +53,9 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new Mock<IChasmSerializer>();
-            CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = int.MinValue;
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedMaxDop);
 
             // Action
             ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -112,10 +80,9 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var mockChasmSerializer = new Mock<IChasmSerializer>();
-            CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = default;
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedCompressionLevel, expectedMaxDop);
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedMaxDop);
 
             // Action
             ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -140,10 +107,9 @@ namespace SourceCode.Chasm.Repository.Tests
         {
             // Arrange
             var chasmSerializer = default(IChasmSerializer);
-            CompressionLevel expectedCompressionLevel = CompressionLevel.NoCompression;
             int expectedMaxDop = 5;
 
-            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedCompressionLevel, expectedMaxDop);
+            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedMaxDop);
 
             // Action
             ArgumentNullException actual = Assert.Throws<ArgumentNullException>(() =>

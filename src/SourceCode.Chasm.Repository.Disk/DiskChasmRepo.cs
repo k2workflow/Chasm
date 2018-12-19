@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
@@ -22,8 +21,8 @@ namespace SourceCode.Chasm.Repository.Disk
         /// </summary>
         public string RootPath { get; }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-            : base(serializer, compressionLevel, maxDop)
+        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, int maxDop)
+            : base(serializer, maxDop)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length < 3) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
             string rootPath = Path.GetFullPath(rootFolder);
@@ -62,12 +61,8 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, CompressionLevel compressionLevel)
-          : this(rootFolder, serializer, compressionLevel, -1)
-        { }
-
         public DiskChasmRepo(string rootFolder, IChasmSerializer serializer)
-            : this(rootFolder, serializer, CompressionLevel.Optimal)
+          : this(rootFolder, serializer, -1)
         { }
 
         private static async Task<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)

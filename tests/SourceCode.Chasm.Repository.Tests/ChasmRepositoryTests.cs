@@ -28,7 +28,6 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
             var repo = new Mock<IChasmRepository>();
 
             repo.Setup(r => r.Serializer).Returns(new JsonChasmSerializer());
-            repo.Setup(r => r.CompressionLevel).Returns(System.IO.Compression.CompressionLevel.NoCompression);
             repo.Setup(r => r.MaxDop).Returns(-1);
 
             repo.Setup(r => r.ReadCommitRefAsync(null, null, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));

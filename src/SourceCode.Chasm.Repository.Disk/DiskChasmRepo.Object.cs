@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
@@ -18,21 +17,8 @@ namespace SourceCode.Chasm.Repository.Disk
                 .ConfigureAwait(false);
 
             if (bytes == null) return default;
+            return bytes;
 
-            using (var input = new MemoryStream(bytes))
-            using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
-            using (var output = new MemoryStream())
-            {
-                input.Position = 0; // Else gzip returns []
-                gzip.CopyTo(output);
-
-                if (output.Length > 0)
-                {
-                    return output.ToArray(); // TODO: Perf
-                }
-            }
-
-            return default;
         }
 
         public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
@@ -50,13 +36,12 @@ namespace SourceCode.Chasm.Repository.Disk
             FileStream fileStream = await WaitForFileAsync(fiePath, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
                 .ConfigureAwait(false);
 
-            var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress, false);
-            return gzipStream;
+            return fileStream;
         }
 
         public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, item, CompressionLevel, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, item, cancellationToken)
                 .ConfigureAwait(false);
 
             RenameScratchFile(forceOverwrite, sha1, scratchFile);
@@ -68,7 +53,7 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, CompressionLevel, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, cancellationToken)
                 .ConfigureAwait(false);
 
             RenameScratchFile(forceOverwrite, sha1, scratchFile);

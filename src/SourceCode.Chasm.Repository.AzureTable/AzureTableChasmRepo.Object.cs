@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -30,16 +29,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     return default;
 
                 var entity = (DataEntity)result.Result;
-
-                using (var input = new MemoryStream(entity.Content))
-                using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
-                using (var output = new MemoryStream())
-                {
-                    gzip.CopyTo(output);
-
-                    byte[] buffer = output.ToArray(); // TODO: Perf
-                    return buffer;
-                }
+                return entity.Content; // TODO: Perf
             }
             // Try-catch is cheaper than a separate (latent) exists check
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
@@ -49,9 +39,17 @@ namespace SourceCode.Chasm.Repository.AzureTable
             }
         }
 
-        public override Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            ReadOnlyMemory<byte>? memory = await ReadObjectAsync(objectId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (memory == null)
+                return null;
+
+            // TODO: Use a real stream from source if possible
+            var stream = new MemoryStream(memory.Value.ToArray());
+            return stream;
         }
 
         public override async Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
@@ -86,52 +84,33 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     var entity = (DataEntity)result.Result;
                     Sha1 sha1 = DataEntity.FromPartition(entity);
 
-                    // Unzip
-                    using (var input = new MemoryStream(entity.Content))
-                    using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
-                    using (var output = new MemoryStream())
-                    {
-                        gzip.CopyTo(output);
-
-                        byte[] buffer = output.ToArray(); // TODO: Perf
-                        dict[sha1] = buffer;
-                    }
+                    dict[sha1] = entity.Content; // TODO: Perf;
                 }
             }
 
             return dict;
         }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            var zipped = new Dictionary<Sha1, Memory<byte>>();
+            var dict = new Dictionary<Sha1, Memory<byte>>();
 
-            // Zip
             foreach (Memory<byte> item in items)
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
                 Sha1 sha1 = Hasher.HashData(item.Span);
-                using (var output = new MemoryStream())
-                {
-                    using (var gz = new GZipStream(output, compressionLevel, true))
-                    {
-                        gz.Write(item.Span);
-                    }
-                    output.Position = 0;
 
-                    var zip = new Memory<byte>(output.ToArray()); // TODO: Perf
-                    zipped.Add(sha1, zip);
-                }
+                dict.Add(sha1, item);
             }
 
-            IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildWriteBatches(zipped, forceOverwrite);
+            IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildWriteBatches(dict, forceOverwrite);
             return batches;
         }
 
         public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, CompressionLevel, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, cancellationToken)
                 .ConfigureAwait(false);
 
             try
@@ -160,7 +139,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, CompressionLevel, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, cancellationToken)
                 .ConfigureAwait(false);
 
             try
@@ -188,7 +167,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             if (items == null || !items.Any()) return;
 
             // Build batches
-            IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(items, forceOverwrite, CompressionLevel, cancellationToken);
+            IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(items, forceOverwrite, cancellationToken);
 
             CloudTable objectsTable = _objectsTable.Value;
 

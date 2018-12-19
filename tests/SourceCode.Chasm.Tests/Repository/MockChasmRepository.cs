@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Chasm.Serializer;
@@ -16,8 +15,8 @@ namespace SourceCode.Chasm.Repository.Tests
             return BuildConcurrencyException(branch, name, innerException);
         }
 
-        public MockChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
-            : base(serializer, compressionLevel, maxDop)
+        public MockChasmRepository(IChasmSerializer serializer, int maxDop)
+            : base(serializer, maxDop)
         { }
 
         public override ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)

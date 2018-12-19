@@ -1,5 +1,4 @@
 using System;
-using System.IO.Compression;
 using System.Threading;
 using SourceCode.Chasm.Serializer;
 using crypt = System.Security.Cryptography;
@@ -14,17 +13,13 @@ namespace SourceCode.Chasm.Repository
 
         public IChasmSerializer Serializer { get; }
 
-        public CompressionLevel CompressionLevel { get; }
-
         public int MaxDop { get; }
 
-        protected ChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
+        protected ChasmRepository(IChasmSerializer serializer, int maxDop)
         {
-            if (!Enum.IsDefined(typeof(CompressionLevel), compressionLevel)) throw new ArgumentOutOfRangeException(nameof(compressionLevel));
             if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
 
             Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            CompressionLevel = compressionLevel;
             MaxDop = maxDop;
         }
 

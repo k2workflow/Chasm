@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -155,7 +154,7 @@ namespace SoruceCode.Chasm.IntegrationTests
                 if (!tmp.EndsWith('/')) tmp += '/';
                 using (var serializer = new JsonChasmSerializer())
                 {
-                    var repo = new DiskChasmRepo(tmp, serializer, CompressionLevel.Optimal);
+                    var repo = new DiskChasmRepo(tmp, serializer);
                     await TestRepository(repo);
                 }
             }
@@ -174,7 +173,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
             using (var serializer = new JsonChasmSerializer())
             {
-                var repo = new AzureBlobChasmRepo(csa, serializer, CompressionLevel.Optimal);
+                var repo = new AzureBlobChasmRepo(csa, serializer);
                 await TestRepository(repo);
             }
         }
@@ -188,7 +187,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
             using (var serializer = new JsonChasmSerializer())
             {
-                var repo = new AzureTableChasmRepo(csa, serializer, CompressionLevel.Optimal);
+                var repo = new AzureTableChasmRepo(csa, serializer);
                 await TestRepository(repo);
             }
         }

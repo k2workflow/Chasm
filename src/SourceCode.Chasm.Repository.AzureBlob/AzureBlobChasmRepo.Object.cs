@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,20 +23,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             try
             {
                 using (var input = new MemoryStream())
-                using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
                 {
                     // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
                     await blobRef.DownloadToStreamAsync(input)
                         .ConfigureAwait(false);
 
-                    using (var output = new MemoryStream())
-                    {
-                        input.Position = 0; // Else gzip returns []
-                        gzip.CopyTo(output);
-
-                        byte[] buffer = output.ToArray(); // TODO: Perf
-                        return buffer;
-                    }
+                    byte[] buffer = input.ToArray(); // TODO: Perf
+                    return buffer;
                 }
             }
             // Try-catch is cheaper than a separate (latent) exists check
@@ -57,14 +49,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             try
             {
-                using (var input = new MemoryStream())
-                using (var gzip = new GZipStream(input, CompressionMode.Decompress, false))
+                var input = new MemoryStream();
                 {
                     // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
                     await blobRef.DownloadToStreamAsync(input)
                         .ConfigureAwait(false);
 
-                    return gzip;
+                    return input;
                 }
             }
             // Try-catch is cheaper than a separate (latent) exists check
@@ -81,7 +72,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, CompressionLevel, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, cancellationToken)
                 .ConfigureAwait(false);
             try
             {
@@ -126,7 +117,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, CompressionLevel, cancellationToken)
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, cancellationToken)
                 .ConfigureAwait(false);
 
             try
