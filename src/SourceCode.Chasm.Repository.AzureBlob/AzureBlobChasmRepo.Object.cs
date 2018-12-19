@@ -15,9 +15,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            CloudBlobContainer objectsContainer = _objectsContainer.Value;
-
             string blobName = DeriveBlobName(objectId);
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
             try
@@ -42,9 +41,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            CloudBlobContainer objectsContainer = _objectsContainer.Value;
-
             string blobName = DeriveBlobName(objectId);
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
             try

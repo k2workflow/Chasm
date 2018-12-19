@@ -33,7 +33,7 @@ Rather, this is meant to be a general purpose CAS store for any document type.
 
 ### Prerequisites
 
-* .NET Core SDK 2.1 (https://www.microsoft.com/net/download/core)
+* .NET Core SDK 2.2 (https://www.microsoft.com/net/download/core)
 
 ### Getting started
 
