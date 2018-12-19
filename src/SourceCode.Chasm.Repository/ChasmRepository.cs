@@ -8,15 +8,15 @@ namespace SourceCode.Chasm.Repository
 {
     public abstract partial class ChasmRepository : IChasmRepository
     {
+        // Use a thread-local instance of the underlying crypto algorithm.
+        private static readonly ThreadLocal<crypt.SHA1> s_hasher = new ThreadLocal<crypt.SHA1>(crypt.SHA1.Create);
+        protected static crypt.SHA1 Hasher => s_hasher.Value;
+
         public IChasmSerializer Serializer { get; }
 
         public CompressionLevel CompressionLevel { get; }
 
         public int MaxDop { get; }
-
-        // Use a thread-local instance of the underlying crypto algorithm.
-        private static readonly ThreadLocal<crypt.SHA1> s_hasher = new ThreadLocal<crypt.SHA1>(crypt.SHA1.Create);
-        public crypt.SHA1 Hasher => s_hasher.Value;
 
         protected ChasmRepository(IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
         {

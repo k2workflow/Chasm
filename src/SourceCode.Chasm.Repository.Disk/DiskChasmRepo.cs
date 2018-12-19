@@ -15,6 +15,7 @@ namespace SourceCode.Chasm.Repository.Disk
 
         private readonly string _refsContainer;
         private readonly string _objectsContainer;
+        private readonly string _scratchPath;
 
         /// <summary>
         /// Gets the root path for the repository.
@@ -28,6 +29,9 @@ namespace SourceCode.Chasm.Repository.Disk
             string rootPath = Path.GetFullPath(rootFolder);
 
             RootPath = rootPath;
+
+            // Scratch area
+            _scratchPath = Path.GetTempPath();
 
             // Root
             {
@@ -162,9 +166,5 @@ namespace SourceCode.Chasm.Repository.Disk
             string fileName = Path.Combine(tokens.Key, tokens.Value);
             return fileName;
         }
-
-        // Note that an empty file is created
-        private static string GetTempPath()
-            => Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
     }
 }

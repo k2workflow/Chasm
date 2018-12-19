@@ -10,7 +10,5 @@ namespace SourceCode.Chasm.Repository
         CompressionLevel CompressionLevel { get; }
 
         int MaxDop { get; }
-
-        System.Security.Cryptography.SHA1 Hasher { get; }
     }
 }

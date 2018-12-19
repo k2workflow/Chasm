@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -35,7 +35,7 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public override Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -45,22 +45,17 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<Sha1> HashObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
