@@ -13,6 +13,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         private readonly Lazy<CloudBlobContainer> _refsContainer;
         private readonly Lazy<CloudBlobContainer> _objectsContainer;
+        private readonly string _scratchPath;
 
         #endregion
 
@@ -22,6 +23,9 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             : base(serializer, compressionLevel, maxDop)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
+
+            // Scratch area
+            _scratchPath = System.IO.Path.GetTempPath();
 
             CloudBlobClient client = storageAccount.CreateCloudBlobClient();
             client.DefaultRequestOptions.ParallelOperationThreadCount = 4; // Default is 1

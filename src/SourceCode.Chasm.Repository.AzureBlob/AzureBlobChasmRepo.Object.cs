@@ -14,7 +14,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
     {
         #region Read
 
-        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
 
@@ -79,11 +79,12 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         #region Write
 
-        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
 
-            string blobName = DeriveBlobName(objectId);
+            Sha1 sha1 = Hasher.HashData(item.Span);
+            string blobName = DeriveBlobName(sha1);
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
             // Objects are immutable
@@ -99,7 +100,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
                 se.Suppress();
-                return;
+                return sha1;
             }
 
             using (var output = new MemoryStream())
@@ -115,16 +116,54 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.AppendBlockAsync(output)
                     .ConfigureAwait(false);
             }
+
+            return sha1;
         }
 
-        public override ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-        }
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        public override ValueTask<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, stream, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
+
+            try
+            {
+                string blobName = DeriveBlobName(sha1);
+                CloudBlobContainer objectsContainer = _objectsContainer.Value;
+                CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
+
+                // Objects are immutable
+                AccessCondition accessCondition = forceOverwrite ? null : AccessCondition.GenerateIfNotExistsCondition(); // If-None-Match *
+
+                try
+                {
+                    // Required to create blob header before appending to it
+                    await blobRef.CreateOrReplaceAsync(accessCondition, default, default)
+                        .ConfigureAwait(false);
+                }
+                // Try-catch is cheaper than a separate (latent) exists check
+                catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
+                {
+                    se.Suppress();
+                    return sha1;
+                }
+
+                using (var fs = new FileStream(scratchFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    // Append blob. Following seems to be the only safe multi-writer method available
+                    // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
+                    await blobRef.AppendBlockAsync(fs)
+                        .ConfigureAwait(false);
+                }
+
+                return sha1;
+            }
+            finally
+            {
+                if (File.Exists(scratchFile))
+                    File.Delete(scratchFile);
+            }
         }
 
         #endregion

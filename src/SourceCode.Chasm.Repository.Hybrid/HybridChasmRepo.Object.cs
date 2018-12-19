@@ -11,7 +11,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
 {
     partial class HybridChasmRepo // .Object
     {
-        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             // We read from closest to furthest
             for (int i = 0; i < Chain.Count; i++)
@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.Repository.Hybrid
             throw new NotImplementedException();
         }
 
-        public override async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             if (objectIds == null) return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
 
@@ -49,19 +49,26 @@ namespace SourceCode.Chasm.Repository.Hybrid
             return default;
         }
 
-        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            var tasks = new Task[Chain.Count];
+            var tasks = new Task<Sha1>[Chain.Count];
             for (var i = 0; i < tasks.Length; i++)
             {
-                tasks[i] = Chain[i].WriteObjectAsync(objectId, item, forceOverwrite, cancellationToken);
+                tasks[i] = Chain[i].WriteObjectAsync(item, forceOverwrite, cancellationToken);
             }
 
             await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
+
+            return tasks[0].Result;
         }
 
-        public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
 
@@ -75,16 +82,6 @@ namespace SourceCode.Chasm.Repository.Hybrid
 
             await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
-        }
-
-        public override ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override ValueTask<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
         }
     }
 }

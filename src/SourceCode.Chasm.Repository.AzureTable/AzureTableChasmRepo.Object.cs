@@ -11,13 +11,12 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Clay;
-using SourceCode.Clay.Threading;
 
 namespace SourceCode.Chasm.Repository.AzureTable
 {
     partial class AzureTableChasmRepo // .Object
     {
-        public override async ValueTask<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             CloudTable objectsTable = _objectsTable.Value;
             TableOperation op = DataEntity.BuildReadOperation(objectId);
@@ -55,31 +54,31 @@ namespace SourceCode.Chasm.Repository.AzureTable
             throw new NotImplementedException();
         }
 
-        public override async ValueTask<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             if (objectIds == null) return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
-
-            var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>();
 
             // Build batches
             IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildReadBatches(objectIds);
 
-            var parallelOptions = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = MaxDop,
-                CancellationToken = cancellationToken
-            };
-
             // Enumerate batches
             CloudTable objectsTable = _objectsTable.Value;
-            await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
+            var tasks = new List<Task<IList<TableResult>>>(batches.Count);
+            foreach (TableBatchOperation batch in batches)
             {
                 // Execute batch
-                IList<TableResult> results = await objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken)
-                    .ConfigureAwait(false);
+                Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken);
+                tasks.Add(task);
+            }
 
-                // Transform batch results
-                foreach (TableResult result in results)
+            await Task.WhenAll(tasks)
+                .ConfigureAwait(false);
+
+            // Transform batch results
+            var dict = new ConcurrentDictionary<Sha1, ReadOnlyMemory<byte>>();
+            foreach (Task<IList<TableResult>> task in tasks)
+            {
+                foreach (TableResult result in task.Result)
                 {
                     if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
                         continue;
@@ -96,34 +95,33 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
                         byte[] buffer = output.ToArray(); // TODO: Perf
                         dict[sha1] = buffer;
-                        return;
                     }
                 }
-            })
-            .ConfigureAwait(false);
+            }
 
             return dict;
         }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
         {
             var zipped = new Dictionary<Sha1, Memory<byte>>();
 
             // Zip
-            foreach (KeyValuePair<Sha1, Memory<byte>> item in items)
+            foreach (Memory<byte> item in items)
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
+                Sha1 sha1 = Hasher.HashData(item.Span);
                 using (var output = new MemoryStream())
                 {
                     using (var gz = new GZipStream(output, compressionLevel, true))
                     {
-                        gz.Write(item.Value.Span);
+                        gz.Write(item.Span);
                     }
                     output.Position = 0;
 
                     var zip = new Memory<byte>(output.ToArray()); // TODO: Perf
-                    zipped.Add(item.Key, zip);
+                    zipped.Add(sha1, zip);
                 }
             }
 
@@ -131,34 +129,61 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return batches;
         }
 
-        public override async Task WriteObjectAsync(Sha1 objectId, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            CloudTable objectsTable = _objectsTable.Value;
+            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, memory, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
 
-            // TODO: Perf: Do not write if row already exists (objects are immutable)
-
-            using (var output = new MemoryStream())
+            try
             {
-                using (var gz = new GZipStream(output, CompressionLevel, true))
-                {
-                    gz.Write(item.Span);
-                }
-                output.Position = 0;
-
-                var mem = new Memory<byte>(output.ToArray()); // TODO: Perf
-
-                TableOperation op = DataEntity.BuildWriteOperation(objectId, mem, forceOverwrite);
-                await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                var bytes = await File.ReadAllBytesAsync(scratchFile, cancellationToken)
                     .ConfigureAwait(false);
+
+                using (var output = new MemoryStream())
+                {
+                    TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
+                    CloudTable objectsTable = _objectsTable.Value;
+                    await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                return sha1;
+            }
+            finally
+            {
+                if (File.Exists(scratchFile))
+                    File.Delete(scratchFile);
             }
         }
 
-        public override ValueTask<Sha1> HashObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, stream, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
+
+            try
+            {
+                var bytes = await File.ReadAllBytesAsync(scratchFile, cancellationToken)
+                    .ConfigureAwait(false);
+
+                TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
+
+                CloudTable objectsTable = _objectsTable.Value;
+                await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                    .ConfigureAwait(false);
+
+                return sha1;
+            }
+            finally
+            {
+                if (File.Exists(scratchFile))
+                    File.Delete(scratchFile);
+            }
         }
 
-        public override async Task WriteObjectBatchAsync(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
 
@@ -167,25 +192,16 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             CloudTable objectsTable = _objectsTable.Value;
 
-            var parallelOptions = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = MaxDop,
-                CancellationToken = cancellationToken
-            };
-
             // Enumerate batches
-            await ParallelAsync.ForEachAsync(batches, parallelOptions, async batch =>
+            var tasks = new List<Task>();
+            foreach (TableBatchOperation batch in batches)
             {
-                // Execute batch
-                await objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken)
-                    .ConfigureAwait(false);
-            })
-            .ConfigureAwait(false);
-        }
+                Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken);
+                tasks.Add(task);
+            }
 
-        public override ValueTask<Sha1> HashObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+            await Task.WhenAll(tasks)
+                .ConfigureAwait(false);
         }
     }
 }

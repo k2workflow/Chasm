@@ -284,7 +284,7 @@ namespace SourceCode.Chasm.Repository.Tests
             CommitId actual = await mockChasmRepository.Object.WriteTreeAsync(parents, TreeNodeMapTestObject.Random, AuditTestObject.Random, AuditTestObject.Random, RandomHelper.String, TestValues.CancellationToken);
 
             // Assert
-            Assert.NotEqual(new CommitId(), actual);
+            Assert.Equal(new CommitId(), actual);
             mockChasmRepository.Verify(i => i.WriteTreeAsync(It.IsAny<TreeNodeMap>(), It.IsAny<CancellationToken>()));
             mockChasmRepository.Verify(i => i.WriteCommitAsync(It.IsAny<Commit>(), It.IsAny<CancellationToken>()));
         }
@@ -306,8 +306,8 @@ namespace SourceCode.Chasm.Repository.Tests
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.NotEqual(new TreeId(), actual);
-            mockChasmRepository.Verify(i => i.WriteObjectAsync(It.IsAny<Sha1>(), It.IsAny<Memory<byte>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+            Assert.Equal(new TreeId(), actual);
+            mockChasmRepository.Verify(i => i.WriteObjectAsync(It.IsAny<Memory<byte>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
         }
     }
 }
