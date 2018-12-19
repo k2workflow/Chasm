@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
+using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository
 {
@@ -41,9 +44,9 @@ namespace SourceCode.Chasm.Repository
             return dict2;
         }
 
-        public abstract Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public abstract Task<Sha1> WriteObjectAsync(Stream item, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
 
         public virtual async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
@@ -59,5 +62,52 @@ namespace SourceCode.Chasm.Repository
             await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
         }
+
+        #region Helpers
+
+        protected async Task<(Sha1 Sha1, string Path)> WriteScratchFileAsync(string path, Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            Debug.Assert(!string.IsNullOrWhiteSpace(path));
+
+            string tempPath = Path.Combine(path, Path.GetTempFileName()); // Note that an empty file is created
+
+            using (var fs = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+            using (var gz = new GZipStream(fs, CompressionLevel, true))
+            using (var ct = crypt.SHA1.Create())
+            {
+                using (var cs = new crypt.CryptoStream(gz, ct, crypt.CryptoStreamMode.Write))
+                {
+                    await cs.WriteAsync(item, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                var sha1 = new Sha1(ct.Hash);
+                return (sha1, tempPath);
+            }
+        }
+
+        protected async Task<(Sha1 Sha1, string Path)> WriteScratchFileAsync(string path, Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            Debug.Assert(!string.IsNullOrWhiteSpace(path));
+            Debug.Assert(stream != null);
+
+            string tempPath = Path.Combine(path, Path.GetTempFileName()); // Note that an empty file is created
+
+            using (var fs = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+            using (var gz = new GZipStream(fs, CompressionLevel, true))
+            using (var ct = crypt.SHA1.Create())
+            {
+                using (var cs = new crypt.CryptoStream(gz, ct, crypt.CryptoStreamMode.Write))
+                {
+                    await stream.CopyToAsync(cs, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                var sha1 = new Sha1(ct.Hash);
+                return (sha1, tempPath);
+            }
+        }
+
+        #endregion
     }
 }

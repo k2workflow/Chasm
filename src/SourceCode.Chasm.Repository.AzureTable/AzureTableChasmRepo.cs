@@ -11,11 +11,15 @@ namespace SourceCode.Chasm.Repository.AzureTable
     {
         private readonly Lazy<CloudTable> _refsTable;
         private readonly Lazy<CloudTable> _objectsTable;
+        private readonly string _scratchPath;
 
         public AzureTableChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, CompressionLevel compressionLevel, int maxDop)
             : base(serializer, compressionLevel, maxDop)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
+
+            // Scratch area
+            _scratchPath = System.IO.Path.GetTempPath();
 
             CloudTableClient client = storageAccount.CreateCloudTableClient();
 

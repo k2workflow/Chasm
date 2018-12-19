@@ -102,7 +102,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return dict;
         }
 
-        private IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CompressionLevel compressionLevel, CancellationToken cancellationToken)
         {
             var zipped = new Dictionary<Sha1, Memory<byte>>();
 
@@ -129,34 +129,58 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return batches;
         }
 
-        public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            CloudTable objectsTable = _objectsTable.Value;
+            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, memory, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
 
-            // TODO: Perf: Do not write if row already exists (objects are immutable)
-
-            Sha1 sha1 = Hasher.HashData(item.Span);
-            using (var output = new MemoryStream())
+            try
             {
-                using (var gz = new GZipStream(output, CompressionLevel, true))
-                {
-                    gz.Write(item.Span);
-                }
-                output.Position = 0;
-
-                var mem = new Memory<byte>(output.ToArray()); // TODO: Perf
-
-                TableOperation op = DataEntity.BuildWriteOperation(sha1, mem, forceOverwrite);
-                await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                var bytes = await File.ReadAllBytesAsync(scratchFile, cancellationToken)
                     .ConfigureAwait(false);
-            }
 
-            return sha1;
+                using (var output = new MemoryStream())
+                {
+                    TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
+                    CloudTable objectsTable = _objectsTable.Value;
+                    await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                return sha1;
+            }
+            finally
+            {
+                if (File.Exists(scratchFile))
+                    File.Delete(scratchFile);
+            }
         }
 
-        public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, stream, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
+
+            try
+            {
+                var bytes = await File.ReadAllBytesAsync(scratchFile, cancellationToken)
+                    .ConfigureAwait(false);
+
+                TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
+
+                CloudTable objectsTable = _objectsTable.Value;
+                await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                    .ConfigureAwait(false);
+
+                return sha1;
+            }
+            finally
+            {
+                if (File.Exists(scratchFile))
+                    File.Delete(scratchFile);
+            }
         }
 
         public override async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)

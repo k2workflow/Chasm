@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
@@ -13,9 +12,9 @@ namespace SourceCode.Chasm.Repository.Disk
         public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             string filename = DeriveFileName(objectId);
-            string path = Path.Combine(_objectsContainer, filename);
+            string filePath = Path.Combine(_objectsContainer, filename);
 
-            byte[] bytes = await ReadFileAsync(path, cancellationToken)
+            byte[] bytes = await ReadFileAsync(filePath, cancellationToken)
                 .ConfigureAwait(false);
 
             if (bytes == null) return default;
@@ -39,117 +38,71 @@ namespace SourceCode.Chasm.Repository.Disk
         public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             string filename = DeriveFileName(objectId);
-            string path = Path.Combine(_objectsContainer, filename);
+            string fiePath = Path.Combine(_objectsContainer, filename);
 
-            string dir = Path.GetDirectoryName(path);
+            string dir = Path.GetDirectoryName(fiePath);
             if (!Directory.Exists(dir))
                 return default;
 
-            if (!File.Exists(path))
+            if (!File.Exists(fiePath))
                 return default;
 
-            FileStream fileStream = await WaitForFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
+            FileStream fileStream = await WaitForFileAsync(fiePath, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
                 .ConfigureAwait(false);
-            var gzip = new GZipStream(fileStream, CompressionMode.Decompress, false);
 
-            return gzip;
+            var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress, false);
+            return gzipStream;
         }
 
         public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            string tempPath = GetTempPath(); // Note that an empty file is created
-            try
-            {
-                Sha1 sha1;
-                using (var fs = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
-                using (var gz = new GZipStream(fs, CompressionLevel, true))
-#pragma warning disable CA5350 // Do Not Use Weak Cryptographic Algorithms
-                using (var ct = SHA1.Create())
-#pragma warning restore CA5350 // Do Not Use Weak Cryptographic Algorithms
-                using (var cs = new CryptoStream(gz, ct, CryptoStreamMode.Write))
-                {
-                    await cs.WriteAsync(item, cancellationToken)
-                        .ConfigureAwait(false);
+            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, item, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
 
-                    cs.FlushFinalBlock();
-                    sha1 = new Sha1(ct.Hash);
-                }
+            RenameScratchFile(forceOverwrite, sha1, scratchFile);
 
-                string filename = DeriveFileName(sha1);
-                string path = Path.Combine(_objectsContainer, filename);
-
-                string dir = Path.GetDirectoryName(path);
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-                else if (File.Exists(path))
-                {
-                    // If file already exists then we can be sure it already contains the same content
-                    if (!forceOverwrite)
-                        return sha1;
-
-                    File.Delete(path);
-                }
-
-                File.Move(tempPath, path);
-
-                return sha1;
-            }
-            finally
-            {
-                if (File.Exists(tempPath))
-                    File.Delete(tempPath);
-            }
+            return sha1;
         }
 
-        public override async Task<Sha1> WriteObjectAsync(Stream data, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            string tempPath = GetTempPath(); // Note that an empty file is created
+            (Sha1 sha1, string scratchFile) = await WriteScratchFileAsync(_scratchPath, stream, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
+
+            RenameScratchFile(forceOverwrite, sha1, scratchFile);
+
+            return sha1;
+        }
+
+        private void RenameScratchFile(bool forceOverwrite, Sha1 sha1, string scratchFile)
+        {
             try
             {
-                Sha1 sha1;
-                using (var fs = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
-                using (var gz = new GZipStream(fs, CompressionLevel, true))
-#pragma warning disable CA5350 // Do Not Use Weak Cryptographic Algorithms
-                using (var ct = SHA1.Create())
-#pragma warning restore CA5350 // Do Not Use Weak Cryptographic Algorithms
-                using (var cs = new CryptoStream(gz, ct, CryptoStreamMode.Write))
-                {
-                    await data.CopyToAsync(cs)
-                        .ConfigureAwait(false);
-
-                    cs.FlushFinalBlock();
-                    sha1 = new Sha1(ct.Hash);
-                }
-
                 string filename = DeriveFileName(sha1);
-                string path = Path.Combine(_objectsContainer, filename);
+                string filePath = Path.Combine(_objectsContainer, filename);
 
-                string dir = Path.GetDirectoryName(path);
+                string dir = Path.GetDirectoryName(filePath);
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
                 }
-                else if (File.Exists(path))
+                else if (File.Exists(filePath))
                 {
                     // If file already exists then we can be sure it already contains the same content
                     if (!forceOverwrite)
-                        return sha1;
+                        return;
 
-                    File.Delete(path);
+                    File.Delete(filePath);
                 }
 
-                File.Move(tempPath, path);
-
-                return sha1;
+                File.Move(scratchFile, filePath);
             }
             finally
             {
-                if (File.Exists(tempPath))
-                    File.Delete(tempPath);
+                if (File.Exists(scratchFile))
+                    File.Delete(scratchFile);
             }
         }
     }
