@@ -79,12 +79,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         #region Write
 
-        public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            CloudBlobContainer objectsContainer = _objectsContainer.Value;
+            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, CompressionLevel, cancellationToken)
+                .ConfigureAwait(false);
 
-            Sha1 sha1 = Hasher.HashData(item.Span);
             string blobName = DeriveBlobName(sha1);
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
             // Objects are immutable
@@ -103,14 +104,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 return sha1;
             }
 
-            using (var output = new MemoryStream())
+            using (var output = new FileStream(scratchFile, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                using (var gz = new GZipStream(output, CompressionLevel, true))
-                {
-                    gz.Write(item.Span);
-                }
-                output.Position = 0;
-
                 // Append blob. Following seems to be the only safe multi-writer method available
                 // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
                 await blobRef.AppendBlockAsync(output)
