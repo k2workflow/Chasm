@@ -110,41 +110,29 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, cancellationToken)
-                .ConfigureAwait(false);
-
-            try
+            Sha1 sha1 = await WriteFileAsync(memory, async (_, tempPath) =>
             {
-                var bytes = await File.ReadAllBytesAsync(scratchFile, cancellationToken)
+                var bytes = await File.ReadAllBytesAsync(tempPath, cancellationToken)
                     .ConfigureAwait(false);
 
-                using (var output = new MemoryStream())
-                {
-                    TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
-                    CloudTable objectsTable = _objectsTable.Value;
-                    await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
-                        .ConfigureAwait(false);
-                }
+                TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
+                CloudTable objectsTable = _objectsTable.Value;
+                await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                    .ConfigureAwait(false);
 
-                return sha1;
-            }
-            finally
-            {
-                if (File.Exists(scratchFile))
-                    File.Delete(scratchFile);
-            }
+            }, true, cancellationToken)
+                .ConfigureAwait(false);
+
+            return sha1;
         }
 
         public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, cancellationToken)
-                .ConfigureAwait(false);
-
-            try
+            Sha1 sha1 = await WriteFileAsync(stream, async (_, tempPath) =>
             {
-                var bytes = await File.ReadAllBytesAsync(scratchFile, cancellationToken)
+                var bytes = await File.ReadAllBytesAsync(tempPath, cancellationToken)
                     .ConfigureAwait(false);
 
                 TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
@@ -153,13 +141,10 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
                     .ConfigureAwait(false);
 
-                return sha1;
-            }
-            finally
-            {
-                if (File.Exists(scratchFile))
-                    File.Delete(scratchFile);
-            }
+            }, true, cancellationToken)
+                .ConfigureAwait(false);
+
+            return sha1;
         }
 
         public override async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)

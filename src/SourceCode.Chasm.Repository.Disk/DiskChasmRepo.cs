@@ -14,7 +14,6 @@ namespace SourceCode.Chasm.Repository.Disk
         private const int _retryMs = 15;
         private readonly string _refsContainer;
         private readonly string _objectsContainer;
-        private readonly string _scratchPath;
 
         /// <summary>
         /// Gets the root path for the repository.
@@ -25,23 +24,19 @@ namespace SourceCode.Chasm.Repository.Disk
             : base(serializer, maxDop)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length < 3) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
-            string rootPath = Path.GetFullPath(rootFolder);
 
-            RootPath = rootPath;
-
-            // Scratch area
-            _scratchPath = Path.GetTempPath();
+            RootPath = Path.GetFullPath(rootFolder);
 
             // Root
             {
-                if (!Directory.Exists(rootPath))
-                    Directory.CreateDirectory(rootPath);
+                if (!Directory.Exists(RootPath))
+                    Directory.CreateDirectory(RootPath);
             }
 
             // Refs
             {
                 const string container = "refs";
-                string path = Path.Combine(rootPath, container);
+                string path = Path.Combine(RootPath, container);
 
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
@@ -52,7 +47,7 @@ namespace SourceCode.Chasm.Repository.Disk
             // Objects
             {
                 const string container = "objects";
-                string path = Path.Combine(rootPath, container);
+                string path = Path.Combine(RootPath, container);
 
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);

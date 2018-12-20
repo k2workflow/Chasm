@@ -70,9 +70,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, memory, cancellationToken)
-                .ConfigureAwait(false);
-            try
+            Sha1 sha1 = await WriteFileAsync(memory, async (_, tempPath) =>
             {
                 string blobName = DeriveBlobName(sha1);
                 CloudBlobContainer objectsContainer = _objectsContainer.Value;
@@ -91,10 +89,9 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
                 {
                     se.Suppress();
-                    return sha1;
                 }
 
-                using (var output = new FileStream(scratchFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var output = new FileStream(tempPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     // Append blob. Following seems to be the only safe multi-writer method available
                     // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
@@ -102,25 +99,19 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                         .ConfigureAwait(false);
                 }
 
-                return sha1;
-            }
-            finally
-            {
-                if (File.Exists(scratchFile))
-                    File.Delete(scratchFile);
-            }
+            }, true, cancellationToken)
+                .ConfigureAwait(false);
+
+            return sha1;
         }
 
         public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, cancellationToken)
-                .ConfigureAwait(false);
-
-            try
+            Sha1 sha1 = await WriteFileAsync(stream, async (sha, tempPath) =>
             {
-                string blobName = DeriveBlobName(sha1);
+                string blobName = DeriveBlobName(sha);
                 CloudBlobContainer objectsContainer = _objectsContainer.Value;
                 CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
@@ -137,24 +128,20 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
                 {
                     se.Suppress();
-                    return sha1;
                 }
 
-                using (var fs = new FileStream(scratchFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var fs = new FileStream(tempPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     // Append blob. Following seems to be the only safe multi-writer method available
                     // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
                     await blobRef.AppendBlockAsync(fs)
                         .ConfigureAwait(false);
                 }
+            },
+            true, cancellationToken)
+                .ConfigureAwait(false);
 
-                return sha1;
-            }
-            finally
-            {
-                if (File.Exists(scratchFile))
-                    File.Delete(scratchFile);
-            }
+            return sha1;
         }
 
         #endregion

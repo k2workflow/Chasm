@@ -39,12 +39,16 @@ namespace SourceCode.Chasm.Repository.Disk
             return fileStream;
         }
 
-        public override async Task<Sha1> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, item, cancellationToken)
-                .ConfigureAwait(false);
+            Task MoveAction(Sha1 sha, string tempPath)
+            {
+                Rename(forceOverwrite, sha, tempPath);
+                return Task.CompletedTask;
+            }
 
-            RenameScratchFile(forceOverwrite, sha1, scratchFile);
+            Sha1 sha1 = await WriteFileAsync(memory, MoveAction, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
 
             return sha1;
         }
@@ -53,15 +57,19 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            (Sha1 sha1, string scratchFile) = await ScratchFileHelper.WriteAsync(_scratchPath, stream, cancellationToken)
-                .ConfigureAwait(false);
+            Task MoveAction(Sha1 sha, string tempPath)
+            {
+                Rename(forceOverwrite, sha, tempPath);
+                return Task.CompletedTask;
+            }
 
-            RenameScratchFile(forceOverwrite, sha1, scratchFile);
+            Sha1 sha1 = await WriteFileAsync(stream, MoveAction, forceOverwrite, cancellationToken)
+                .ConfigureAwait(false);
 
             return sha1;
         }
 
-        private void RenameScratchFile(bool forceOverwrite, Sha1 sha1, string scratchFile)
+        private void Rename(bool forceOverwrite, Sha1 sha1, string tempFile)
         {
             try
             {
@@ -73,21 +81,22 @@ namespace SourceCode.Chasm.Repository.Disk
                 {
                     Directory.CreateDirectory(dir);
                 }
+
+                // If file already exists then we can be sure it already contains the same content
                 else if (File.Exists(filePath))
                 {
-                    // If file already exists then we can be sure it already contains the same content
                     if (!forceOverwrite)
                         return;
 
                     File.Delete(filePath);
                 }
 
-                File.Move(scratchFile, filePath);
+                File.Move(tempFile, filePath);
             }
             finally
             {
-                if (File.Exists(scratchFile))
-                    File.Delete(scratchFile);
+                if (File.Exists(tempFile))
+                    File.Delete(tempFile);
             }
         }
     }
