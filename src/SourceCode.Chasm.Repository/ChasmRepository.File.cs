@@ -9,7 +9,7 @@ namespace SourceCode.Chasm.Repository
 {
     partial class ChasmRepository // .File
     {
-        protected static async ValueTask<Sha1> WriteFileAsync(Func<Stream, Task> writeAction, Func<Sha1, string, Task> fileAction, bool delete, CancellationToken cancellationToken)
+        protected static async Task<Sha1> WriteFileAsync(Func<Stream, Task> writeAction, Func<Sha1, string, Task> fileAction, bool delete, CancellationToken cancellationToken)
         {
             if (writeAction == null) throw new ArgumentNullException(nameof(writeAction));
 
@@ -49,7 +49,7 @@ namespace SourceCode.Chasm.Repository
             }
         }
 
-        protected static ValueTask<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, Task> fileAction, bool delete, CancellationToken cancellationToken)
+        protected static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, Task> fileAction, bool delete, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -59,10 +59,10 @@ namespace SourceCode.Chasm.Repository
             return WriteFileAsync(FileAction, fileAction, delete, cancellationToken);
         }
 
-        protected static ValueTask<Sha1> WriteFileAsync(Memory<byte> memory, Func<Sha1, string, Task> fileAction, bool delete, CancellationToken cancellationToken)
+        protected static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, Task> fileAction, bool delete, CancellationToken cancellationToken)
         {
             Task FileAction(Stream inner)
-                => inner.WriteAsync(memory, cancellationToken).AsTask();
+                => inner.WriteAsync(buffer, cancellationToken).AsTask();
 
             return WriteFileAsync(FileAction, fileAction, delete, cancellationToken);
         }

@@ -11,6 +11,8 @@ namespace SourceCode.Chasm.Repository
 {
     partial class ChasmRepository // .Object
     {
+        #region Read
+
         public abstract Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
         public abstract Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken);
@@ -41,23 +43,29 @@ namespace SourceCode.Chasm.Repository
             return dict2;
         }
 
-        public abstract Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken);
+        #endregion
+
+        #region Write
+
+        public abstract Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken);
 
         public abstract Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public virtual async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public virtual async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (items == null || !items.Any()) return;
+            if (buffers == null || !buffers.Any()) return;
 
             var tasks = new List<Task>();
-            foreach (Memory<byte> item in items)
+            foreach (Memory<byte> buffer in buffers)
             {
-                Task<Sha1> task = WriteObjectAsync(item, forceOverwrite, cancellationToken);
+                Task<Sha1> task = WriteObjectAsync(buffer, forceOverwrite, cancellationToken);
                 tasks.Add(task);
             }
 
             await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
         }
+
+        #endregion
     }
 }

@@ -31,15 +31,15 @@ namespace SoruceCode.Chasm.IntegrationTests
         {
             var g = Guid.NewGuid();
 
-            byte[] data = g.ToByteArray();
-            Sha1 sha = s_hasher.HashData(data);
+            byte[] buffer = g.ToByteArray();
+            Sha1 sha = s_hasher.HashData(buffer);
 
             // Unknown SHA
             Sha1 usha1 = s_hasher.HashData(Guid.NewGuid().ToByteArray());
             Sha1 usha2 = s_hasher.HashData(Guid.NewGuid().ToByteArray());
 
             // Blob
-            Sha1 sha2 = await repository.WriteObjectAsync(new Memory<byte>(data), false, default);
+            Sha1 sha2 = await repository.WriteObjectAsync(new Memory<byte>(buffer), false, default);
             Assert.Equal(sha, sha2);
             ReadOnlyMemory<byte>? rdata = await repository.ReadObjectAsync(sha, default);
             Assert.True(rdata.HasValue);
@@ -50,20 +50,20 @@ namespace SoruceCode.Chasm.IntegrationTests
             Assert.False(urdata.HasValue);
 
             //
-            sha2 = await repository.WriteObjectAsync(data, true, default);
+            sha2 = await repository.WriteObjectAsync(buffer, true, default);
             Assert.Equal(sha, sha2);
 
             ReadOnlyMemory<byte>? cnt2 = await repository.ReadObjectAsync(sha2, default);
-            Assert.Equal(data, cnt2.Value.ToArray());
+            Assert.Equal(buffer, cnt2.Value.ToArray());
 
             using (Stream stream2 = await repository.ReadStreamAsync(sha2, default))
             using (var ms = new MemoryStream())
             {
                 stream2.CopyTo(ms);
-                Assert.Equal(data, ms.ToArray());
+                Assert.Equal(buffer, ms.ToArray());
             }
 
-            using (Stream stream2 = new MemoryStream(data))
+            using (Stream stream2 = new MemoryStream(buffer))
             {
                 sha2 = await repository.WriteObjectAsync(stream2, true, default);
             }
@@ -73,7 +73,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             using (var ms = new MemoryStream())
             {
                 stream2.CopyTo(ms);
-                Assert.Equal(data, ms.ToArray());
+                Assert.Equal(buffer, ms.ToArray());
             }
 
             // Tree

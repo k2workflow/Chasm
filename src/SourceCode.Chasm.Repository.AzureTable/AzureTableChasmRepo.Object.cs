@@ -15,6 +15,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
 {
     partial class AzureTableChasmRepo // .Object
     {
+        #region Read
+
         public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             CloudTable objectsTable = _objectsTable.Value;
@@ -91,60 +93,30 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return dict;
         }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            var dict = new Dictionary<Sha1, Memory<byte>>();
+        #endregion
 
-            foreach (Memory<byte> item in items)
-            {
-                if (cancellationToken.IsCancellationRequested) break;
+        #region Write
 
-                Sha1 sha1 = Hasher.HashData(item.Span);
+        public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
+            => WriteFileAsync(buffer, (sha1, tempPath) => Upload(sha1, tempPath, forceOverwrite, cancellationToken), true, cancellationToken);
 
-                dict.Add(sha1, item);
-            }
-
-            IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildWriteBatches(dict, forceOverwrite);
-            return batches;
-        }
-
-        public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            Sha1 sha1 = await WriteFileAsync(memory, async (_, tempPath) =>
-            {
-                var bytes = await File.ReadAllBytesAsync(tempPath, cancellationToken)
-                    .ConfigureAwait(false);
-
-                TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
-                CloudTable objectsTable = _objectsTable.Value;
-                await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
-                    .ConfigureAwait(false);
-
-            }, true, cancellationToken)
-                .ConfigureAwait(false);
-
-            return sha1;
-        }
-
-        public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            Sha1 sha1 = await WriteFileAsync(stream, async (_, tempPath) =>
-            {
-                var bytes = await File.ReadAllBytesAsync(tempPath, cancellationToken)
-                    .ConfigureAwait(false);
+            return WriteFileAsync(stream, (sha1, tempPath) => Upload(sha1, tempPath, forceOverwrite, cancellationToken), true, cancellationToken);
+        }
 
-                TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
-
-                CloudTable objectsTable = _objectsTable.Value;
-                await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
-                    .ConfigureAwait(false);
-
-            }, true, cancellationToken)
+        private async Task Upload(Sha1 sha1, string tempPath, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            var bytes = await File.ReadAllBytesAsync(tempPath, cancellationToken)
                 .ConfigureAwait(false);
 
-            return sha1;
+            TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
+
+            CloudTable objectsTable = _objectsTable.Value;
+            await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         public override async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
@@ -167,5 +139,24 @@ namespace SourceCode.Chasm.Repository.AzureTable
             await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
         }
+
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            var dict = new Dictionary<Sha1, Memory<byte>>();
+
+            foreach (Memory<byte> item in items)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+
+                Sha1 sha1 = Hasher.HashData(item.Span);
+
+                dict.Add(sha1, item);
+            }
+
+            IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildWriteBatches(dict, forceOverwrite);
+            return batches;
+        }
+
+        #endregion
     }
 }

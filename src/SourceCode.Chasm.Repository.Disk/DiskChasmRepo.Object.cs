@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +9,8 @@ namespace SourceCode.Chasm.Repository.Disk
 {
     partial class DiskChasmRepo // .Object
     {
+        #region Read
+
         public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             string filename = DeriveFileName(objectId);
@@ -39,65 +42,47 @@ namespace SourceCode.Chasm.Repository.Disk
             return fileStream;
         }
 
-        public override async Task<Sha1> WriteObjectAsync(Memory<byte> memory, bool forceOverwrite, CancellationToken cancellationToken)
-        {
-            Task MoveAction(Sha1 sha, string tempPath)
-            {
-                Rename(forceOverwrite, sha, tempPath);
-                return Task.CompletedTask;
-            }
+        #endregion
 
-            Sha1 sha1 = await WriteFileAsync(memory, MoveAction, forceOverwrite, cancellationToken)
-                .ConfigureAwait(false);
+        #region Write
 
-            return sha1;
-        }
+        public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
+            => WriteFileAsync(buffer, (sha1, tempPath) => RenameFile(tempPath, sha1, forceOverwrite), true, cancellationToken);
 
-        public override async Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            Task MoveAction(Sha1 sha, string tempPath)
-            {
-                Rename(forceOverwrite, sha, tempPath);
-                return Task.CompletedTask;
-            }
-
-            Sha1 sha1 = await WriteFileAsync(stream, MoveAction, forceOverwrite, cancellationToken)
-                .ConfigureAwait(false);
-
-            return sha1;
+            return WriteFileAsync(stream, (sha1, tempPath) => RenameFile(tempPath, sha1, forceOverwrite), true, cancellationToken);
         }
 
-        private void Rename(bool forceOverwrite, Sha1 sha1, string tempFile)
+        private Task RenameFile(string tempPath, Sha1 sha1, bool forceOverwrite)
         {
-            try
+            Debug.Assert(!string.IsNullOrWhiteSpace(tempPath));
+
+            string filename = DeriveFileName(sha1);
+            string filePath = Path.Combine(_objectsContainer, filename);
+
+            string dir = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(dir))
             {
-                string filename = DeriveFileName(sha1);
-                string filePath = Path.Combine(_objectsContainer, filename);
-
-                string dir = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-
-                // If file already exists then we can be sure it already contains the same content
-                else if (File.Exists(filePath))
-                {
-                    if (!forceOverwrite)
-                        return;
-
-                    File.Delete(filePath);
-                }
-
-                File.Move(tempFile, filePath);
+                Directory.CreateDirectory(dir);
             }
-            finally
+
+            // If file already exists then we can be sure it already contains the same content
+            else if (File.Exists(filePath))
             {
-                if (File.Exists(tempFile))
-                    File.Delete(tempFile);
+                if (!forceOverwrite)
+                    return Task.CompletedTask;
+
+                File.Delete(filePath);
             }
+
+            File.Move(tempPath, filePath);
+
+            return Task.CompletedTask;
         }
+
+        #endregion
     }
 }
