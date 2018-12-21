@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.Repository.Disk
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public static async Task<Sha1> WriteFileAsync(Func<Stream, Task> beforeHash, Func<Sha1, string, Task> fileAction, CancellationToken cancellationToken)
+        public static async Task<Sha1> WriteFileAsync(Func<Stream, ValueTask> beforeHash, Func<Sha1, string, ValueTask> fileAction, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
@@ -73,14 +73,14 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, Task> fileAction, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, ValueTask> fileAction, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            Task Curry(Stream inner)
-                => stream.CopyToAsync(inner, cancellationToken);
+            ValueTask CopyStreamAsync(Stream inner)
+                => new ValueTask(stream.CopyToAsync(inner, cancellationToken));
 
-            return WriteFileAsync(Curry, fileAction, cancellationToken);
+            return WriteFileAsync(CopyStreamAsync, fileAction, cancellationToken);
         }
 
         /// <summary>
@@ -92,12 +92,12 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, Task> fileAction, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, ValueTask> fileAction, CancellationToken cancellationToken)
         {
-            Task Curry(Stream inner)
-                => inner.WriteAsync(buffer, cancellationToken).AsTask();
+            ValueTask CopyBufferAsync(Stream inner)
+                => inner.WriteAsync(buffer, cancellationToken);
 
-            return WriteFileAsync(Curry, fileAction, cancellationToken);
+            return WriteFileAsync(CopyBufferAsync, fileAction, cancellationToken);
         }
 
         private static async Task<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)

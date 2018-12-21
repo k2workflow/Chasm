@@ -54,13 +54,13 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            Task Curry(Sha1 sha1, string tempPath)
+            ValueTask RenameAsync(Sha1 sha1, string tempPath)
             {
-                RenameFile(tempPath, sha1, forceOverwrite);
-                return Task.CompletedTask;
+                MoveIntoObjectsContainer(tempPath, sha1, forceOverwrite);
+                return default; // Same as Task.CompletedTask
             }
 
-            return WriteFileAsync(buffer, Curry, cancellationToken);
+            return WriteFileAsync(buffer, RenameAsync, cancellationToken);
         }
 
         /// <summary>
@@ -73,13 +73,13 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            Task Curry(Sha1 sha1, string tempPath)
+            ValueTask RenameAsync(Sha1 sha1, string tempPath)
             {
-                RenameFile(tempPath, sha1, forceOverwrite);
-                return Task.CompletedTask;
+                MoveIntoObjectsContainer(tempPath, sha1, forceOverwrite);
+                return default; // Same as Task.CompletedTask
             }
 
-            return WriteFileAsync(stream, Curry, cancellationToken);
+            return WriteFileAsync(stream, RenameAsync, cancellationToken);
         }
 
         /// <summary>
@@ -91,20 +91,20 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
-            Task Curry(Sha1 sha1, string tempPath)
+            ValueTask RenameAsync(Sha1 sha1, string tempPath)
             {
-                RenameFile(tempPath, sha1, forceOverwrite);
-                return Task.CompletedTask;
+                MoveIntoObjectsContainer(tempPath, sha1, forceOverwrite);
+                return default; // Same as Task.CompletedTask
             }
 
-            return WriteFileAsync(beforeHash, Curry, cancellationToken);
+            return WriteFileAsync(beforeHash, RenameAsync, cancellationToken);
         }
 
-        private void RenameFile(string tempPath, Sha1 sha1, bool forceOverwrite)
+        private void MoveIntoObjectsContainer(string tempPath, Sha1 sha1, bool forceOverwrite)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(tempPath));
 

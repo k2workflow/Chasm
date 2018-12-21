@@ -106,10 +106,10 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            Task Curry(Sha1 sha1, string tempPath)
-                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+            ValueTask UploadAsync(Sha1 sha1, string tempPath)
+                => UploadFileAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(buffer, Curry, true, cancellationToken);
+            return DiskChasmRepo.WriteFileAsync(buffer, UploadAsync, cancellationToken);
         }
 
         /// <summary>
@@ -122,10 +122,10 @@ namespace SourceCode.Chasm.Repository.AzureTable
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            Task Curry(Sha1 sha1, string tempPath)
-                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+            ValueTask UploadAsync(Sha1 sha1, string tempPath)
+                => UploadFileAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(stream, Curry, true, cancellationToken);
+            return DiskChasmRepo.WriteFileAsync(stream, UploadAsync, cancellationToken);
         }
 
         /// <summary>
@@ -137,14 +137,18 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
+        /// <remarks>Note that the <paramref name="beforeHash"/> function should maintain the integrity
+        /// of the source stream: the hash will be taken on the result of this operation.
+        /// For example, transforming to Json is appropriate but compression is not since the latter
+        /// is not a representative model of the original content, but rather a storage optimization.</remarks>
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
-            Task Curry(Sha1 sha1, string tempPath)
-                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+            ValueTask UploadAsync(Sha1 sha1, string tempPath)
+                => UploadFileAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(beforeHash, Curry, true, cancellationToken);
+            return DiskChasmRepo.WriteFileAsync(beforeHash, UploadAsync, cancellationToken);
         }
 
         /// <summary>
@@ -153,7 +157,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="buffers">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task WriteObjectsAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
 
@@ -174,7 +178,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 .ConfigureAwait(false);
         }
 
-        private async Task UploadAsync(string tempPath, Sha1 sha1, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask UploadFileAsync(string tempPath, Sha1 sha1, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var bytes = await File.ReadAllBytesAsync(tempPath, cancellationToken)
                 .ConfigureAwait(false);

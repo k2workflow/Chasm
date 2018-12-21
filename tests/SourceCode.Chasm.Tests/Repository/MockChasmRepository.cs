@@ -49,7 +49,7 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task WriteObjectsAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -59,7 +59,7 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> writeAction, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, ValueTask> writeAction, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

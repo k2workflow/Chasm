@@ -51,9 +51,9 @@ namespace SourceCode.Chasm.Repository
 
         public abstract Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public abstract Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeHash, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<Sha1> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public virtual async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken)
+        public virtual async Task WriteObjectsAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (buffers == null || !buffers.Any()) return;
 
