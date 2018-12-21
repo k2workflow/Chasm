@@ -16,6 +16,16 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
+            // Try disk repo first
+
+            ReadOnlyMemory<byte>? cached = await _diskRepo.ReadObjectAsync(objectId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (cached.HasValue)
+                return cached.Value;
+
+            // Else go to cloud
+
             string blobName = DeriveBlobName(objectId);
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
@@ -42,6 +52,16 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
+            // Try disk repo first
+
+            Stream cached = await _diskRepo.ReadStreamAsync(objectId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (cached != null)
+                return cached;
+
+            // Else go to cloud
+
             string blobName = DeriveBlobName(objectId);
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
@@ -49,13 +69,12 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             try
             {
                 var input = new MemoryStream();
-                {
-                    // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
-                    await blobRef.DownloadToStreamAsync(input)
-                        .ConfigureAwait(false);
 
-                    return input;
-                }
+                // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
+                await blobRef.DownloadToStreamAsync(input)
+                    .ConfigureAwait(false);
+
+                return input;
             }
             // Try-catch is cheaper than a separate (latent) exists check
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
@@ -80,7 +99,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             Task Curry(Sha1 sha1, string tempPath)
                 => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(buffer, Curry, true, cancellationToken);
+            return DiskChasmRepo.WriteFileAsync(buffer, Curry, cancellationToken);
         }
 
         /// <summary>
@@ -96,26 +115,26 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             Task Curry(Sha1 sha1, string tempPath)
                 => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(stream, Curry, true, cancellationToken);
+            return DiskChasmRepo.WriteFileAsync(stream, Curry, cancellationToken);
         }
 
         /// <summary>
         /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
-        /// The <paramref name="beforeWrite"/> function permits a transformation operation
+        /// The <paramref name="beforeHash"/> function permits a transformation operation
         /// on the source value before calculating the hash and writing to the destination.
         /// For example, the source stream may be encoded as Json.
         /// </summary>
-        /// <param name="beforeWrite">An action to take on the internal stream, before calculating the hash.</param>
+        /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeWrite, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (beforeWrite == null) throw new ArgumentNullException(nameof(beforeWrite));
+            if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
             Task Curry(Sha1 sha1, string tempPath)
                 => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(beforeWrite, Curry, true, cancellationToken);
+            return DiskChasmRepo.WriteFileAsync(beforeHash, Curry, cancellationToken);
         }
 
         private async Task UploadAsync(string tempPath, Sha1 sha1, bool forceOverwrite, CancellationToken cancellationToken)

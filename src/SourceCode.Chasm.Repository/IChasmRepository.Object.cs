@@ -33,14 +33,14 @@ namespace SourceCode.Chasm.Repository
 
         /// <summary>
         /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
-        /// The <paramref name="beforeWrite"/> function permits a transformation operation
+        /// The <paramref name="beforeHash"/> function permits a transformation operation
         /// on the source value before calculating the hash and writing to the destination.
         /// For example, the source stream may be encoded as Json.
         /// </summary>
-        /// <param name="beforeWrite">An action to take on the internal stream, before calculating the hash.</param>
+        /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeWrite, bool forceOverwrite, CancellationToken cancellationToken);
+        Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeHash, bool forceOverwrite, CancellationToken cancellationToken);
 
         /// <summary>
         /// Writes a list of buffers to the destination, returning the content's <see cref="Sha1"/> value.

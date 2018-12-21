@@ -130,21 +130,21 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         /// <summary>
         /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
-        /// The <paramref name="beforeWrite"/> function permits a transformation operation
+        /// The <paramref name="beforeHash"/> function permits a transformation operation
         /// on the source value before calculating the hash and writing to the destination.
         /// For example, the source stream may be encoded as Json.
         /// </summary>
-        /// <param name="beforeWrite">An action to take on the internal stream, before calculating the hash.</param>
+        /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeWrite, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (beforeWrite == null) throw new ArgumentNullException(nameof(beforeWrite));
+            if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
             Task Curry(Sha1 sha1, string tempPath)
                 => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(beforeWrite, Curry, true, cancellationToken);
+            return DiskChasmRepo.WriteFileAsync(beforeHash, Curry, true, cancellationToken);
         }
 
         /// <summary>

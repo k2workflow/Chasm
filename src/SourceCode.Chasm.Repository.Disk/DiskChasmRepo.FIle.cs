@@ -11,24 +11,23 @@ namespace SourceCode.Chasm.Repository.Disk
     {
         /// <summary>
         /// Writes a file to disk, returning the content's <see cref="Sha1"/> value.
-        /// The <paramref name="beforeWrite"/> function permits a transformation operation
+        /// The <paramref name="beforeHash"/> function permits a transformation operation
         /// on the source value before calculating the hash and writing to the destination.
         /// For example, the source stream may be encoded as Json.
         /// The <paramref name="fileAction"/> function permits an operation to be
         /// performed on the file immediately after writing it. For example, the file
         /// may be uploaded to the cloud.
         /// </summary>
-        /// <param name="beforeWrite">An action to take on the internal stream, before hashing and writing.</param>
+        /// <param name="beforeHash">An action to take on the internal stream, before hashing and writing.</param>
         /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
-        /// <param name="deleteFile">Whether or not to delete the file after all actions are complete.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        /// <remarks>Note that the <paramref name="beforeWrite"/> function should maintain the integrity
+        /// <remarks>Note that the <paramref name="beforeHash"/> function should maintain the integrity
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public static async Task<Sha1> WriteFileAsync(Func<Stream, Task> beforeWrite, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
+        public static async Task<Sha1> WriteFileAsync(Func<Stream, Task> beforeHash, Func<Sha1, string, Task> fileAction, CancellationToken cancellationToken)
         {
-            if (beforeWrite == null) throw new ArgumentNullException(nameof(beforeWrite));
+            if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
             // Note that an empty file is physically created
             var tempPath = Path.GetTempFileName();
@@ -41,7 +40,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 {
                     using (var cs = new crypt.CryptoStream(fs, ct, crypt.CryptoStreamMode.Write, false))
                     {
-                        await beforeWrite(cs)
+                        await beforeHash(cs)
                             .ConfigureAwait(false);
                     }
 
@@ -58,8 +57,7 @@ namespace SourceCode.Chasm.Repository.Disk
             }
             finally
             {
-                if (deleteFile
-                    && File.Exists(tempPath))
+                if (File.Exists(tempPath))
                 {
                     File.Delete(tempPath);
                 }
@@ -74,16 +72,15 @@ namespace SourceCode.Chasm.Repository.Disk
         /// </summary>
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
-        /// <param name="deleteFile">Whether or not to delete the file after all actions are complete.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, Task> fileAction, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             Task Curry(Stream inner)
                 => stream.CopyToAsync(inner, cancellationToken);
 
-            return WriteFileAsync(Curry, fileAction, deleteFile, cancellationToken);
+            return WriteFileAsync(Curry, fileAction, cancellationToken);
         }
 
         /// <summary>
@@ -94,14 +91,13 @@ namespace SourceCode.Chasm.Repository.Disk
         /// </summary>
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
-        /// <param name="deleteFile">Whether or not to delete the file after all actions are complete.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, Task> fileAction, CancellationToken cancellationToken)
         {
             Task Curry(Stream inner)
                 => inner.WriteAsync(buffer, cancellationToken).AsTask();
 
-            return WriteFileAsync(Curry, fileAction, deleteFile, cancellationToken);
+            return WriteFileAsync(Curry, fileAction, cancellationToken);
         }
 
         private static async Task<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
