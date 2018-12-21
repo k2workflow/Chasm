@@ -56,7 +56,7 @@ namespace SourceCode.Chasm.Repository.Disk
             return WriteFileAsync(stream, (sha1, tempPath) => RenameFile(tempPath, sha1, forceOverwrite), true, cancellationToken);
         }
 
-        private Task RenameFile(string tempPath, Sha1 sha1, bool forceOverwrite)
+        public Task RenameFile(string tempPath, Sha1 sha1, bool forceOverwrite)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(tempPath));
 
