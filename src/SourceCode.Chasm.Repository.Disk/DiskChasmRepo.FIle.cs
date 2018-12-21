@@ -80,10 +80,10 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            Task FileAction(Stream inner)
+            Task Curry(Stream inner)
                 => stream.CopyToAsync(inner, cancellationToken);
 
-            return WriteFileAsync(FileAction, fileAction, deleteFile, cancellationToken);
+            return WriteFileAsync(Curry, fileAction, deleteFile, cancellationToken);
         }
 
         /// <summary>
@@ -98,10 +98,10 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
         {
-            Task FileAction(Stream inner)
+            Task Curry(Stream inner)
                 => inner.WriteAsync(buffer, cancellationToken).AsTask();
 
-            return WriteFileAsync(FileAction, fileAction, deleteFile, cancellationToken);
+            return WriteFileAsync(Curry, fileAction, deleteFile, cancellationToken);
         }
 
         private static async Task<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
