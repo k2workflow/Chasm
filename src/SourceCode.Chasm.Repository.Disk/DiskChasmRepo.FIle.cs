@@ -22,6 +22,10 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
         /// <param name="deleteFile">Whether or not to delete the file after all actions are complete.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
+        /// <remarks>Note that the <paramref name="beforeWrite"/> function should maintain the integrity
+        /// of the source stream: the hash will be taken on the result of this operation.
+        /// For example, transforming to Json is appropriate but compression is not since the latter
+        /// is not a representative model of the original content, but rather a storage optimization.</remarks>
         public static async Task<Sha1> WriteFileAsync(Func<Stream, Task> beforeWrite, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
         {
             if (beforeWrite == null) throw new ArgumentNullException(nameof(beforeWrite));
