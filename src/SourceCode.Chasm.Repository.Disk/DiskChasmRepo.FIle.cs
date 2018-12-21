@@ -9,9 +9,22 @@ namespace SourceCode.Chasm.Repository.Disk
 {
     partial class DiskChasmRepo // .File
     {
-        public static async Task<Sha1> WriteFileAsync(Func<Stream, Task> writeAction, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
+        /// <summary>
+        /// Writes a file to disk, returning the content's <see cref="Sha1"/> value.
+        /// The <paramref name="beforeWrite"/> function permits a transformation operation
+        /// on the source value before calculating the hash and writing to the destination.
+        /// For example, the source stream may be encoded as Json.
+        /// The <paramref name="fileAction"/> function permits an operation to be
+        /// performed on the file immediately after writing it. For example, the file
+        /// may be uploaded to the cloud.
+        /// </summary>
+        /// <param name="beforeWrite">An action to take on the internal stream, before hashing and writing.</param>
+        /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
+        /// <param name="deleteFile">Whether or not to delete the file after all actions are complete.</param>
+        /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
+        public static async Task<Sha1> WriteFileAsync(Func<Stream, Task> beforeWrite, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
         {
-            if (writeAction == null) throw new ArgumentNullException(nameof(writeAction));
+            if (beforeWrite == null) throw new ArgumentNullException(nameof(beforeWrite));
 
             // Note that an empty file is physically created
             var tempPath = Path.GetTempFileName();
@@ -24,7 +37,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 {
                     using (var cs = new crypt.CryptoStream(fs, ct, crypt.CryptoStreamMode.Write, false))
                     {
-                        await writeAction(cs)
+                        await beforeWrite(cs)
                             .ConfigureAwait(false);
                     }
 
@@ -49,6 +62,16 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
+        /// <summary>
+        /// Writes a file to disk, returning the content's <see cref="Sha1"/> value.
+        /// The <paramref name="fileAction"/> function permits an operation to be
+        /// performed on the file immediately after writing it. For example, the file
+        /// may be uploaded to the cloud.
+        /// </summary>
+        /// <param name="stream">The content to hash and write.</param>
+        /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
+        /// <param name="deleteFile">Whether or not to delete the file after all actions are complete.</param>
+        /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -59,6 +82,16 @@ namespace SourceCode.Chasm.Repository.Disk
             return WriteFileAsync(FileAction, fileAction, deleteFile, cancellationToken);
         }
 
+        /// <summary>
+        /// Writes a file to disk, returning the content's <see cref="Sha1"/> value.
+        /// The <paramref name="fileAction"/> function permits an operation to be
+        /// performed on the file immediately after writing it. For example, the file
+        /// may be uploaded to the cloud.
+        /// </summary>
+        /// <param name="buffer">The content to hash and write.</param>
+        /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
+        /// <param name="deleteFile">Whether or not to delete the file after all actions are complete.</param>
+        /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, Task> fileAction, bool deleteFile, CancellationToken cancellationToken)
         {
             Task FileAction(Stream inner)

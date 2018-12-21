@@ -98,6 +98,12 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         #region Write
 
+        /// <summary>
+        /// Writes a buffer to the destination, returning the content's <see cref="Sha1"/> value.
+        /// </summary>
+        /// <param name="buffer">The content to hash and write.</param>
+        /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
+        /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
         {
             Task Curry(Sha1 sha1, string tempPath)
@@ -106,6 +112,12 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return DiskChasmRepo.WriteFileAsync(buffer, Curry, true, cancellationToken);
         }
 
+        /// <summary>
+        /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
+        /// </summary>
+        /// <param name="stream">The content to hash and write.</param>
+        /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
+        /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -116,16 +128,31 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return DiskChasmRepo.WriteFileAsync(stream, Curry, true, cancellationToken);
         }
 
-        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> writeAction, bool forceOverwrite, CancellationToken cancellationToken)
+        /// <summary>
+        /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
+        /// The <paramref name="beforeWrite"/> function permits a transformation operation
+        /// on the source value before calculating the hash and writing to the destination.
+        /// For example, the source stream may be encoded as Json.
+        /// </summary>
+        /// <param name="beforeWrite">An action to take on the internal stream, before calculating the hash.</param>
+        /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
+        /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> beforeWrite, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (writeAction == null) throw new ArgumentNullException(nameof(writeAction));
+            if (beforeWrite == null) throw new ArgumentNullException(nameof(beforeWrite));
 
             Task Curry(Sha1 sha1, string tempPath)
                 => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(writeAction, Curry, true, cancellationToken);
+            return DiskChasmRepo.WriteFileAsync(beforeWrite, Curry, true, cancellationToken);
         }
 
+        /// <summary>
+        /// Writes a list of buffers to the destination, returning the content's <see cref="Sha1"/> value.
+        /// </summary>
+        /// <param name="buffers">The content to hash and write.</param>
+        /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
+        /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public override async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any()) return;
