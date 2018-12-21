@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using SourceCode.Chasm.Repository.Disk;
 using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.AzureBlob
@@ -69,16 +70,34 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         #region Write
 
         public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
-            => WriteFileAsync(buffer, (sha1, tempPath) => Upload(sha1, tempPath, forceOverwrite, cancellationToken), true, cancellationToken);
+        {
+            Task Curry(Sha1 sha1, string tempPath)
+                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+
+            return DiskChasmRepo.WriteFileAsync(buffer, Curry, true, cancellationToken);
+        }
 
         public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            return WriteFileAsync(stream, (sha1, tempPath) => Upload(sha1, tempPath, forceOverwrite, cancellationToken), true, cancellationToken);
+            Task Curry(Sha1 sha1, string tempPath)
+                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+
+            return DiskChasmRepo.WriteFileAsync(stream, Curry, true, cancellationToken);
         }
 
-        private async Task Upload(Sha1 sha1, string tempPath, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> writeAction, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            if (writeAction == null) throw new ArgumentNullException(nameof(writeAction));
+
+            Task Curry(Sha1 sha1, string tempPath)
+                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+
+            return DiskChasmRepo.WriteFileAsync(writeAction, Curry, true, cancellationToken);
+        }
+
+        private async Task UploadAsync(string tempPath, Sha1 sha1, bool forceOverwrite, CancellationToken cancellationToken)
         {
             string blobName = DeriveBlobName(sha1);
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
@@ -107,10 +126,6 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                     .ConfigureAwait(false);
             }
         }
-
-        #endregion
-
-        #region Helpers
 
         public static string DeriveBlobName(Sha1 sha1)
         {

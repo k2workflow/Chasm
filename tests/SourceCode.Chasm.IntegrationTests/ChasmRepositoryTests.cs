@@ -173,7 +173,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
             using (var serializer = new JsonChasmSerializer())
             {
-                var repo = new AzureBlobChasmRepo(csa, serializer);
+                var repo = new AzureBlobChasmRepo(csa, new DiskChasmRepo(@"c:\temp\", serializer));
                 await TestRepository(repo);
             }
         }
@@ -187,7 +187,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             var csa = CloudStorageAccount.Parse(DevelopmentStorage);
             using (var serializer = new JsonChasmSerializer())
             {
-                var repo = new AzureTableChasmRepo(csa, serializer);
+                var repo = new AzureTableChasmRepo(csa, new DiskChasmRepo(@"c:\temp\", serializer));
                 await TestRepository(repo);
             }
         }

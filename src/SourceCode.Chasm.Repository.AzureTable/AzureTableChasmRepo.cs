@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using SourceCode.Chasm.Serializer;
+using SourceCode.Chasm.Repository.Disk;
 
 namespace SourceCode.Chasm.Repository.AzureTable
 {
@@ -10,28 +10,17 @@ namespace SourceCode.Chasm.Repository.AzureTable
     {
         private readonly Lazy<CloudTable> _refsTable;
         private readonly Lazy<CloudTable> _objectsTable;
-        private readonly string _scratchPath;
+        private readonly DiskChasmRepo _diskRepo;
 
-        public AzureTableChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, int maxDop)
-            : base(serializer, maxDop)
+        public AzureTableChasmRepo(CloudStorageAccount storageAccount, DiskChasmRepo diskRepo, int maxDop = -1)
+            : base(diskRepo.Serializer, maxDop)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
 
-            // Scratch area
-            _scratchPath = System.IO.Path.GetTempPath();
+            // File staging repo
+            _diskRepo = diskRepo ?? throw new ArgumentNullException(nameof(diskRepo));
 
             CloudTableClient client = storageAccount.CreateCloudTableClient();
-
-            // Refs
-            _refsTable = new Lazy<CloudTable>(() =>
-            {
-                const string table = "refs";
-                CloudTable tr = client.GetTableReference(table);
-
-                tr.CreateIfNotExistsAsync().Wait();
-
-                return tr;
-            }, LazyThreadSafetyMode.PublicationOnly);
 
             // Objects
             _objectsTable = new Lazy<CloudTable>(() =>
@@ -43,19 +32,26 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
                 return tr;
             }, LazyThreadSafetyMode.PublicationOnly);
+
+            // Refs
+            _refsTable = new Lazy<CloudTable>(() =>
+            {
+                const string table = "refs";
+                CloudTable tr = client.GetTableReference(table);
+
+                tr.CreateIfNotExistsAsync().Wait();
+
+                return tr;
+            }, LazyThreadSafetyMode.PublicationOnly);
         }
 
-        public AzureTableChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer)
-          : this(storageAccount, serializer, -1)
-        { }
-
-        public static AzureTableChasmRepo Create(string connectionString, IChasmSerializer serializer, int maxDop)
+        public static AzureTableChasmRepo Create(string connectionString, DiskChasmRepo diskRepo, int maxDop)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
-            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            if (diskRepo == null) throw new ArgumentNullException(nameof(diskRepo));
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
-            var repo = new AzureTableChasmRepo(storageAccount, serializer, maxDop);
+            var repo = new AzureTableChasmRepo(storageAccount, diskRepo, maxDop);
 
             return repo;
         }

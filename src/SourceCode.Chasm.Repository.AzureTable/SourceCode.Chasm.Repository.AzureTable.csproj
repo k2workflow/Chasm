@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SourceCode.Chasm.Repository\SourceCode.Chasm.Repository.csproj" />
+    <ProjectReference Include="..\SourceCode.Chasm.Repository.Disk\SourceCode.Chasm.Repository.Disk.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

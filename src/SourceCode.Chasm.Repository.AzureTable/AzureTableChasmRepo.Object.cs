@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using SourceCode.Chasm.Repository.Disk;
 using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.AzureTable
@@ -98,25 +99,31 @@ namespace SourceCode.Chasm.Repository.AzureTable
         #region Write
 
         public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
-            => WriteFileAsync(buffer, (sha1, tempPath) => Upload(sha1, tempPath, forceOverwrite, cancellationToken), true, cancellationToken);
+        {
+            Task Curry(Sha1 sha1, string tempPath)
+                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+
+            return DiskChasmRepo.WriteFileAsync(buffer, Curry, true, cancellationToken);
+        }
 
         public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            return WriteFileAsync(stream, (sha1, tempPath) => Upload(sha1, tempPath, forceOverwrite, cancellationToken), true, cancellationToken);
+            Task Curry(Sha1 sha1, string tempPath)
+                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+
+            return DiskChasmRepo.WriteFileAsync(stream, Curry, true, cancellationToken);
         }
 
-        private async Task Upload(Sha1 sha1, string tempPath, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> writeAction, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            var bytes = await File.ReadAllBytesAsync(tempPath, cancellationToken)
-                .ConfigureAwait(false);
+            if (writeAction == null) throw new ArgumentNullException(nameof(writeAction));
 
-            TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
+            Task Curry(Sha1 sha1, string tempPath)
+                => UploadAsync(tempPath, sha1, forceOverwrite, cancellationToken);
 
-            CloudTable objectsTable = _objectsTable.Value;
-            await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
-                .ConfigureAwait(false);
+            return DiskChasmRepo.WriteFileAsync(writeAction, Curry, true, cancellationToken);
         }
 
         public override async Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
@@ -137,6 +144,18 @@ namespace SourceCode.Chasm.Repository.AzureTable
             }
 
             await Task.WhenAll(tasks)
+                .ConfigureAwait(false);
+        }
+
+        private async Task UploadAsync(string tempPath, Sha1 sha1, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            var bytes = await File.ReadAllBytesAsync(tempPath, cancellationToken)
+                .ConfigureAwait(false);
+
+            TableOperation op = DataEntity.BuildWriteOperation(sha1, bytes, forceOverwrite);
+
+            CloudTable objectsTable = _objectsTable.Value;
+            await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
                 .ConfigureAwait(false);
         }
 

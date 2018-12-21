@@ -2,43 +2,26 @@ using System;
 using System.Threading;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using SourceCode.Chasm.Serializer;
+using SourceCode.Chasm.Repository.Disk;
 
 namespace SourceCode.Chasm.Repository.AzureBlob
 {
     public sealed partial class AzureBlobChasmRepo : ChasmRepository
     {
-        #region Fields
-
         private readonly Lazy<CloudBlobContainer> _refsContainer;
         private readonly Lazy<CloudBlobContainer> _objectsContainer;
-        private readonly string _scratchPath;
+        private readonly DiskChasmRepo _diskRepo;
 
-        #endregion
-
-        #region Constructors
-
-        public AzureBlobChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer, int maxDop)
-            : base(serializer, maxDop)
+        public AzureBlobChasmRepo(CloudStorageAccount storageAccount, DiskChasmRepo diskRepo, int maxDop = -1)
+            : base(diskRepo.Serializer, maxDop)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
 
-            // Scratch area
-            _scratchPath = System.IO.Path.GetTempPath();
+            // File staging repo
+            _diskRepo = diskRepo ?? throw new ArgumentNullException(nameof(diskRepo));
 
             CloudBlobClient client = storageAccount.CreateCloudBlobClient();
             client.DefaultRequestOptions.ParallelOperationThreadCount = 4; // Default is 1
-
-            // Refs
-            _refsContainer = new Lazy<CloudBlobContainer>(() =>
-            {
-                const string container = "refs";
-                CloudBlobContainer tr = client.GetContainerReference(container);
-
-                tr.CreateIfNotExistsAsync().Wait();
-
-                return tr;
-            }, LazyThreadSafetyMode.PublicationOnly);
 
             // Objects
             _objectsContainer = new Lazy<CloudBlobContainer>(() =>
@@ -50,27 +33,28 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                 return tr;
             }, LazyThreadSafetyMode.PublicationOnly);
+
+            // Refs
+            _refsContainer = new Lazy<CloudBlobContainer>(() =>
+            {
+                const string container = "refs";
+                CloudBlobContainer tr = client.GetContainerReference(container);
+
+                tr.CreateIfNotExistsAsync().Wait();
+
+                return tr;
+            }, LazyThreadSafetyMode.PublicationOnly);
         }
 
-        public AzureBlobChasmRepo(CloudStorageAccount storageAccount, IChasmSerializer serializer)
-          : this(storageAccount, serializer, -1)
-        { }
-
-        #endregion
-
-        #region Factory
-
-        public static AzureBlobChasmRepo Create(string connectionString, IChasmSerializer serializer, int maxDop)
+        public static AzureBlobChasmRepo Create(string connectionString, DiskChasmRepo diskRepo, int maxDop)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
-            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
+            if (diskRepo == null) throw new ArgumentNullException(nameof(diskRepo));
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
-            var repo = new AzureBlobChasmRepo(storageAccount, serializer, maxDop);
+            var repo = new AzureBlobChasmRepo(storageAccount, diskRepo, maxDop);
 
             return repo;
         }
-
-        #endregion
     }
 }

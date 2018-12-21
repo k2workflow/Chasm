@@ -47,16 +47,43 @@ namespace SourceCode.Chasm.Repository.Disk
         #region Write
 
         public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
-            => WriteFileAsync(buffer, (sha1, tempPath) => RenameFile(tempPath, sha1, forceOverwrite), true, cancellationToken);
+        {
+            Task Curry(Sha1 sha1, string tempPath)
+            {
+                RenameFile(tempPath, sha1, forceOverwrite);
+                return Task.CompletedTask;
+            }
+
+            return WriteFileAsync(buffer, Curry, true, cancellationToken);
+        }
 
         public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            return WriteFileAsync(stream, (sha1, tempPath) => RenameFile(tempPath, sha1, forceOverwrite), true, cancellationToken);
+            Task Curry(Sha1 sha1, string tempPath)
+            {
+                RenameFile(tempPath, sha1, forceOverwrite);
+                return Task.CompletedTask;
+            }
+
+            return WriteFileAsync(stream, Curry, true, cancellationToken);
         }
 
-        public Task RenameFile(string tempPath, Sha1 sha1, bool forceOverwrite)
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> writeAction, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            if (writeAction == null) throw new ArgumentNullException(nameof(writeAction));
+
+            Task Curry(Sha1 sha1, string tempPath)
+            {
+                RenameFile(tempPath, sha1, forceOverwrite);
+                return Task.CompletedTask;
+            }
+
+            return WriteFileAsync(writeAction, Curry, true, cancellationToken);
+        }
+
+        private void RenameFile(string tempPath, Sha1 sha1, bool forceOverwrite)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(tempPath));
 
@@ -73,14 +100,12 @@ namespace SourceCode.Chasm.Repository.Disk
             else if (File.Exists(filePath))
             {
                 if (!forceOverwrite)
-                    return Task.CompletedTask;
+                    return;
 
                 File.Delete(filePath);
             }
 
             File.Move(tempPath, filePath);
-
-            return Task.CompletedTask;
         }
 
         #endregion

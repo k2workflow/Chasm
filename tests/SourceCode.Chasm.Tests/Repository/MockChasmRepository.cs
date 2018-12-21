@@ -59,6 +59,11 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
+        public override Task<Sha1> WriteObjectAsync(Func<Stream, Task> writeAction, bool forceOverwrite, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public override ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
         {
             throw new NotImplementedException();

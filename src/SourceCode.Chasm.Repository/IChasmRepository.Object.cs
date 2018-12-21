@@ -19,6 +19,8 @@ namespace SourceCode.Chasm.Repository
 
         Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
 
+        Task<Sha1> WriteObjectAsync(Func<Stream, Task> writeAction, bool forceOverwrite, CancellationToken cancellationToken);
+
         Task WriteObjectBatchAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken);
     }
 }
