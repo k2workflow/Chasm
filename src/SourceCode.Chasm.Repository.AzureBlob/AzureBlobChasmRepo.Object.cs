@@ -14,6 +14,28 @@ namespace SourceCode.Chasm.Repository.AzureBlob
     {
         #region Read
 
+        public override async Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            // Try disk repo first
+
+            bool exists = await _diskRepo.ExistsAsync(objectId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (exists)
+                return true;
+
+            // Else go to cloud
+
+            string blobName = DeriveBlobName(objectId);
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
+            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
+
+            exists = await blobRef.ExistsAsync()
+                .ConfigureAwait(false);
+
+            return exists;
+        }
+
         public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             // Try disk repo first

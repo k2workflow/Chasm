@@ -24,6 +24,11 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
+        public override Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public override Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();

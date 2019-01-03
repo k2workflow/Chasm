@@ -18,8 +18,51 @@ namespace SourceCode.Chasm.Repository.AzureTable
     {
         #region Read
 
+        public override async Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            // Try disk repo first
+
+            bool exists = await _diskRepo.ExistsAsync(objectId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (exists)
+                return true;
+
+            // Else go to cloud
+
+            CloudTable objectsTable = _objectsTable.Value;
+            TableOperation op = DataEntity.BuildExistsOperation(objectId);
+
+            try
+            {
+                TableResult result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                    .ConfigureAwait(false);
+
+                if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
+                    return false;
+
+                return true;
+            }
+            // Try-catch is cheaper than a separate (latent) exists check
+            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
+            {
+                se.Suppress();
+                return default;
+            }
+        }
+
         public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
+            // Try disk repo first
+
+            ReadOnlyMemory<byte>? cached = await _diskRepo.ReadObjectAsync(objectId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (cached.HasValue)
+                return cached.Value;
+
+            // Else go to cloud
+
             CloudTable objectsTable = _objectsTable.Value;
             TableOperation op = DataEntity.BuildReadOperation(objectId);
 
@@ -44,6 +87,16 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
+            // Try disk repo first
+
+            Stream cached = await _diskRepo.ReadStreamAsync(objectId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (cached != null)
+                return cached;
+
+            // Else go to cloud
+
             ReadOnlyMemory<byte>? memory = await ReadObjectAsync(objectId, cancellationToken)
                 .ConfigureAwait(false);
 

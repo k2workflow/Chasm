@@ -13,6 +13,8 @@ namespace SourceCode.Chasm.Repository
     {
         #region Read
 
+        public abstract Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken);
+
         public abstract Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
         public abstract Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken);

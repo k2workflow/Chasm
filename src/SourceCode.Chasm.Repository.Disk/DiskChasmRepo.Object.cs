@@ -11,6 +11,19 @@ namespace SourceCode.Chasm.Repository.Disk
     {
         #region Read
 
+        public override Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            string filename = DeriveFileName(objectId);
+            string filePath = Path.Combine(_objectsContainer, filename);
+
+            string dir = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(dir))
+                return Task.FromResult(false);
+
+            bool exists = File.Exists(filePath);
+            return Task.FromResult(exists);
+        }
+
         public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             string filename = DeriveFileName(objectId);

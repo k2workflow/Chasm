@@ -9,6 +9,8 @@ namespace SourceCode.Chasm.Repository
 {
     partial interface IChasmRepository // .Object
     {
+        Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken);
+
         Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
         Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken);

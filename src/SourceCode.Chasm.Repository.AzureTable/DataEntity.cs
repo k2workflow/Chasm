@@ -111,14 +111,14 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         #region Exists
 
-        private static readonly List<string> s_cols = new List<string> { nameof(ITableEntity.PartitionKey), nameof(ITableEntity.RowKey) };
+        private static readonly List<string> s_keys = new List<string> { nameof(ITableEntity.PartitionKey), nameof(ITableEntity.RowKey) };
 
         internal static TableOperation BuildExistsOperation(Sha1 sha1)
         {
             string partitionKey = GetPartitionKey(sha1);
             string rowKey = GetRowKey(sha1);
 
-            var op = TableOperation.Retrieve<DataEntity>(partitionKey, rowKey, s_cols);
+            var op = TableOperation.Retrieve<DataEntity>(partitionKey, rowKey, s_keys);
             return op;
         }
 
