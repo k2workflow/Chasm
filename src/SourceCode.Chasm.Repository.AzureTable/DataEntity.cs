@@ -260,17 +260,18 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return op;
         }
 
-        internal static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> contents, bool forceOverwrite)
+        internal static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite)
         {
-            if (contents == null || !contents.Any()) return Array.Empty<TableBatchOperation>();
+            if (items == null || !items.Any())
+                return Array.Empty<TableBatchOperation>();
 
             // TODO: Limit number of items in each TableBatchOperation
 
             var batches = new Dictionary<string, TableBatchOperation>(StringComparer.Ordinal);
 
-            foreach (KeyValuePair<Sha1, Memory<byte>> content in contents)
+            foreach (KeyValuePair<Sha1, Memory<byte>> item in items)
             {
-                DataEntity entity = Create(content.Key, content.Value, forceOverwrite);
+                DataEntity entity = Create(item.Key, item.Value, forceOverwrite);
 
                 if (!batches.TryGetValue(entity.PartitionKey, out TableBatchOperation batch))
                 {
@@ -333,7 +334,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         private static string GetRowKey(string name) => $"{name}-commit";
 
-        public static Sha1 FromPartition(DataEntity entity)
+        public static Sha1 FromPartition(ITableEntity entity)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
 

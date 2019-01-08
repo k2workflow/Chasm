@@ -55,19 +55,28 @@ namespace SourceCode.Chasm.Repository
 
         public abstract Task<Sha1> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public virtual async Task WriteObjectsAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken)
+        public virtual async Task<IReadOnlyList<Sha1>> WriteObjectsAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (buffers == null || !buffers.Any()) return;
+            if (buffers == null || !buffers.Any())
+                return Array.Empty<Sha1>();
 
-            var tasks = new List<Task>();
+            var tasks = new List<Task<Sha1>>();
             foreach (Memory<byte> buffer in buffers)
             {
+                // Concurrency: instantiate tasks without await
                 Task<Sha1> task = WriteObjectAsync(buffer, forceOverwrite, cancellationToken);
                 tasks.Add(task);
             }
 
-            await Task.WhenAll(tasks)
-                .ConfigureAwait(false);
+            // Await the tasks
+            var list = new Sha1[tasks.Count];
+            for (var i = 0; i < tasks.Count; i++)
+            {
+                list[i] = await tasks[i]
+                    .ConfigureAwait(false);
+            }
+
+            return list;
         }
 
         #endregion

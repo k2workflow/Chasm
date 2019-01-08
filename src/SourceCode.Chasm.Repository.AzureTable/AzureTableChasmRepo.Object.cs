@@ -205,14 +205,15 @@ namespace SourceCode.Chasm.Repository.AzureTable
         }
 
         /// <summary>
-        /// Writes a list of buffers to the destination, returning the content's <see cref="Sha1"/> value.
+        /// Writes a list of buffers to the destination, returning the contents' <see cref="Sha1"/> values.
         /// </summary>
         /// <param name="buffers">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task WriteObjectsAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyList<Sha1>> WriteObjectsAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (items == null || !items.Any()) return;
+            if (items == null || !items.Any())
+                return Array.Empty<Sha1>();
 
             // Build batches
             IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(items, forceOverwrite, cancellationToken);
@@ -220,15 +221,25 @@ namespace SourceCode.Chasm.Repository.AzureTable
             CloudTable objectsTable = _objectsTable.Value;
 
             // Enumerate batches
-            var tasks = new List<Task>();
+            var tasks = new List<Task<IList<TableResult>>>(batches.Count);
             foreach (TableBatchOperation batch in batches)
             {
+                // Concurrency: instantiate tasks without await
                 Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken);
                 tasks.Add(task);
             }
 
+            // Await the tasks
             await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
+
+            Sha1[] list = batches
+                .Select(batch => batch)
+                .SelectMany(op => op)
+                .Select(op => DataEntity.FromPartition(op.Entity))
+                .ToArray();
+
+            return list;
         }
 
         private async ValueTask UploadFileAsync(string tempPath, Sha1 sha1, bool forceOverwrite, CancellationToken cancellationToken)
@@ -252,7 +263,6 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 if (cancellationToken.IsCancellationRequested) break;
 
                 Sha1 sha1 = Hasher.HashData(item.Span);
-
                 dict.Add(sha1, item);
             }
 
