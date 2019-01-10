@@ -18,7 +18,8 @@ namespace SourceCode.Chasm.Repository
 
         public T ToT() => Data;
 
-        public static implicit operator T(ChasmResult<T> result) => result.Data;
+        public static implicit operator T(ChasmResult<T> result)
+            => result == null ? default : result.Data;
     }
 
     //public class ChasmResult

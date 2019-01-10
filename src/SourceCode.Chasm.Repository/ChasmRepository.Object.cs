@@ -49,27 +49,27 @@ namespace SourceCode.Chasm.Repository
 
         #region Write
 
-        public abstract Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<ChasmResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public abstract Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<ChasmResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public abstract Task<Sha1> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<ChasmResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public virtual async Task<IReadOnlyList<Sha1>> WriteObjectsAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken)
+        public virtual async Task<IReadOnlyList<ChasmResult<Sha1>>> WriteObjectsAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (buffers == null || !buffers.Any())
-                return Array.Empty<Sha1>();
+                return Array.Empty<ChasmResult<Sha1>>();
 
-            var tasks = new List<Task<Sha1>>();
+            var tasks = new List<Task<ChasmResult<Sha1>>>();
             foreach (Memory<byte> buffer in buffers)
             {
                 // Concurrency: instantiate tasks without await
-                Task<Sha1> task = WriteObjectAsync(buffer, forceOverwrite, cancellationToken);
+                Task<ChasmResult<Sha1>> task = WriteObjectAsync(buffer, forceOverwrite, cancellationToken);
                 tasks.Add(task);
             }
 
             // Await the tasks
-            var list = new Sha1[tasks.Count];
+            var list = new ChasmResult<Sha1>[tasks.Count];
             for (var i = 0; i < tasks.Count; i++)
             {
                 list[i] = await tasks[i]

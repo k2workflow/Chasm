@@ -163,12 +163,20 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            ValueTask UploadAsync(Sha1 objectId, string filePath)
-                => IdempotentUploadAsync(filePath, objectId, forceOverwrite, cancellationToken);
+            var idempotentSuccess = false;
 
-            return DiskChasmRepo.WriteFileAsync(buffer, UploadAsync, cancellationToken);
+            async ValueTask UploadAsync(Sha1 sha1, string filePath)
+            {
+                idempotentSuccess = await IdempotentUploadAsync(filePath, sha1, forceOverwrite, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, UploadAsync, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
         }
 
         /// <summary>
@@ -177,14 +185,22 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            ValueTask UploadAsync(Sha1 objectId, string filePath)
-                => IdempotentUploadAsync(filePath, objectId, forceOverwrite, cancellationToken);
+            var idempotentSuccess = false;
 
-            return DiskChasmRepo.WriteFileAsync(stream, UploadAsync, cancellationToken);
+            async ValueTask UploadAsync(Sha1 sha1, string filePath)
+            {
+                idempotentSuccess = await IdempotentUploadAsync(filePath, sha1, forceOverwrite, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, UploadAsync, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
         }
 
         /// <summary>
@@ -200,14 +216,23 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public override Task<Sha1> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
-            ValueTask UploadAsync(Sha1 objectId, string filePath)
-                => IdempotentUploadAsync(filePath, objectId, forceOverwrite, cancellationToken);
 
-            return DiskChasmRepo.WriteFileAsync(beforeHash, UploadAsync, cancellationToken);
+            var idempotentSuccess = false;
+
+            async ValueTask UploadAsync(Sha1 sha1, string filePath)
+            {
+                idempotentSuccess = await IdempotentUploadAsync(filePath, sha1, forceOverwrite, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(beforeHash, UploadAsync, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
         }
 
         /// <summary>
@@ -216,10 +241,10 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="buffers">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<IReadOnlyList<Sha1>> WriteObjectsAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyList<ChasmResult<Sha1>>> WriteObjectsAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any())
-                return Array.Empty<Sha1>();
+                return Array.Empty<ChasmResult<Sha1>>();
 
             // Build batches
             IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(items, forceOverwrite, cancellationToken);
@@ -239,16 +264,17 @@ namespace SourceCode.Chasm.Repository.AzureTable
             await Task.WhenAll(tasks)
                 .ConfigureAwait(false);
 
-            Sha1[] list = batches
+            ChasmResult<Sha1>[] list = batches
                 .Select(batch => batch)
                 .SelectMany(op => op)
                 .Select(op => DataEntity.FromPartition(op.Entity))
+                .Select(e => new ChasmResult<Sha1>(e, false))
                 .ToArray();
 
             return list;
         }
 
-        private async ValueTask IdempotentUploadAsync(string filePath, Sha1 objectId, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask<bool> IdempotentUploadAsync(string filePath, Sha1 objectId, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (!forceOverwrite)
             {
@@ -257,7 +283,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
                 // Idempotent success (already exists)
                 if (exists)
-                    return;
+                    return true;
             }
 
             var bytes = await File.ReadAllBytesAsync(filePath, cancellationToken)
@@ -268,6 +294,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
             CloudTable objectsTable = _objectsTable.Value;
             await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
                 .ConfigureAwait(false);
+
+            return false;
         }
 
         private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)

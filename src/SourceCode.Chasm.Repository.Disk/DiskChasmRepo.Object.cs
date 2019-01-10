@@ -65,12 +65,20 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            ValueTask RenameAsync(Sha1 objectId, string tempPath)
-                => IdempotentRenameAsync(tempPath, objectId, forceOverwrite);
+            var idempotentSuccess = false;
 
-            return WriteFileAsync(buffer, RenameAsync, cancellationToken);
+            ValueTask RenameAsync(Sha1 sha1, string tempPath)
+            {
+                idempotentSuccess = IdempotentRename(tempPath, sha1, forceOverwrite);
+                return default; // Same as Task.CompletedTask
+            }
+
+            Sha1 objectId = await WriteFileAsync(buffer, RenameAsync, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
         }
 
         /// <summary>
@@ -79,14 +87,22 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            ValueTask RenameAsync(Sha1 objectId, string tempPath)
-                => IdempotentRenameAsync(tempPath, objectId, forceOverwrite);
+            var idempotentSuccess = false;
 
-            return WriteFileAsync(stream, RenameAsync, cancellationToken);
+            ValueTask RenameAsync(Sha1 sha1, string tempPath)
+            {
+                idempotentSuccess = IdempotentRename(tempPath, sha1, forceOverwrite);
+                return default; // Same as Task.CompletedTask
+            }
+
+            Sha1 objectId = await WriteFileAsync(stream, RenameAsync, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
         }
 
         /// <summary>
@@ -98,17 +114,25 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override Task<Sha1> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
-            ValueTask RenameAsync(Sha1 objectId, string tempPath)
-                => IdempotentRenameAsync(tempPath, objectId, forceOverwrite);
+            var idempotentSuccess = false;
 
-            return WriteFileAsync(beforeHash, RenameAsync, cancellationToken);
+            ValueTask RenameAsync(Sha1 sha1, string tempPath)
+            {
+                idempotentSuccess = IdempotentRename(tempPath, sha1, forceOverwrite);
+                return default; // Same as Task.CompletedTask
+            }
+
+            Sha1 objectId = await WriteFileAsync(beforeHash, RenameAsync, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
         }
 
-        private ValueTask IdempotentRenameAsync(string tempPath, Sha1 objectId, bool forceOverwrite)
+        private bool IdempotentRename(string tempPath, Sha1 objectId, bool forceOverwrite)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(tempPath));
 
@@ -125,7 +149,7 @@ namespace SourceCode.Chasm.Repository.Disk
             {
                 // Idempotent success (already exists)
                 if (!forceOverwrite)
-                    return default; // Same as Task.CompletedTask
+                    return true;
 
                 // TODO: Possible race-condition on delete+create if concurrent read access
                 File.Delete(filePath);
@@ -134,7 +158,7 @@ namespace SourceCode.Chasm.Repository.Disk
             // TODO: Possible race-condition if concurrent writes
             File.Move(tempPath, filePath);
 
-            return default; // Same as Task.CompletedTask
+            return false;
         }
 
         #endregion
