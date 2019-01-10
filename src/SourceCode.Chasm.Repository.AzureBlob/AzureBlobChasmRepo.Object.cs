@@ -21,16 +21,22 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             bool exists = await _diskRepo.ExistsAsync(objectId, cancellationToken)
                 .ConfigureAwait(false);
 
-            if (exists)
-                return true;
-
             // Else go to cloud
 
+            if (!exists)
+                exists = await ExistsOnCloudAsync(objectId, cancellationToken)
+                    .ConfigureAwait(false);
+
+            return exists;
+        }
+
+        private async Task<bool> ExistsOnCloudAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
             string blobName = DeriveBlobName(objectId);
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
-            exists = await blobRef.ExistsAsync()
+            bool exists = await blobRef.ExistsAsync()
                 .ConfigureAwait(false);
 
             return exists;
@@ -118,8 +124,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            ValueTask UploadAsync(Sha1 sha1, string tempPath)
-                => UploadFileAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+            ValueTask UploadAsync(Sha1 objectId, string tempPath)
+                => IdempotentUploadAsync(tempPath, objectId, forceOverwrite, cancellationToken);
 
             return DiskChasmRepo.WriteFileAsync(buffer, UploadAsync, cancellationToken);
         }
@@ -134,8 +140,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            ValueTask UploadAsync(Sha1 sha1, string tempPath)
-                => UploadFileAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+            ValueTask UploadAsync(Sha1 objectId, string tempPath)
+                => IdempotentUploadAsync(tempPath, objectId, forceOverwrite, cancellationToken);
 
             return DiskChasmRepo.WriteFileAsync(stream, UploadAsync, cancellationToken);
         }
@@ -157,23 +163,34 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
-            ValueTask UploadAsync(Sha1 sha1, string tempPath)
-                => UploadFileAsync(tempPath, sha1, forceOverwrite, cancellationToken);
+            ValueTask UploadAsync(Sha1 objectId, string tempPath)
+                => IdempotentUploadAsync(tempPath, objectId, forceOverwrite, cancellationToken);
 
             return DiskChasmRepo.WriteFileAsync(beforeHash, UploadAsync, cancellationToken);
         }
 
-        private async ValueTask UploadFileAsync(string tempPath, Sha1 sha1, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask IdempotentUploadAsync(string tempPath, Sha1 objectId, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            string blobName = DeriveBlobName(sha1);
-            CloudBlobContainer objectsContainer = _objectsContainer.Value;
-            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
+            if (!forceOverwrite)
+            {
+                bool exists = await ExistsOnCloudAsync(objectId, cancellationToken)
+                    .ConfigureAwait(false);
+
+                // Idempotent success (already exists)
+                if (exists)
+                    return;
+            }
 
             // Objects are immutable
             AccessCondition accessCondition = forceOverwrite ? null : AccessCondition.GenerateIfNotExistsCondition(); // If-None-Match *
 
+            string blobName = DeriveBlobName(objectId);
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
+            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
+
             try
             {
+
                 // Required to create blob header before appending to it
                 await blobRef.CreateOrReplaceAsync(accessCondition, default, default)
                     .ConfigureAwait(false);

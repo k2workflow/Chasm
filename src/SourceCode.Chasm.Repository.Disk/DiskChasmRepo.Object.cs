@@ -67,11 +67,8 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public override Task<Sha1> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            ValueTask RenameAsync(Sha1 sha1, string tempPath)
-            {
-                MoveIntoObjectsContainer(tempPath, sha1, forceOverwrite);
-                return default; // Same as Task.CompletedTask
-            }
+            ValueTask RenameAsync(Sha1 objectId, string tempPath)
+                => IdempotentRenameAsync(tempPath, objectId, forceOverwrite);
 
             return WriteFileAsync(buffer, RenameAsync, cancellationToken);
         }
@@ -86,11 +83,8 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            ValueTask RenameAsync(Sha1 sha1, string tempPath)
-            {
-                MoveIntoObjectsContainer(tempPath, sha1, forceOverwrite);
-                return default; // Same as Task.CompletedTask
-            }
+            ValueTask RenameAsync(Sha1 objectId, string tempPath)
+                => IdempotentRenameAsync(tempPath, objectId, forceOverwrite);
 
             return WriteFileAsync(stream, RenameAsync, cancellationToken);
         }
@@ -108,38 +102,39 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
-            ValueTask RenameAsync(Sha1 sha1, string tempPath)
-            {
-                MoveIntoObjectsContainer(tempPath, sha1, forceOverwrite);
-                return default; // Same as Task.CompletedTask
-            }
+            ValueTask RenameAsync(Sha1 objectId, string tempPath)
+                => IdempotentRenameAsync(tempPath, objectId, forceOverwrite);
 
             return WriteFileAsync(beforeHash, RenameAsync, cancellationToken);
         }
 
-        private void MoveIntoObjectsContainer(string tempPath, Sha1 sha1, bool forceOverwrite)
+        private ValueTask IdempotentRenameAsync(string tempPath, Sha1 objectId, bool forceOverwrite)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(tempPath));
 
-            string filename = DeriveFileName(sha1);
+            string filename = DeriveFileName(objectId);
             string filePath = Path.Combine(_objectsContainer, filename);
-
             string dir = Path.GetDirectoryName(filePath);
+
             if (!Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
             }
-
             // If file already exists then we can be sure it already contains the same content
             else if (File.Exists(filePath))
             {
+                // Idempotent success (already exists)
                 if (!forceOverwrite)
-                    return;
+                    return default; // Same as Task.CompletedTask
 
+                // TODO: Possible race-condition on delete+create if concurrent read access
                 File.Delete(filePath);
             }
 
+            // TODO: Possible race-condition if concurrent writes
             File.Move(tempPath, filePath);
+
+            return default; // Same as Task.CompletedTask
         }
 
         #endregion

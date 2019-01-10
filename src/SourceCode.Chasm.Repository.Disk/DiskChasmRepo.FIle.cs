@@ -11,23 +11,23 @@ namespace SourceCode.Chasm.Repository.Disk
     {
         /// <summary>
         /// Writes a file to disk, returning the content's <see cref="Sha1"/> value.
-        /// The <paramref name="beforeHash"/> function permits a transformation operation
+        /// The <paramref name="hashWriter"/> function permits a transformation operation
         /// on the source value before calculating the hash and writing to the destination.
         /// For example, the source stream may be encoded as Json.
-        /// The <paramref name="fileAction"/> function permits an operation to be
+        /// The <paramref name="afterHash"/> function permits an operation to be
         /// performed on the file immediately after writing it. For example, the file
         /// may be uploaded to the cloud.
         /// </summary>
-        /// <param name="beforeHash">An action to take on the internal stream, before hashing and writing.</param>
-        /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
+        /// <param name="hashWriter">An action to take on the internal hashing stream.</param>
+        /// <param name="afterHash">An action to take on the file, after writing has finished.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        /// <remarks>Note that the <paramref name="beforeHash"/> function should maintain the integrity
+        /// <remarks>Note that the <paramref name="hashWriter"/> function should maintain the integrity
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public static async Task<Sha1> WriteFileAsync(Func<Stream, ValueTask> beforeHash, Func<Sha1, string, ValueTask> fileAction, CancellationToken cancellationToken)
+        public static async Task<Sha1> WriteFileAsync(Func<Stream, ValueTask> hashWriter, Func<Sha1, string, ValueTask> afterHash, CancellationToken cancellationToken)
         {
-            if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
+            if (hashWriter == null) throw new ArgumentNullException(nameof(hashWriter));
 
             // Note that an empty file is physically created
             var tempPath = Path.GetTempFileName();
@@ -40,16 +40,16 @@ namespace SourceCode.Chasm.Repository.Disk
                 {
                     using (var cs = new crypt.CryptoStream(fs, ct, crypt.CryptoStreamMode.Write, false))
                     {
-                        await beforeHash(cs)
+                        await hashWriter(cs)
                             .ConfigureAwait(false);
                     }
 
                     sha1 = new Sha1(ct.Hash);
                 }
 
-                if (fileAction != null)
+                if (afterHash != null)
                 {
-                    await fileAction(sha1, tempPath)
+                    await afterHash(sha1, tempPath)
                         .ConfigureAwait(false);
                 }
 
@@ -66,38 +66,38 @@ namespace SourceCode.Chasm.Repository.Disk
 
         /// <summary>
         /// Writes a file to disk, returning the content's <see cref="Sha1"/> value.
-        /// The <paramref name="fileAction"/> function permits an operation to be
+        /// The <paramref name="afterHash"/> function permits an operation to be
         /// performed on the file immediately after writing it. For example, the file
         /// may be uploaded to the cloud.
         /// </summary>
         /// <param name="stream">The content to hash and write.</param>
-        /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
+        /// <param name="afterHash">An action to take on the file, after writing has finished.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, ValueTask> fileAction, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, ValueTask> afterHash, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            ValueTask CopyStreamAsync(Stream inner)
-                => new ValueTask(stream.CopyToAsync(inner, cancellationToken));
+            ValueTask CopyStreamAsync(Stream output)
+                => new ValueTask(stream.CopyToAsync(output, cancellationToken));
 
-            return WriteFileAsync(CopyStreamAsync, fileAction, cancellationToken);
+            return WriteFileAsync(CopyStreamAsync, afterHash, cancellationToken);
         }
 
         /// <summary>
         /// Writes a file to disk, returning the content's <see cref="Sha1"/> value.
-        /// The <paramref name="fileAction"/> function permits an operation to be
+        /// The <paramref name="afterHash"/> function permits an operation to be
         /// performed on the file immediately after writing it. For example, the file
         /// may be uploaded to the cloud.
         /// </summary>
         /// <param name="buffer">The content to hash and write.</param>
-        /// <param name="fileAction">An action to take on the file, after writing has finished.</param>
+        /// <param name="afterHash">An action to take on the file, after writing has finished.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, ValueTask> fileAction, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, ValueTask> afterHash, CancellationToken cancellationToken)
         {
-            ValueTask CopyBufferAsync(Stream inner)
-                => inner.WriteAsync(buffer, cancellationToken);
+            ValueTask CopyBufferAsync(Stream output)
+                => output.WriteAsync(buffer, cancellationToken);
 
-            return WriteFileAsync(CopyBufferAsync, fileAction, cancellationToken);
+            return WriteFileAsync(CopyBufferAsync, afterHash, cancellationToken);
         }
 
         private static async Task<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
