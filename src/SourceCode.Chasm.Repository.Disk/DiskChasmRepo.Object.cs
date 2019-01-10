@@ -69,13 +69,13 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             var created = true;
 
-            ValueTask AfterHash(Sha1 sha1, string tempPath)
+            ValueTask AfterWrite(Sha1 sha1, string tempPath)
             {
                 created = Rename(sha1, tempPath, forceOverwrite);
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await WriteFileAsync(buffer, AfterHash, cancellationToken)
+            Sha1 objectId = await WriteFileAsync(buffer, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -93,13 +93,13 @@ namespace SourceCode.Chasm.Repository.Disk
 
             var created = true;
 
-            ValueTask AfterHash(Sha1 sha1, string tempPath)
+            ValueTask AfterWrite(Sha1 sha1, string tempPath)
             {
                 created = Rename(sha1, tempPath, forceOverwrite);
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await WriteFileAsync(stream, AfterHash, cancellationToken)
+            Sha1 objectId = await WriteFileAsync(stream, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -120,13 +120,13 @@ namespace SourceCode.Chasm.Repository.Disk
 
             bool created = true;
 
-            ValueTask AfterHash(Sha1 sha1, string tempPath)
+            ValueTask AfterWrite(Sha1 sha1, string tempPath)
             {
                 created = Rename(sha1, tempPath, forceOverwrite);
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await WriteFileAsync(beforeHash, AfterHash, cancellationToken)
+            Sha1 objectId = await StageFileAsync(beforeHash, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);

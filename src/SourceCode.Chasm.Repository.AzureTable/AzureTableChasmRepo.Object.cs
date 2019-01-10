@@ -167,13 +167,13 @@ namespace SourceCode.Chasm.Repository.AzureTable
         {
             var created = true;
 
-            async ValueTask AfterHash(Sha1 sha1, string filePath)
+            async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await this.UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterHash, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -191,13 +191,13 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             var created = true;
 
-            async ValueTask AfterHash(Sha1 sha1, string filePath)
+            async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await this.UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterHash, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -222,13 +222,13 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             var created = true;
 
-            async ValueTask AfterHash(Sha1 sha1, string filePath)
+            async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await this.UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(beforeHash, AfterHash, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.StageFileAsync(beforeHash, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);

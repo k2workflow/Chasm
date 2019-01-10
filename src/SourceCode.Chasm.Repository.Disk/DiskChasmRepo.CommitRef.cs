@@ -88,7 +88,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 else
                 {
                     // CommitIds are not compressed
-                    byte[] bytes = await ReadFromStreamAsync(file, cancellationToken)
+                    byte[] bytes = await ReadBytesAsync(file, cancellationToken)
                         .ConfigureAwait(false);
 
                     CommitId commitId = Serializer.DeserializeCommitId(bytes);

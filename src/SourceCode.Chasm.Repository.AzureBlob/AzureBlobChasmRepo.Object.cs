@@ -96,13 +96,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             try
             {
-                var input = new MemoryStream();
+                var output = new MemoryStream();
 
                 // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
-                await blobRef.DownloadToStreamAsync(input)
+                await blobRef.DownloadToStreamAsync(output)
                     .ConfigureAwait(false);
 
-                return input;
+                return output;
             }
             // Try-catch is cheaper than a separate (latent) exists check
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
@@ -126,13 +126,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         {
             var created = true;
 
-            async ValueTask AfterHash(Sha1 sha1, string filePath)
+            async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
                 created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterHash, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -150,13 +150,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             var created = true;
 
-            async ValueTask AfterHash(Sha1 sha1, string filePath)
+            async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
                 created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterHash, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -181,13 +181,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             var created = true;
 
-            async ValueTask AfterHash(Sha1 sha1, string filePath)
+            async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
                 created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(beforeHash, AfterHash, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.StageFileAsync(beforeHash, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
