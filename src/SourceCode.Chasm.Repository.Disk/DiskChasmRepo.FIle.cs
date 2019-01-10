@@ -30,12 +30,12 @@ namespace SourceCode.Chasm.Repository.Disk
             if (hashWriter == null) throw new ArgumentNullException(nameof(hashWriter));
 
             // Note that an empty file is physically created
-            var tempPath = Path.GetTempFileName();
+            var filePath = Path.GetTempFileName();
 
             try
             {
                 Sha1 sha1;
-                using (var fs = new FileStream(tempPath, FileMode.Open, FileAccess.Write, FileShare.Read))
+                using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Write, FileShare.Read))
                 using (var ct = crypt.SHA1.Create())
                 {
                     using (var cs = new crypt.CryptoStream(fs, ct, crypt.CryptoStreamMode.Write, false))
@@ -49,7 +49,7 @@ namespace SourceCode.Chasm.Repository.Disk
 
                 if (afterHash != null)
                 {
-                    await afterHash(sha1, tempPath)
+                    await afterHash(sha1, filePath)
                         .ConfigureAwait(false);
                 }
 
@@ -57,9 +57,9 @@ namespace SourceCode.Chasm.Repository.Disk
             }
             finally
             {
-                if (File.Exists(tempPath))
+                if (File.Exists(filePath))
                 {
-                    File.Delete(tempPath);
+                    File.Delete(filePath);
                 }
             }
         }
