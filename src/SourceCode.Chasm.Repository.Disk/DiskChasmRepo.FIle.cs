@@ -77,10 +77,10 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            ValueTask CopyStreamAsync(Stream output)
+            ValueTask HashWriter(Stream output)
                 => new ValueTask(stream.CopyToAsync(output, cancellationToken));
 
-            return WriteFileAsync(CopyStreamAsync, afterHash, cancellationToken);
+            return WriteFileAsync(HashWriter, afterHash, cancellationToken);
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
         public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, ValueTask> afterHash, CancellationToken cancellationToken)
         {
-            ValueTask CopyBufferAsync(Stream output)
+            ValueTask HashWriter(Stream output)
                 => output.WriteAsync(buffer, cancellationToken);
 
-            return WriteFileAsync(CopyBufferAsync, afterHash, cancellationToken);
+            return WriteFileAsync(HashWriter, afterHash, cancellationToken);
         }
 
         private static async Task<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)

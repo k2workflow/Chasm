@@ -122,20 +122,20 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            var idempotentSuccess = false;
+            var created = true;
 
-            async ValueTask UploadAsync(Sha1 sha1, string filePath)
+            async ValueTask AfterHash(Sha1 sha1, string filePath)
             {
-                idempotentSuccess = await IdempotentUploadAsync(filePath, sha1, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, UploadAsync, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterHash, cancellationToken)
                 .ConfigureAwait(false);
 
-            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
+            return new WriteResult<Sha1>(objectId, created);
         }
 
         /// <summary>
@@ -144,22 +144,22 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            var idempotentSuccess = false;
+            var created = true;
 
-            async ValueTask UploadAsync(Sha1 sha1, string filePath)
+            async ValueTask AfterHash(Sha1 sha1, string filePath)
             {
-                idempotentSuccess = await IdempotentUploadAsync(filePath, sha1, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, UploadAsync, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterHash, cancellationToken)
                 .ConfigureAwait(false);
 
-            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
+            return new WriteResult<Sha1>(objectId, created);
         }
 
         /// <summary>
@@ -175,34 +175,34 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public override async Task<ChasmResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
-            var idempotentSuccess = false;
+            var created = true;
 
-            async ValueTask UploadAsync(Sha1 sha1, string filePath)
+            async ValueTask AfterHash(Sha1 sha1, string filePath)
             {
-                idempotentSuccess = await IdempotentUploadAsync(filePath, sha1, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(beforeHash, UploadAsync, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(beforeHash, AfterHash, cancellationToken)
                 .ConfigureAwait(false);
 
-            return new ChasmResult<Sha1>(objectId, idempotentSuccess);
+            return new WriteResult<Sha1>(objectId, created);
         }
 
-        private async ValueTask<bool> IdempotentUploadAsync(string filePath, Sha1 objectId, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (!forceOverwrite)
             {
                 bool exists = await ExistsOnCloudAsync(objectId, cancellationToken)
                     .ConfigureAwait(false);
 
-                // Idempotent success (already exists)
+                // Not created (already existed)
                 if (exists)
-                    return true;
+                    return false;
             }
 
             // Objects are immutable
@@ -217,6 +217,14 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 // Required to create blob header before appending to it
                 await blobRef.CreateOrReplaceAsync(accessCondition, default, default)
                     .ConfigureAwait(false);
+
+                using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    // Append blob. Following seems to be the only safe multi-writer method available
+                    // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
+                    await blobRef.AppendBlockAsync(fs)
+                        .ConfigureAwait(false);
+                }
             }
             // Try-catch is cheaper than a separate (latent) exists check
             catch (StorageException se) when (!forceOverwrite && se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
@@ -224,15 +232,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 se.Suppress();
             }
 
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                // Append blob. Following seems to be the only safe multi-writer method available
-                // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
-                await blobRef.AppendBlockAsync(fs)
-                    .ConfigureAwait(false);
-            }
-
-            return false;
+            // Created
+            return true;
         }
 
         public static string DeriveBlobName(Sha1 sha1)
