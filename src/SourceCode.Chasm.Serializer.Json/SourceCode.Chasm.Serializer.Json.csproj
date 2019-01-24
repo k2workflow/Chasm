@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.10.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.3" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00680" />
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.0-preview1-00682" />
   </ItemGroup>
 
   <ItemGroup>
