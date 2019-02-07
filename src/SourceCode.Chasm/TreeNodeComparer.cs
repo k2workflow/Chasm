@@ -77,6 +77,7 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNode obj)
             {
+#if !NETSTANDARD2_0
                 var hc = new HashCode();
 
                 hc.Add(obj.Kind);
@@ -84,6 +85,16 @@ namespace SourceCode.Chasm
                 hc.Add(obj.Name ?? string.Empty, StringComparer.Ordinal);
 
                 return hc.ToHashCode();
+#else
+                int hc = 11;
+                unchecked
+                {
+                    hc = hc * 7 + (int)obj.Kind;
+                    hc = hc * 7 + obj.Sha1.GetHashCode();
+                    hc = hc * 7 + obj.Name?.GetHashCode() ?? 0;
+                }
+                return hc;
+#endif
             }
         }
 
@@ -95,6 +106,7 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(TreeNode obj)
             {
+#if !NETSTANDARD2_0
                 var hc = new HashCode();
 
                 hc.Add(obj.Kind);
@@ -102,6 +114,16 @@ namespace SourceCode.Chasm
                 hc.Add(obj.Name, StringComparer.Ordinal);
 
                 return hc.ToHashCode();
+#else
+                int hc = 11;
+                unchecked
+                {
+                    hc = hc * 7 + (int)obj.Kind;
+                    hc = hc * 7 + obj.Sha1.GetHashCode();
+                    hc = hc * 7 + obj.Name?.GetHashCode() ?? 0;
+                }
+                return hc;
+#endif
             }
         }
 

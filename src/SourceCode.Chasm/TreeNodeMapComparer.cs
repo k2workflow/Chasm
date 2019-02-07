@@ -1,6 +1,6 @@
 using System;
-using SourceCode.Clay.Buffers;
 using System.Collections.Generic;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm
 {
@@ -41,7 +41,12 @@ namespace SourceCode.Chasm
         {
             public override bool Equals(TreeNodeMap x, TreeNodeMap y) => x._nodes.MemoryEquals(y._nodes);
 
-            public override int GetHashCode(TreeNodeMap obj) => HashCode.Combine(obj._nodes.Length);
+            public override int GetHashCode(TreeNodeMap obj)
+#if !NETSTANDARD2_0
+                => HashCode.Combine(obj._nodes.Length);
+#else
+                => obj._nodes.Length;
+#endif
         }
 
         #endregion

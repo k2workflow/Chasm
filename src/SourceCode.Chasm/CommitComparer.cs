@@ -52,6 +52,7 @@ namespace SourceCode.Chasm
 
             public override int GetHashCode(Commit obj)
             {
+#if !NETSTANDARD2_0
                 var hc = new HashCode();
 
                 hc.Add(obj.TreeId ?? default, TreeIdComparer.Default);
@@ -61,6 +62,18 @@ namespace SourceCode.Chasm
                 hc.Add(obj.Message ?? string.Empty, StringComparer.Ordinal);
 
                 return hc.ToHashCode();
+#else
+                int hc = 11;
+                unchecked
+                {
+                    hc = hc * 7 + obj.TreeId?.GetHashCode() ?? 0;
+                    hc = hc * 7 + obj.Author.GetHashCode();
+                    hc = hc * 7 + obj.Committer.GetHashCode();
+                    hc = hc * 7 + obj.Parents?.Count ?? 0;
+                    hc = hc * 7 + obj.Message?.GetHashCode() ?? 0;
+                }
+                return hc;
+#endif
             }
         }
 

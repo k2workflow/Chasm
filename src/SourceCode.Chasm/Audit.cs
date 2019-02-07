@@ -66,12 +66,22 @@ namespace SourceCode.Chasm
 
         public override int GetHashCode()
         {
+#if !NETSTANDARD2_0
             var hc = new HashCode();
 
             hc.Add(Name ?? string.Empty, StringComparer.Ordinal);
             hc.Add(Timestamp);
 
             return hc.ToHashCode();
+#else
+            int hc = 11;
+            unchecked
+            {
+                hc = hc * 7 + Name?.GetHashCode() ?? 0;
+                hc = hc * 7 + Timestamp.GetHashCode();
+            }
+            return hc;
+#endif
         }
 
         #endregion
