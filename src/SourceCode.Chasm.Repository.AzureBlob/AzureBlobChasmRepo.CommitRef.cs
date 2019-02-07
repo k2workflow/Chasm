@@ -162,7 +162,12 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
                 using (var output = new MemoryStream())
                 {
+#if !NETSTANDARD2_0
                     output.Write(owner.Memory.Span);
+#else
+                    byte[] array = owner.Memory.ToArray();
+                    output.Write(array, 0, array.Length);
+#endif
                     output.Position = 0;
 
                     // Append blob. Following seems to be the only safe multi-writer method available
