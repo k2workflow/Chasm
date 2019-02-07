@@ -1,7 +1,6 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
@@ -25,7 +24,12 @@ namespace SourceCode.Chasm.Repository
 
         public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken)
         {
-            if (treeIds == null) return ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
+            if (treeIds == null)
+#if !NETSTANDARD2_0
+                return System.Collections.Immutable.ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
+#else
+                return new Dictionary<TreeId, TreeNodeMap>(0);
+#endif
 
             // Read bytes in batch
             IEnumerable<Sha1> sha1s = System.Linq.Enumerable.Select(treeIds, n => n.Sha1);
@@ -33,7 +37,12 @@ namespace SourceCode.Chasm.Repository
                 .ConfigureAwait(false);
 
             // Deserialize batch
-            if (kvps.Count == 0) return ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
+            if (kvps.Count == 0)
+#if !NETSTANDARD2_0
+                return System.Collections.Immutable.ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
+#else
+                return new Dictionary<TreeId, TreeNodeMap>(0);
+#endif
 
             var dict = new Dictionary<TreeId, TreeNodeMap>(kvps.Count);
 
