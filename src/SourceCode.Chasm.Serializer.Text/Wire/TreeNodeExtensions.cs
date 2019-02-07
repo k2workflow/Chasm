@@ -33,14 +33,25 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
             return wire;
         }
 
+#if NETSTANDARD2_0
+        private static readonly char[] s_split = new char[1] { ' ' };
+#endif
         public static TreeNode ConvertTreeNode(this string wire)
         {
             if (string.IsNullOrWhiteSpace(wire)) return default;
 
+#if !NETSTANDARD2_0
             string[] tokens = wire.Split(' ', 4, StringSplitOptions.None);
+#else
+            string[] tokens = wire.Split(s_split, 4, StringSplitOptions.None);
+#endif
             if (tokens.Length != 4) throw new SerializationException();
 
+#if !NETSTANDARD2_0
             NodeKind kind = Enum.Parse<NodeKind>(tokens[1], true);
+#else
+            var kind = (NodeKind)Enum.Parse(typeof(NodeKind), tokens[1], true);
+#endif
             var sha1 = Sha1.Parse(tokens[2]);
             string name = tokens[3];
 
