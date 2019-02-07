@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -116,7 +115,12 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         public override async Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
-            if (objectIds == null) return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
+            if (objectIds == null)
+#if !NETSTANDARD2_0
+                return System.Collections.Immutable.ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
+#else
+                return new Dictionary<Sha1, ReadOnlyMemory<byte>>(0);
+#endif
 
             // Build batches
             IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildReadBatches(objectIds);
@@ -285,9 +289,12 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     return false;
             }
 
+#if !NETSTANDARD2_0
             var bytes = await File.ReadAllBytesAsync(filePath, cancellationToken)
                 .ConfigureAwait(false);
-
+#else
+            var bytes = File.ReadAllBytes(filePath);
+#endif
             TableOperation op = DataEntity.BuildWriteOperation(objectId, bytes, forceOverwrite);
 
             CloudTable objectsTable = _objectsTable.Value;
