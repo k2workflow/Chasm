@@ -39,12 +39,11 @@ namespace SourceCode.Chasm.Repository.Disk
                 using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Write, FileShare.Read))
                 using (var ct = crypt.SHA1.Create())
                 {
-                    using (var cs = new crypt.CryptoStream(fs, ct, crypt.CryptoStreamMode.Write, false))
+                    using (var cs = new crypt.CryptoStream(fs, ct, crypt.CryptoStreamMode.Write))
                     {
                         await onWrite(cs)
                             .ConfigureAwait(false);
                     }
-
                     sha1 = new Sha1(ct.Hash);
                 }
 
@@ -79,7 +78,11 @@ namespace SourceCode.Chasm.Repository.Disk
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             ValueTask HashWriter(Stream output)
+#if !NETSTANDARD2_0
                 => new ValueTask(stream.CopyToAsync(output, cancellationToken));
+#else
+                => new ValueTask(stream.CopyToAsync(output, 1024, cancellationToken));
+#endif
 
             return StageFileAsync(HashWriter, afterWrite, cancellationToken);
         }
@@ -96,8 +99,15 @@ namespace SourceCode.Chasm.Repository.Disk
         public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, ValueTask> afterWrite, CancellationToken cancellationToken)
         {
             ValueTask HashWriter(Stream output)
+#if !NETSTANDARD2_0
                 => output.WriteAsync(buffer, cancellationToken);
-
+#else
+            {
+                byte[] array = buffer.ToArray();
+                output.Write(array, 0, array.Length);
+                return default;
+            }
+#endif
             return StageFileAsync(HashWriter, afterWrite, cancellationToken);
         }
 

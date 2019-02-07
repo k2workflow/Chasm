@@ -103,8 +103,14 @@ namespace SourceCode.Chasm.Repository.Disk
                 }
 
                 // CommitIds are not compressed
+#if !NETSTANDARD2_0
                 await file.WriteAsync(owner.Memory, cancellationToken)
                     .ConfigureAwait(false);
+#else
+                byte[] array = owner.Memory.ToArray();
+                await file.WriteAsync(array, 0, array.Length, cancellationToken)
+                    .ConfigureAwait(false);
+#endif
 
                 if (file.Position != owner.Memory.Length)
                     file.Position = owner.Memory.Length;

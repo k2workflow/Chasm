@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using SourceCode.Chasm.Serializer;
 
@@ -23,7 +24,11 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length < 3) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
 
+#if !NETSTANDARD2_0
             RootPath = rootFolder.EndsWith(Path.DirectorySeparatorChar)
+#else
+            RootPath = rootFolder.EndsWith(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+#endif
                 ? Path.GetFullPath(rootFolder)
                 : Path.GetFullPath(rootFolder + Path.DirectorySeparatorChar);
 
