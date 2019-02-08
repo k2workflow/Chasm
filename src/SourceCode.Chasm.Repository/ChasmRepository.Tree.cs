@@ -25,11 +25,7 @@ namespace SourceCode.Chasm.Repository
         public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, CancellationToken cancellationToken)
         {
             if (treeIds == null)
-#if !NETSTANDARD2_0
-                return System.Collections.Immutable.ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
-#else
-                return new Dictionary<TreeId, TreeNodeMap>(0);
-#endif
+                return EmptyMap<TreeId, TreeNodeMap>.Empty;
 
             // Read bytes in batch
             IEnumerable<Sha1> sha1s = System.Linq.Enumerable.Select(treeIds, n => n.Sha1);
@@ -38,11 +34,7 @@ namespace SourceCode.Chasm.Repository
 
             // Deserialize batch
             if (kvps.Count == 0)
-#if !NETSTANDARD2_0
-                return System.Collections.Immutable.ImmutableDictionary<TreeId, TreeNodeMap>.Empty;
-#else
-                return new Dictionary<TreeId, TreeNodeMap>(0);
-#endif
+                return EmptyMap<TreeId, TreeNodeMap>.Empty;
 
             var dict = new Dictionary<TreeId, TreeNodeMap>(kvps.Count);
 

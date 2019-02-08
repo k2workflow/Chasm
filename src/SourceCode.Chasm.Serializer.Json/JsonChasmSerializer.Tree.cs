@@ -14,18 +14,15 @@ namespace SourceCode.Chasm.Serializer.Json
             int length = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
 
             IMemoryOwner<byte> rented = _pool.Rent(length);
-#if !NETSTANDARD2_0
-            length = Encoding.UTF8.GetBytes(json, rented.Memory.Span);
-#else
+
             unsafe
             {
                 fixed (char* wa = json)
                 {
                     MemoryHandle p = rented.Memory.Pin();
-                    length = Encoding.UTF8.GetBytes(wa, 0, (byte*)p.Pointer, 0);
+                    length = Encoding.UTF8.GetBytes(wa, json.Length, (byte*)p.Pointer, length);
                 }
             }
-#endif
 
             IMemoryOwner<byte> slice = rented.WrapSlice(0, length);
             return slice;
@@ -36,9 +33,6 @@ namespace SourceCode.Chasm.Serializer.Json
             if (span.Length == 0) throw new ArgumentNullException(nameof(span));
 
             string json;
-#if !NETSTANDARD2_0
-            json = Encoding.UTF8.GetString(span);
-#else
             unsafe
             {
                 fixed (byte* ba = span)
@@ -46,7 +40,6 @@ namespace SourceCode.Chasm.Serializer.Json
                     json = Encoding.UTF8.GetString(ba, span.Length);
                 }
             }
-#endif
 
             TreeNodeMap model = json.ReadTreeNodeMap();
             return model;

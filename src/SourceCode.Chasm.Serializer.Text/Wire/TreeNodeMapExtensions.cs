@@ -34,19 +34,13 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
             }
         }
 
-#if NETSTANDARD2_0
         private static readonly char[] s_split = new char[1] { '\n' };
-#endif
 
         public static TreeNodeMap ConvertTree(this string wire)
         {
             if (string.IsNullOrWhiteSpace(wire)) return default;
 
-#if !NETSTANDARD2_0
-            string[] tokens = wire.Split('\n', StringSplitOptions.None);
-#else
             string[] tokens = wire.Split(s_split, StringSplitOptions.None);
-#endif
             if (tokens.Length == 0)
                 return TreeNodeMap.Empty;
 

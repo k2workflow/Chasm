@@ -21,11 +21,7 @@ namespace SourceCode.Chasm.Repository
         public virtual async Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             if (objectIds == null)
-#if !NETSTANDARD2_0
-                return System.Collections.Immutable.ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
-#else
-                return new Dictionary<Sha1, ReadOnlyMemory<byte>>(0);
-#endif
+                return EmptyMap<Sha1, ReadOnlyMemory<byte>>.Empty;
 
             // Enumerate batches
             var dict = new Dictionary<Sha1, Task<ReadOnlyMemory<byte>?>>(Sha1Comparer.Default);
