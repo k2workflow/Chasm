@@ -3,19 +3,13 @@
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2;netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>SourceCode.Chasm.IO</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
     <AssemblyName>SourceCode.Chasm.Serializer</AssemblyName>
     <RootNamespace>SourceCode.Chasm.Serializer</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.2'">
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
   </PropertyGroup>
 
   <ItemGroup>

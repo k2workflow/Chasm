@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using SourceCode.Clay;
 
@@ -42,7 +43,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
             {
                 wire.Data.CopyTo(rented, 0);
 
-                model = new Sha1(rented);
+                model = new Sha1(new ReadOnlySpan<byte>(rented));
             }
             ArrayPool<byte>.Shared.Return(rented);
 
