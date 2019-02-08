@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Common properties defined in Directory.Build.props -->
 
@@ -15,9 +15,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.3" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
-    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00700" />
-    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00700" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00700" />
+    <PackageReference Include="SourceCode.Clay" Version="1.0.0-preview1-00701" />
+    <PackageReference Include="SourceCode.Clay.Buffers" Version="1.0.0-preview1-00701" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="1.0.0-preview1-00701" />
   </ItemGroup>
 
   <PropertyGroup>

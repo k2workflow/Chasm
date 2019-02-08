@@ -43,7 +43,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
             {
                 wire.Data.CopyTo(rented, 0);
 
-                model = new Sha1(new ReadOnlySpan<byte>(rented));
+                model = new Sha1(rented);
             }
             ArrayPool<byte>.Shared.Return(rented);
 
