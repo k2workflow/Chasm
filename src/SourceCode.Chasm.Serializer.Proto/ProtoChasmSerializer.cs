@@ -23,9 +23,9 @@ namespace SourceCode.Chasm.Serializer.Proto
             IMemoryOwner<byte> rented = _pool.Rent(length);
 
             // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
-            fixed (byte* rf = &MemoryMarshal.GetReference(rented.Memory.Span))
+            fixed (byte* ba = &MemoryMarshal.GetReference(rented.Memory.Span))
             {
-                using (var strm = new UnmanagedMemoryStream(rf, length, rented.Memory.Length, FileAccess.Write))
+                using (var strm = new UnmanagedMemoryStream(ba, length, rented.Memory.Length, FileAccess.Write))
                 {
                     wire.WriteTo(strm);
                 }

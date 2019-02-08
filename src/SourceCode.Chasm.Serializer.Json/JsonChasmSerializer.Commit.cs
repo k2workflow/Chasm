@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Runtime.InteropServices;
 using System.Text;
 using SourceCode.Chasm.Serializer.Json.Wire;
 using SourceCode.Clay.Buffers;
@@ -35,7 +36,8 @@ namespace SourceCode.Chasm.Serializer.Json
             string json;
             unsafe
             {
-                fixed (byte* ba = span)
+                // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
+                fixed (byte* ba = &MemoryMarshal.GetReference(span))
                 {
                     json = Encoding.UTF8.GetString(ba, span.Length);
                 }
