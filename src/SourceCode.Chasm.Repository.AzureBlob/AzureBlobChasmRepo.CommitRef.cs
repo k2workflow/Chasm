@@ -160,13 +160,20 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                 // CommitIds are not compressed
                 using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
-                using (var output = new MemoryStream())
+                using (var output = new MemoryStream(owner.Memory.Length))
                 {
 #if !NETSTANDARD2_0
                     output.Write(owner.Memory.Span);
 #else
-                    byte[] array = owner.Memory.ToArray();
-                    output.Write(array, 0, array.Length);
+                    unsafe
+                    {
+                        // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
+                        fixed (byte* ba = &System.Runtime.InteropServices.MemoryMarshal.GetReference(owner.Memory.Span))
+                        {
+                            for (int i = 0; i < owner.Memory.Length; i++) // TODO: Perf
+                                output.WriteByte(ba[i]);
+                        }
+                    }
 #endif
                     output.Position = 0;
 

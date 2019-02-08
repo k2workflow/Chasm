@@ -60,13 +60,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             try
             {
-                using (var input = new MemoryStream())
+                using (var output = new MemoryStream())
                 {
                     // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
-                    await blobRef.DownloadToStreamAsync(input)
+                    await blobRef.DownloadToStreamAsync(output)
                         .ConfigureAwait(false);
 
-                    byte[] buffer = input.ToArray(); // TODO: Perf
+                    byte[] buffer = output.ToArray(); // TODO: Perf
                     return buffer;
                 }
             }

@@ -103,8 +103,15 @@ namespace SourceCode.Chasm.Repository.Disk
                 => output.WriteAsync(buffer, cancellationToken);
 #else
             {
-                byte[] array = buffer.ToArray();
-                output.Write(array, 0, array.Length);
+                unsafe
+                {
+                    // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
+                    fixed (byte* ba = &System.Runtime.InteropServices.MemoryMarshal.GetReference(buffer.Span))
+                    {
+                        for (int i = 0; i < buffer.Length; i++) // TODO: Perf
+                            output.WriteByte(ba[i]);
+                    }
+                }
                 return default;
             }
 #endif
