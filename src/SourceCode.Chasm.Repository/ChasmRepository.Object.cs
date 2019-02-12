@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
+using SourceCode.Clay.Collections.Generic;
 
 namespace SourceCode.Chasm.Repository
 {

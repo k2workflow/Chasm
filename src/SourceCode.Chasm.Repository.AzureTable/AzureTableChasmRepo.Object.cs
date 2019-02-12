@@ -10,6 +10,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Chasm.Repository.Disk;
 using SourceCode.Clay;
+using SourceCode.Clay.Collections.Generic;
 
 namespace SourceCode.Chasm.Repository.AzureTable
 {
