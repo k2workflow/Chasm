@@ -50,22 +50,22 @@ namespace SourceCode.Chasm.Repository
 
         #region Write
 
-        public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public virtual async Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken)
+        public virtual async Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<KeyValuePair<Memory<byte>, Metadata>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (buffers == null || !buffers.Any())
+            if (items == null || !items.Any())
                 return Array.Empty<WriteResult<Sha1>>();
 
             var tasks = new List<Task<WriteResult<Sha1>>>();
-            foreach (Memory<byte> buffer in buffers)
+            foreach (KeyValuePair<Memory<byte>, Metadata> item in items)
             {
                 // Concurrency: instantiate tasks without await
-                Task<WriteResult<Sha1>> task = WriteObjectAsync(buffer, forceOverwrite, cancellationToken);
+                Task<WriteResult<Sha1>> task = WriteObjectAsync(item.Key, item.Value, forceOverwrite, cancellationToken);
                 tasks.Add(task);
             }
 

@@ -23,7 +23,7 @@ namespace SourceCode.Chasm.Repository
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken);
+        Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
         /// <summary>
         /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.Repository
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken);
+        Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
         /// <summary>
         /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
@@ -42,14 +42,14 @@ namespace SourceCode.Chasm.Repository
         /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken);
+        Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
         /// <summary>
         /// Writes a list of buffers to the destination, returning the contents' <see cref="Sha1"/> values.
         /// </summary>
-        /// <param name="buffers">The content to hash and write.</param>
+        /// <param name="items">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<Memory<byte>> buffers, bool forceOverwrite, CancellationToken cancellationToken);
+        Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<KeyValuePair<Memory<byte>, Metadata>> items, bool forceOverwrite, CancellationToken cancellationToken);
     }
 }

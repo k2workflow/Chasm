@@ -306,7 +306,7 @@ namespace SourceCode.Chasm.Repository.Tests
 
             // Assert
             Assert.Equal(new TreeId(), actual);
-            mockChasmRepository.Verify(i => i.WriteObjectAsync(It.IsAny<Memory<byte>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+            mockChasmRepository.Verify(i => i.WriteObjectAsync(It.IsAny<Memory<byte>>(), null, It.IsAny<bool>(), It.IsAny<CancellationToken>()));
         }
     }
 }

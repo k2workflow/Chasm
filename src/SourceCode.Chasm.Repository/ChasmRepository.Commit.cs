@@ -23,7 +23,7 @@ namespace SourceCode.Chasm.Repository
         {
             using (IMemoryOwner<byte> owner = Serializer.Serialize(commit))
             {
-                Sha1 sha1 = await WriteObjectAsync(owner.Memory, false, cancellationToken)
+                Sha1 sha1 = await WriteObjectAsync(owner.Memory, null, false, cancellationToken)
                     .ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);

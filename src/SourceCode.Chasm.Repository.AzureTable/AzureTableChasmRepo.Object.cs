@@ -164,13 +164,13 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var created = true;
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
@@ -186,7 +186,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -194,7 +194,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
@@ -217,7 +217,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
@@ -225,7 +225,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
                     .ConfigureAwait(false);
             }
 
@@ -241,7 +241,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="buffers">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<KeyValuePair<Memory<byte>, Metadata>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (items == null || !items.Any())
                 return Array.Empty<WriteResult<Sha1>>();
@@ -274,7 +274,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return list;
         }
 
-        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (!forceOverwrite)
             {
@@ -288,7 +288,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             var bytes = File.ReadAllBytes(filePath);
 
-            TableOperation op = DataEntity.BuildWriteOperation(objectId, bytes, forceOverwrite);
+            TableOperation op = DataEntity.BuildWriteOperation(objectId, bytes, metadata, forceOverwrite);
 
             CloudTable objectsTable = _objectsTable.Value;
             await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
@@ -298,16 +298,16 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return true;
         }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Memory<byte>, Metadata>> items, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            var dict = new Dictionary<Sha1, Memory<byte>>();
+            var dict = new Dictionary<Sha1, KeyValuePair<Memory<byte>, Metadata>>();
 
-            foreach (Memory<byte> item in items)
+            foreach (KeyValuePair<Memory<byte>, Metadata> item in items)
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
-                Sha1 sha1 = Hasher.HashData(item.Span);
-                dict.Add(sha1, item);
+                Sha1 sha1 = Hasher.HashData(item.Key.Span);
+                dict.Add(sha1, new KeyValuePair<Memory<byte>, Metadata>(item.Key, item.Value));
             }
 
             IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildWriteBatches(dict, forceOverwrite);
