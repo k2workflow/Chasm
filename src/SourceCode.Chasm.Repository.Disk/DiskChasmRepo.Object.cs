@@ -24,7 +24,7 @@ namespace SourceCode.Chasm.Repository.Disk
             return Task.FromResult(exists);
         }
 
-        public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             string filename = DeriveFileName(objectId);
             string filePath = Path.Combine(_objectsContainer, filename);
@@ -33,11 +33,11 @@ namespace SourceCode.Chasm.Repository.Disk
                 .ConfigureAwait(false);
 
             if (bytes == null) return default;
-            return bytes;
+            return new ChasmBlob(bytes, null);
 
         }
 
-        public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             string filename = DeriveFileName(objectId);
             string fiePath = Path.Combine(_objectsContainer, filename);
@@ -52,7 +52,7 @@ namespace SourceCode.Chasm.Repository.Disk
             FileStream fileStream = await WaitForFileAsync(fiePath, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
                 .ConfigureAwait(false);
 
-            return fileStream;
+            return new ChasmStream(fileStream, null);
         }
 
         #endregion
@@ -65,7 +65,7 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var created = true;
 

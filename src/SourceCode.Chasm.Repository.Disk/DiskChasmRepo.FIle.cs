@@ -96,7 +96,7 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="afterWrite">An action to take on the file, after writing has finished.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(Memory<byte> buffer, Func<Sha1, string, ValueTask> afterWrite, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(ReadOnlyMemory<byte> buffer, Func<Sha1, string, ValueTask> afterWrite, CancellationToken cancellationToken)
         {
             ValueTask HashWriter(Stream output)
 #if !NETSTANDARD2_0

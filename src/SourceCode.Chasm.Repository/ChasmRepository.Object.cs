@@ -15,32 +15,34 @@ namespace SourceCode.Chasm.Repository
 
         public abstract Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken);
 
-        public abstract Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
+        public abstract Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken);
 
-        public abstract Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken);
+        public abstract Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken);
 
-        public virtual async Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public virtual async Task<IReadOnlyDictionary<Sha1, IChasmBlob>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             if (objectIds == null)
-                return EmptyMap<Sha1, ReadOnlyMemory<byte>>.Empty;
+                return EmptyMap<Sha1, IChasmBlob>.Empty;
 
-            // Enumerate batches
-            var dict = new Dictionary<Sha1, Task<ReadOnlyMemory<byte>?>>(Sha1Comparer.Default);
+            // Enumerate
+            var dict = new Dictionary<Sha1, Task<IChasmBlob>>(Sha1Comparer.Default);
             foreach (Sha1 objectId in objectIds)
             {
                 dict[objectId] = ReadObjectAsync(objectId, cancellationToken);
             }
 
-            await Task.WhenAll(dict.Values.ToList())
+            // Await
+            await Task.WhenAll(dict.Values)
                 .ConfigureAwait(false);
 
-            var dict2 = new Dictionary<Sha1, ReadOnlyMemory<byte>>(Sha1Comparer.Default);
-            foreach (KeyValuePair<Sha1, Task<ReadOnlyMemory<byte>?>> task in dict)
+            // Return
+            var dict2 = new Dictionary<Sha1, IChasmBlob>(Sha1Comparer.Default);
+            foreach (KeyValuePair<Sha1, Task<IChasmBlob>> task in dict)
             {
-                if (task.Value == null || task.Value.Result.Value.Length == 0)
+                if (task.Value == null || task.Value.Result == null)
                     continue;
 
-                dict2[task.Key] = task.Value.Result.Value;
+                dict2[task.Key] = task.Value.Result;
             }
 
             return dict2;
@@ -50,22 +52,22 @@ namespace SourceCode.Chasm.Repository
 
         #region Write
 
-        public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
+        public abstract Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
         public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
         public abstract Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
-        public virtual async Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<KeyValuePair<Memory<byte>, Metadata>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public virtual async Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, CancellationToken cancellationToken)
         {
-            if (items == null || !items.Any())
+            if (blobs == null || !blobs.Any())
                 return Array.Empty<WriteResult<Sha1>>();
 
             var tasks = new List<Task<WriteResult<Sha1>>>();
-            foreach (KeyValuePair<Memory<byte>, Metadata> item in items)
+            foreach (IChasmBlob blob in blobs)
             {
                 // Concurrency: instantiate tasks without await
-                Task<WriteResult<Sha1>> task = WriteObjectAsync(item.Key, item.Value, forceOverwrite, cancellationToken);
+                Task<WriteResult<Sha1>> task = WriteObjectAsync(blob.Content, blob.Metadata, forceOverwrite, cancellationToken);
                 tasks.Add(task);
             }
 

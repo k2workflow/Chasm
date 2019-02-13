@@ -16,7 +16,7 @@ namespace SourceCode.Chasm.Repository
                 : default;
         }
 
-        public static Task<ReadOnlyMemory<byte>?> ReadObjectAsync(this IChasmRepository chasmRepository, Sha1? objectId, CancellationToken cancellationToken)
+        public static Task<IChasmBlob> ReadObjectAsync(this IChasmRepository chasmRepository, Sha1? objectId, CancellationToken cancellationToken)
         {
             if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));
 
@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.Repository
                 : default;
         }
 
-        public static Task<ReadOnlyMemory<byte>?> ReadObjectAsync(this IChasmRepository chasmRepository, BlobId? objectId, CancellationToken cancellationToken)
+        public static Task<IChasmBlob> ReadObjectAsync(this IChasmRepository chasmRepository, BlobId? objectId, CancellationToken cancellationToken)
         {
             if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));
 

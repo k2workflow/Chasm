@@ -45,47 +45,11 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             return exists;
         }
 
-        public override async Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             // Try disk repo first
 
-            ReadOnlyMemory<byte>? cached = await _diskRepo.ReadObjectAsync(objectId, cancellationToken)
-                .ConfigureAwait(false);
-
-            if (cached.HasValue)
-                return cached.Value;
-
-            // Else go to cloud
-
-            string blobName = DeriveBlobName(objectId);
-            CloudBlobContainer objectsContainer = _objectsContainer.Value;
-            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
-
-            try
-            {
-                using (var output = new MemoryStream())
-                {
-                    // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
-                    await blobRef.DownloadToStreamAsync(output)
-                        .ConfigureAwait(false);
-
-                    byte[] buffer = output.ToArray(); // TODO: Perf
-                    return buffer;
-                }
-            }
-            // Try-catch is cheaper than a separate (latent) exists check
-            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
-            {
-                se.Suppress();
-                return default;
-            }
-        }
-
-        public override async Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
-        {
-            // Try disk repo first
-
-            Stream cached = await _diskRepo.ReadStreamAsync(objectId, cancellationToken)
+            IChasmBlob cached = await _diskRepo.ReadObjectAsync(objectId, cancellationToken)
                 .ConfigureAwait(false);
 
             if (cached != null)
@@ -99,13 +63,65 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             try
             {
-                var output = new MemoryStream();
+                // Fetch metadata
+                await blobRef.FetchAttributesAsync()
+                    .ConfigureAwait(false);
+
+                blobRef.Metadata.TryGetValue(FileNameKey, out string filename);
+                blobRef.Metadata.TryGetValue(MimeTypeKey, out string contentType);
+                var metadata = new Metadata(filename, contentType);
+
+                using (var output = new MemoryStream())
+                {
+                    // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
+                    await blobRef.DownloadToStreamAsync(output)
+                        .ConfigureAwait(false);
+
+                    byte[] buffer = output.ToArray(); // TODO: Perf
+
+                    return new ChasmBlob(buffer, metadata);
+                }
+            }
+            // Try-catch is cheaper than a separate (latent) exists check
+            catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
+            {
+                se.Suppress();
+                return default;
+            }
+        }
+
+        public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        {
+            // Try disk repo first
+
+            IChasmStream cached = await _diskRepo.ReadStreamAsync(objectId, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (cached != null)
+                return cached;
+
+            // Else go to cloud
+
+            string blobName = DeriveBlobName(objectId);
+            CloudBlobContainer objectsContainer = _objectsContainer.Value;
+            CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
+
+            try
+            {
+                // Fetch metadata
+                await blobRef.FetchAttributesAsync()
+                    .ConfigureAwait(false);
+
+                blobRef.Metadata.TryGetValue(FileNameKey, out string filename);
+                blobRef.Metadata.TryGetValue(MimeTypeKey, out string contentType);
+                var metadata = new Metadata(filename, contentType);
 
                 // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
+                var output = new MemoryStream();
                 await blobRef.DownloadToStreamAsync(output)
                     .ConfigureAwait(false);
 
-                return output;
+                return new ChasmStream(output, metadata);
             }
             // Try-catch is cheaper than a separate (latent) exists check
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
@@ -125,7 +141,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var created = true;
 
@@ -221,13 +237,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.CreateOrReplaceAsync(accessCondition, default, default)
                     .ConfigureAwait(false);
 
+                Task metadataTask = null;
                 if (metadata != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(metadata.Filename))
-                        blobRef.Metadata.Add(FileNameKey, metadata.Filename);
+                    blobRef.Metadata.Add(FileNameKey, metadata.Filename);
+                    blobRef.Metadata.Add(MimeTypeKey, metadata.ContentType);
 
-                    if (!string.IsNullOrWhiteSpace(metadata.ContentType))
-                        blobRef.Metadata.Add(MimeTypeKey, metadata.ContentType);
+                    metadataTask = blobRef.SetMetadataAsync();
                 }
 
                 using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -237,9 +253,9 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                     await blobRef.AppendBlockAsync(fs)
                         .ConfigureAwait(false);
 
-                    if (metadata != null)
+                    if (metadataTask != null)
                     {
-                        await blobRef.SetMetadataAsync()
+                        await metadataTask
                             .ConfigureAwait(false);
                     }
                 }
