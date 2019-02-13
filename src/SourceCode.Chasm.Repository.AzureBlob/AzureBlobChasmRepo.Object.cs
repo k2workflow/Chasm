@@ -12,8 +12,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 {
     partial class AzureBlobChasmRepo // .Object
     {
-        private const string FileNameKey = "filename";
-        private const string MimeTypeKey = "mimetype";
+        private const string ContentTypeKey = "contentType";
+        private const string FilenameKey = "filename";
 
         #region Read
 
@@ -67,9 +67,9 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.FetchAttributesAsync()
                     .ConfigureAwait(false);
 
-                blobRef.Metadata.TryGetValue(FileNameKey, out string filename);
-                blobRef.Metadata.TryGetValue(MimeTypeKey, out string contentType);
-                var metadata = new Metadata(filename, contentType);
+                blobRef.Metadata.TryGetValue(FilenameKey, out string filename);
+                blobRef.Metadata.TryGetValue(ContentTypeKey, out string contentType);
+                var metadata = new ChasmMetadata(filename, contentType);
 
                 using (var output = new MemoryStream())
                 {
@@ -112,9 +112,9 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.FetchAttributesAsync()
                     .ConfigureAwait(false);
 
-                blobRef.Metadata.TryGetValue(FileNameKey, out string filename);
-                blobRef.Metadata.TryGetValue(MimeTypeKey, out string contentType);
-                var metadata = new Metadata(filename, contentType);
+                blobRef.Metadata.TryGetValue(FilenameKey, out string filename);
+                blobRef.Metadata.TryGetValue(ContentTypeKey, out string contentType);
+                var metadata = new ChasmMetadata(filename, contentType);
 
                 // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
                 var output = new MemoryStream();
@@ -141,7 +141,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var created = true;
 
@@ -163,7 +163,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -194,7 +194,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
@@ -212,7 +212,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             return new WriteResult<Sha1>(objectId, created);
         }
 
-        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (!forceOverwrite)
             {
@@ -240,8 +240,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 Task metadataTask = null;
                 if (metadata != null)
                 {
-                    blobRef.Metadata.Add(FileNameKey, metadata.Filename);
-                    blobRef.Metadata.Add(MimeTypeKey, metadata.ContentType);
+                    blobRef.Metadata.Add(FilenameKey, metadata.Filename);
+                    blobRef.Metadata.Add(ContentTypeKey, metadata.ContentType);
 
                     metadataTask = blobRef.SetMetadataAsync();
                 }

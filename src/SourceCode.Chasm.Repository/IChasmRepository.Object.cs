@@ -23,7 +23,7 @@ namespace SourceCode.Chasm.Repository
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
+        Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
         /// <summary>
         /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
@@ -31,7 +31,7 @@ namespace SourceCode.Chasm.Repository
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
+        Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
         /// <summary>
         /// Writes a stream to the destination, returning the content's <see cref="Sha1"/> value.
@@ -42,7 +42,7 @@ namespace SourceCode.Chasm.Repository
         /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
+        Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken);
 
         /// <summary>
         /// Writes a list of buffers to the destination, returning the contents' <see cref="Sha1"/> values.

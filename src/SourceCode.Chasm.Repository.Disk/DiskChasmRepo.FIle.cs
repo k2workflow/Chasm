@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
@@ -206,6 +207,48 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
+        [Newtonsoft.Json.JsonObject(Id = "metadata")]
+        private sealed class JsonMetadata
+        {
+            private const string ContentTypeKey = "ct";
+            private const string FilenameKey = "fn";
+
+            [Newtonsoft.Json.JsonProperty(PropertyName = ContentTypeKey)]
+            public string ContentType { get; set; }
+
+            [Newtonsoft.Json.JsonProperty(PropertyName = FilenameKey)]
+            public string Filename { get; set; }
+        }
+
+        private static void WriteMetadata(ChasmMetadata metadata, string path)
+        {
+            var dto = new JsonMetadata
+            {
+                ContentType = metadata?.ContentType,
+                Filename = metadata?.Filename
+            };
+
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
+
+            File.WriteAllText(path, json, Encoding.UTF8);
+        }
+
+        private static ChasmMetadata ReadMetadata(string path)
+        {
+            ChasmMetadata metadata = null;
+
+            if (File.Exists(path))
+            {
+                string json = File.ReadAllText(path, Encoding.UTF8);
+
+                JsonMetadata dto = Newtonsoft.Json.JsonConvert.DeserializeObject<JsonMetadata>(json);
+
+                metadata = new ChasmMetadata(dto.Filename, dto.ContentType);
+            }
+
+            return metadata;
+        }
+
         private static string DeriveCommitRefFileName(string name, string branch)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(name));
@@ -216,12 +259,15 @@ namespace SourceCode.Chasm.Repository.Disk
             return refName;
         }
 
-        public static string DeriveFileName(Sha1 sha1)
+        public static (string filePath, string metaPath) DeriveFileNames(string root, Sha1 sha1)
         {
             System.Collections.Generic.KeyValuePair<string, string> tokens = sha1.Split(PrefixLength);
 
             string fileName = Path.Combine(tokens.Key, tokens.Value);
-            return fileName;
+            string filePath = Path.Combine(root, fileName);
+            string metaPath = filePath + ".metadata";
+
+            return (filePath, metaPath);
         }
     }
 }

@@ -6,16 +6,16 @@ namespace SourceCode.Chasm.Repository
     {
         ReadOnlyMemory<byte> Content { get; }
 
-        Metadata Metadata { get; }
+        ChasmMetadata Metadata { get; }
     }
 
     internal sealed class ChasmBlob : IChasmBlob
     {
         public ReadOnlyMemory<byte> Content { get; }
 
-        public Metadata Metadata { get; }
+        public ChasmMetadata Metadata { get; }
 
-        public ChasmBlob(ReadOnlyMemory<byte> content, Metadata metadata)
+        public ChasmBlob(ReadOnlyMemory<byte> content, ChasmMetadata metadata)
         {
             Content = content;
             Metadata = metadata;

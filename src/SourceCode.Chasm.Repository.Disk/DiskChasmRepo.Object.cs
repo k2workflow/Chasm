@@ -13,8 +13,7 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            string filename = DeriveFileName(objectId);
-            string filePath = Path.Combine(_objectsContainer, filename);
+            (string filePath, _) = DeriveFileNames(_objectsContainer, objectId);
 
             string dir = Path.GetDirectoryName(filePath);
             if (!Directory.Exists(dir))
@@ -26,33 +25,38 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            string filename = DeriveFileName(objectId);
-            string filePath = Path.Combine(_objectsContainer, filename);
+            (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
             byte[] bytes = await ReadFileAsync(filePath, cancellationToken)
                 .ConfigureAwait(false);
 
             if (bytes == null) return default;
-            return new ChasmBlob(bytes, null);
+
+            ChasmMetadata metadata = ReadMetadata(metaPath);
+
+            var blob = new ChasmBlob(bytes, metadata);
+            return blob;
 
         }
 
         public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
-            string filename = DeriveFileName(objectId);
-            string fiePath = Path.Combine(_objectsContainer, filename);
+            (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
-            string dir = Path.GetDirectoryName(fiePath);
+            string dir = Path.GetDirectoryName(filePath);
             if (!Directory.Exists(dir))
                 return default;
 
-            if (!File.Exists(fiePath))
+            if (!File.Exists(filePath))
                 return default;
 
-            FileStream fileStream = await WaitForFileAsync(fiePath, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
+            ChasmMetadata metadata = ReadMetadata(metaPath);
+
+            FileStream fileStream = await WaitForFileAsync(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
                 .ConfigureAwait(false);
 
-            return new ChasmStream(fileStream, null);
+            var blob = new ChasmStream(fileStream, metadata);
+            return blob;
         }
 
         #endregion
@@ -65,13 +69,13 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var created = true;
 
             ValueTask AfterWrite(Sha1 sha1, string tempPath)
             {
-                created = Rename(sha1, tempPath, forceOverwrite);
+                created = Rename(sha1, tempPath, metadata, forceOverwrite);
                 return default; // Task.CompletedTask
             }
 
@@ -87,7 +91,7 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -95,7 +99,7 @@ namespace SourceCode.Chasm.Repository.Disk
 
             ValueTask AfterWrite(Sha1 sha1, string tempPath)
             {
-                created = Rename(sha1, tempPath, forceOverwrite);
+                created = Rename(sha1, tempPath, metadata, forceOverwrite);
                 return default; // Task.CompletedTask
             }
 
@@ -114,7 +118,7 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
@@ -122,7 +126,7 @@ namespace SourceCode.Chasm.Repository.Disk
 
             ValueTask AfterWrite(Sha1 sha1, string tempPath)
             {
-                created = Rename(sha1, tempPath, forceOverwrite);
+                created = Rename(sha1, tempPath, metadata, forceOverwrite);
                 return default; // Task.CompletedTask
             }
 
@@ -132,12 +136,11 @@ namespace SourceCode.Chasm.Repository.Disk
             return new WriteResult<Sha1>(objectId, created);
         }
 
-        private bool Rename(Sha1 objectId, string tempPath, bool forceOverwrite)
+        private bool Rename(Sha1 objectId, string tempPath, ChasmMetadata metadata, bool forceOverwrite)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(tempPath));
 
-            string filename = DeriveFileName(objectId);
-            string filePath = Path.Combine(_objectsContainer, filename);
+            (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
             string dir = Path.GetDirectoryName(filePath);
 
             if (!Directory.Exists(dir))
@@ -157,6 +160,9 @@ namespace SourceCode.Chasm.Repository.Disk
 
             // TODO: Possible race-condition if concurrent writes
             File.Move(tempPath, filePath);
+
+            // Create metadata file
+            WriteMetadata(metadata, metaPath);
 
             // Created
             return true;

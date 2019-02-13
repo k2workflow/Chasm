@@ -81,7 +81,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     return default;
 
                 var entity = (DataEntity)result.Result;
-                var metadata = new Metadata(entity.Filename, entity.ContentType);
+                var metadata = new ChasmMetadata(entity.Filename, entity.ContentType);
 
                 return new ChasmBlob(entity.Content, metadata);
             }
@@ -149,7 +149,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
                     var entity = (DataEntity)result.Result;
                     Sha1 sha1 = DataEntity.FromPartition(entity);
-                    var metadata = new Metadata(entity.Filename, entity.ContentType);
+                    var metadata = new ChasmMetadata(entity.Filename, entity.ContentType);
 
                     dict[sha1] = new ChasmBlob(entity.Content, metadata);
                 }
@@ -168,7 +168,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             var created = true;
 
@@ -190,7 +190,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -221,7 +221,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
 
@@ -278,7 +278,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return list;
         }
 
-        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             if (!forceOverwrite)
             {

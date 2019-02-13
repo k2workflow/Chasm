@@ -49,17 +49,17 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> item, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> item, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> writeAction, Metadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> writeAction, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

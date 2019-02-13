@@ -7,16 +7,16 @@ namespace SourceCode.Chasm.Repository
     {
         Stream Content { get; }
 
-        Metadata Metadata { get; }
+        ChasmMetadata Metadata { get; }
     }
 
     internal sealed class ChasmStream : IChasmStream
     {
         public Stream Content { get; }
 
-        public Metadata Metadata { get; }
+        public ChasmMetadata Metadata { get; }
 
-        public ChasmStream(Stream stream, Metadata metadata)
+        public ChasmStream(Stream stream, ChasmMetadata metadata)
         {
             Content = stream;
             Metadata = metadata;
