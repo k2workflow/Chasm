@@ -21,28 +21,33 @@ namespace SourceCode.Chasm.Repository.AzureTable
         public byte[] Content { get; set; }
 #pragma warning restore CA1819 // Properties should not return arrays
 
-        public string ObjectType { get; set; }
+        public string Filename { get; set; }
+
+        public string ContentType { get; set; }
 
         #endregion
 
         #region Constructors
 
-        private DataEntity(string partitionKey, string rowKey, Memory<byte> content)
+        private DataEntity(string partitionKey, string rowKey, IChasmBlob blob)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
-            Content = content.ToArray(); // TODO: Perf
+
+            Content = blob?.Content.ToArray(); // TODO: Perf
+            Filename = blob?.Metadata?.Filename;
+            ContentType = blob?.Metadata?.ContentType;
         }
 
-        private DataEntity(string partitionKey, string rowKey, Memory<byte> content, string etag)
-            : this(partitionKey, rowKey, content)
+        private DataEntity(string partitionKey, string rowKey, IChasmBlob blob, string etag)
+            : this(partitionKey, rowKey, blob)
         {
             // https://azure.microsoft.com/en-us/blog/managing-concurrency-in-microsoft-azure-storage-2/
             ETag = etag;
         }
 
-        private DataEntity(string partitionKey, string rowKey, Memory<byte> content, bool forceOverwrite)
-            : this(partitionKey, rowKey, content)
+        private DataEntity(string partitionKey, string rowKey, IChasmBlob blob, bool forceOverwrite)
+            : this(partitionKey, rowKey, blob)
         {
             if (forceOverwrite)
             {
@@ -59,51 +64,59 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         #region Factory
 
-        internal static DataEntity Create(Sha1 sha1, Memory<byte> content, string etag)
+        internal static DataEntity Create(Sha1 sha1, IChasmBlob blob, string etag)
         {
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
+
             KeyValuePair<string, string> split = GetPartition(sha1);
 
-            var entity = new DataEntity(split.Key, split.Value, content.ToArray(), etag); // TODO: Perf
+            var entity = new DataEntity(split.Key, split.Value, blob, etag);
             return entity;
         }
 
-        internal static DataEntity Create(Sha1 sha1, Memory<byte> content, bool forceOverwrite)
+        internal static DataEntity Create(Sha1 sha1, IChasmBlob blob, bool forceOverwrite)
         {
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
+
             KeyValuePair<string, string> split = GetPartition(sha1);
 
-            var entity = new DataEntity(split.Key, split.Value, content.ToArray(), forceOverwrite); // TODO: Perf
+            var entity = new DataEntity(split.Key, split.Value, blob, forceOverwrite);
             return entity;
         }
 
-        internal static DataEntity Create(Sha1 sha1, Memory<byte> content)
+        internal static DataEntity Create(Sha1 sha1, IChasmBlob blob)
         {
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
+
             KeyValuePair<string, string> split = GetPartition(sha1);
 
-            var entity = new DataEntity(split.Key, split.Value, content.ToArray()); // TODO: Perf
+            var entity = new DataEntity(split.Key, split.Value, blob);
             return entity;
         }
 
-        internal static DataEntity Create(string name, string branch, Memory<byte> content, string etag)
+        internal static DataEntity Create(string name, string branch, IChasmBlob blob, string etag)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
 
             string partitionKey = GetPartitionKey(name);
             string rowKey = GetRowKey(branch);
 
-            var entity = new DataEntity(partitionKey, rowKey, content, etag);
+            var entity = new DataEntity(partitionKey, rowKey, blob, etag);
             return entity;
         }
 
-        internal static DataEntity Create(string name, string branch, Memory<byte> content)
+        internal static DataEntity Create(string name, string branch, IChasmBlob blob)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
 
             string partitionKey = GetPartitionKey(name);
             string rowKey = GetRowKey(branch);
 
-            var entity = new DataEntity(partitionKey, rowKey, content);
+            var entity = new DataEntity(partitionKey, rowKey, blob);
             return entity;
         }
 
@@ -214,64 +227,72 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
         #region Write
 
-        internal static TableOperation BuildWriteOperation(Sha1 sha1, Memory<byte> content, bool forceOverwrite)
+        internal static TableOperation BuildWriteOperation(Sha1 sha1, IChasmBlob blob, bool forceOverwrite)
         {
-            DataEntity entity = Create(sha1, content, forceOverwrite);
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
+
+            DataEntity entity = Create(sha1, blob, forceOverwrite);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(Sha1 sha1, Memory<byte> content, string etag)
+        internal static TableOperation BuildWriteOperation(Sha1 sha1, IChasmBlob blob, string etag)
         {
-            DataEntity entity = Create(sha1, content, etag);
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
+
+            DataEntity entity = Create(sha1, blob, etag);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(Sha1 sha1, Memory<byte> content)
+        internal static TableOperation BuildWriteOperation(Sha1 sha1, IChasmBlob blob)
         {
-            DataEntity entity = Create(sha1, content);
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
+
+            DataEntity entity = Create(sha1, blob);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(string name, string branch, Memory<byte> content, string etag)
+        internal static TableOperation BuildWriteOperation(string name, string branch, IChasmBlob blob, string etag)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
 
-            DataEntity entity = Create(name, branch, content, etag);
+            DataEntity entity = Create(name, branch, blob, etag);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static TableOperation BuildWriteOperation(string name, string branch, Memory<byte> content)
+        internal static TableOperation BuildWriteOperation(string name, string branch, IChasmBlob blob)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
+            if (blob == null) throw new ArgumentNullException(nameof(blob));
 
-            DataEntity entity = Create(name, branch, content);
+            DataEntity entity = Create(name, branch, blob);
 
             var op = TableOperation.InsertOrReplace(entity);
             return op;
         }
 
-        internal static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, Memory<byte>>> items, bool forceOverwrite)
+        internal static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<KeyValuePair<Sha1, IChasmBlob>> blobs, bool forceOverwrite)
         {
-            if (items == null || !items.Any())
+            if (blobs == null || !blobs.Any())
                 return Array.Empty<TableBatchOperation>();
 
             // TODO: Limit number of items in each TableBatchOperation
 
             var batches = new Dictionary<string, TableBatchOperation>(StringComparer.Ordinal);
 
-            foreach (KeyValuePair<Sha1, Memory<byte>> item in items)
+            foreach (KeyValuePair<Sha1, IChasmBlob> blob in blobs)
             {
-                DataEntity entity = Create(item.Key, item.Value, forceOverwrite);
+                DataEntity entity = Create(blob.Key, blob.Value, forceOverwrite);
 
                 if (!batches.TryGetValue(entity.PartitionKey, out TableBatchOperation batch))
                 {

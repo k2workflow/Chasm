@@ -29,17 +29,17 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<ReadOnlyMemory<byte>?> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<Stream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public override Task<IReadOnlyDictionary<Sha1, IChasmBlob>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -49,22 +49,22 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(Memory<byte> item, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> item, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> writeAction, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> writeAction, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<Memory<byte>> items, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

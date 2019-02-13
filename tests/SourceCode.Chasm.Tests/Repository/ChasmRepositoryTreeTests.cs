@@ -8,6 +8,7 @@ using Moq;
 using SourceCode.Chasm.Tests;
 using SourceCode.Chasm.Tests.TestObjects;
 using SourceCode.Clay;
+using SourceCode.Clay.Collections.Generic;
 using Xunit;
 
 namespace SourceCode.Chasm.Repository.Tests
@@ -113,7 +114,7 @@ namespace SourceCode.Chasm.Repository.Tests
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return TestValues.ReadOnlyMemory;
+                    return new ChasmBlob(TestValues.ReadOnlyMemory, null);
                 });
 
             // Action
@@ -158,7 +159,7 @@ namespace SourceCode.Chasm.Repository.Tests
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return TestValues.ReadOnlyMemory;
+                    return new ChasmBlob(TestValues.ReadOnlyMemory, null);
                 });
 
             // Action
@@ -204,13 +205,13 @@ namespace SourceCode.Chasm.Repository.Tests
                 {
                     await Task.Yield();
 
-                    var dictionary = new Dictionary<Sha1, ReadOnlyMemory<byte>>();
+                    var dictionary = new Dictionary<Sha1, IChasmBlob>();
                     foreach (Sha1 objectId in objectIds)
                     {
-                        dictionary.Add(objectId, TestValues.ReadOnlyMemory);
+                        dictionary.Add(objectId, new ChasmBlob(TestValues.ReadOnlyMemory, null));
                     }
 
-                    return new ReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>>(dictionary);
+                    return new ReadOnlyDictionary<Sha1, IChasmBlob>(dictionary);
                 });
 
             // Action
@@ -256,14 +257,14 @@ namespace SourceCode.Chasm.Repository.Tests
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return ImmutableDictionary<Sha1, ReadOnlyMemory<byte>>.Empty;
+                    return EmptyMap<Sha1, IChasmBlob>.Empty;
                 });
 
             // Action
             IReadOnlyDictionary<TreeId, TreeNodeMap> actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
-            Assert.Equal(ImmutableDictionary<TreeId, TreeNodeMap>.Empty, actual);
+            Assert.Equal(EmptyMap<TreeId, TreeNodeMap>.Empty, actual);
         }
 
         [Trait("Type", "Unit")]
@@ -306,7 +307,7 @@ namespace SourceCode.Chasm.Repository.Tests
 
             // Assert
             Assert.Equal(new TreeId(), actual);
-            mockChasmRepository.Verify(i => i.WriteObjectAsync(It.IsAny<Memory<byte>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+            mockChasmRepository.Verify(i => i.WriteObjectAsync(It.IsAny<ReadOnlyMemory<byte>>(), null, It.IsAny<bool>(), It.IsAny<CancellationToken>()));
         }
     }
 }

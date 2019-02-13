@@ -13,13 +13,14 @@ namespace SourceCode.Chasm.Repository
         public virtual async ValueTask<TreeNodeMap?> ReadTreeAsync(TreeId treeId, CancellationToken cancellationToken)
         {
             // Read bytes
-            ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(treeId.Sha1, cancellationToken)
+            IChasmBlob blob = await ReadObjectAsync(treeId.Sha1, cancellationToken)
                 .ConfigureAwait(false);
 
-            if (buffer == null || buffer.Value.Length == 0) return default;
+            if (blob == null || blob.Content.IsEmpty)
+                return default;
 
             // Deserialize
-            TreeNodeMap tree = Serializer.DeserializeTree(buffer.Value.Span);
+            TreeNodeMap tree = Serializer.DeserializeTree(blob.Content.Span);
             return tree;
         }
 
@@ -30,7 +31,7 @@ namespace SourceCode.Chasm.Repository
 
             // Read bytes in batch
             IEnumerable<Sha1> sha1s = System.Linq.Enumerable.Select(treeIds, n => n.Sha1);
-            IReadOnlyDictionary<Sha1, ReadOnlyMemory<byte>> kvps = await ReadObjectBatchAsync(sha1s, cancellationToken)
+            IReadOnlyDictionary<Sha1, IChasmBlob> kvps = await ReadObjectBatchAsync(sha1s, cancellationToken)
                 .ConfigureAwait(false);
 
             // Deserialize batch
@@ -39,9 +40,9 @@ namespace SourceCode.Chasm.Repository
 
             var dict = new Dictionary<TreeId, TreeNodeMap>(kvps.Count);
 
-            foreach (KeyValuePair<Sha1, ReadOnlyMemory<byte>> kvp in kvps)
+            foreach (KeyValuePair<Sha1, IChasmBlob> kvp in kvps)
             {
-                TreeNodeMap tree = Serializer.DeserializeTree(kvp.Value.Span);
+                TreeNodeMap tree = Serializer.DeserializeTree(kvp.Value.Content.Span);
 
                 var treeId = new TreeId(kvp.Key);
                 dict[treeId] = tree;
@@ -89,7 +90,7 @@ namespace SourceCode.Chasm.Repository
         {
             using (IMemoryOwner<byte> owner = Serializer.Serialize(tree))
             {
-                Sha1 sha1 = await WriteObjectAsync(owner.Memory, false, cancellationToken)
+                Sha1 sha1 = await WriteObjectAsync(owner.Memory, null, false, cancellationToken)
                     .ConfigureAwait(false);
 
                 var model = new TreeId(sha1);

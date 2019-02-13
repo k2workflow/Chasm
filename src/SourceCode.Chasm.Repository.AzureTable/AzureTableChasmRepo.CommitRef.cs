@@ -121,7 +121,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 // CommitIds are not compressed
                 using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
                 {
-                    TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, owner.Memory, etag); // Note etag access condition
+                    var blob = new ChasmBlob(owner.Memory, null);
+                    TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, blob, etag); // Note etag access condition
 
                     await refsTable.ExecuteAsync(op)
                         .ConfigureAwait(false);

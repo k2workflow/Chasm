@@ -1,4 +1,3 @@
-using System;
 using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,12 +9,13 @@ namespace SourceCode.Chasm.Repository
     {
         public virtual async ValueTask<Commit?> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
         {
-            ReadOnlyMemory<byte>? buffer = await ReadObjectAsync(commitId.Sha1, cancellationToken)
+            IChasmBlob blob = await ReadObjectAsync(commitId.Sha1, cancellationToken)
                 .ConfigureAwait(false);
 
-            if (buffer == null || buffer.Value.Length == 0) return default;
+            if (blob == null || blob.Content.IsEmpty)
+                return default;
 
-            Commit model = Serializer.DeserializeCommit(buffer.Value.Span);
+            Commit model = Serializer.DeserializeCommit(blob.Content.Span);
             return model;
         }
 
@@ -23,7 +23,7 @@ namespace SourceCode.Chasm.Repository
         {
             using (IMemoryOwner<byte> owner = Serializer.Serialize(commit))
             {
-                Sha1 sha1 = await WriteObjectAsync(owner.Memory, false, cancellationToken)
+                Sha1 sha1 = await WriteObjectAsync(owner.Memory, null, false, cancellationToken)
                     .ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);
