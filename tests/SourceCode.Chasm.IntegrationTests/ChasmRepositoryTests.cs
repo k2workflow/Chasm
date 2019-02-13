@@ -39,22 +39,28 @@ namespace SoruceCode.Chasm.IntegrationTests
             Sha1 usha2 = s_hasher.HashData(Guid.NewGuid().ToByteArray());
 
             // Blob
-            Sha1 sha2 = await repository.WriteObjectAsync(new ReadOnlyMemory<byte>(buffer), null, false, default);
+            var metadata = new ChasmMetadata("application/json", "file123.txt");
+            Sha1 sha2 = await repository.WriteObjectAsync(new ReadOnlyMemory<byte>(buffer), metadata, false, default);
             Assert.Equal(sha, sha2);
             IChasmBlob rdata = await repository.ReadObjectAsync(sha, default);
             Assert.True(rdata != null);
             Assert.Equal(16, rdata.Content.Length);
             Assert.Equal(g, new Guid(rdata.Content.ToArray()));
+            Assert.Equal("application/json", rdata.Metadata.ContentType);
+            Assert.Equal("file123.txt", rdata.Metadata.Filename);
 
             IChasmBlob urdata = await repository.ReadObjectAsync(usha1, default);
             Assert.False(urdata != null);
 
             //
-            sha2 = await repository.WriteObjectAsync(buffer, null, true, default);
+            metadata = new ChasmMetadata("application/text", null);
+            sha2 = await repository.WriteObjectAsync(buffer, metadata, true, default);
             Assert.Equal(sha, sha2);
 
             IChasmBlob cnt2 = await repository.ReadObjectAsync(sha2, default);
             Assert.Equal(buffer, cnt2.Content.ToArray());
+            Assert.Equal("application/text", cnt2.Metadata.ContentType);
+            Assert.Null(cnt2.Metadata.Filename);
 
             using (IChasmStream stream2 = await repository.ReadStreamAsync(sha2, default))
             using (var ms = new MemoryStream())

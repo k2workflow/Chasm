@@ -6,7 +6,7 @@ namespace SourceCode.Chasm.Repository
 
         public string ContentType { get; }
 
-        public ChasmMetadata(string filename, string contentType)
+        public ChasmMetadata(string contentType, string filename)
         {
             Filename = filename;
             ContentType = contentType;

@@ -207,29 +207,10 @@ namespace SourceCode.Chasm.Repository.Disk
             }
         }
 
-        [Newtonsoft.Json.JsonObject(Id = "metadata")]
-        private sealed class JsonMetadata
-        {
-            private const string ContentTypeKey = "ct";
-            private const string FilenameKey = "fn";
-
-            [Newtonsoft.Json.JsonProperty(PropertyName = ContentTypeKey)]
-            public string ContentType { get; set; }
-
-            [Newtonsoft.Json.JsonProperty(PropertyName = FilenameKey)]
-            public string Filename { get; set; }
-        }
-
         private static void WriteMetadata(ChasmMetadata metadata, string path)
         {
-            var dto = new JsonMetadata
-            {
-                ContentType = metadata?.ContentType,
-                Filename = metadata?.Filename
-            };
-
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(dto);
-
+            var dto = new JsonMetadata(metadata?.ContentType, metadata?.Filename);
+            var json = dto.ToJson();
             File.WriteAllText(path, json, Encoding.UTF8);
         }
 
@@ -240,10 +221,9 @@ namespace SourceCode.Chasm.Repository.Disk
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path, Encoding.UTF8);
+                var dto = JsonMetadata.FromJson(json);
 
-                JsonMetadata dto = Newtonsoft.Json.JsonConvert.DeserializeObject<JsonMetadata>(json);
-
-                metadata = new ChasmMetadata(dto.Filename, dto.ContentType);
+                metadata = new ChasmMetadata(dto.ContentType, dto.Filename);
             }
 
             return metadata;

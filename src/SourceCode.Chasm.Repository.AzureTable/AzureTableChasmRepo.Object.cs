@@ -81,7 +81,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     return default;
 
                 var entity = (DataEntity)result.Result;
-                var metadata = new ChasmMetadata(entity.Filename, entity.ContentType);
+                var metadata = new ChasmMetadata(entity.ContentType, entity.Filename);
 
                 return new ChasmBlob(entity.Content, metadata);
             }
@@ -149,7 +149,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
                     var entity = (DataEntity)result.Result;
                     Sha1 sha1 = DataEntity.FromPartition(entity);
-                    var metadata = new ChasmMetadata(entity.Filename, entity.ContentType);
+                    var metadata = new ChasmMetadata(entity.ContentType, entity.Filename);
 
                     dict[sha1] = new ChasmBlob(entity.Content, metadata);
                 }

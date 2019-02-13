@@ -69,7 +69,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                 blobRef.Metadata.TryGetValue(FilenameKey, out string filename);
                 blobRef.Metadata.TryGetValue(ContentTypeKey, out string contentType);
-                var metadata = new ChasmMetadata(filename, contentType);
+                var metadata = new ChasmMetadata(contentType, filename);
 
                 using (var output = new MemoryStream())
                 {
@@ -114,7 +114,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                 blobRef.Metadata.TryGetValue(FilenameKey, out string filename);
                 blobRef.Metadata.TryGetValue(ContentTypeKey, out string contentType);
-                var metadata = new ChasmMetadata(filename, contentType);
+                var metadata = new ChasmMetadata(contentType, filename);
 
                 // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
                 var output = new MemoryStream();
