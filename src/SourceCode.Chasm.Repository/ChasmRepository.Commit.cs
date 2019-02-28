@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,9 +8,11 @@ namespace SourceCode.Chasm.Repository
 {
     partial class ChasmRepository // .Commit
     {
-        public virtual async ValueTask<Commit?> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken)
+        public virtual async ValueTask<Commit?> ReadCommitAsync(CommitId commitId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
-            IChasmBlob blob = await ReadObjectAsync(commitId.Sha1, cancellationToken)
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
+            IChasmBlob blob = await ReadObjectAsync(commitId.Sha1, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (blob == null || blob.Content.IsEmpty)
@@ -19,11 +22,13 @@ namespace SourceCode.Chasm.Repository
             return model;
         }
 
-        public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken)
+        public virtual async ValueTask<CommitId> WriteCommitAsync(Commit commit, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             using (IMemoryOwner<byte> owner = Serializer.Serialize(commit))
             {
-                Sha1 sha1 = await WriteObjectAsync(owner.Memory, null, false, cancellationToken)
+                Sha1 sha1 = await WriteObjectAsync(owner.Memory, null, false, requestContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 var commitId = new CommitId(sha1);

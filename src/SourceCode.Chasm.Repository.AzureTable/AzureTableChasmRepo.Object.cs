@@ -18,30 +18,41 @@ namespace SourceCode.Chasm.Repository.AzureTable
     {
         #region Read
 
-        public override async Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<bool> ExistsAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             // Try disk repo first
 
-            bool exists = await _diskRepo.ExistsAsync(objectId, cancellationToken)
+            bool exists = await _diskRepo.ExistsAsync(objectId, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             // Else go to cloud
 
             if (!exists)
-                exists = await ExistsOnCloudAsync(objectId, cancellationToken)
+            {
+                exists = await ExistsOnCloudAsync(objectId, requestContext, cancellationToken)
                     .ConfigureAwait(false);
+            }
 
             return exists;
         }
 
-        private async Task<bool> ExistsOnCloudAsync(Sha1 objectId, CancellationToken cancellationToken)
+        private async Task<bool> ExistsOnCloudAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             CloudTable objectsTable = _objectsTable.Value;
             TableOperation op = DataEntity.BuildExistsOperation(objectId);
 
             try
             {
-                TableResult result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                TableResult result = await objectsTable.ExecuteAsync(op, default, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
@@ -57,11 +68,18 @@ namespace SourceCode.Chasm.Repository.AzureTable
             }
         }
 
-        public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             // Try disk repo first
 
-            IChasmBlob cached = await _diskRepo.ReadObjectAsync(objectId, cancellationToken)
+            IChasmBlob cached = await _diskRepo.ReadObjectAsync(objectId, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (cached != null)
@@ -74,7 +92,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             try
             {
-                TableResult result = await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+                TableResult result = await objectsTable.ExecuteAsync(op, default, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (result.HttpStatusCode == (int)HttpStatusCode.NotFound)
@@ -93,11 +111,13 @@ namespace SourceCode.Chasm.Repository.AzureTable
             }
         }
 
-        public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             // Try disk repo first
 
-            IChasmStream cached = await _diskRepo.ReadStreamAsync(objectId, cancellationToken)
+            IChasmStream cached = await _diskRepo.ReadStreamAsync(objectId, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (cached != null)
@@ -105,7 +125,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
 
             // Else go to cloud
 
-            IChasmBlob blob = await ReadObjectAsync(objectId, cancellationToken)
+            IChasmBlob blob = await ReadObjectAsync(objectId, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (blob == null)
@@ -117,10 +137,17 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return new ChasmStream(stream, blob.Metadata);
         }
 
-        public override async Task<IReadOnlyDictionary<Sha1, IChasmBlob>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyDictionary<Sha1, IChasmBlob>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (objectIds == null)
                 return EmptyMap<Sha1, IChasmBlob>.Empty;
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
 
             // Build batches
             IReadOnlyCollection<TableBatchOperation> batches = DataEntity.BuildReadBatches(objectIds);
@@ -131,7 +158,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             foreach (TableBatchOperation batch in batches)
             {
                 // Execute batch
-                Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, default, default, cancellationToken);
+                Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, default, opContext, cancellationToken);
                 tasks.Add(task);
             }
 
@@ -168,17 +195,19 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             var created = true;
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, requestContext, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterWrite, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -190,19 +219,21 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             var created = true;
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, requestContext, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterWrite, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -221,19 +252,21 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             var created = true;
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, requestContext, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.StageFileAsync(beforeHash, AfterWrite, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.StageFileAsync(beforeHash, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -245,13 +278,20 @@ namespace SourceCode.Chasm.Repository.AzureTable
         /// <param name="buffers">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (blobs == null || !blobs.Any())
                 return Array.Empty<WriteResult<Sha1>>();
 
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             // Build batches
-            IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(blobs, forceOverwrite, cancellationToken);
+            IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(blobs, forceOverwrite, requestContext, cancellationToken);
 
             CloudTable objectsTable = _objectsTable.Value;
 
@@ -260,7 +300,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             foreach (TableBatchOperation batch in batches)
             {
                 // Concurrency: instantiate tasks without await
-                Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, null, null, cancellationToken);
+                Task<IList<TableResult>> task = objectsTable.ExecuteBatchAsync(batch, default, opContext, cancellationToken);
                 tasks.Add(task);
             }
 
@@ -278,11 +318,18 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return list;
         }
 
-        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             if (!forceOverwrite)
             {
-                bool exists = await ExistsOnCloudAsync(objectId, cancellationToken)
+                bool exists = await ExistsOnCloudAsync(objectId, requestContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 // Not created (already existed)
@@ -296,15 +343,17 @@ namespace SourceCode.Chasm.Repository.AzureTable
             TableOperation op = DataEntity.BuildWriteOperation(objectId, blob, forceOverwrite);
 
             CloudTable objectsTable = _objectsTable.Value;
-            await objectsTable.ExecuteAsync(op, default, default, cancellationToken)
+            await objectsTable.ExecuteAsync(op, default, opContext, cancellationToken)
                 .ConfigureAwait(false);
 
             // Created
             return true;
         }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, CancellationToken cancellationToken)
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             var dict = new Dictionary<Sha1, IChasmBlob>();
 
             foreach (IChasmBlob blob in blobs)

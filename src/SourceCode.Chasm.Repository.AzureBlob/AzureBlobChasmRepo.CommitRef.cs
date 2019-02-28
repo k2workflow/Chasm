@@ -22,9 +22,16 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         #region List
 
-        public override async ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken)
+        public override async ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
 
             CloudBlobContainer refsContainer = _refsContainer.Value;
             var results = new List<CommitRef>();
@@ -34,7 +41,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             do
             {
-                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync(name, false, BlobListingDetails.None, null, token, null, null)
+                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync(name, false, BlobListingDetails.None, null, token, null, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 foreach (IListBlobItem blobItem in resultSegment.Results)
@@ -50,7 +57,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                     using (var output = new MemoryStream())
                     {
-                        await blob.DownloadToStreamAsync(output, default, default, default, cancellationToken)
+                        await blob.DownloadToStreamAsync(output, default, default, opContext, cancellationToken)
                             .ConfigureAwait(false);
 
                         if (output.Length < Sha1.ByteLength)
@@ -67,8 +74,15 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             return results;
         }
 
-        public override async ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
+        public override async ValueTask<IReadOnlyList<string>> GetNamesAsync(ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             CloudBlobContainer refsContainer = _refsContainer.Value;
             var results = new List<string>();
 
@@ -76,7 +90,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
             do
             {
-                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync("", false, BlobListingDetails.None, null, token, null, null)
+                BlobResultSegment resultSegment = await refsContainer.ListBlobsSegmentedAsync("", false, BlobListingDetails.None, null, token, null, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 foreach (IListBlobItem blobItem in resultSegment.Results)
@@ -99,12 +113,14 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         #region Read
 
-        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)
+        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            (bool found, CommitId commitId, AccessCondition _, CloudAppendBlob _) = await ReadCommitRefImplAsync(name, branch, cancellationToken)
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
+            (bool found, CommitId commitId, AccessCondition _, CloudAppendBlob _) = await ReadCommitRefImplAsync(name, branch, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             // NotFound
@@ -119,13 +135,20 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         #region Write
 
-        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken)
+        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             // Load existing commit ref in order to use its etag
-            (bool found, CommitId existingCommitId, AccessCondition ifMatchCondition, CloudAppendBlob blobRef) = await ReadCommitRefImplAsync(name, commitRef.Branch, cancellationToken)
+            (bool found, CommitId existingCommitId, AccessCondition ifMatchCondition, CloudAppendBlob blobRef) = await ReadCommitRefImplAsync(name, commitRef.Branch, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             // Optimistic concurrency check
@@ -133,12 +156,12 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             {
                 // We found a previous commit but the caller didn't say to expect one
                 if (!previousCommitId.HasValue)
-                    throw BuildConcurrencyException(name, commitRef.Branch, null); // TODO: May need a different error
+                    throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext); // TODO: May need a different error
 
                 // Semantics follow Interlocked.Exchange (compare then exchange)
                 if (existingCommitId != previousCommitId.Value)
                 {
-                    throw BuildConcurrencyException(name, commitRef.Branch, null);
+                    throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext);
                 }
 
                 // Idempotent
@@ -149,13 +172,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             // The caller expected a previous commit, but we didn't find one
             else if (previousCommitId.HasValue)
             {
-                throw BuildConcurrencyException(name, commitRef.Branch, null); // TODO: May need a different error
+                throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext); // TODO: May need a different error
             }
 
             try
             {
                 // Required to create blob before appending to it
-                await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, default, cancellationToken)
+                await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, opContext, cancellationToken)
                     .ConfigureAwait(false); // Note etag access condition
 
                 // CommitIds are not compressed
@@ -179,13 +202,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                     // Append blob. Following seems to be the only safe multi-writer method available
                     // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
-                    await blobRef.AppendBlockAsync(output)
+                    await blobRef.AppendBlockAsync(output, default, default, default, opContext, cancellationToken)
                         .ConfigureAwait(false);
                 }
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
-                throw BuildConcurrencyException(name, commitRef.Branch, se);
+                throw BuildConcurrencyException(name, commitRef.Branch, se, requestContext);
             }
         }
 
@@ -205,9 +228,15 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             return refName;
         }
 
-        private async ValueTask<(bool found, CommitId, AccessCondition, CloudAppendBlob)> ReadCommitRefImplAsync(string name, string branch, CancellationToken cancellationToken)
+        private async ValueTask<(bool found, CommitId, AccessCondition, CloudAppendBlob)> ReadCommitRefImplAsync(string name, string branch, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             // Callers have already validated parameters
+
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
 
             CloudBlobContainer refsContainer = _refsContainer.Value;
             string blobName = DeriveCommitRefBlobName(name, branch);
@@ -220,7 +249,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                     // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
                     // Or use blobRef.DownloadToByteArrayAsync() since we already know expected length of data (Sha1.ByteLen)
                     // Keep in mind Azure and/or specific IChasmSerializer may add some overhead: it looks like emperical byte length is 40-52 bytes
-                    await blobRef.DownloadToStreamAsync(output, default, default, default, cancellationToken)
+                    await blobRef.DownloadToStreamAsync(output, default, default, opContext, cancellationToken)
                         .ConfigureAwait(false);
 
                     // Grab the etag - we need it for optimistic concurrency control

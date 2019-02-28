@@ -27,9 +27,11 @@ namespace SourceCode.Chasm.Repository.Disk
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public static async Task<Sha1> StageFileAsync(Func<Stream, ValueTask> onWrite, Func<Sha1, string, ValueTask> afterWrite, CancellationToken cancellationToken)
+        public static async Task<Sha1> StageFileAsync(Func<Stream, ValueTask> onWrite, Func<Sha1, string, ValueTask> afterWrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (onWrite == null) throw new ArgumentNullException(nameof(onWrite));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             // Note that an empty file is physically created
             var filePath = Path.GetTempFileName();
@@ -74,9 +76,11 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="afterWrite">An action to take on the file, after writing has finished.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, ValueTask> afterWrite, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(Stream stream, Func<Sha1, string, ValueTask> afterWrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             ValueTask HashWriter(Stream output)
 #if !NETSTANDARD2_0
@@ -85,7 +89,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 => new ValueTask(stream.CopyToAsync(output, 1024, cancellationToken));
 #endif
 
-            return StageFileAsync(HashWriter, afterWrite, cancellationToken);
+            return StageFileAsync(HashWriter, afterWrite, requestContext, cancellationToken);
         }
 
         /// <summary>
@@ -97,8 +101,10 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="afterWrite">An action to take on the file, after writing has finished.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public static Task<Sha1> WriteFileAsync(ReadOnlyMemory<byte> buffer, Func<Sha1, string, ValueTask> afterWrite, CancellationToken cancellationToken)
+        public static Task<Sha1> WriteFileAsync(ReadOnlyMemory<byte> buffer, Func<Sha1, string, ValueTask> afterWrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             ValueTask HashWriter(Stream output)
 #if !NETSTANDARD2_0
                 => output.WriteAsync(buffer, cancellationToken);
@@ -116,12 +122,14 @@ namespace SourceCode.Chasm.Repository.Disk
                 return default;
             }
 #endif
-            return StageFileAsync(HashWriter, afterWrite, cancellationToken);
+            return StageFileAsync(HashWriter, afterWrite, requestContext, cancellationToken);
         }
 
-        private static async Task<byte[]> ReadFileAsync(string path, CancellationToken cancellationToken)
+        private static async Task<byte[]> ReadFileAsync(string path, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(path));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             string dir = Path.GetDirectoryName(path);
             if (!Directory.Exists(dir))
@@ -133,16 +141,18 @@ namespace SourceCode.Chasm.Repository.Disk
             using (FileStream fileStream = await WaitForFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
                 .ConfigureAwait(false))
             {
-                var bytes = await ReadBytesAsync(fileStream, cancellationToken)
+                var bytes = await ReadBytesAsync(fileStream, requestContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 return bytes;
             }
         }
 
-        private static async Task<byte[]> ReadBytesAsync(Stream stream, CancellationToken cancellationToken)
+        private static async Task<byte[]> ReadBytesAsync(Stream stream, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             Debug.Assert(stream != null);
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             int offset = 0;
             int remaining = (int)stream.Length;
@@ -163,12 +173,14 @@ namespace SourceCode.Chasm.Repository.Disk
             return bytes;
         }
 
-        private static async Task TouchFileAsync(string path, CancellationToken cancellationToken)
+        private static async Task TouchFileAsync(string path, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(path));
 
             if (!File.Exists(path))
                 return;
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             for (int retryCount = 0; retryCount < _retryMax; retryCount++)
             {

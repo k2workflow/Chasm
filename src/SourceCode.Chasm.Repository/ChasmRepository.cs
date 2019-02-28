@@ -23,7 +23,7 @@ namespace SourceCode.Chasm.Repository
             MaxDop = maxDop;
         }
 
-        protected static ChasmConcurrencyException BuildConcurrencyException(string name, string branch, Exception innerException)
-            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {name}/{branch}", innerException);
+        protected static ChasmConcurrencyException BuildConcurrencyException(string name, string branch, Exception innerException, ChasmRequestContext chasmContext)
+            => new ChasmConcurrencyException($"Concurrent write detected on {nameof(CommitRef)} {name}/{branch} ({chasmContext?.CorrelationId})", innerException);
     }
 }

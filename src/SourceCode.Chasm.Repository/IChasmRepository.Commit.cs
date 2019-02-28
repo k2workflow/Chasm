@@ -5,8 +5,8 @@ namespace SourceCode.Chasm.Repository
 {
     partial interface IChasmRepository // .Commit
     {
-        ValueTask<Commit?> ReadCommitAsync(CommitId commitId, CancellationToken cancellationToken);
+        ValueTask<Commit?> ReadCommitAsync(CommitId commitId, ChasmRequestContext requestContext, CancellationToken cancellationToken);
 
-        ValueTask<CommitId> WriteCommitAsync(Commit commit, CancellationToken cancellationToken);
+        ValueTask<CommitId> WriteCommitAsync(Commit commit, ChasmRequestContext requestContext, CancellationToken cancellationToken);
     }
 }

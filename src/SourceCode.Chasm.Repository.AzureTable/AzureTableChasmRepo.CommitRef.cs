@@ -15,8 +15,15 @@ namespace SourceCode.Chasm.Repository.AzureTable
 {
     partial class AzureTableChasmRepo // .CommitRef
     {
-        public override async ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken)
+        public override async ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             CloudTable refsTable = _refsTable.Value;
             TableQuery<DataEntity> query = DataEntity.BuildListQuery(name);
 
@@ -25,7 +32,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             TableContinuationToken token = null;
             do
             {
-                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken)
+                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 foreach (DataEntity entity in result.Results)
@@ -44,8 +51,15 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return results;
         }
 
-        public override async ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
+        public override async ValueTask<IReadOnlyList<string>> GetNamesAsync(ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             CloudTable refsTable = _refsTable.Value;
             TableQuery<DataEntity> query = DataEntity.BuildListQuery();
 
@@ -54,7 +68,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             TableContinuationToken token = null;
             do
             {
-                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, default, cancellationToken)
+                TableQuerySegment<DataEntity> result = await refsTable.ExecuteQuerySegmentedAsync(query, token, default, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 foreach (DataEntity item in result.Results)
@@ -65,12 +79,14 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return names.ToList();
         }
 
-        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)
+        public override async ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            (bool found, CommitId commitId, string _) = await ReadCommitRefImplAsync(name, branch, Serializer, cancellationToken)
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
+            (bool found, CommitId commitId, string _) = await ReadCommitRefImplAsync(name, branch, Serializer, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             // NotFound
@@ -81,13 +97,20 @@ namespace SourceCode.Chasm.Repository.AzureTable
             return commitRef;
         }
 
-        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken)
+        public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (commitRef == CommitRef.Empty) throw new ArgumentNullException(nameof(commitRef));
 
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             // Load existing commit ref in order to use its etag
-            (bool found, CommitId existingCommitId, string etag) = await ReadCommitRefImplAsync(name, commitRef.Branch, Serializer, cancellationToken)
+            (bool found, CommitId existingCommitId, string etag) = await ReadCommitRefImplAsync(name, commitRef.Branch, Serializer, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             // Optimistic concurrency check
@@ -95,12 +118,12 @@ namespace SourceCode.Chasm.Repository.AzureTable
             {
                 // We found a previous commit but the caller didn't say to expect one
                 if (!previousCommitId.HasValue)
-                    throw BuildConcurrencyException(name, commitRef.Branch, null); // TODO: May need a different error
+                    throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext); // TODO: May need a different error
 
                 // Semantics follow Interlocked.Exchange (compare then exchange)
                 if (previousCommitId.HasValue && existingCommitId != previousCommitId.Value)
                 {
-                    throw BuildConcurrencyException(name, commitRef.Branch, null);
+                    throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext);
                 }
 
                 // Idempotent
@@ -111,7 +134,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             // The caller expected a previous commit, but we didn't find one
             else if (previousCommitId.HasValue)
             {
-                throw BuildConcurrencyException(name, commitRef.Branch, null); // TODO: May need a different error
+                throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext); // TODO: May need a different error
             }
 
             try
@@ -124,25 +147,32 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     var blob = new ChasmBlob(owner.Memory, null);
                     TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, blob, etag); // Note etag access condition
 
-                    await refsTable.ExecuteAsync(op)
+                    await refsTable.ExecuteAsync(op, default, opContext, cancellationToken)
                         .ConfigureAwait(false);
                 }
             }
             catch (StorageException se) when (se.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
             {
-                throw BuildConcurrencyException(name, commitRef.Branch, se);
+                throw BuildConcurrencyException(name, commitRef.Branch, se, requestContext);
             }
         }
 
-        private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string name, string branch, IChasmSerializer serializer, CancellationToken cancellationToken)
+        private async ValueTask<(bool found, CommitId, string etag)> ReadCommitRefImplAsync(string name, string branch, IChasmSerializer serializer, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             CloudTable refsTable = _refsTable.Value;
             TableOperation operation = DataEntity.BuildReadOperation(name, branch);
 
             try
             {
                 // Read from table
-                TableResult result = await refsTable.ExecuteAsync(operation, default, default, cancellationToken)
+                TableResult result = await refsTable.ExecuteAsync(operation, default, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 // NotFound

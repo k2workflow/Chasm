@@ -7,39 +7,47 @@ namespace SourceCode.Chasm.Repository
 {
     public static class ChasmRepositoryExtensions
     {
-        public static ValueTask<Commit?> ReadCommitAsync(this IChasmRepository chasmRepository, CommitId? commitId, CancellationToken cancellationToken)
+        public static ValueTask<Commit?> ReadCommitAsync(this IChasmRepository chasmRepository, CommitId? commitId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             return commitId.HasValue
-                ? chasmRepository.ReadCommitAsync(commitId.Value, cancellationToken)
+                ? chasmRepository.ReadCommitAsync(commitId.Value, requestContext, cancellationToken)
                 : default;
         }
 
-        public static Task<IChasmBlob> ReadObjectAsync(this IChasmRepository chasmRepository, Sha1? objectId, CancellationToken cancellationToken)
+        public static Task<IChasmBlob> ReadObjectAsync(this IChasmRepository chasmRepository, Sha1? objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             return objectId.HasValue
-                ? chasmRepository.ReadObjectAsync(objectId.Value, cancellationToken)
+                ? chasmRepository.ReadObjectAsync(objectId.Value, requestContext, cancellationToken)
                 : default;
         }
 
-        public static Task<IChasmBlob> ReadObjectAsync(this IChasmRepository chasmRepository, BlobId? objectId, CancellationToken cancellationToken)
+        public static Task<IChasmBlob> ReadObjectAsync(this IChasmRepository chasmRepository, BlobId? objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             return objectId.HasValue
-                ? chasmRepository.ReadObjectAsync(objectId.Value.Sha1, cancellationToken)
+                ? chasmRepository.ReadObjectAsync(objectId.Value.Sha1, requestContext, cancellationToken)
                 : default;
         }
 
-        public static ValueTask<TreeNodeMap?> ReadTreeAsync(this IChasmRepository chasmRepository, TreeId? treeId, CancellationToken cancellationToken)
+        public static ValueTask<TreeNodeMap?> ReadTreeAsync(this IChasmRepository chasmRepository, TreeId? treeId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             return treeId.HasValue
-                ? chasmRepository.ReadTreeAsync(treeId.Value, cancellationToken)
+                ? chasmRepository.ReadTreeAsync(treeId.Value, requestContext, cancellationToken)
                 : default;
         }
     }

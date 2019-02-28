@@ -19,7 +19,7 @@ namespace SourceCode.Chasm.Repository.Tests
             var expectedInnerException = new Exception(RandomHelper.String);
 
             // Action
-            ChasmConcurrencyException actual = MockChasmRepository.MockBuildConcurrencyException(expectedBranch, expectedName, expectedInnerException);
+            ChasmConcurrencyException actual = MockChasmRepository.MockBuildConcurrencyException(expectedBranch, expectedName, expectedInnerException, null);
 
             // Assert
             Assert.Equal(expectedInnerException, actual.InnerException);

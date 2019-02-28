@@ -11,8 +11,10 @@ namespace SourceCode.Chasm.Repository.Disk
     {
         #region Read
 
-        public override Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override Task<bool> ExistsAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             (string filePath, _) = DeriveFileNames(_objectsContainer, objectId);
 
             string dir = Path.GetDirectoryName(filePath);
@@ -23,11 +25,13 @@ namespace SourceCode.Chasm.Repository.Disk
             return Task.FromResult(exists);
         }
 
-        public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
-            byte[] bytes = await ReadFileAsync(filePath, cancellationToken)
+            byte[] bytes = await ReadFileAsync(filePath, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (bytes == null) return default;
@@ -39,8 +43,10 @@ namespace SourceCode.Chasm.Repository.Disk
 
         }
 
-        public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
             string dir = Path.GetDirectoryName(filePath);
@@ -69,8 +75,10 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             var created = true;
 
             ValueTask AfterWrite(Sha1 sha1, string tempPath)
@@ -79,7 +87,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await WriteFileAsync(buffer, AfterWrite, cancellationToken)
+            Sha1 objectId = await WriteFileAsync(buffer, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -91,9 +99,11 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             var created = true;
 
@@ -103,7 +113,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await WriteFileAsync(stream, AfterWrite, cancellationToken)
+            Sha1 objectId = await WriteFileAsync(stream, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -118,9 +128,11 @@ namespace SourceCode.Chasm.Repository.Disk
         /// <param name="beforeHash">An action to take on the internal stream, before calculating the hash.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             bool created = true;
 
@@ -130,7 +142,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await StageFileAsync(beforeHash, AfterWrite, cancellationToken)
+            Sha1 objectId = await StageFileAsync(beforeHash, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);

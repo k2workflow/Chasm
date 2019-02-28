@@ -17,39 +17,57 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
         #region Read
 
-        public override async Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<bool> ExistsAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             // Try disk repo first
 
-            bool exists = await _diskRepo.ExistsAsync(objectId, cancellationToken)
+            bool exists = await _diskRepo.ExistsAsync(objectId, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             // Else go to cloud
 
             if (!exists)
-                exists = await ExistsOnCloudAsync(objectId, cancellationToken)
-                    .ConfigureAwait(false);
+            {
+                exists = await ExistsOnCloudAsync(objectId, requestContext, cancellationToken)
+                      .ConfigureAwait(false);
+            }
 
             return exists;
         }
 
-        private async Task<bool> ExistsOnCloudAsync(Sha1 objectId, CancellationToken cancellationToken)
+        private async Task<bool> ExistsOnCloudAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             string blobName = DeriveBlobName(objectId);
             CloudBlobContainer objectsContainer = _objectsContainer.Value;
             CloudAppendBlob blobRef = objectsContainer.GetAppendBlobReference(blobName);
 
-            bool exists = await blobRef.ExistsAsync()
+            bool exists = await blobRef.ExistsAsync(default, opContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return exists;
         }
 
-        public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             // Try disk repo first
 
-            IChasmBlob cached = await _diskRepo.ReadObjectAsync(objectId, cancellationToken)
+            IChasmBlob cached = await _diskRepo.ReadObjectAsync(objectId, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (cached != null)
@@ -64,7 +82,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             try
             {
                 // Fetch metadata
-                await blobRef.FetchAttributesAsync()
+                await blobRef.FetchAttributesAsync(default, default, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 blobRef.Metadata.TryGetValue(FilenameKey, out string filename);
@@ -74,7 +92,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 using (var output = new MemoryStream())
                 {
                     // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
-                    await blobRef.DownloadToStreamAsync(output)
+                    await blobRef.DownloadToStreamAsync(output, default, default, opContext, cancellationToken)
                         .ConfigureAwait(false);
 
                     byte[] buffer = output.ToArray(); // TODO: Perf
@@ -90,11 +108,18 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             }
         }
 
-        public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             // Try disk repo first
 
-            IChasmStream cached = await _diskRepo.ReadStreamAsync(objectId, cancellationToken)
+            IChasmStream cached = await _diskRepo.ReadStreamAsync(objectId, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (cached != null)
@@ -118,7 +143,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
 
                 // TODO: Perf: Use a stream instead of a preceding call to fetch the buffer length
                 var output = new MemoryStream();
-                await blobRef.DownloadToStreamAsync(output)
+                await blobRef.DownloadToStreamAsync(output, default, default, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 return new ChasmStream(output, metadata);
@@ -141,17 +166,19 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// <param name="buffer">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> buffer, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             var created = true;
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, requestContext, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterWrite, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -163,19 +190,21 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// <param name="stream">The content to hash and write.</param>
         /// <param name="forceOverwrite">Forces the target to be ovwerwritten, even if it already exists.</param>
         /// <param name="cancellationToken">Allows the operation to be cancelled.</param>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             var created = true;
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, requestContext, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterWrite, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -194,29 +223,38 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         /// of the source stream: the hash will be taken on the result of this operation.
         /// For example, transforming to Json is appropriate but compression is not since the latter
         /// is not a representative model of the original content, but rather a storage optimization.</remarks>
-        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override async Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> beforeHash, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (beforeHash == null) throw new ArgumentNullException(nameof(beforeHash));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             var created = true;
 
             async ValueTask AfterWrite(Sha1 sha1, string filePath)
             {
-                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, cancellationToken)
+                created = await UploadAsync(sha1, filePath, metadata, forceOverwrite, requestContext, cancellationToken)
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.StageFileAsync(beforeHash, AfterWrite, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.StageFileAsync(beforeHash, AfterWrite, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
         }
 
-        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        private async ValueTask<bool> UploadAsync(Sha1 objectId, string filePath, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+            var opContext = new OperationContext
+            {
+                ClientRequestID = requestContext.CorrelationId,
+                CustomUserAgent = requestContext.CustomUserAgent
+            };
+
             if (!forceOverwrite)
             {
-                bool exists = await ExistsOnCloudAsync(objectId, cancellationToken)
+                bool exists = await ExistsOnCloudAsync(objectId, requestContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 // Not created (already existed)
@@ -234,7 +272,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             try
             {
                 // Required to create blob header before appending to it
-                await blobRef.CreateOrReplaceAsync(accessCondition, default, default)
+                await blobRef.CreateOrReplaceAsync(accessCondition, default, opContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 Task metadataTask = null;
@@ -243,14 +281,14 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                     blobRef.Metadata.Add(FilenameKey, metadata.Filename);
                     blobRef.Metadata.Add(ContentTypeKey, metadata.ContentType);
 
-                    metadataTask = blobRef.SetMetadataAsync();
+                    metadataTask = blobRef.SetMetadataAsync(default, default, opContext, cancellationToken);
                 }
 
                 using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     // Append blob. Following seems to be the only safe multi-writer method available
                     // http://stackoverflow.com/questions/32530126/azure-cloudappendblob-errors-with-concurrent-access
-                    await blobRef.AppendBlockAsync(fs)
+                    await blobRef.AppendBlockAsync(fs, default, default, default, opContext, cancellationToken)
                         .ConfigureAwait(false);
 
                     if (metadataTask != null)

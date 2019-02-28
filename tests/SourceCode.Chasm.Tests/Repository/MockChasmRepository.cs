@@ -10,71 +10,71 @@ namespace SourceCode.Chasm.Repository.Tests
 {
     internal class MockChasmRepository : ChasmRepository
     {
-        internal static ChasmConcurrencyException MockBuildConcurrencyException(string name, string branch, Exception innerException)
+        internal static ChasmConcurrencyException MockBuildConcurrencyException(string name, string branch, Exception innerException, ChasmRequestContext requestContext)
         {
-            return BuildConcurrencyException(branch, name, innerException);
+            return BuildConcurrencyException(branch, name, innerException, requestContext);
         }
 
         public MockChasmRepository(IChasmSerializer serializer, int maxDop)
             : base(serializer, maxDop)
         { }
 
-        public override ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken)
+        public override ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<bool> ExistsAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override Task<bool> ExistsAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IChasmStream> ReadStreamAsync(Sha1 objectId, CancellationToken cancellationToken)
+        public override Task<IChasmStream> ReadStreamAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IReadOnlyDictionary<Sha1, IChasmBlob>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, CancellationToken cancellationToken)
+        public override Task<IReadOnlyDictionary<Sha1, IChasmBlob>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, CancellationToken cancellationToken)
+        public override Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> item, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> item, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(Stream stream, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> writeAction, ChasmMetadata metadata, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<WriteResult<Sha1>> WriteObjectAsync(Func<Stream, ValueTask> writeAction, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, CancellationToken cancellationToken)
+        public override Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken)
+        public override ValueTask<IReadOnlyList<string>> GetNamesAsync(ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public override ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken)
+        public override ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

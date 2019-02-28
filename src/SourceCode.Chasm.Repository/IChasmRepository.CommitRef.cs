@@ -6,7 +6,7 @@ namespace SourceCode.Chasm.Repository
 {
     partial interface IChasmRepository // .CommitRef
     {
-        ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, CancellationToken cancellationToken);
+        ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, ChasmRequestContext requestContext, CancellationToken cancellationToken);
 
         /// <summary>
         /// Write a <see cref="CommitRef"/> to the repository using the provided values.
@@ -18,10 +18,10 @@ namespace SourceCode.Chasm.Repository
         /// <param name="cancellationToken">Allows the <see cref="Task"/> to be cancelled.</param>
         /// <exception cref="ChasmConcurrencyException">Thrown when a concurrency exception is detected.</exception>
         /// <returns></returns>
-        Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, CancellationToken cancellationToken);
+        Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, ChasmRequestContext requestContext, CancellationToken cancellationToken);
 
-        ValueTask<IReadOnlyList<string>> GetNamesAsync(CancellationToken cancellationToken);
+        ValueTask<IReadOnlyList<string>> GetNamesAsync(ChasmRequestContext requestContext, CancellationToken cancellationToken);
 
-        ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, CancellationToken cancellationToken);
+        ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, ChasmRequestContext requestContext, CancellationToken cancellationToken);
     }
 }
