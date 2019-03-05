@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
@@ -258,14 +257,14 @@ namespace SourceCode.Chasm.Repository.Tests
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return EmptyMap<Sha1, IChasmBlob>.Empty;
+                    return EmptyMap.Empty<Sha1, IChasmBlob>();
                 });
 
             // Action
             IReadOnlyDictionary<TreeId, TreeNodeMap> actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.RequestContext, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
-            Assert.Equal(EmptyMap<TreeId, TreeNodeMap>.Empty, actual);
+            Assert.Equal(EmptyMap.Empty<TreeId, TreeNodeMap>(), actual);
         }
 
         [Trait("Type", "Unit")]

@@ -25,7 +25,7 @@ namespace SourceCode.Chasm.Serializer.Text
                 }
             }
 
-            IMemoryOwner<byte> slice = rented.WrapSlice(0, length);
+            IMemoryOwner<byte> slice = rented.Slice(0, length);
             return slice;
         }
 

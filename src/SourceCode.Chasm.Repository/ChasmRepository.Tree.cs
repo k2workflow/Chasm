@@ -29,7 +29,7 @@ namespace SourceCode.Chasm.Repository
         public virtual async ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (treeIds == null)
-                return EmptyMap<TreeId, TreeNodeMap>.Empty;
+                return EmptyMap.Empty<TreeId, TreeNodeMap>();
 
             requestContext = ChasmRequestContext.Ensure(requestContext);
 
@@ -40,7 +40,7 @@ namespace SourceCode.Chasm.Repository
 
             // Deserialize batch
             if (kvps.Count == 0)
-                return EmptyMap<TreeId, TreeNodeMap>.Empty;
+                return EmptyMap.Empty<TreeId, TreeNodeMap>();
 
             var dict = new Dictionary<TreeId, TreeNodeMap>(kvps.Count);
 

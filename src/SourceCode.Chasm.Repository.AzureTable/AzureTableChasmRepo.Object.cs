@@ -140,7 +140,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         public override async Task<IReadOnlyDictionary<Sha1, IChasmBlob>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (objectIds == null)
-                return EmptyMap<Sha1, IChasmBlob>.Empty;
+                return EmptyMap.Empty<Sha1, IChasmBlob>();
 
             requestContext = ChasmRequestContext.Ensure(requestContext);
             var opContext = new OperationContext
