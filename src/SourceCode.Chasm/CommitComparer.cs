@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SourceCode.Clay.Collections.Generic;
 
 namespace SourceCode.Chasm
 {
@@ -45,9 +44,12 @@ namespace SourceCode.Chasm
                 if (x.Author != y.Author) return false;
                 if (x.Committer != y.Committer) return false;
                 if (!StringComparer.Ordinal.Equals(x.Message, y.Message)) return false;
-                if (!x.Parents.NullableSequenceEqual(y.Parents, CommitIdComparer.Default)) return false;
 
-                return true;
+                if (x.Parents == null ^ y.Parents == null) return false;
+                if (x.Parents == null) return true;
+                if (System.Linq.Enumerable.SequenceEqual(x.Parents, y.Parents, CommitIdComparer.Default)) return true;
+
+                return false;
             }
 
             public override int GetHashCode(Commit obj)
