@@ -159,7 +159,8 @@ namespace SourceCode.Chasm.Repository.Disk
 
             while (remaining > 0)
             {
-                int count = await stream.ReadAsync(owned.Memory.Slice(offset, remaining), cancellationToken)
+                Memory<byte> slice = owned.Memory.Slice(offset, remaining);
+                int count = await stream.ReadAsync(slice, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (count == 0)
