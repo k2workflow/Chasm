@@ -181,7 +181,6 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 await blobRef.CreateOrReplaceAsync(ifMatchCondition, default, opContext, cancellationToken)
                     .ConfigureAwait(false); // Note etag access condition
 
-                // CommitIds are not compressed
                 using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
                 using (var output = new MemoryStream(owner.Memory.Length))
                 {
@@ -258,7 +257,6 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                     if (output.Length < Sha1.ByteLength)
                         throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {output.Length}");
 
-                    // CommitIds are not compressed
                     CommitId commitId = Serializer.DeserializeCommitId(output.ToArray()); // TODO: Perf
 
                     // Found
