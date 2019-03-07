@@ -6,7 +6,7 @@ namespace SourceCode.Chasm.Tests.TestObjects
 {
     public class RandomChasmSerializer : IChasmSerializer
     {
-        private static readonly MemoryPool<byte> _pool = MemoryPool<byte>.Shared;
+        private static readonly MemoryPool<byte> s_pool = MemoryPool<byte>.Shared;
 
         public Commit DeserializeCommit(ReadOnlySpan<byte> span)
             => CommitTestObject.Random;
@@ -18,12 +18,12 @@ namespace SourceCode.Chasm.Tests.TestObjects
             => TreeNodeMapTestObject.Random;
 
         public IMemoryOwner<byte> Serialize(TreeNodeMap model)
-            => _pool.Rent(1);
+            => s_pool.Rent(1);
 
         public IMemoryOwner<byte> Serialize(CommitId model)
-            => _pool.Rent(1);
+            => s_pool.Rent(1);
 
         public IMemoryOwner<byte> Serialize(Commit model)
-            => _pool.Rent(1);
+            => s_pool.Rent(1);
     }
 }

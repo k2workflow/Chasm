@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.Serializer.Proto
             where T : IMessage<T>
         {
             int length = wire.CalculateSize();
-            IMemoryOwner<byte> rented = _pool.Rent(length);
+            IMemoryOwner<byte> rented = _pool.RentExact(length);
 
             // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
             fixed (byte* ba = &MemoryMarshal.GetReference(rented.Memory.Span))
@@ -31,8 +31,7 @@ namespace SourceCode.Chasm.Serializer.Proto
                 }
             }
 
-            IMemoryOwner<byte> slice = rented.Slice(0, length);
-            return slice;
+            return rented;
         }
 
         private static unsafe void DeserializeImpl<T>(ReadOnlySpan<byte> span, ref T wire)
