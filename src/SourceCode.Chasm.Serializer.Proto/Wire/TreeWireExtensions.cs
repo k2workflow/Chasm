@@ -31,26 +31,20 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
             return model;
         }
 
-        public static NodeKind Convert(this NodeKindWire wire)
+        public static NodeKind Convert(this NodeKindWire wire) => wire switch
         {
             // Do not use direct integer conversion - it may fail silently
-            switch (wire)
-            {
-                case NodeKindWire.Blob: return NodeKind.Blob;
-                case NodeKindWire.Tree: return NodeKind.Tree;
-                default: throw new ArgumentOutOfRangeException(nameof(wire));
-            }
-        }
+            NodeKindWire.Blob => NodeKind.Blob,
+            NodeKindWire.Tree => NodeKind.Tree,
+            _ => throw new ArgumentOutOfRangeException(nameof(wire))
+        };
 
-        public static NodeKindWire Convert(this NodeKind model)
+        public static NodeKindWire Convert(this NodeKind model) => model switch
         {
             // Do not use direct integer conversion - it may fail silently
-            switch (model)
-            {
-                case NodeKind.Blob: return NodeKindWire.Blob;
-                case NodeKind.Tree: return NodeKindWire.Tree;
-                default: throw new ArgumentOutOfRangeException(nameof(model));
-            }
-        }
+            NodeKind.Blob => NodeKindWire.Blob,
+            NodeKind.Tree => NodeKindWire.Tree,
+            _ => throw new ArgumentOutOfRangeException(nameof(model))
+        };
     }
 }

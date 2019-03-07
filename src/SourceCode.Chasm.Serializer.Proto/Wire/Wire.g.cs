@@ -387,7 +387,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
       }
       if (other.nodeId_ != null) {
         if (nodeId_ == null) {
-          nodeId_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
+          NodeId = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
         }
         NodeId.MergeFrom(other.NodeId);
       }
@@ -407,14 +407,14 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
             break;
           }
           case 16: {
-            kind_ = (global::SourceCode.Chasm.Serializer.Proto.Wire.NodeKindWire) input.ReadEnum();
+            Kind = (global::SourceCode.Chasm.Serializer.Proto.Wire.NodeKindWire) input.ReadEnum();
             break;
           }
           case 26: {
             if (nodeId_ == null) {
-              nodeId_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
+              NodeId = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
             }
-            input.ReadMessage(nodeId_);
+            input.ReadMessage(NodeId);
             break;
           }
         }
@@ -933,25 +933,25 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
       parents_.Add(other.parents_);
       if (other.treeId_ != null) {
         if (treeId_ == null) {
-          treeId_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
+          TreeId = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
         }
         TreeId.MergeFrom(other.TreeId);
       }
       if (other.author_ != null) {
         if (author_ == null) {
-          author_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
+          Author = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
         }
         Author.MergeFrom(other.Author);
       }
       if (other.committer_ != null) {
         if (committer_ == null) {
-          committer_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
+          Committer = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
         }
         Committer.MergeFrom(other.Committer);
       }
       if (other.message_ != null) {
         if (message_ == null) {
-          message_ = new global::Google.Protobuf.WellKnownTypes.StringValue();
+          Message = new global::Google.Protobuf.WellKnownTypes.StringValue();
         }
         Message.MergeFrom(other.Message);
       }
@@ -972,30 +972,30 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
           }
           case 18: {
             if (treeId_ == null) {
-              treeId_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
+              TreeId = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
             }
-            input.ReadMessage(treeId_);
+            input.ReadMessage(TreeId);
             break;
           }
           case 26: {
             if (author_ == null) {
-              author_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
+              Author = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
             }
-            input.ReadMessage(author_);
+            input.ReadMessage(Author);
             break;
           }
           case 34: {
             if (committer_ == null) {
-              committer_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
+              Committer = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
             }
-            input.ReadMessage(committer_);
+            input.ReadMessage(Committer);
             break;
           }
           case 42: {
             if (message_ == null) {
-              message_ = new global::Google.Protobuf.WellKnownTypes.StringValue();
+              Message = new global::Google.Protobuf.WellKnownTypes.StringValue();
             }
-            input.ReadMessage(message_);
+            input.ReadMessage(Message);
             break;
           }
         }
@@ -1114,7 +1114,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
       }
       if (other.id_ != null) {
         if (id_ == null) {
-          id_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
+          Id = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
         }
         Id.MergeFrom(other.Id);
       }
@@ -1131,9 +1131,9 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
             break;
           case 10: {
             if (id_ == null) {
-              id_ = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
+              Id = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
             }
-            input.ReadMessage(id_);
+            input.ReadMessage(Id);
             break;
           }
         }

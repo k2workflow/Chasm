@@ -14,10 +14,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
                     return string.Empty;
 
                 case 1:
-                    {
-                        string wire = model[0].Convert();
-                        return wire;
-                    }
+                    return model[0].Convert();
 
                 default:
                     {

@@ -77,17 +77,18 @@ namespace SourceCode.Chasm
                 case 2:
                     {
                         int cmp = CommitIdComparer.Default.Compare(parents[0], parents[1]);
-                        switch (cmp)
+                        _parents = cmp switch
                         {
                             // Silently de-duplicate
-                            case 0: _parents = new CommitId[1] { parents[0] }; return;
+                            0 => new CommitId[1] { parents[0] },
 
                             // Sort forward
-                            case -1: _parents = new CommitId[2] { parents[0], parents[1] }; return;
+                            -1 => new CommitId[2] { parents[0], parents[1] },
 
                             // Sort reverse
-                            default: _parents = new CommitId[2] { parents[1], parents[0] }; return;
-                        }
+                            _ => new CommitId[2] { parents[1], parents[0] }
+                        };
+                        return;
                     }
 
                 default:
