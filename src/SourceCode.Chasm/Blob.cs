@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using SourceCode.Clay.Buffers;
 
@@ -7,6 +8,8 @@ namespace SourceCode.Chasm
     [DebuggerDisplay("{ToString(),nq,ac}")]
     public readonly struct Blob : IEquatable<Blob>
     {
+        #region Constants
+
         private static readonly Blob s_empty;
 
         /// <summary>
@@ -17,25 +20,45 @@ namespace SourceCode.Chasm
         /// </value>
         public static ref readonly Blob Empty => ref s_empty;
 
-        public ReadOnlyMemory<byte> Data { get; }
+        #endregion
 
-        public Blob(ReadOnlyMemory<byte> data)
+        #region Properties
+
+        private readonly byte[] _data;
+
+        public IReadOnlyList<byte> Data => _data;
+
+        #endregion
+
+        #region Constructors
+
+        public Blob(byte[] data)
         {
-            Data = data;
+            _data = data;
         }
 
-        public bool Equals(Blob other) => BufferComparer.Memory.Equals(Data, other.Data);
+        #endregion
+
+        #region IEquatable
+
+        public bool Equals(Blob other) => BufferComparer.Array.Equals(_data, other._data);
 
         public override bool Equals(object obj)
             => obj is Blob other
             && Equals(other);
 
-        public override int GetHashCode() => BufferComparer.Memory.GetHashCode(Data);
+        public override int GetHashCode() => BufferComparer.Memory.GetHashCode(_data);
+
+        #endregion
+
+        #region Operators
 
         public static bool operator ==(Blob x, Blob y) => x.Equals(y);
 
         public static bool operator !=(Blob x, Blob y) => !(x == y);
 
-        public override string ToString() => $"{nameof(Data.Length)}: {Data.Length}";
+        public override string ToString() => nameof(_data.Length) + ": " + (_data == null ? "null" : $"{_data.Length}");
+
+        #endregion
     }
 }

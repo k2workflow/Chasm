@@ -141,6 +141,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             {
                 CloudTable refsTable = _refsTable.Value;
 
+                // CommitIds are not compressed
                 using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
                 {
                     var blob = new ChasmBlob(owner.Memory, null);
@@ -184,6 +185,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                 if (count < Sha1.ByteLength)
                     throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {count}");
 
+                // CommitIds are not compressed
                 CommitId commitId = serializer.DeserializeCommitId(entity.Content);
 
                 // Found

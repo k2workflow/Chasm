@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -28,19 +27,20 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
-            using (IMemoryOwner<byte> owned = await ReadFileAsync(filePath, cancellationToken)
-                .ConfigureAwait(false))
-            {
-                if (owned == null)
-                    return default;
+            byte[] bytes = await ReadFileAsync(filePath, requestContext, cancellationToken)
+                .ConfigureAwait(false);
 
-                ChasmMetadata metadata = ReadMetadata(metaPath);
+            if (bytes == null) return default;
 
-                var blob = new ChasmBlob(owned.Memory, metadata);
-                return blob;
-            }
+            ChasmMetadata metadata = ReadMetadata(metaPath);
+
+            var blob = new ChasmBlob(bytes, metadata);
+            return blob;
+
         }
 
         public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
