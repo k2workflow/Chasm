@@ -291,7 +291,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
             };
 
             // Build batches
-            IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(blobs, forceOverwrite, requestContext, cancellationToken);
+            IReadOnlyCollection<TableBatchOperation> batches = BuildWriteBatches(blobs, forceOverwrite, cancellationToken);
 
             CloudTable objectsTable = _objectsTable.Value;
 
@@ -338,22 +338,21 @@ namespace SourceCode.Chasm.Repository.AzureTable
             }
 
             var bytes = File.ReadAllBytes(filePath);
-            var blob = new ChasmBlob(bytes, metadata);
+            using (var blob = new ChasmBlob(bytes, metadata))
+            {
+                TableOperation op = DataEntity.BuildWriteOperation(objectId, blob, forceOverwrite);
 
-            TableOperation op = DataEntity.BuildWriteOperation(objectId, blob, forceOverwrite);
-
-            CloudTable objectsTable = _objectsTable.Value;
-            await objectsTable.ExecuteAsync(op, default, opContext, cancellationToken)
-                .ConfigureAwait(false);
+                CloudTable objectsTable = _objectsTable.Value;
+                await objectsTable.ExecuteAsync(op, default, opContext, cancellationToken)
+                    .ConfigureAwait(false);
+            }
 
             // Created
             return true;
         }
 
-        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
+        private static IReadOnlyCollection<TableBatchOperation> BuildWriteBatches(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, CancellationToken cancellationToken = default)
         {
-            requestContext = ChasmRequestContext.Ensure(requestContext);
-
             var dict = new Dictionary<Sha1, IChasmBlob>();
 
             foreach (IChasmBlob blob in blobs)

@@ -37,8 +37,7 @@ namespace SourceCode.Chasm.Repository.Disk
 
             ChasmMetadata metadata = ReadMetadata(metaPath);
 
-            var blob = new ChasmBlob(owned, metadata);
-            return blob;
+            return new ChasmBlob(owned, metadata);
         }
 
         public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)

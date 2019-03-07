@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -141,9 +140,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
             {
                 CloudTable refsTable = _refsTable.Value;
 
-                using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
+                using (var blob = new ChasmBlob(Serializer.Serialize(commitRef.CommitId), null))
                 {
-                    var blob = new ChasmBlob(owner, null);
                     TableOperation op = DataEntity.BuildWriteOperation(name, commitRef.Branch, blob, etag); // Note etag access condition
 
                     await refsTable.ExecuteAsync(op, default, opContext, cancellationToken)

@@ -12,7 +12,7 @@ namespace SourceCode.Chasm.Repository
 
     internal sealed class ChasmBlob : IChasmBlob
     {
-        private readonly IMemoryOwner<byte> _owner;
+        private IMemoryOwner<byte> _owner;
 
         public ReadOnlyMemory<byte> Content { get; }
 
@@ -42,6 +42,7 @@ namespace SourceCode.Chasm.Repository
                 if (disposing)
                 {
                     _owner?.Dispose();
+                    _owner = null;
                 }
 
                 _disposed = true;
