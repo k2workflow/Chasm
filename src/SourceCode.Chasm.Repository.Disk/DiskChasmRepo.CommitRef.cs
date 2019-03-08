@@ -13,6 +13,8 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override async ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             string filename = DeriveCommitRefFileName(name, null);
             string path = Path.Combine(_refsContainer, filename);
             string[] files = Directory.GetFiles(path, "*" + CommitExtension, SearchOption.TopDirectoryOnly);
@@ -20,15 +22,14 @@ namespace SourceCode.Chasm.Repository.Disk
             var results = new CommitRef[files.Length];
             for (int i = 0; i < results.Length; i++)
             {
-                using IMemoryOwner<byte> owned = await ReadFileAsync(files[i], cancellationToken)
+                byte[] bytes = await ReadFileAsync(files[i], requestContext, cancellationToken)
                     .ConfigureAwait(false);
 
                 string branch = Path.ChangeExtension(Path.GetFileName(files[i]), null);
 
-                CommitId commitId = Serializer.DeserializeCommitId(owned.Memory.Span);
+                CommitId commitId = Serializer.DeserializeCommitId(bytes);
                 results[i] = new CommitRef(branch, commitId);
             }
-
             return results;
         }
 
@@ -51,17 +52,20 @@ namespace SourceCode.Chasm.Repository.Disk
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             string filename = DeriveCommitRefFileName(name, branch);
             string path = Path.Combine(_refsContainer, filename);
 
-            using IMemoryOwner<byte> owned = await ReadFileAsync(path, cancellationToken)
+            byte[] bytes = await ReadFileAsync(path, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             // NotFound
-            if (owned == null || owned.Memory.Length == 0)
+            if (bytes == null || bytes.Length == 0)
                 return default;
 
-            CommitId commitId = Serializer.DeserializeCommitId(owned.Memory.Span);
+            // CommitIds are not compressed
+            CommitId commitId = Serializer.DeserializeCommitId(bytes);
 
             var commitRef = new CommitRef(branch, commitId);
             return commitRef;
@@ -92,10 +96,11 @@ namespace SourceCode.Chasm.Repository.Disk
                 }
                 else
                 {
-                    using IMemoryOwner<byte> owned = await ReadBytesAsync(file, cancellationToken)
+                    // CommitIds are not compressed
+                    byte[] bytes = await ReadBytesAsync(file, requestContext, cancellationToken)
                         .ConfigureAwait(false);
 
-                    CommitId commitId = Serializer.DeserializeCommitId(owned.Memory.Span);
+                    CommitId commitId = Serializer.DeserializeCommitId(bytes);
 
                     if (!previousCommitId.HasValue)
                         throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext);
@@ -119,7 +124,7 @@ namespace SourceCode.Chasm.Repository.Disk
                     file.Position = owner.Memory.Length;
             }
 
-            await TouchFileAsync(path, cancellationToken)
+            await TouchFileAsync(path, requestContext, cancellationToken)
                 .ConfigureAwait(false);
         }
     }

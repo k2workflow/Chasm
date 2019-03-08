@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -14,6 +13,8 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override Task<bool> ExistsAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             (string filePath, _) = DeriveFileNames(_objectsContainer, objectId);
 
             string dir = Path.GetDirectoryName(filePath);
@@ -26,23 +27,26 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
-            // TODO: Dispose
-            IMemoryOwner<byte> owned = await ReadFileAsync(filePath, cancellationToken)
+            byte[] bytes = await ReadFileAsync(filePath, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
-            if (owned == null)
-                return default;
+            if (bytes == null) return default;
 
             ChasmMetadata metadata = ReadMetadata(metaPath);
 
-            var blob = new ChasmBlob(owned, metadata);
+            var blob = new ChasmBlob(bytes, metadata);
             return blob;
+
         }
 
         public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
+            requestContext = ChasmRequestContext.Ensure(requestContext);
+
             (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
             string dir = Path.GetDirectoryName(filePath);

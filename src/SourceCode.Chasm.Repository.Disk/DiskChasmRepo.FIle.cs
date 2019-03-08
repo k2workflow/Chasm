@@ -1,12 +1,10 @@
 using System;
-using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
-using SourceCode.Clay.Buffers;
 using crypt = System.Security.Cryptography;
 
 namespace SourceCode.Chasm.Repository.Disk
@@ -127,9 +125,11 @@ namespace SourceCode.Chasm.Repository.Disk
             return StageFileAsync(HashWriter, afterWrite, requestContext, cancellationToken);
         }
 
-        private static async Task<IMemoryOwner<byte>> ReadFileAsync(string path, CancellationToken cancellationToken = default)
+        private static async Task<byte[]> ReadFileAsync(string path, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(path));
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             string dir = Path.GetDirectoryName(path);
             if (!Directory.Exists(dir))
@@ -141,25 +141,26 @@ namespace SourceCode.Chasm.Repository.Disk
             using (FileStream fileStream = await WaitForFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
                 .ConfigureAwait(false))
             {
-                IMemoryOwner<byte> owned = await ReadBytesAsync(fileStream, cancellationToken)
+                var bytes = await ReadBytesAsync(fileStream, requestContext, cancellationToken)
                     .ConfigureAwait(false);
 
-                return owned;
+                return bytes;
             }
         }
 
-        private static async Task<IMemoryOwner<byte>> ReadBytesAsync(Stream stream, CancellationToken cancellationToken = default)
+        private static async Task<byte[]> ReadBytesAsync(Stream stream, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             Debug.Assert(stream != null);
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             int offset = 0;
             int remaining = (int)stream.Length;
 
-            IMemoryOwner<byte> owned = MemoryPool<byte>.Shared.RentExact(remaining);
-
+            byte[] bytes = new byte[remaining];
             while (remaining > 0)
             {
-                int count = await stream.ReadAsync(owned.Memory.Slice(offset, remaining), cancellationToken)
+                int count = await stream.ReadAsync(bytes, offset, remaining, cancellationToken)
                     .ConfigureAwait(false);
 
                 if (count == 0)
@@ -169,15 +170,17 @@ namespace SourceCode.Chasm.Repository.Disk
                 remaining -= count;
             }
 
-            return owned;
+            return bytes;
         }
 
-        private static async Task TouchFileAsync(string path, CancellationToken cancellationToken = default)
+        private static async Task TouchFileAsync(string path, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(path));
 
             if (!File.Exists(path))
                 return;
+
+            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             for (int retryCount = 0; retryCount < _retryMax; retryCount++)
             {
