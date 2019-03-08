@@ -1,3 +1,4 @@
+using System;
 using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace SourceCode.Chasm.Repository
         {
             requestContext = ChasmRequestContext.Ensure(requestContext);
 
-            using IChasmBlob blob = await ReadObjectAsync(commitId.Sha1, requestContext, cancellationToken)
+            IChasmBlob blob = await ReadObjectAsync(commitId.Sha1, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (blob == null || blob.Content.IsEmpty)

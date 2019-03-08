@@ -15,7 +15,7 @@ namespace SourceCode.Chasm.Repository
             requestContext = ChasmRequestContext.Ensure(requestContext);
 
             // Read bytes
-            using IChasmBlob blob = await ReadObjectAsync(treeId.Sha1, requestContext, cancellationToken)
+            IChasmBlob blob = await ReadObjectAsync(treeId.Sha1, requestContext, cancellationToken)
                 .ConfigureAwait(false);
 
             if (blob == null || blob.Content.IsEmpty)
@@ -46,13 +46,10 @@ namespace SourceCode.Chasm.Repository
 
             foreach (KeyValuePair<Sha1, IChasmBlob> kvp in kvps)
             {
-                using (kvp.Value)
-                {
-                    TreeNodeMap tree = Serializer.DeserializeTree(kvp.Value.Content.Span);
+                TreeNodeMap tree = Serializer.DeserializeTree(kvp.Value.Content.Span);
 
-                    var treeId = new TreeId(kvp.Key);
-                    dict[treeId] = tree;
-                }
+                var treeId = new TreeId(kvp.Key);
+                dict[treeId] = tree;
             }
 
             return dict;
