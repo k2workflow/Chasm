@@ -29,8 +29,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
                 default: throw new SerializationException();
             }
 
-            string wire = $"{perm} {kind} {model.Sha1:n} {model.Name}";
-            return wire;
+            return $"{perm} {kind} {model.Sha1:n} {model.Name}";
         }
 
         private static readonly char[] s_split = new char[1] { ' ' };
@@ -47,8 +46,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
             var sha1 = Sha1.Parse(tokens[2]);
             string name = tokens[3];
 
-            var model = new TreeNode(name, kind, sha1);
-            return model;
+            return new TreeNode(name, kind, sha1);
         }
     }
 }

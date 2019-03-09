@@ -8,9 +8,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
 
             Clay.Sha1? sha1 = wire.NodeId.Convert();
 
-            var model = new TreeNode(wire.Name, wire.Kind.Convert(), sha1.Value);
-
-            return model;
+            return new TreeNode(wire.Name, wire.Kind.Convert(), sha1.Value);
         }
 
         public static TreeWireNode Convert(this TreeNode model)

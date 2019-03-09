@@ -207,7 +207,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterWrite, requestContext, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(buffer, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -233,7 +233,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterWrite, requestContext, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.WriteFileAsync(stream, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -266,7 +266,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
                     .ConfigureAwait(false);
             }
 
-            Sha1 objectId = await DiskChasmRepo.StageFileAsync(beforeHash, AfterWrite, requestContext, cancellationToken)
+            Sha1 objectId = await DiskChasmRepo.StageFileAsync(beforeHash, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);

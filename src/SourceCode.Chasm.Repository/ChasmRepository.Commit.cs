@@ -1,4 +1,3 @@
-using System;
 using System.Buffers;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,8 +30,7 @@ namespace SourceCode.Chasm.Repository
                 Sha1 sha1 = await WriteObjectAsync(owner.Memory, null, false, requestContext, cancellationToken)
                     .ConfigureAwait(false);
 
-                var commitId = new CommitId(sha1);
-                return commitId;
+                return new CommitId(sha1);
             }
         }
     }

@@ -87,8 +87,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
             // Message
             string message = wire.Message?.Value;
 
-            var model = new Commit(parents, treeId, author, committer, message);
-            return model;
+            return new Commit(parents, treeId, author, committer, message);
         }
     }
 }

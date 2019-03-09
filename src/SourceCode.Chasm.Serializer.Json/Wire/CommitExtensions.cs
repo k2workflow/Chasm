@@ -80,8 +80,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                Commit model = ReadCommit(jr);
-                return model;
+                return ReadCommit(jr);
             }
         }
 

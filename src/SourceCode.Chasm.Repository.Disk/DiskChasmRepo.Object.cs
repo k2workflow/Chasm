@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -13,8 +14,6 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override Task<bool> ExistsAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
-            requestContext = ChasmRequestContext.Ensure(requestContext);
-
             (string filePath, _) = DeriveFileNames(_objectsContainer, objectId);
 
             string dir = Path.GetDirectoryName(filePath);
@@ -27,26 +26,23 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override async Task<IChasmBlob> ReadObjectAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
-            requestContext = ChasmRequestContext.Ensure(requestContext);
-
             (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
-            byte[] bytes = await ReadFileAsync(filePath, requestContext, cancellationToken)
-                .ConfigureAwait(false);
+            using (IMemoryOwner<byte> owned = await ReadFileAsync(filePath, cancellationToken)
+                .ConfigureAwait(false))
+            {
+                if (owned == null || owned.Memory.IsEmpty)
+                    return default;
 
-            if (bytes == null) return default;
+                ChasmMetadata metadata = ReadMetadata(metaPath);
 
-            ChasmMetadata metadata = ReadMetadata(metaPath);
-
-            var blob = new ChasmBlob(bytes, metadata);
-            return blob;
-
+                // HACK: Perf is horrid
+                return new ChasmBlob(owned.Memory.ToArray(), metadata);
+            }
         }
 
         public override async Task<IChasmStream> ReadStreamAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
-            requestContext = ChasmRequestContext.Ensure(requestContext);
-
             (string filePath, string metaPath) = DeriveFileNames(_objectsContainer, objectId);
 
             string dir = Path.GetDirectoryName(filePath);
@@ -58,11 +54,10 @@ namespace SourceCode.Chasm.Repository.Disk
 
             ChasmMetadata metadata = ReadMetadata(metaPath);
 
-            FileStream fileStream = await WaitForFileAsync(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken)
+            FileStream fileStream = await WaitForFileAsync(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            var blob = new ChasmStream(fileStream, metadata);
-            return blob;
+            return new ChasmStream(fileStream, metadata);
         }
 
         #endregion
@@ -87,7 +82,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await WriteFileAsync(buffer, AfterWrite, requestContext, cancellationToken)
+            Sha1 objectId = await WriteFileAsync(buffer, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -113,7 +108,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await WriteFileAsync(stream, AfterWrite, requestContext, cancellationToken)
+            Sha1 objectId = await WriteFileAsync(stream, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);
@@ -142,7 +137,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 return default; // Task.CompletedTask
             }
 
-            Sha1 objectId = await StageFileAsync(beforeHash, AfterWrite, requestContext, cancellationToken)
+            Sha1 objectId = await StageFileAsync(beforeHash, AfterWrite, cancellationToken)
                 .ConfigureAwait(false);
 
             return new WriteResult<Sha1>(objectId, created);

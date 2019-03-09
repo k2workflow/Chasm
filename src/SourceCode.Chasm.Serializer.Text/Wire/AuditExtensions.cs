@@ -15,8 +15,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
             // Offset (ticks)
             long tz = model.Timestamp.Offset.Ticks;
 
-            string wire = $"{model.Name} {dt} {tz}";
-            return wire;
+            return $"{model.Name} {dt} {tz}";
         }
 
         public static Audit ConvertAudit(this string wire)

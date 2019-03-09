@@ -40,16 +40,12 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                CommitId model = ReadCommitId(jr);
-                return model;
+                return ReadCommitId(jr);
             }
         }
 
         public static string Write(this CommitId model)
-        {
             // Perf: No need to use JsonWriter for a simple scalar
-            string json = "{ \"" + _id + "\": \"" + model.Sha1.ToString("n") + "\" }";
-            return json;
-        }
+            => "{ \"" + _id + "\": \"" + model.Sha1.ToString("n") + "\" }";
     }
 }

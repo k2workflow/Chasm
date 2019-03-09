@@ -185,19 +185,7 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                 using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
                 using (var output = new MemoryStream(owner.Memory.Length))
                 {
-#if !NETSTANDARD2_0
                     output.Write(owner.Memory.Span);
-#else
-                    unsafe
-                    {
-                        // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
-                        fixed (byte* ba = &System.Runtime.InteropServices.MemoryMarshal.GetReference(owner.Memory.Span))
-                        {
-                            for (int i = 0; i < owner.Memory.Length; i++) // TODO: Perf
-                                output.WriteByte(ba[i]);
-                        }
-                    }
-#endif
                     output.Position = 0;
 
                     // Append blob. Following seems to be the only safe multi-writer method available
@@ -258,10 +246,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
                     if (output.Length < Sha1.ByteLength)
                         throw new SerializationException($"{nameof(CommitRef)} '{name}/{branch}' expected to have byte length {Sha1.ByteLength} but has length {output.Length}");
 
-                    // CommitIds are not compressed
                     CommitId commitId = Serializer.DeserializeCommitId(output.ToArray()); // TODO: Perf
 
-                    // Found
                     return (true, commitId, ifMatchCondition, blobRef);
                 }
             }

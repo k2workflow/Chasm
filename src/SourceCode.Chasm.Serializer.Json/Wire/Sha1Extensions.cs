@@ -22,8 +22,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             if (string.IsNullOrEmpty(str))
                 return null;
 
-            var sha1 = Sha1.Parse(str);
-            return sha1;
+            return Sha1.Parse(str);
         }
 
         /// <summary>
@@ -36,8 +35,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             Debug.Assert(jr != null);
 
             string str = (string)jr.Value;
-            var sha1 = Sha1.Parse(str);
-            return sha1;
+            return Sha1.Parse(str);
         }
     }
 }

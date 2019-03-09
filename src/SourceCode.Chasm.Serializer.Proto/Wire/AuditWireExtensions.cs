@@ -35,8 +35,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
             // DateTimeOffset
             DateTimeOffset dto = new DateTimeOffset(dt).ToOffset(tz);
 
-            var model = new Audit(name, dto);
-            return model;
+            return new Audit(name, dto);
         }
     }
 }

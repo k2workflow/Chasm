@@ -23,9 +23,9 @@ namespace SourceCode.Chasm.Serializer.Proto
             IMemoryOwner<byte> rented = _pool.RentExact(length);
 
             // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
-            fixed (byte* ba = &MemoryMarshal.GetReference(rented.Memory.Span))
+            fixed (byte* ptr = &MemoryMarshal.GetReference(rented.Memory.Span))
             {
-                using (var strm = new UnmanagedMemoryStream(ba, length, rented.Memory.Length, FileAccess.Write))
+                using (var strm = new UnmanagedMemoryStream(ptr, length, rented.Memory.Length, FileAccess.Write))
                 {
                     wire.WriteTo(strm);
                 }
@@ -37,16 +37,15 @@ namespace SourceCode.Chasm.Serializer.Proto
         private static unsafe void DeserializeImpl<T>(ReadOnlySpan<byte> span, ref T wire)
             where T : IMessage<T>
         {
-            byte[] rented = ArrayPool<byte>.Shared.Rent(span.Length);
+            // https://github.com/dotnet/corefx/pull/32669#issuecomment-429579594
+            fixed (byte* ptr = &MemoryMarshal.GetReference(span))
             {
-                // TODO: Perf
-                span.CopyTo(new Span<byte>(rented, 0, span.Length)); // First copy
-                wire.MergeFrom(rented, 0, span.Length); // Second copy
+                using (var strm = new UnmanagedMemoryStream(ptr, span.Length, span.Length, FileAccess.Read))
+                {
+                    wire.MergeFrom(strm);
+                }
             }
-            ArrayPool<byte>.Shared.Return(rented);
         }
-
-        #region IDisposable
 
         private bool _disposed;
 
@@ -66,10 +65,6 @@ namespace SourceCode.Chasm.Serializer.Proto
         }
 
         public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        #endregion
+            => Dispose(true);
     }
 }

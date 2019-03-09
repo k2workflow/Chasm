@@ -25,8 +25,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
                             sb.AppendLine(text);
                         }
 
-                        string wire = sb.ToString();
-                        return wire;
+                        return sb.ToString();
                     }
             }
         }
@@ -51,8 +50,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
                 nodes.Add(node);
             }
 
-            var model = new TreeNodeMap(nodes);
-            return model;
+            return new TreeNodeMap(nodes);
         }
     }
 }

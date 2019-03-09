@@ -15,8 +15,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
             IReadOnlyList<TreeNode> list = jr.ReadArray(() => jr.ReadTreeNode());
 
-            var tree = new TreeNodeMap(list);
-            return tree;
+            return new TreeNodeMap(list);
         }
 
         public static TreeNodeMap ReadTreeNodeMap(this string json)
@@ -28,8 +27,7 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             {
                 jr.DateParseHandling = DateParseHandling.None;
 
-                TreeNodeMap model = ReadTreeNodeMap(jr);
-                return model;
+                return ReadTreeNodeMap(jr);
             }
         }
 

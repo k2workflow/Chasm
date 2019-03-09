@@ -2,15 +2,10 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
 {
     internal static class CommitIdWireExtensions
     {
-        public static CommitIdWire Convert(this CommitId model)
+        public static CommitIdWire Convert(this CommitId model) => new CommitIdWire
         {
-            var wire = new CommitIdWire
-            {
-                Id = model.Sha1.Convert()
-            };
-
-            return wire;
-        }
+            Id = model.Sha1.Convert()
+        };
 
         public static CommitId? Convert(this CommitIdWire wire)
         {
@@ -19,8 +14,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
             Clay.Sha1? sha1 = wire.Id.Convert();
             if (sha1 == null) return default;
 
-            var model = new CommitId(sha1.Value);
-            return model;
+            return new CommitId(sha1.Value);
         }
     }
 }

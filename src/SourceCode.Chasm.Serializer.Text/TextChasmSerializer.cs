@@ -1,5 +1,8 @@
 using System;
 using System.Buffers;
+using System.Diagnostics;
+using System.Text;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm.Serializer.Text
 {
@@ -12,7 +15,21 @@ namespace SourceCode.Chasm.Serializer.Text
             _pool = pool ?? MemoryPool<byte>.Shared;
         }
 
-        #region IDisposable
+        private IMemoryOwner<byte> ToOwnedUtf8(string text)
+        {
+            Debug.Assert(text != null);
+
+            int length = Encoding.UTF8.GetMaxByteCount(text.Length); // Utf8 is 1-4 bpc
+
+            IMemoryOwner<byte> rented = _pool.Rent(length);
+
+            length = Encoding.UTF8.GetBytes(text, rented.Memory.Span);
+
+            return rented.Slice(0, length);
+        }
+
+        private static unsafe string GetUtf8(ReadOnlySpan<byte> span)
+            => Encoding.UTF8.GetString(span);
 
         private bool _disposed;
 
@@ -35,7 +52,5 @@ namespace SourceCode.Chasm.Serializer.Text
         {
             Dispose(true);
         }
-
-        #endregion
     }
 }

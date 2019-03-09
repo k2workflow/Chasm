@@ -27,8 +27,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
             for (int i = 0; i < nodes.Length; i++)
                 nodes[i] = wire.Nodes[i].Convert();
 
-            var model = new TreeNodeMap(nodes);
-            return model;
+            return new TreeNodeMap(nodes);
         }
 
         public static NodeKind Convert(this NodeKindWire wire) => wire switch

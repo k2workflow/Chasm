@@ -13,23 +13,25 @@ namespace SourceCode.Chasm.Repository.Disk
 
         public override async ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
-            requestContext = ChasmRequestContext.Ensure(requestContext);
-
             string filename = DeriveCommitRefFileName(name, null);
             string path = Path.Combine(_refsContainer, filename);
+
             string[] files = Directory.GetFiles(path, "*" + CommitExtension, SearchOption.TopDirectoryOnly);
 
             var results = new CommitRef[files.Length];
+
             for (int i = 0; i < results.Length; i++)
             {
-                byte[] bytes = await ReadFileAsync(files[i], requestContext, cancellationToken)
-                    .ConfigureAwait(false);
+                using (IMemoryOwner<byte> owned = await ReadFileAsync(files[i], cancellationToken)
+                    .ConfigureAwait(false))
+                {
+                    string branch = Path.ChangeExtension(Path.GetFileName(files[i]), null);
 
-                string branch = Path.ChangeExtension(Path.GetFileName(files[i]), null);
-
-                CommitId commitId = Serializer.DeserializeCommitId(bytes);
-                results[i] = new CommitRef(branch, commitId);
+                    CommitId commitId = Serializer.DeserializeCommitId(owned.Memory.Span);
+                    results[i] = new CommitRef(branch, commitId);
+                }
             }
+
             return results;
         }
 
@@ -37,8 +39,6 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             if (!Directory.Exists(_refsContainer))
                 return new ValueTask<IReadOnlyList<string>>(Array.Empty<string>());
-
-            requestContext = ChasmRequestContext.Ensure(requestContext);
 
             string[] dirs = Directory.GetDirectories(_refsContainer);
             for (int i = 0; i < dirs.Length; i++)
@@ -52,23 +52,19 @@ namespace SourceCode.Chasm.Repository.Disk
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(branch)) throw new ArgumentNullException(nameof(branch));
 
-            requestContext = ChasmRequestContext.Ensure(requestContext);
-
             string filename = DeriveCommitRefFileName(name, branch);
             string path = Path.Combine(_refsContainer, filename);
 
-            byte[] bytes = await ReadFileAsync(path, requestContext, cancellationToken)
-                .ConfigureAwait(false);
+            using (IMemoryOwner<byte> bytes = await ReadFileAsync(path, cancellationToken)
+                .ConfigureAwait(false))
+            {
+                if (bytes == null || bytes.Memory.Length == 0)
+                    return default;
 
-            // NotFound
-            if (bytes == null || bytes.Length == 0)
-                return default;
+                CommitId commitId = Serializer.DeserializeCommitId(bytes.Memory.Span);
 
-            // CommitIds are not compressed
-            CommitId commitId = Serializer.DeserializeCommitId(bytes);
-
-            var commitRef = new CommitRef(branch, commitId);
-            return commitRef;
+                return new CommitRef(branch, commitId);
+            }
         }
 
         public override async Task WriteCommitRefAsync(CommitId? previousCommitId, string name, CommitRef commitRef, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
@@ -86,7 +82,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 Directory.CreateDirectory(dir);
 
             using (IMemoryOwner<byte> owner = Serializer.Serialize(commitRef.CommitId))
-            using (FileStream file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken)
+            using (FileStream file = await WaitForFileAsync(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, cancellationToken: cancellationToken)
                 .ConfigureAwait(false))
             {
                 if (file.Length == 0)
@@ -96,35 +92,29 @@ namespace SourceCode.Chasm.Repository.Disk
                 }
                 else
                 {
-                    // CommitIds are not compressed
-                    byte[] bytes = await ReadBytesAsync(file, requestContext, cancellationToken)
-                        .ConfigureAwait(false);
+                    using (IMemoryOwner<byte> owned = await ReadBytesAsync(file, cancellationToken)
+                         .ConfigureAwait(false))
+                    {
+                        CommitId commitId = Serializer.DeserializeCommitId(owned.Memory.Span);
 
-                    CommitId commitId = Serializer.DeserializeCommitId(bytes);
+                        if (!previousCommitId.HasValue)
+                            throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext);
 
-                    if (!previousCommitId.HasValue)
-                        throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext);
+                        if (previousCommitId.Value != commitId)
+                            throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext);
 
-                    if (previousCommitId.Value != commitId)
-                        throw BuildConcurrencyException(name, commitRef.Branch, null, requestContext);
-
-                    file.Position = 0;
+                        file.Position = 0;
+                    }
                 }
 
-#if !NETSTANDARD2_0
                 await file.WriteAsync(owner.Memory, cancellationToken)
                     .ConfigureAwait(false);
-#else
-                byte[] array = owner.Memory.ToArray();
-                await file.WriteAsync(array, 0, array.Length, cancellationToken)
-                    .ConfigureAwait(false);
-#endif
 
                 if (file.Position != owner.Memory.Length)
                     file.Position = owner.Memory.Length;
             }
 
-            await TouchFileAsync(path, requestContext, cancellationToken)
+            await TouchFileAsync(path, cancellationToken)
                 .ConfigureAwait(false);
         }
     }

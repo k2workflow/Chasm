@@ -13,8 +13,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
 
             var sha1 = Sha1.Parse(wire);
 
-            var model = new CommitId(sha1);
-            return model;
+            return new CommitId(sha1);
         }
     }
 }

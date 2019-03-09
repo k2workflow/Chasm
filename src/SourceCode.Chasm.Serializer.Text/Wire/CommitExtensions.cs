@@ -58,8 +58,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
             // Message
             sb.AppendLine().AppendLine(model.Message);
 
-            string wire = sb.ToString();
-            return wire;
+            return sb.ToString();
         }
 
         public static Commit ConvertCommit(this string wire)
@@ -144,8 +143,7 @@ namespace SourceCode.Chasm.Serializer.Text.Wire
             string message = wire.Substring(index).Trim(new char[] { '\r', '\n' });
 
             // Done
-            var model = new Commit(parents, treeId, author, committer, message);
-            return model;
+            return new Commit(parents, treeId, author, committer, message);
         }
     }
 }
