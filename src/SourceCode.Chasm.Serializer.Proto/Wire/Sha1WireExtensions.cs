@@ -1,4 +1,3 @@
-using System;
 using System.Buffers;
 using SourceCode.Clay;
 
@@ -29,8 +28,6 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
 
         public static Sha1Wire Convert(this BlobId? model) => Convert(model?.Sha1);
 
-        public static Sha1Wire Convert(this CommitId? model) => Convert(model?.Sha1);
-
         public static Sha1Wire Convert(this TreeId? model) => Convert(model?.Sha1);
 
         public static Sha1? Convert(this Sha1Wire wire)
@@ -56,14 +53,6 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
 
             Sha1? model = Convert(wire);
             return new BlobId(model.Value);
-        }
-
-        public static CommitId? ConvertCommit(this Sha1Wire wire)
-        {
-            if (wire == null || !wire.Set) return default;
-
-            Sha1? model = Convert(wire);
-            return new CommitId(model.Value);
         }
 
         public static TreeId? ConvertTree(this Sha1Wire wire)

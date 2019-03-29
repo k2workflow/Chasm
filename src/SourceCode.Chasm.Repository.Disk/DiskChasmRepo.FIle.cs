@@ -209,15 +209,6 @@ namespace SourceCode.Chasm.Repository.Disk
             return new ChasmMetadata(dto.ContentType, dto.Filename);
         }
 
-        private static string DeriveCommitRefFileName(string name, string branch)
-        {
-            Debug.Assert(!string.IsNullOrWhiteSpace(name));
-
-            if (branch == null) return name;
-
-            return Path.Combine(name, $"{branch}{CommitExtension}");
-        }
-
         public static (string filePath, string metaPath) DeriveFileNames(string root, Sha1 sha1)
         {
             System.Collections.Generic.KeyValuePair<string, string> tokens = sha1.Split(PrefixLength);
