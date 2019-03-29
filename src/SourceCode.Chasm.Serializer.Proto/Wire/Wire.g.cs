@@ -24,28 +24,19 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
     static WireReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgpXaXJlLnByb3RvGg53cmFwcGVycy5wcm90byIlCghTaGExV2lyZRILCgNT",
-            "ZXQYASABKAgSDAoERGF0YRgCIAEoDCJUCgxUcmVlV2lyZU5vZGUSDAoETmFt",
-            "ZRgBIAEoCRIbCgRLaW5kGAIgASgOMg0uTm9kZUtpbmRXaXJlEhkKBk5vZGVJ",
-            "ZBgDIAEoCzIJLlNoYTFXaXJlIigKCFRyZWVXaXJlEhwKBU5vZGVzGAEgAygL",
-            "Mg0uVHJlZVdpcmVOb2RlIjsKCUF1ZGl0V2lyZRIMCgROYW1lGAEgASgJEhAK",
-            "CERhdGVUaW1lGAIgASgDEg4KBk9mZnNldBgDIAEoAyKtAQoKQ29tbWl0V2ly",
-            "ZRIaCgdQYXJlbnRzGAEgAygLMgkuU2hhMVdpcmUSGQoGVHJlZUlkGAIgASgL",
-            "MgkuU2hhMVdpcmUSGgoGQXV0aG9yGAMgASgLMgouQXVkaXRXaXJlEh0KCUNv",
-            "bW1pdHRlchgEIAEoCzIKLkF1ZGl0V2lyZRItCgdNZXNzYWdlGAUgASgLMhwu",
-            "Z29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlIiUKDENvbW1pdElkV2lyZRIV",
-            "CgJJZBgBIAEoCzIJLlNoYTFXaXJlKiIKDE5vZGVLaW5kV2lyZRIICgRCbG9i",
-            "EAASCAoEVHJlZRABQimqAiZTb3VyY2VDb2RlLkNoYXNtLlNlcmlhbGl6ZXIu",
-            "UHJvdG8uV2lyZWIGcHJvdG8z"));
+            "CgpXaXJlLnByb3RvIiUKCFNoYTFXaXJlEgsKA1NldBgBIAEoCBIMCgREYXRh",
+            "GAIgASgMInMKDFRyZWVXaXJlTm9kZRIMCgROYW1lGAEgASgJEhsKBEtpbmQY",
+            "AiABKA4yDS5Ob2RlS2luZFdpcmUSGQoGTm9kZUlkGAMgASgLMgkuU2hhMVdp",
+            "cmUSDwoHSGFzRGF0YRgEIAEoCBIMCgREYXRhGAUgASgMIigKCFRyZWVXaXJl",
+            "EhwKBU5vZGVzGAEgAygLMg0uVHJlZVdpcmVOb2RlKiIKDE5vZGVLaW5kV2ly",
+            "ZRIICgRCbG9iEAASCAoEVHJlZRABQimqAiZTb3VyY2VDb2RlLkNoYXNtLlNl",
+            "cmlhbGl6ZXIuUHJvdG8uV2lyZWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.WrappersReflection.Descriptor, },
+          new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.NodeKindWire), }, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire), global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire.Parser, new[]{ "Set", "Data" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.TreeWireNode), global::SourceCode.Chasm.Serializer.Proto.Wire.TreeWireNode.Parser, new[]{ "Name", "Kind", "NodeId" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.TreeWire), global::SourceCode.Chasm.Serializer.Proto.Wire.TreeWire.Parser, new[]{ "Nodes" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire), global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire.Parser, new[]{ "Name", "DateTime", "Offset" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.CommitWire), global::SourceCode.Chasm.Serializer.Proto.Wire.CommitWire.Parser, new[]{ "Parents", "TreeId", "Author", "Committer", "Message" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.CommitIdWire), global::SourceCode.Chasm.Serializer.Proto.Wire.CommitIdWire.Parser, new[]{ "Id" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.TreeWireNode), global::SourceCode.Chasm.Serializer.Proto.Wire.TreeWireNode.Parser, new[]{ "Name", "Kind", "NodeId", "HasData", "Data" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::SourceCode.Chasm.Serializer.Proto.Wire.TreeWire), global::SourceCode.Chasm.Serializer.Proto.Wire.TreeWire.Parser, new[]{ "Nodes" }, null, null, null)
           }));
     }
     #endregion
@@ -260,6 +251,8 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
       name_ = other.name_;
       kind_ = other.kind_;
       nodeId_ = other.nodeId_ != null ? other.nodeId_.Clone() : null;
+      hasData_ = other.hasData_;
+      data_ = other.data_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -301,6 +294,28 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
       }
     }
 
+    /// <summary>Field number for the "HasData" field.</summary>
+    public const int HasDataFieldNumber = 4;
+    private bool hasData_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool HasData {
+      get { return hasData_; }
+      set {
+        hasData_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Data" field.</summary>
+    public const int DataFieldNumber = 5;
+    private pb::ByteString data_ = pb::ByteString.Empty;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public pb::ByteString Data {
+      get { return data_; }
+      set {
+        data_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as TreeWireNode);
@@ -317,6 +332,8 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
       if (Name != other.Name) return false;
       if (Kind != other.Kind) return false;
       if (!object.Equals(NodeId, other.NodeId)) return false;
+      if (HasData != other.HasData) return false;
+      if (Data != other.Data) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -326,6 +343,8 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (Kind != 0) hash ^= Kind.GetHashCode();
       if (nodeId_ != null) hash ^= NodeId.GetHashCode();
+      if (HasData != false) hash ^= HasData.GetHashCode();
+      if (Data.Length != 0) hash ^= Data.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -351,6 +370,14 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
         output.WriteRawTag(26);
         output.WriteMessage(NodeId);
       }
+      if (HasData != false) {
+        output.WriteRawTag(32);
+        output.WriteBool(HasData);
+      }
+      if (Data.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteBytes(Data);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -367,6 +394,12 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
       }
       if (nodeId_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(NodeId);
+      }
+      if (HasData != false) {
+        size += 1 + 1;
+      }
+      if (Data.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeBytesSize(Data);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -390,6 +423,12 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
           NodeId = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
         }
         NodeId.MergeFrom(other.NodeId);
+      }
+      if (other.HasData != false) {
+        HasData = other.HasData;
+      }
+      if (other.Data.Length != 0) {
+        Data = other.Data;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -415,6 +454,14 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
               NodeId = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
             }
             input.ReadMessage(NodeId);
+            break;
+          }
+          case 32: {
+            HasData = input.ReadBool();
+            break;
+          }
+          case 42: {
+            Data = input.ReadBytes();
             break;
           }
         }
@@ -539,601 +586,6 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire {
             break;
           case 10: {
             nodes_.AddEntriesFrom(input, _repeated_nodes_codec);
-            break;
-          }
-        }
-      }
-    }
-
-  }
-
-  /// <summary>
-  /// Audit
-  /// </summary>
-  public sealed partial class AuditWire : pb::IMessage<AuditWire> {
-    private static readonly pb::MessageParser<AuditWire> _parser = new pb::MessageParser<AuditWire>(() => new AuditWire());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<AuditWire> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::SourceCode.Chasm.Serializer.Proto.Wire.WireReflection.Descriptor.MessageTypes[3]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public AuditWire() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public AuditWire(AuditWire other) : this() {
-      name_ = other.name_;
-      dateTime_ = other.dateTime_;
-      offset_ = other.offset_;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public AuditWire Clone() {
-      return new AuditWire(this);
-    }
-
-    /// <summary>Field number for the "Name" field.</summary>
-    public const int NameFieldNumber = 1;
-    private string name_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public string Name {
-      get { return name_; }
-      set {
-        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "DateTime" field.</summary>
-    public const int DateTimeFieldNumber = 2;
-    private long dateTime_;
-    /// <summary>
-    /// Ticks
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public long DateTime {
-      get { return dateTime_; }
-      set {
-        dateTime_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "Offset" field.</summary>
-    public const int OffsetFieldNumber = 3;
-    private long offset_;
-    /// <summary>
-    /// Ticks
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public long Offset {
-      get { return offset_; }
-      set {
-        offset_ = value;
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override bool Equals(object other) {
-      return Equals(other as AuditWire);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(AuditWire other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (Name != other.Name) return false;
-      if (DateTime != other.DateTime) return false;
-      if (Offset != other.Offset) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (DateTime != 0L) hash ^= DateTime.GetHashCode();
-      if (Offset != 0L) hash ^= Offset.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (Name.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Name);
-      }
-      if (DateTime != 0L) {
-        output.WriteRawTag(16);
-        output.WriteInt64(DateTime);
-      }
-      if (Offset != 0L) {
-        output.WriteRawTag(24);
-        output.WriteInt64(Offset);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int CalculateSize() {
-      int size = 0;
-      if (Name.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
-      }
-      if (DateTime != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(DateTime);
-      }
-      if (Offset != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Offset);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(AuditWire other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Name.Length != 0) {
-        Name = other.Name;
-      }
-      if (other.DateTime != 0L) {
-        DateTime = other.DateTime;
-      }
-      if (other.Offset != 0L) {
-        Offset = other.Offset;
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            Name = input.ReadString();
-            break;
-          }
-          case 16: {
-            DateTime = input.ReadInt64();
-            break;
-          }
-          case 24: {
-            Offset = input.ReadInt64();
-            break;
-          }
-        }
-      }
-    }
-
-  }
-
-  /// <summary>
-  /// Commit
-  /// </summary>
-  public sealed partial class CommitWire : pb::IMessage<CommitWire> {
-    private static readonly pb::MessageParser<CommitWire> _parser = new pb::MessageParser<CommitWire>(() => new CommitWire());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<CommitWire> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::SourceCode.Chasm.Serializer.Proto.Wire.WireReflection.Descriptor.MessageTypes[4]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CommitWire() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CommitWire(CommitWire other) : this() {
-      parents_ = other.parents_.Clone();
-      treeId_ = other.treeId_ != null ? other.treeId_.Clone() : null;
-      author_ = other.author_ != null ? other.author_.Clone() : null;
-      committer_ = other.committer_ != null ? other.committer_.Clone() : null;
-      message_ = other.message_ != null ? other.message_.Clone() : null;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CommitWire Clone() {
-      return new CommitWire(this);
-    }
-
-    /// <summary>Field number for the "Parents" field.</summary>
-    public const int ParentsFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire> _repeated_parents_codec
-        = pb::FieldCodec.ForMessage(10, global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire.Parser);
-    private readonly pbc::RepeatedField<global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire> parents_ = new pbc::RepeatedField<global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public pbc::RepeatedField<global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire> Parents {
-      get { return parents_; }
-    }
-
-    /// <summary>Field number for the "TreeId" field.</summary>
-    public const int TreeIdFieldNumber = 2;
-    private global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire treeId_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire TreeId {
-      get { return treeId_; }
-      set {
-        treeId_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "Author" field.</summary>
-    public const int AuthorFieldNumber = 3;
-    private global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire author_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire Author {
-      get { return author_; }
-      set {
-        author_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "Committer" field.</summary>
-    public const int CommitterFieldNumber = 4;
-    private global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire committer_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire Committer {
-      get { return committer_; }
-      set {
-        committer_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "Message" field.</summary>
-    public const int MessageFieldNumber = 5;
-    private global::Google.Protobuf.WellKnownTypes.StringValue message_;
-    /// <summary>
-    /// Nullable
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Google.Protobuf.WellKnownTypes.StringValue Message {
-      get { return message_; }
-      set {
-        message_ = value;
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override bool Equals(object other) {
-      return Equals(other as CommitWire);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(CommitWire other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if(!parents_.Equals(other.parents_)) return false;
-      if (!object.Equals(TreeId, other.TreeId)) return false;
-      if (!object.Equals(Author, other.Author)) return false;
-      if (!object.Equals(Committer, other.Committer)) return false;
-      if (!object.Equals(Message, other.Message)) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override int GetHashCode() {
-      int hash = 1;
-      hash ^= parents_.GetHashCode();
-      if (treeId_ != null) hash ^= TreeId.GetHashCode();
-      if (author_ != null) hash ^= Author.GetHashCode();
-      if (committer_ != null) hash ^= Committer.GetHashCode();
-      if (message_ != null) hash ^= Message.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void WriteTo(pb::CodedOutputStream output) {
-      parents_.WriteTo(output, _repeated_parents_codec);
-      if (treeId_ != null) {
-        output.WriteRawTag(18);
-        output.WriteMessage(TreeId);
-      }
-      if (author_ != null) {
-        output.WriteRawTag(26);
-        output.WriteMessage(Author);
-      }
-      if (committer_ != null) {
-        output.WriteRawTag(34);
-        output.WriteMessage(Committer);
-      }
-      if (message_ != null) {
-        output.WriteRawTag(42);
-        output.WriteMessage(Message);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int CalculateSize() {
-      int size = 0;
-      size += parents_.CalculateSize(_repeated_parents_codec);
-      if (treeId_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(TreeId);
-      }
-      if (author_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Author);
-      }
-      if (committer_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Committer);
-      }
-      if (message_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Message);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(CommitWire other) {
-      if (other == null) {
-        return;
-      }
-      parents_.Add(other.parents_);
-      if (other.treeId_ != null) {
-        if (treeId_ == null) {
-          TreeId = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
-        }
-        TreeId.MergeFrom(other.TreeId);
-      }
-      if (other.author_ != null) {
-        if (author_ == null) {
-          Author = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
-        }
-        Author.MergeFrom(other.Author);
-      }
-      if (other.committer_ != null) {
-        if (committer_ == null) {
-          Committer = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
-        }
-        Committer.MergeFrom(other.Committer);
-      }
-      if (other.message_ != null) {
-        if (message_ == null) {
-          Message = new global::Google.Protobuf.WellKnownTypes.StringValue();
-        }
-        Message.MergeFrom(other.Message);
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            parents_.AddEntriesFrom(input, _repeated_parents_codec);
-            break;
-          }
-          case 18: {
-            if (treeId_ == null) {
-              TreeId = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
-            }
-            input.ReadMessage(TreeId);
-            break;
-          }
-          case 26: {
-            if (author_ == null) {
-              Author = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
-            }
-            input.ReadMessage(Author);
-            break;
-          }
-          case 34: {
-            if (committer_ == null) {
-              Committer = new global::SourceCode.Chasm.Serializer.Proto.Wire.AuditWire();
-            }
-            input.ReadMessage(Committer);
-            break;
-          }
-          case 42: {
-            if (message_ == null) {
-              Message = new global::Google.Protobuf.WellKnownTypes.StringValue();
-            }
-            input.ReadMessage(Message);
-            break;
-          }
-        }
-      }
-    }
-
-  }
-
-  /// <summary>
-  /// CommitId
-  /// </summary>
-  public sealed partial class CommitIdWire : pb::IMessage<CommitIdWire> {
-    private static readonly pb::MessageParser<CommitIdWire> _parser = new pb::MessageParser<CommitIdWire>(() => new CommitIdWire());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<CommitIdWire> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::SourceCode.Chasm.Serializer.Proto.Wire.WireReflection.Descriptor.MessageTypes[5]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CommitIdWire() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CommitIdWire(CommitIdWire other) : this() {
-      id_ = other.id_ != null ? other.id_.Clone() : null;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CommitIdWire Clone() {
-      return new CommitIdWire(this);
-    }
-
-    /// <summary>Field number for the "Id" field.</summary>
-    public const int IdFieldNumber = 1;
-    private global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire id_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire Id {
-      get { return id_; }
-      set {
-        id_ = value;
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override bool Equals(object other) {
-      return Equals(other as CommitIdWire);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(CommitIdWire other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (!object.Equals(Id, other.Id)) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (id_ != null) hash ^= Id.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (id_ != null) {
-        output.WriteRawTag(10);
-        output.WriteMessage(Id);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int CalculateSize() {
-      int size = 0;
-      if (id_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Id);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(CommitIdWire other) {
-      if (other == null) {
-        return;
-      }
-      if (other.id_ != null) {
-        if (id_ == null) {
-          Id = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
-        }
-        Id.MergeFrom(other.Id);
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            if (id_ == null) {
-              Id = new global::SourceCode.Chasm.Serializer.Proto.Wire.Sha1Wire();
-            }
-            input.ReadMessage(Id);
             break;
           }
         }

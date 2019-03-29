@@ -23,7 +23,6 @@ namespace SourceCode.Chasm.Repository.Tests
 
             // Assert
             Assert.Equal(expectedInnerException, actual.InnerException);
-            Assert.Contains(nameof(CommitRef), actual.Message);
             Assert.Contains(expectedBranch, actual.Message);
             Assert.Contains(expectedName, actual.Message);
         }

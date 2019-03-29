@@ -5,7 +5,7 @@ namespace SourceCode.Chasm
     /// <summary>
     /// Represents a way to compare different <see cref="TreeId"/> values.
     /// </summary>
-    public abstract class TreeIdComparer : IEqualityComparer<TreeId>, IComparer<TreeId>
+    internal abstract class TreeIdComparer : IEqualityComparer<TreeId>, IComparer<TreeId>
     {
         #region Constants
 

@@ -7,17 +7,6 @@ namespace SourceCode.Chasm.Repository
 {
     public static class ChasmRepositoryExtensions
     {
-        public static ValueTask<Commit?> ReadCommitAsync(this IChasmRepository chasmRepository, CommitId? commitId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
-        {
-            if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));
-
-            requestContext = ChasmRequestContext.Ensure(requestContext);
-
-            return commitId.HasValue
-                ? chasmRepository.ReadCommitAsync(commitId.Value, requestContext, cancellationToken)
-                : default;
-        }
-
         public static Task<IChasmBlob> ReadObjectAsync(this IChasmRepository chasmRepository, Sha1? objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (chasmRepository == null) throw new ArgumentNullException(nameof(chasmRepository));

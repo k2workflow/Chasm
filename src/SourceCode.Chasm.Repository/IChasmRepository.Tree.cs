@@ -10,14 +10,8 @@ namespace SourceCode.Chasm.Repository
     {
         ValueTask<TreeNodeMap?> ReadTreeAsync(TreeId treeId, ChasmRequestContext requestContext, CancellationToken cancellationToken);
 
-        ValueTask<TreeNodeMap?> ReadTreeAsync(string branch, string commitRefName, ChasmRequestContext requestContext, CancellationToken cancellationToken);
-
-        ValueTask<TreeNodeMap?> ReadTreeAsync(CommitId commitId, ChasmRequestContext requestContext, CancellationToken cancellationToken);
-
         ValueTask<IReadOnlyDictionary<TreeId, TreeNodeMap>> ReadTreeBatchAsync(IEnumerable<TreeId> treeIds, ChasmRequestContext requestContext, CancellationToken cancellationToken);
 
         ValueTask<TreeId> WriteTreeAsync(TreeNodeMap tree, ChasmRequestContext requestContext, CancellationToken cancellationToken);
-
-        ValueTask<CommitId> WriteTreeAsync(IReadOnlyList<CommitId> parents, TreeNodeMap tree, Audit author, Audit committer, string message, ChasmRequestContext requestContext, CancellationToken cancellationToken);
     }
 }

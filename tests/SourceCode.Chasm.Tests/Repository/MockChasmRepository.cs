@@ -19,11 +19,6 @@ namespace SourceCode.Chasm.Repository.Tests
             : base(serializer, maxDop)
         { }
 
-        public override ValueTask<CommitRef?> ReadCommitRefAsync(string name, string branch, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
         public override Task<bool> ExistsAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
@@ -44,11 +39,6 @@ namespace SourceCode.Chasm.Repository.Tests
             throw new NotImplementedException();
         }
 
-        public override Task WriteCommitRefAsync(CommitId? previousCommitId, string branch, CommitRef commitRef, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
         public override Task<WriteResult<Sha1>> WriteObjectAsync(ReadOnlyMemory<byte> item, ChasmMetadata metadata, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
@@ -65,16 +55,6 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         public override Task<IReadOnlyList<WriteResult<Sha1>>> WriteObjectsAsync(IEnumerable<IChasmBlob> blobs, bool forceOverwrite, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override ValueTask<IReadOnlyList<string>> GetNamesAsync(ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override ValueTask<IReadOnlyList<CommitRef>> GetBranchesAsync(string name, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

@@ -6,9 +6,7 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using SourceCode.Chasm;
@@ -95,60 +93,6 @@ namespace SoruceCode.Chasm.IntegrationTests
 
             TreeNodeMap? urtree = await repository.ReadTreeAsync(new TreeId(usha1), cx, default);
             Assert.False(urtree.HasValue);
-
-            // Commit
-            var commit = new Commit(
-                new CommitId?(),
-                treeId,
-                new Audit("User1", DateTimeOffset.UtcNow.AddDays(-1)),
-                new Audit("User2", DateTimeOffset.UtcNow),
-                "Initial commit"
-            );
-            CommitId commitId = await repository.WriteCommitAsync(commit, cx, default);
-            Commit? rcommit = await repository.ReadCommitAsync(commitId, cx, default);
-            Assert.True(rcommit.HasValue);
-            Assert.Equal(commit, rcommit);
-
-            Commit? urcommit = await repository.ReadCommitAsync(new CommitId(usha1), cx, default);
-            Assert.False(urcommit.HasValue);
-
-            // CommitRef
-            string commitRefName = Guid.NewGuid().ToString("N");
-            var commitRef = new CommitRef("production", commitId);
-            await repository.WriteCommitRefAsync(null, commitRefName, commitRef, cx, default);
-            CommitRef? rcommitRef = await repository.ReadCommitRefAsync(commitRefName, commitRef.Branch, cx, default);
-            Assert.True(rcommit.HasValue);
-            Assert.Equal(commitRef, rcommitRef);
-
-            CommitRef? urcommitRef = await repository.ReadCommitRefAsync(commitRefName + "_", commitRef.Branch, cx, default);
-            Assert.False(urcommit.HasValue);
-
-            await Assert.ThrowsAsync<ChasmConcurrencyException>(() =>
-                repository.WriteCommitRefAsync(null, commitRefName, new CommitRef("production", new CommitId(usha1)), cx, default));
-
-            await Assert.ThrowsAsync<ChasmConcurrencyException>(() =>
-                repository.WriteCommitRefAsync(new CommitId(usha2), commitRefName, new CommitRef("production", new CommitId(usha1)), cx, default));
-
-            await repository.WriteCommitRefAsync(null, commitRefName, new CommitRef("dev", commitId), cx, default);
-            await repository.WriteCommitRefAsync(null, commitRefName, new CommitRef("staging", new CommitId(usha1)), cx, default);
-            await repository.WriteCommitRefAsync(null, commitRefName + "_1", new CommitRef("production", new CommitId(usha1)), cx, default);
-
-            IReadOnlyList<string> names = await repository.GetNamesAsync(default, default);
-            Assert.Contains(names, x => x == commitRefName);
-            Assert.Contains(names, x => x == commitRefName + "_1");
-
-            IReadOnlyList<CommitRef> branches = await repository.GetBranchesAsync(commitRefName, cx, default);
-            Assert.Contains(branches.Select(x => x.Branch), x => x == "production");
-            Assert.Contains(branches.Select(x => x.Branch), x => x == "dev");
-            Assert.Contains(branches.Select(x => x.Branch), x => x == "staging");
-
-            Assert.Equal(commitId, branches.First(x => x.Branch == "production").CommitId);
-            Assert.Equal(commitId, branches.First(x => x.Branch == "dev").CommitId);
-            Assert.Equal(new CommitId(usha1), branches.First(x => x.Branch == "staging").CommitId);
-
-            branches = await repository.GetBranchesAsync(commitRefName + "_1", cx, default);
-            Assert.Contains(branches.Select(x => x.Branch), x => x == "production");
-            Assert.Equal(new CommitId(usha1), branches.First(x => x.Branch == "production").CommitId);
         }
 
         [Fact(DisplayName = nameof(DiskChasmRepo_Test))]
