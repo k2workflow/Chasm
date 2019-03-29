@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SourceCode.Clay;
+using SourceCode.Clay.Buffers;
 
 namespace SourceCode.Chasm
 {
@@ -61,9 +62,17 @@ namespace SourceCode.Chasm
                 cmp = Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);
                 if (cmp != 0) return cmp;
 
-                // And lastly by Kind
+                // Then by Kind
                 cmp = ((int)x.Kind).CompareTo((int)y.Kind);
-                return cmp;
+                if (cmp != 0) return cmp;
+
+                // And lastly by Data
+                if (x.Data == null)
+                {
+                    return y.Data == null ? 0 : -1;
+                }
+
+                return y.Data == null ? 1 : BufferComparer.Memory.Compare(x.Data.Value, y.Data.Value);
             }
 
             public override bool Equals(TreeNode x, TreeNode y)
@@ -72,7 +81,8 @@ namespace SourceCode.Chasm
                 if (x.Sha1 != y.Sha1) return false;
                 if (!StringComparer.Ordinal.Equals(x.Name, y.Name)) return false;
 
-                return true;
+                if (x.Data == null ^ y.Data == null) return false;
+                return x.Data == null || x.Data.Value.MemoryEquals(y.Data.Value);
             }
 
             public override int GetHashCode(TreeNode obj)
@@ -83,6 +93,7 @@ namespace SourceCode.Chasm
                 hc.Add(obj.Kind);
                 hc.Add(obj.Sha1, Sha1Comparer.Default);
                 hc.Add(obj.Name ?? string.Empty, StringComparer.Ordinal);
+                hc.Add(obj.Data == null ? 0 : Clay.Buffers.BufferComparer.Memory.GetHashCode(obj.Data.Value));
 
                 return hc.ToHashCode();
 #else
@@ -92,6 +103,7 @@ namespace SourceCode.Chasm
                     hc = hc * 7 + (int)obj.Kind;
                     hc = hc * 7 + obj.Sha1.GetHashCode();
                     hc = hc * 7 + obj.Name?.GetHashCode() ?? 0;
+                    hc = hc * 7 + (obj.Data == null ? 0 : Clay.Buffers.BufferComparer.Memory.GetHashCode(obj.Data.Value));
                 }
                 return hc;
 #endif
@@ -109,8 +121,6 @@ namespace SourceCode.Chasm
 #if !NETSTANDARD2_0
                 var hc = new HashCode();
 
-                hc.Add(obj.Kind);
-                hc.Add(obj.Sha1, Sha1Comparer.Default);
                 hc.Add(obj.Name, StringComparer.Ordinal);
 
                 return hc.ToHashCode();
@@ -118,8 +128,6 @@ namespace SourceCode.Chasm
                 int hc = 11;
                 unchecked
                 {
-                    hc = hc * 7 + (int)obj.Kind;
-                    hc = hc * 7 + obj.Sha1.GetHashCode();
                     hc = hc * 7 + obj.Name?.GetHashCode() ?? 0;
                 }
                 return hc;

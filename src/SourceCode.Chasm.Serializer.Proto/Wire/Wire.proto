@@ -1,64 +1,35 @@
 syntax = "proto3";
-import "wrappers.proto";
 option csharp_namespace = "SourceCode.Chasm.Serializer.Proto.Wire";
 
-	// Sha1
-	message Sha1Wire
-	{
-		bool Set = 1;
-		bytes Data = 2; // Expected to be 20 bytes
-	}
+  // Sha1
+  message Sha1Wire
+  {
+    bool Set = 1;
+    bytes Data = 2; // Expected to be 20 bytes
+  }
 
-	// NodeKind
-	enum NodeKindWire 
-	{
-		Blob = 0; // Default
+  // NodeKind
+  enum NodeKindWire
+  {
+    Blob = 0; // Default
+    Tree = 1;
+  }
 
-		Tree = 1;
-	}
+  // TreeNode
+  message TreeWireNode
+  {
+    string Name = 1;
 
-	// TreeNode
-	message TreeWireNode
-	{
-		string Name = 1;
+    NodeKindWire Kind = 2;
 
-		NodeKindWire Kind = 2;
+    Sha1Wire NodeId = 3;
 
-		Sha1Wire NodeId = 3;
-	}
+    bool HasData = 4;
+    bytes Data = 5;
+  }
 
-	// Tree
-	message TreeWire 
-	{
-		repeated TreeWireNode Nodes = 1;
-	}
-
-	// Audit
-	message AuditWire
-	{
-		string Name = 1;
-
-		int64 DateTime = 2; // Ticks
-
-		int64 Offset = 3; // Ticks
-	}
-
-	// Commit
-	message CommitWire
-	{
-		repeated Sha1Wire Parents = 1;
-
-		Sha1Wire TreeId = 2;
-		
-		AuditWire Author = 3;
-		
-		AuditWire Committer = 4;
-		
-		google.protobuf.StringValue Message = 5; // Nullable
-	}
-
-	// CommitId
-	message CommitIdWire
-	{
-		Sha1Wire Id = 1;
-	}
+  // Tree
+  message TreeWire
+  {
+    repeated TreeWireNode Nodes = 1;
+  }

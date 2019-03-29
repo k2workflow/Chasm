@@ -1,6 +1,6 @@
-using SourceCode.Clay;
 using System;
 using System.Diagnostics;
+using SourceCode.Clay;
 
 namespace SourceCode.Chasm
 {
@@ -29,6 +29,8 @@ namespace SourceCode.Chasm
 
         public NodeKind Kind { get; }
 
+        public ReadOnlyMemory<byte>? Data { get; }
+
         public TreeId TreeId
         {
             get
@@ -53,35 +55,37 @@ namespace SourceCode.Chasm
 
         #region De/Constructors
 
-        private TreeNode(string name, in Sha1 sha1, NodeKind kind)
+        private TreeNode(string name, in Sha1 sha1, NodeKind kind, ReadOnlyMemory<byte>? data)
         {
             // Used for .Empty (no validation)
 
             Name = name;
             Kind = kind;
             Sha1 = sha1;
+            Data = data;
         }
 
-        public TreeNode(string name, NodeKind kind, in Sha1 sha1)
-            : this(name, sha1, kind)
+        public TreeNode(string name, NodeKind kind, in Sha1 sha1, ReadOnlyMemory<byte>? data = null)
+            : this(name, sha1, kind, data)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (!Enum.IsDefined(typeof(NodeKind), kind)) throw new ArgumentOutOfRangeException(nameof(kind));
         }
 
-        public TreeNode(string name, in BlobId blobId)
-            : this(name, NodeKind.Blob, blobId.Sha1)
+        public TreeNode(string name, in BlobId blobId, ReadOnlyMemory<byte>? data = null)
+            : this(name, NodeKind.Blob, blobId.Sha1, data)
         { }
 
-        public TreeNode(string name, in TreeId treeId)
-            : this(name, NodeKind.Tree, treeId.Sha1)
+        public TreeNode(string name, in TreeId treeId, ReadOnlyMemory<byte>? data = null)
+            : this(name, NodeKind.Tree, treeId.Sha1, data)
         { }
 
-        public void Deconstruct(out string name, out NodeKind kind, out Sha1 sha1)
+        public void Deconstruct(out string name, out NodeKind kind, out Sha1 sha1, out ReadOnlyMemory<byte>? data)
         {
             name = Name;
             sha1 = Sha1;
             kind = Kind;
+            data = Data;
         }
 
         #endregion

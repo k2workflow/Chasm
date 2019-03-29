@@ -85,10 +85,10 @@ namespace SourceCode.Chasm.Tests
         [Fact(DisplayName = nameof(TreeNode_Deconstruct))]
         public static void TreeNode_Deconstruct()
         {
-            var expected = new TreeNode("a", NodeKind.Blob, s_hasher.HashData("abc"));
+            var expected = new TreeNode("a", NodeKind.Blob, s_hasher.HashData("abc"), new byte[] { 1, 2, 3 });
 
-            (string name, NodeKind kind, Sha1 sha) = expected;
-            var actual = new TreeNode(name, kind, sha);
+            (string name, NodeKind kind, Sha1 sha, ReadOnlyMemory<byte>? data) = expected;
+            var actual = new TreeNode(name, kind, sha, data);
 
             Assert.Equal(expected, actual);
         }
