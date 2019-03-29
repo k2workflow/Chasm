@@ -56,23 +56,29 @@ namespace SourceCode.Chasm
             {
                 // Nodes are always sorted by Name first (see TreeNodeMap)
                 int cmp = string.CompareOrdinal(x.Name, y.Name);
-                if (cmp != 0) return cmp;
-
-                // Then by Sha1 (in order to detect duplicate)
-                cmp = Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);
-                if (cmp != 0) return cmp;
-
-                // Then by Kind
-                cmp = ((int)x.Kind).CompareTo((int)y.Kind);
-                if (cmp != 0) return cmp;
-
-                // And lastly by Data
-                if (x.Data == null)
+                if (cmp == 0)
                 {
-                    return y.Data == null ? 0 : -1;
+                    // Then by Sha1 (in order to detect duplicate)
+                    cmp = Sha1Comparer.Default.Compare(x.Sha1, y.Sha1);
+                    if (cmp == 0)
+                    {
+                        // Then by Kind
+                        cmp = ((int)x.Kind).CompareTo((int)y.Kind);
+                        if (cmp == 0)
+                        {
+                            // And lastly by Data
+                            if (x.Data == null)
+                                return y.Data == null ? 0 : -1;
+
+                            if (y.Data == null)
+                                return 1;
+
+                            cmp = BufferComparer.Memory.Compare(x.Data.Value, y.Data.Value);
+                        }
+                    }
                 }
 
-                return y.Data == null ? 1 : BufferComparer.Memory.Compare(x.Data.Value, y.Data.Value);
+                return cmp < 0 ? -1 : (cmp > 0 ? 1 : 0);
             }
 
             public override bool Equals(TreeNode x, TreeNode y)
