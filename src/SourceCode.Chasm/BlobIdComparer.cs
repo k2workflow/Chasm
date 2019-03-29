@@ -5,7 +5,7 @@ namespace SourceCode.Chasm
     /// <summary>
     /// Represents a way to compare different <see cref="BlobId"/> values.
     /// </summary>
-    public abstract class BlobIdComparer : IEqualityComparer<BlobId>, IComparer<BlobId>
+    internal abstract class BlobIdComparer : IEqualityComparer<BlobId>, IComparer<BlobId>
     {
         #region Constants
 
