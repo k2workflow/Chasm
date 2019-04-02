@@ -9,14 +9,14 @@ namespace SourceCode.Chasm.Serializer.Json
         public IMemoryOwner<byte> Serialize(TreeNodeMap model)
         {
             string json = model.Write();
-            return ToUtf8(json);
+            return GetBytes(json);
         }
 
         public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) throw new ArgumentNullException(nameof(span));
 
-            string json = GetUtf8(span);
+            string json = GetString(span);
             return json.ReadTreeNodeMap();
         }
     }

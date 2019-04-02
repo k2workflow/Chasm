@@ -11,7 +11,7 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
 
             byte[] rented = ArrayPool<byte>.Shared.Rent(Sha1.ByteLength);
             {
-                model.CopyTo(rented);
+                model.CopyTo(rented); // TODO: Perf
 
                 wire = new Sha1Wire
                 {
@@ -24,11 +24,14 @@ namespace SourceCode.Chasm.Serializer.Proto.Wire
             return wire;
         }
 
-        public static Sha1Wire Convert(this Sha1? model) => model == null ? new Sha1Wire() : Convert(model.Value);
+        public static Sha1Wire Convert(this Sha1? model)
+            => model == null ? new Sha1Wire() : Convert(model.Value);
 
-        public static Sha1Wire Convert(this BlobId? model) => Convert(model?.Sha1);
+        public static Sha1Wire Convert(this BlobId? model)
+            => Convert(model?.Sha1);
 
-        public static Sha1Wire Convert(this TreeId? model) => Convert(model?.Sha1);
+        public static Sha1Wire Convert(this TreeId? model)
+            => Convert(model?.Sha1);
 
         public static Sha1? Convert(this Sha1Wire wire)
         {

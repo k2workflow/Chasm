@@ -20,7 +20,8 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
         public static TreeNodeMap ReadTreeNodeMap(this string json)
         {
-            if (json == null || json == JsonConstants.JsonNull) return default;
+            if (json == null || json == JsonConstants.JsonNull)
+                return default;
 
             using (var tr = new StringReader(json))
             using (var jr = new JsonTextReader(tr))
@@ -51,7 +52,8 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
 
         public static string Write(this TreeNodeMap model)
         {
-            if (model == default) return JsonConstants.JsonNull;
+            if (model == default)
+                return JsonConstants.JsonNull;
 
             var sb = new StringBuilder();
             using (var sw = new StringWriter(sb))

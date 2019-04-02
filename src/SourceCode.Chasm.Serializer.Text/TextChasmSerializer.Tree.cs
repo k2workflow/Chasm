@@ -9,14 +9,14 @@ namespace SourceCode.Chasm.Serializer.Text
         public IMemoryOwner<byte> Serialize(TreeNodeMap model)
         {
             string text = model.Convert();
-            return ToOwnedUtf8(text);
+            return GetBytes(text);
         }
 
         public TreeNodeMap DeserializeTree(ReadOnlySpan<byte> span)
         {
             if (span.Length == 0) return default;
 
-            string text = GetUtf8(span);
+            string text = GetoString(span);
             return text.ConvertTree();
         }
     }

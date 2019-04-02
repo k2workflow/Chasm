@@ -16,7 +16,8 @@ namespace SourceCode.Chasm.Serializer.Json.Wire
             Debug.Assert(jr != null);
 
             // Caller decides how to handle null
-            if (jr.TokenType == JsonToken.Null) return null;
+            if (jr.TokenType == JsonToken.Null)
+                return null;
 
             string str = (string)jr.Value;
             if (string.IsNullOrEmpty(str))

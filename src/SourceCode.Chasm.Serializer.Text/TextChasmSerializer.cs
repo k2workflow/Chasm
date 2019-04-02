@@ -15,7 +15,7 @@ namespace SourceCode.Chasm.Serializer.Text
             _pool = pool ?? MemoryPool<byte>.Shared;
         }
 
-        private IMemoryOwner<byte> ToOwnedUtf8(string text)
+        private IMemoryOwner<byte> GetBytes(string text)
         {
             Debug.Assert(text != null);
 
@@ -28,29 +28,21 @@ namespace SourceCode.Chasm.Serializer.Text
             return rented.Slice(0, length);
         }
 
-        private static unsafe string GetUtf8(ReadOnlySpan<byte> span)
-            => Encoding.UTF8.GetString(span);
+        private static string GetoString(ReadOnlySpan<byte> utf8)
+            => Encoding.UTF8.GetString(utf8);
 
         private bool _disposed;
 
-        void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!_disposed)
             {
-                if (disposing)
-                {
-                    // This is a no-op for MemoryPool.Shared
-                    // See https://github.com/dotnet/corefx/blob/master/src/System.Memory/src/System/Buffers/ArrayMemoryPool.cs
-                    _pool.Dispose();
-                }
-
                 _disposed = true;
-            }
-        }
 
-        public void Dispose()
-        {
-            Dispose(true);
+                // This is a no-op for MemoryPool.Shared
+                // See https://github.com/dotnet/corefx/blob/master/src/System.Memory/src/System/Buffers/ArrayMemoryPool.cs
+                _pool.Dispose();
+            }
         }
     }
 }
