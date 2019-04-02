@@ -10,7 +10,7 @@ namespace SourceCode.Chasm.Tests
         private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNode_is_empty))]
+        [Fact]
         public static void TreeNode_is_empty()
         {
             var noData = new TreeNode();
@@ -38,7 +38,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNode_equality))]
+        [Fact]
         public static void TreeNode_equality()
         {
             var tree1 = new TreeNode("a", NodeKind.Tree, s_hasher.HashData("abc"), new byte[] { 1, 2, 3 });
@@ -99,7 +99,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNode_Deconstruct))]
+        [Fact]
         public static void TreeNode_Deconstruct()
         {
             var expected = new TreeNode("a", NodeKind.Blob, s_hasher.HashData("abc"), new byte[] { 1, 2, 3 });
@@ -111,7 +111,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNode_Compare))]
+        [Fact]
         public static void TreeNode_Compare()
         {
             TreeNodeComparer comparer = TreeNodeComparer.Default;
@@ -140,7 +140,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNode_Constructor_String_TreeId))]
+        [Fact]
         public static void TreeNode_Constructor_String_TreeId()
         {
             // Arrange

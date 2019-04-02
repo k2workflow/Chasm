@@ -10,7 +10,7 @@ namespace SourceCode.Chasm.Tests
         private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(BlobId_equality))]
+        [Fact]
         public static void BlobId_equality()
         {
             var blobId1 = new BlobId(s_hasher.HashData("abc"));
@@ -36,20 +36,18 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(BlobId_Compare))]
+        [Fact]
         public static void BlobId_Compare()
         {
-            BlobIdComparer comparer = BlobIdComparer.Default;
-
             var blobId1 = new BlobId(s_hasher.HashData("abc"));
             var blobId2 = new BlobId(s_hasher.HashData("abc"));
             var blobId3 = new BlobId(s_hasher.HashData("def"));
-            BlobId[] list = new[] { blobId1, blobId2, blobId3 };
 
             Assert.True(blobId1.CompareTo(blobId2) == 0);
             Assert.True(blobId1.CompareTo(blobId3) != 0);
 
-            Array.Sort(list, comparer.Compare);
+            BlobId[] list = new[] { blobId1, blobId2, blobId3 };
+            Array.Sort(list);
 
             Assert.True(list[0] <= list[1]);
             Assert.True(list[2] >= list[1]);

@@ -7,13 +7,7 @@ namespace SourceCode.Chasm
     [DebuggerDisplay("{" + nameof(Sha1) + ".ToString(\"D\"),nq,ac}")]
     public readonly struct BlobId : IEquatable<BlobId>, IComparable<BlobId>
     {
-        #region Properties
-
         public Sha1 Sha1 { get; }
-
-        #endregion
-
-        #region Constructors
 
         [DebuggerStepThrough]
         public BlobId(in Sha1 sha1)
@@ -21,42 +15,32 @@ namespace SourceCode.Chasm
             Sha1 = sha1;
         }
 
-        #endregion
+        public override string ToString()
+            => Sha1.ToString("n"); // Used by callsites as a proxy for .Sha1.ToString()
 
-        #region IEquatable
-
-        public bool Equals(BlobId other) => BlobIdComparer.Default.Equals(this, other);
+        public bool Equals(BlobId other)
+            => Sha1.Equals(other.Sha1);
 
         public override bool Equals(object obj)
             => obj is BlobId other
             && Equals(other);
 
-        public override int GetHashCode() => BlobIdComparer.Default.GetHashCode(this);
+        public override int GetHashCode()
+            => Sha1.GetHashCode();
 
-        #endregion
+        public int CompareTo(BlobId other)
+            => Sha1.CompareTo(other.Sha1);
 
-        #region IComparable
+        public static bool operator >=(BlobId x, BlobId y) => x.Sha1.CompareTo(y.Sha1) >= 0;
 
-        public int CompareTo(BlobId other) => BlobIdComparer.Default.Compare(this, other);
+        public static bool operator >(BlobId x, BlobId y) => x.Sha1.CompareTo(y.Sha1) > 0;
 
-        #endregion
+        public static bool operator <=(BlobId x, BlobId y) => x.Sha1.CompareTo(y.Sha1) <= 0;
 
-        #region Operators
+        public static bool operator <(BlobId x, BlobId y) => x.Sha1.CompareTo(y.Sha1) < 0;
 
-        public static bool operator >=(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) >= 0;
-
-        public static bool operator >(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) > 0;
-
-        public static bool operator <=(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) <= 0;
-
-        public static bool operator <(BlobId x, BlobId y) => BlobIdComparer.Default.Compare(x, y) < 0;
-
-        public static bool operator ==(BlobId x, BlobId y) => BlobIdComparer.Default.Equals(x, y);
+        public static bool operator ==(BlobId x, BlobId y) => x.Sha1.Equals(y.Sha1);
 
         public static bool operator !=(BlobId x, BlobId y) => !(x == y);
-
-        public override string ToString() => Sha1.ToString("n"); // Used by callsites as a proxy for .Sha1.ToString()
-
-        #endregion
     }
 }

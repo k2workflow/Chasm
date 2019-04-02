@@ -10,7 +10,7 @@ namespace SourceCode.Chasm.Repository.Tests
     public static class ChasmRepositoryTests
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_BuildConcurrencyException))]
+        [Fact]
         public static void ChasmRepository_BuildConcurrencyException()
         {
             // Arrange
@@ -28,14 +28,13 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_Constructor_ChasmSerializer_MaxDop))]
+        [Fact]
         public static void ChasmRepository_Constructor_ChasmSerializer_MaxDop()
         {
             // Arrange
             var mockChasmSerializer = new Mock<IChasmSerializer>();
-            int expectedMaxDop = 5;
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedMaxDop);
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object);
 
             // Action
             ChasmRepository actual = mockChasmRepository.Object;
@@ -43,72 +42,15 @@ namespace SourceCode.Chasm.Repository.Tests
             // Assert
             Assert.NotNull(actual);
             Assert.Equal(mockChasmSerializer.Object, actual.Serializer);
-            Assert.Equal(expectedMaxDop, actual.MaxDop);
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_Constructor_OutOfRange_MaxDop_Negative))]
-        public static void ChasmRepository_Constructor_OutOfRange_MaxDop_Negative()
-        {
-            // Arrange
-            var mockChasmSerializer = new Mock<IChasmSerializer>();
-            int expectedMaxDop = int.MinValue;
-
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedMaxDop);
-
-            // Action
-            ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                try
-                {
-                    ChasmRepository obj = mockChasmRepository.Object;
-                }
-                catch (TargetInvocationException targetInvocationException)
-                {
-                    throw targetInvocationException.InnerException;
-                }
-            });
-
-            // Assert
-            Assert.Contains("maxDop", actual.Message);
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_Constructor_OutOfRange_MaxDop_Zero))]
-        public static void ChasmRepository_Constructor_OutOfRange_MaxDop_Zero()
-        {
-            // Arrange
-            var mockChasmSerializer = new Mock<IChasmSerializer>();
-            int expectedMaxDop = default;
-
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer.Object, expectedMaxDop);
-
-            // Action
-            ArgumentOutOfRangeException actual = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            {
-                try
-                {
-                    ChasmRepository obj = mockChasmRepository.Object;
-                }
-                catch (TargetInvocationException targetInvocationException)
-                {
-                    throw targetInvocationException.InnerException;
-                }
-            });
-
-            // Assert
-            Assert.Contains("maxDop", actual.Message);
-        }
-
-        [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepository_Constructor_SerializerNull))]
+        [Fact]
         public static void ChasmRepository_Constructor_SerializerNull()
         {
             // Arrange
             var chasmSerializer = default(IChasmSerializer);
-            int expectedMaxDop = 5;
-
-            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer, expectedMaxDop);
+            var mockChasmRepository = new Mock<ChasmRepository>(chasmSerializer);
 
             // Action
             ArgumentNullException actual = Assert.Throws<ArgumentNullException>(() =>

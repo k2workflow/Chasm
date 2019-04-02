@@ -10,7 +10,7 @@ namespace SourceCode.Chasm.Tests
         private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeId_equality))]
+        [Fact]
         public static void TreeId_equality()
         {
             var treeId1 = new TreeId(s_hasher.HashData("abc"));
@@ -35,7 +35,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeId_Compare))]
+        [Fact]
         public static void TreeId_Compare()
         {
             TreeIdComparer comparer = TreeIdComparer.Default;

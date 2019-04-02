@@ -95,7 +95,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             Assert.False(urtree.HasValue);
         }
 
-        [Fact(DisplayName = nameof(DiskChasmRepo_Test))]
+        [Fact]
         public static async Task DiskChasmRepo_Test()
         {
             string tmp = Path.GetTempFileName();
@@ -115,9 +115,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             }
         }
 
-        [Fact(DisplayName = nameof(AzureBlobChasmRepo_Test)
-            , Skip = "Azure Table Storage Emulator *STILL* doesn't support everything."
-        )]
+        [Fact(Skip = "Azure Table Storage Emulator *STILL* doesn't support everything.")]
         public static async Task AzureBlobChasmRepo_Test()
         {
             // Use your own cstring here.
@@ -129,9 +127,7 @@ namespace SoruceCode.Chasm.IntegrationTests
             }
         }
 
-        [Fact(DisplayName = nameof(AzureTableChasmRepo_Test)
-            , Skip = "Azure Table Storage Emulator *STILL* doesn't support everything."
-        )]
+        [Fact(Skip = "Azure Table Storage Emulator *STILL* doesn't support everything.")]
         public static async Task AzureTableChasmRepo_Test()
         {
             // Use your own cstring here.

@@ -15,13 +15,13 @@ namespace SourceCode.Chasm.Repository.Tests
     public static class ChasmRepositoryTreeTests
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepositoryTree_ReadTreeAsync_TreeId))]
+        [Fact]
         public static async Task ChasmRepositoryTree_ReadTreeAsync_TreeId()
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, 5)
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer)
             {
                 CallBase = true
             };
@@ -41,13 +41,13 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepositoryTree_ReadTreeAsync_TreeId_EmptyBuffer))]
+        [Fact]
         public static async Task ChasmRepositoryTree_ReadTreeAsync_TreeId_EmptyBuffer()
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, 5)
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer)
             {
                 CallBase = true
             };
@@ -61,13 +61,13 @@ namespace SourceCode.Chasm.Repository.Tests
 
         // TODO: Fix
         //[Trait("Type", "Unit")]
-        //[Fact(DisplayName = nameof(ChasmRepositoryTree_ReadTreeBatchAsync_TreeIds))]
+        //[Fact]
         //public static async Task ChasmRepositoryTree_ReadTreeBatchAsync_TreeIds()
         //{
         //    // Arrange
         //    var mockChasmSerializer = new RandomChasmSerializer();
 
-        //    var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, 5)
+        //    var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer)
         //    {
         //        CallBase = true
         //    };
@@ -95,13 +95,13 @@ namespace SourceCode.Chasm.Repository.Tests
         //}
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepositoryTree_ReadTreeBatchAsync_TreeIds_Empty))]
+        [Fact]
         public static async Task ChasmRepositoryTree_ReadTreeBatchAsync_TreeIds_Empty()
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, 5)
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer)
             {
                 CallBase = true
             };
@@ -114,13 +114,13 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepositoryTree_ReadTreeBatchAsync_TreeIds_EmptyBuffer))]
+        [Fact]
         public static async Task ChasmRepositoryTree_ReadTreeBatchAsync_TreeIds_EmptyBuffer()
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, 5)
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer)
             {
                 CallBase = true
             };
@@ -140,13 +140,13 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmRepositoryTree_WriteTreeAsync_Tree))]
+        [Fact]
         public static async Task ChasmRepositoryTree_WriteTreeAsync_Tree()
         {
             // Arrange
             var mockChasmSerializer = new RandomChasmSerializer();
 
-            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer, 5)
+            var mockChasmRepository = new Mock<ChasmRepository>(mockChasmSerializer)
             {
                 CallBase = true
             };

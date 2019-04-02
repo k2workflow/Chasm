@@ -12,8 +12,8 @@ namespace SourceCode.Chasm.Repository.AzureTable
         private readonly Lazy<CloudTable> _objectsTable;
         private readonly DiskChasmRepo _diskRepo;
 
-        public AzureTableChasmRepo(CloudStorageAccount storageAccount, DiskChasmRepo diskRepo, int maxDop = -1)
-            : base(diskRepo.Serializer, maxDop)
+        public AzureTableChasmRepo(CloudStorageAccount storageAccount, DiskChasmRepo diskRepo)
+            : base(diskRepo.Serializer)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
 
@@ -45,13 +45,13 @@ namespace SourceCode.Chasm.Repository.AzureTable
             }, LazyThreadSafetyMode.PublicationOnly);
         }
 
-        public static AzureTableChasmRepo Create(string connectionString, DiskChasmRepo diskRepo, int maxDop)
+        public static AzureTableChasmRepo Create(string connectionString, DiskChasmRepo diskRepo)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
             if (diskRepo == null) throw new ArgumentNullException(nameof(diskRepo));
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
-            var repo = new AzureTableChasmRepo(storageAccount, diskRepo, maxDop);
+            var repo = new AzureTableChasmRepo(storageAccount, diskRepo);
 
             return repo;
         }

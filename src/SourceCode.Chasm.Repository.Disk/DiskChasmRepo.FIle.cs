@@ -154,7 +154,7 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!File.Exists(path))
                 return;
 
-            for (int retryCount = 0; retryCount < _retryMax; retryCount++)
+            for (int retryCount = 0; retryCount < RetryMax; retryCount++)
             {
                 try
                 {
@@ -163,7 +163,7 @@ namespace SourceCode.Chasm.Repository.Disk
                 }
                 catch (IOException)
                 {
-                    await Task.Delay(_retryMs, cancellationToken)
+                    await Task.Delay(RetryMs, cancellationToken)
                         .ConfigureAwait(false);
                 }
             }
@@ -182,10 +182,10 @@ namespace SourceCode.Chasm.Repository.Disk
                     fs = new FileStream(path, mode, access, share);
                     return fs;
                 }
-                catch (IOException) when (++retryCount < _retryMax)
+                catch (IOException) when (++retryCount < RetryMax)
                 {
                     fs?.Dispose();
-                    await Task.Delay(_retryMs, cancellationToken)
+                    await Task.Delay(RetryMs, cancellationToken)
                         .ConfigureAwait(false);
                 }
             }

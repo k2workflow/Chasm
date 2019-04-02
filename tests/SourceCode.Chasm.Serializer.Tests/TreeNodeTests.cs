@@ -18,7 +18,7 @@ namespace SourceCode.Chasm.IO.Tests
         private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_NullTreeNodeMap))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_WriteRead_NullTreeNodeMap(IChasmSerializer ser)
         {
@@ -33,7 +33,7 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_EmptyTreeNodeMap))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_WriteRead_EmptyTreeNodeMap(IChasmSerializer ser)
         {
@@ -48,7 +48,7 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_WriteRead_TreeNodeMap))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_WriteRead_TreeNodeMap(IChasmSerializer ser)
         {

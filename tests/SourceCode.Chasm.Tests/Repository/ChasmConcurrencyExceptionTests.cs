@@ -9,7 +9,7 @@ namespace SourceCode.Chasm.Repository.Tests
     public static class ChasmConcurrencyExceptionTests
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmConcurrencyException_Constructor_Empty))]
+        [Fact]
         public static void ChasmConcurrencyException_Constructor_Empty()
         {
             // Arrange & Action
@@ -20,7 +20,7 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmConcurrencyException_Constructor_String))]
+        [Fact]
         public static void ChasmConcurrencyException_Constructor_String()
         {
             // Arrange
@@ -35,7 +35,7 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmConcurrencyException_Constructor_String_Exception))]
+        [Fact]
         public static void ChasmConcurrencyException_Constructor_String_Exception()
         {
             // Arrange
@@ -52,7 +52,7 @@ namespace SourceCode.Chasm.Repository.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(ChasmConcurrencyException_GetObjectData))]
+        [Fact]
         public static void ChasmConcurrencyException_GetObjectData()
         {
             // Arrange

@@ -11,11 +11,11 @@ namespace SourceCode.Chasm.Tests
     {
         private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
-        private static readonly TreeNode Node0 = new TreeNode(nameof(Node0), NodeKind.Tree, s_hasher.HashData(nameof(Node0)));
-        private static readonly TreeNode Node0Blob = new TreeNode(nameof(Node0), NodeKind.Blob, s_hasher.HashData(nameof(Node0Blob)));
-        private static readonly TreeNode Node1 = new TreeNode(nameof(Node1), NodeKind.Blob, s_hasher.HashData(nameof(Node1)));
-        private static readonly TreeNode Node2 = new TreeNode(nameof(Node2), NodeKind.Tree, s_hasher.HashData(nameof(Node2)));
-        private static readonly TreeNode Node3 = new TreeNode(nameof(Node3), NodeKind.Blob, s_hasher.HashData(nameof(Node3)));
+        private static readonly TreeNode s_node0 = new TreeNode("Node0", NodeKind.Tree, s_hasher.HashData("Node0"));
+        private static readonly TreeNode s_blob0 = new TreeNode("Node0", NodeKind.Blob, s_hasher.HashData("Blob0"));
+        private static readonly TreeNode s_node1 = new TreeNode("Node1", NodeKind.Blob, s_hasher.HashData("Node1"));
+        private static readonly TreeNode s_node2 = new TreeNode("Node2", NodeKind.Tree, s_hasher.HashData("Node2"));
+        private static readonly TreeNode s_node3 = new TreeNode("Node3", NodeKind.Blob, s_hasher.HashData("Node3"));
 
         private static void AssertEmpty(TreeNodeMap tree)
         {
@@ -35,7 +35,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Empty))]
+        [Fact]
         public static void TreeNodeMap_Empty()
         {
             var noData = new TreeNodeMap();
@@ -55,65 +55,65 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Sorting))]
+        [Fact]
         public static void TreeNodeMap_Sorting()
         {
-            TreeNode[] nodes = new[] { Node0, Node1 };
+            TreeNode[] nodes = new[] { s_node0, s_node1 };
             var tree0 = new TreeNodeMap(nodes.OrderBy(n => n.Sha1).ToArray());
             var tree1 = new TreeNodeMap(nodes.OrderByDescending(n => n.Sha1).ToList()); // ICollection<T>
 
             Assert.Equal(tree0[0], tree1[0]);
             Assert.Equal(tree0[1], tree1[1]);
 
-            Assert.True(tree1[Node0.Name] == Node0);
-            Assert.True(tree1[Node1.Name] == Node1);
+            Assert.True(tree1[s_node0.Name] == s_node0);
+            Assert.True(tree1[s_node1.Name] == s_node1);
             Assert.False(tree1.ContainsKey("x"));
-            Assert.True(tree1.ContainsKey(Node0.Name));
-            Assert.True(tree1.ContainsKey(Node1.Name));
+            Assert.True(tree1.ContainsKey(s_node0.Name));
+            Assert.True(tree1.ContainsKey(s_node1.Name));
             Assert.False(tree1.TryGetValue("x", out _));
-            Assert.True(tree1.TryGetValue(Node0.Name, out TreeNode v20) && v20 == Node0);
-            Assert.True(tree1.TryGetValue(Node1.Name, out TreeNode v21) && v21 == Node1);
-            Assert.False(tree1.TryGetValue(Node0.Name, NodeKind.Blob, out _));
-            Assert.True(tree1.TryGetValue(Node0.Name, Node0.Kind, out _));
+            Assert.True(tree1.TryGetValue(s_node0.Name, out TreeNode v20) && v20 == s_node0);
+            Assert.True(tree1.TryGetValue(s_node1.Name, out TreeNode v21) && v21 == s_node1);
+            Assert.False(tree1.TryGetValue(s_node0.Name, NodeKind.Blob, out _));
+            Assert.True(tree1.TryGetValue(s_node0.Name, s_node0.Kind, out _));
 
-            nodes = new[] { Node0, Node1, Node2 };
+            nodes = new[] { s_node0, s_node1, s_node2 };
             tree0 = new TreeNodeMap(nodes.OrderBy(n => n.Sha1).ToArray());
             tree1 = new TreeNodeMap(nodes.OrderByDescending(n => n.Sha1).ToList()); // ICollection<T>
 
-            Assert.True(tree1[Node0.Name] == Node0);
-            Assert.True(tree1[Node1.Name] == Node1);
-            Assert.True(tree1[Node2.Name] == Node2);
+            Assert.True(tree1[s_node0.Name] == s_node0);
+            Assert.True(tree1[s_node1.Name] == s_node1);
+            Assert.True(tree1[s_node2.Name] == s_node2);
             Assert.False(tree1.ContainsKey("x"));
-            Assert.True(tree1.ContainsKey(Node0.Name));
-            Assert.True(tree1.ContainsKey(Node1.Name));
-            Assert.True(tree1.ContainsKey(Node2.Name));
+            Assert.True(tree1.ContainsKey(s_node0.Name));
+            Assert.True(tree1.ContainsKey(s_node1.Name));
+            Assert.True(tree1.ContainsKey(s_node2.Name));
             Assert.False(tree1.TryGetValue("x", out _));
-            Assert.True(tree1.TryGetValue(Node0.Name, out TreeNode v30) && v30 == Node0);
-            Assert.True(tree1.TryGetValue(Node1.Name, out TreeNode v31) && v31 == Node1);
-            Assert.True(tree1.TryGetValue(Node2.Name, out TreeNode v32) && v32 == Node2);
+            Assert.True(tree1.TryGetValue(s_node0.Name, out TreeNode v30) && v30 == s_node0);
+            Assert.True(tree1.TryGetValue(s_node1.Name, out TreeNode v31) && v31 == s_node1);
+            Assert.True(tree1.TryGetValue(s_node2.Name, out TreeNode v32) && v32 == s_node2);
 
             Assert.Equal(tree0[0], tree1[0]);
             Assert.Equal(tree0[1], tree1[1]);
             Assert.Equal(tree0[2], tree1[2]);
 
-            nodes = new[] { Node0, Node1, Node2, Node3 };
+            nodes = new[] { s_node0, s_node1, s_node2, s_node3 };
             tree0 = new TreeNodeMap(nodes.OrderBy(n => n.Sha1).ToArray());
             tree1 = new TreeNodeMap(nodes.OrderByDescending(n => n.Sha1).ToList()); // ICollection<T>
 
-            Assert.True(tree1[Node0.Name] == Node0);
-            Assert.True(tree1[Node1.Name] == Node1);
-            Assert.True(tree1[Node2.Name] == Node2);
-            Assert.True(tree1[Node3.Name] == Node3);
+            Assert.True(tree1[s_node0.Name] == s_node0);
+            Assert.True(tree1[s_node1.Name] == s_node1);
+            Assert.True(tree1[s_node2.Name] == s_node2);
+            Assert.True(tree1[s_node3.Name] == s_node3);
             Assert.False(tree1.ContainsKey("x"));
-            Assert.True(tree1.ContainsKey(Node0.Name));
-            Assert.True(tree1.ContainsKey(Node1.Name));
-            Assert.True(tree1.ContainsKey(Node2.Name));
-            Assert.True(tree1.ContainsKey(Node3.Name));
+            Assert.True(tree1.ContainsKey(s_node0.Name));
+            Assert.True(tree1.ContainsKey(s_node1.Name));
+            Assert.True(tree1.ContainsKey(s_node2.Name));
+            Assert.True(tree1.ContainsKey(s_node3.Name));
             Assert.False(tree1.TryGetValue("x", out _));
-            Assert.True(tree1.TryGetValue(Node0.Name, out TreeNode v40) && v40 == Node0);
-            Assert.True(tree1.TryGetValue(Node1.Name, out TreeNode v41) && v41 == Node1);
-            Assert.True(tree1.TryGetValue(Node2.Name, out TreeNode v42) && v42 == Node2);
-            Assert.True(tree1.TryGetValue(Node3.Name, out TreeNode v43) && v43 == Node3);
+            Assert.True(tree1.TryGetValue(s_node0.Name, out TreeNode v40) && v40 == s_node0);
+            Assert.True(tree1.TryGetValue(s_node1.Name, out TreeNode v41) && v41 == s_node1);
+            Assert.True(tree1.TryGetValue(s_node2.Name, out TreeNode v42) && v42 == s_node2);
+            Assert.True(tree1.TryGetValue(s_node3.Name, out TreeNode v43) && v43 == s_node3);
 
             Assert.Equal(tree0[0], tree1[0]);
             Assert.Equal(tree0[1], tree1[1]);
@@ -122,112 +122,112 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_2))]
+        [Fact]
         public static void TreeNodeMap_Duplicate_Full_2()
         {
-            TreeNode[] nodes = new[] { Node0, Node0 };
+            TreeNode[] nodes = new[] { s_node0, s_node0 };
 
             var tree = new TreeNodeMap(nodes);
-            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0));
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, s_node0));
 
             tree = new TreeNodeMap(nodes.ToList()); // ICollection<T>
-            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0));
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, s_node0));
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_3))]
+        [Fact]
         public static void TreeNodeMap_Duplicate_Full_3()
         {
-            TreeNode[] nodes = new[] { Node0, Node1, Node0 }; // Shuffled
+            TreeNode[] nodes = new[] { s_node0, s_node1, s_node0 }; // Shuffled
 
             var tree = new TreeNodeMap(nodes);
-            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1));
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, s_node0), n => Assert.Equal(n, s_node1));
 
             tree = new TreeNodeMap(nodes.ToList()); // ICollection<T>
-            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1));
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, s_node0), n => Assert.Equal(n, s_node1));
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_2_Exception))]
+        [Fact]
         public static void TreeNodeMap_Duplicate_Full_2_Exception()
         {
             // Arrange
-            TreeNode[] nodes = new[] { Node0, Node0Blob }; // Shuffled
+            TreeNode[] nodes = new[] { s_node0, s_blob0 }; // Shuffled
 
             // Action
             ArgumentException ex = Assert.Throws<ArgumentException>(() => new TreeNodeMap(nodes));
 
             // Assert
-            Assert.Contains(Node0.Name, ex.Message);
-            Assert.Contains(Node0.Sha1.ToString(), ex.Message);
+            Assert.Contains(s_node0.Name, ex.Message);
+            Assert.Contains(s_node0.Sha1.ToString(), ex.Message);
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_3_Exception))]
+        [Fact]
         public static void TreeNodeMap_Duplicate_Full_3_Exception()
         {
             // Arrange
-            TreeNode[] nodes = new[] { Node0, Node0Blob, Node1 }; // Shuffled
+            TreeNode[] nodes = new[] { s_node0, s_blob0, s_node1 }; // Shuffled
 
             // Action
             ArgumentException ex = Assert.Throws<ArgumentException>(() => new TreeNodeMap(nodes));
 
             // Assert
-            Assert.Contains(Node0.Name, ex.Message);
-            Assert.Contains(Node0.Sha1.ToString(), ex.Message);
+            Assert.Contains(s_node0.Name, ex.Message);
+            Assert.Contains(s_node0.Sha1.ToString(), ex.Message);
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_4))]
+        [Fact]
         public static void TreeNodeMap_Duplicate_Full_4()
         {
-            TreeNode[] nodes = new[] { Node0, Node2, Node1, Node0 }; // Shuffled
+            TreeNode[] nodes = new[] { s_node0, s_node2, s_node1, s_node0 }; // Shuffled
 
             var tree = new TreeNodeMap(nodes);
-            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1), n => Assert.Equal(n, Node2));
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, s_node0), n => Assert.Equal(n, s_node1), n => Assert.Equal(n, s_node2));
 
             tree = new TreeNodeMap(nodes.ToList()); // ICollection<T>
-            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1), n => Assert.Equal(n, Node2));
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, s_node0), n => Assert.Equal(n, s_node1), n => Assert.Equal(n, s_node2));
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Full_N))]
+        [Fact]
         public static void TreeNodeMap_Duplicate_Full_N()
         {
-            TreeNode[] nodes = new[] { Node3, Node1, Node2, Node0, Node3, Node0, Node1, Node0, Node1, Node2, Node0, Node3 }; // Shuffled
+            TreeNode[] nodes = new[] { s_node3, s_node1, s_node2, s_node0, s_node3, s_node0, s_node1, s_node0, s_node1, s_node2, s_node0, s_node3 }; // Shuffled
 
             var tree = new TreeNodeMap(nodes);
-            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1), n => Assert.Equal(n, Node2), n => Assert.Equal(n, Node3));
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, s_node0), n => Assert.Equal(n, s_node1), n => Assert.Equal(n, s_node2), n => Assert.Equal(n, s_node3));
 
             tree = new TreeNodeMap(nodes.ToList()); // ICollection<T>
-            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, Node0), n => Assert.Equal(n, Node1), n => Assert.Equal(n, Node2), n => Assert.Equal(n, Node3));
+            Assert.Collection<TreeNode>(tree, n => Assert.Equal(n, s_node0), n => Assert.Equal(n, s_node1), n => Assert.Equal(n, s_node2), n => Assert.Equal(n, s_node3));
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Name))]
+        [Fact]
         public static void TreeNodeMap_Duplicate_Name()
         {
-            TreeNode[] nodes = new[] { new TreeNode(Node0.Name, NodeKind.Tree, Node1.Sha1), Node0 }; // Reversed
+            TreeNode[] nodes = new[] { new TreeNode(s_node0.Name, NodeKind.Tree, s_node1.Sha1), s_node0 }; // Reversed
 
             Assert.Throws<ArgumentException>(() => new TreeNodeMap(nodes));
             Assert.Throws<ArgumentException>(() => new TreeNodeMap(nodes.ToList())); // ICollection<T>
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Duplicate_Sha1))]
+        [Fact]
         public static void TreeNodeMap_Duplicate_Sha1()
         {
-            TreeNode[] nodes = new[] { new TreeNode(Node1.Name, NodeKind.Tree, Node0.Sha1), Node0 }; // Reversed
+            TreeNode[] nodes = new[] { new TreeNode(s_node1.Name, NodeKind.Tree, s_node0.Sha1), s_node0 }; // Reversed
 
             var tree0 = new TreeNodeMap(nodes);
-            Assert.Collection<TreeNode>(tree0, n => Assert.Equal(n, Node0), n => Assert.Equal(n, nodes[0]));
+            Assert.Collection<TreeNode>(tree0, n => Assert.Equal(n, s_node0), n => Assert.Equal(n, nodes[0]));
 
             tree0 = new TreeNodeMap(nodes.ToList()); // ICollection<T>
-            Assert.Collection<TreeNode>(tree0, n => Assert.Equal(n, Node0), n => Assert.Equal(n, nodes[0]));
+            Assert.Collection<TreeNode>(tree0, n => Assert.Equal(n, s_node0), n => Assert.Equal(n, nodes[0]));
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Equality))]
+        [Fact]
         public static void TreeNodeMap_Equality()
         {
             var expected = new TreeNodeMap(new[] { new TreeNode("c1", NodeKind.Blob, s_hasher.HashData("c1")), new TreeNode("c2", NodeKind.Tree, s_hasher.HashData("c2")) });
@@ -266,21 +266,21 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_IndexOf))]
+        [Fact]
         public static void TreeNodeMap_IndexOf()
         {
             // Arrange
-            var actual = new TreeNodeMap(new[] { Node0, Node1 });
+            var actual = new TreeNodeMap(new[] { s_node0, s_node1 });
 
             // Action/Assert
             Assert.Equal(-1, actual.IndexOf(null));
             Assert.True(actual.IndexOf(Guid.NewGuid().ToString()) < 0);
-            Assert.Equal(0, actual.IndexOf(Node0.Name));
-            Assert.Equal(1, actual.IndexOf(Node1.Name));
+            Assert.Equal(0, actual.IndexOf(s_node0.Name));
+            Assert.Equal(1, actual.IndexOf(s_node1.Name));
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Empty))]
+        [Fact]
         public static void TreeNodeMap_Merge_Empty()
         {
             var emptyTreeNodeMap = new TreeNodeMap();
@@ -303,11 +303,11 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Null))]
+        [Fact]
         public static void TreeNodeMap_Merge_Null()
         {
             // Arrange
-            var tree = new TreeNodeMap(Node0);
+            var tree = new TreeNodeMap(s_node0);
 
             // Action
             TreeNodeMap merged = tree.Merge(null);
@@ -317,7 +317,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Single))]
+        [Fact]
         public static void TreeNodeMap_Merge_Single()
         {
             var tree = new TreeNodeMap();
@@ -339,7 +339,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Single_Exist))]
+        [Fact]
         public static void TreeNodeMap_Merge_Single_Exist()
         {
             // Arrange
@@ -361,7 +361,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Merge_TreeNodeMap))]
+        [Fact]
         public static void TreeNodeMap_Merge_TreeNodeMap()
         {
             var tree1 = new TreeNodeMap();
@@ -407,7 +407,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Merge_Collection))]
+        [Fact]
         public static void TreeNodeMap_Merge_Collection()
         {
             var tree1 = new TreeNodeMap();
@@ -464,7 +464,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Delete))]
+        [Fact]
         public static void TreeNodeMap_Delete()
         {
             var tree = new TreeNodeMap
@@ -491,7 +491,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_Delete_Predicate))]
+        [Fact]
         public static void TreeNodeMap_Delete_Predicate()
         {
             var tree = new TreeNodeMap
@@ -510,7 +510,7 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_IReadOnlyDictionary_Empty_GetEnumerator))]
+        [Fact]
         public static void TreeNodeMap_IReadOnlyDictionary_Empty_GetEnumerator()
         {
             // Arrange
@@ -529,11 +529,11 @@ namespace SourceCode.Chasm.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(TreeNodeMap_IReadOnlyDictionary_GetEnumerator))]
+        [Fact]
         public static void TreeNodeMap_IReadOnlyDictionary_GetEnumerator()
         {
             // Arrange
-            TreeNode[] nodes = new[] { Node0, Node1 };
+            TreeNode[] nodes = new[] { s_node0, s_node1 };
             var tree = new TreeNodeMap(nodes);
             var readOnlyDictionary = tree as IReadOnlyDictionary<string, TreeNode>;
 
@@ -542,13 +542,13 @@ namespace SourceCode.Chasm.Tests
 
             // Assert
             Assert.True(enumerator.MoveNext());
-            Assert.Equal(Node0, enumerator.Current.Value);
+            Assert.Equal(s_node0, enumerator.Current.Value);
 
             Assert.True(enumerator.MoveNext());
-            Assert.Equal(Node1, enumerator.Current.Value);
+            Assert.Equal(s_node1, enumerator.Current.Value);
 
             Assert.False(enumerator.MoveNext());
-            Assert.Equal(Node1, enumerator.Current.Value);
+            Assert.Equal(s_node1, enumerator.Current.Value);
         }
     }
 }

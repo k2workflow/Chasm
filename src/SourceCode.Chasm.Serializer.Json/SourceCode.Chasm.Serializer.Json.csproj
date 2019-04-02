@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
-    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.2-rc1-00746" />
+    <PackageReference Include="SourceCode.Clay.Json" Version="1.0.2-rc1-00748" />
   </ItemGroup>
 
   <ItemGroup>

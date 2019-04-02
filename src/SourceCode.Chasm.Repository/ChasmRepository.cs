@@ -13,14 +13,9 @@ namespace SourceCode.Chasm.Repository
 
         public IChasmSerializer Serializer { get; }
 
-        public int MaxDop { get; }
-
-        protected ChasmRepository(IChasmSerializer serializer, int maxDop)
+        protected ChasmRepository(IChasmSerializer serializer)
         {
-            if (maxDop < -1 || maxDop == 0) throw new ArgumentOutOfRangeException(nameof(maxDop));
-
             Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            MaxDop = maxDop;
         }
 
         protected static ChasmConcurrencyException BuildConcurrencyException(string name, string branch, Exception innerException, ChasmRequestContext chasmContext)

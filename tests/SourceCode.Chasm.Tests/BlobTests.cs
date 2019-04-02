@@ -6,7 +6,7 @@ namespace SourceCode.Chasm.Tests
     public static class BlobTests
     {
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(Blob_is_empty))]
+        [Fact]
         public static void Blob_is_empty()
         {
             var noData = new Blob();
@@ -50,7 +50,7 @@ namespace SourceCode.Chasm.Tests
         [InlineData(new byte[2] { 0, 0 }, new byte[2] { 0, 1 }, false)]
         [InlineData(new byte[2] { 0, 1 }, new byte[2] { 0, 1 }, true)]
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(Blob_equality))]
+        [Theory]
         public static void Blob_equality(byte[] x, byte[] y, bool isEqual)
         {
             var blob0 = new Blob(x);

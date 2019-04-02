@@ -12,8 +12,8 @@ namespace SourceCode.Chasm.Repository.AzureBlob
         private readonly Lazy<CloudBlobContainer> _objectsContainer;
         private readonly DiskChasmRepo _diskRepo;
 
-        public AzureBlobChasmRepo(CloudStorageAccount storageAccount, DiskChasmRepo diskRepo, int maxDop = -1)
-            : base(diskRepo.Serializer, maxDop)
+        public AzureBlobChasmRepo(CloudStorageAccount storageAccount, DiskChasmRepo diskRepo)
+            : base(diskRepo.Serializer)
         {
             if (storageAccount == null) throw new ArgumentNullException(nameof(storageAccount));
 
@@ -46,13 +46,13 @@ namespace SourceCode.Chasm.Repository.AzureBlob
             }, LazyThreadSafetyMode.PublicationOnly);
         }
 
-        public static AzureBlobChasmRepo Create(string connectionString, DiskChasmRepo diskRepo, int maxDop)
+        public static AzureBlobChasmRepo Create(string connectionString, DiskChasmRepo diskRepo)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
             if (diskRepo == null) throw new ArgumentNullException(nameof(diskRepo));
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
-            var repo = new AzureBlobChasmRepo(storageAccount, diskRepo, maxDop);
+            var repo = new AzureBlobChasmRepo(storageAccount, diskRepo);
 
             return repo;
         }

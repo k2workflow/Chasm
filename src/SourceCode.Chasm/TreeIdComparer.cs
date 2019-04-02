@@ -7,30 +7,16 @@ namespace SourceCode.Chasm
     /// </summary>
     internal abstract class TreeIdComparer : IEqualityComparer<TreeId>, IComparer<TreeId>
     {
-        #region Constants
-
         /// <summary>
         /// Gets a <see cref="TreeIdComparer"/> that compares all fields of a <see cref="TreeId"/> value.
         /// </summary>
         public static TreeIdComparer Default { get; } = new DefaultComparer();
 
-        #endregion
-
-        #region Constructors
-
         private TreeIdComparer()
         { }
 
-        #endregion
-
-        #region IComparer
-
         /// <inheritdoc/>
         public abstract int Compare(TreeId x, TreeId y);
-
-        #endregion
-
-        #region IEqualityComparer
 
         /// <inheritdoc/>
         public abstract bool Equals(TreeId x, TreeId y);
@@ -38,19 +24,16 @@ namespace SourceCode.Chasm
         /// <inheritdoc/>
         public abstract int GetHashCode(TreeId obj);
 
-        #endregion
-
-        #region Concrete
-
         private sealed class DefaultComparer : TreeIdComparer
         {
-            public override int Compare(TreeId x, TreeId y) => x.Sha1.CompareTo(y.Sha1);
+            public override int Compare(TreeId x, TreeId y)
+                => x.Sha1.CompareTo(y.Sha1);
 
-            public override bool Equals(TreeId x, TreeId y) => x.Sha1.Equals(y.Sha1);
+            public override bool Equals(TreeId x, TreeId y)
+                => x.Sha1.Equals(y.Sha1);
 
-            public override int GetHashCode(TreeId obj) => obj.Sha1.GetHashCode();
+            public override int GetHashCode(TreeId obj)
+                => obj.Sha1.GetHashCode();
         }
-
-        #endregion
     }
 }

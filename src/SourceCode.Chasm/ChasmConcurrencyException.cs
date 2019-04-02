@@ -7,8 +7,6 @@ namespace SourceCode.Chasm
     [Serializable]
     public sealed class ChasmConcurrencyException : System.Data.DataException
     {
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ChasmConcurrencyException"/> class.
         /// This is the default constructor.
@@ -33,10 +31,6 @@ namespace SourceCode.Chasm
             : base(s, innerException)
         { }
 
-        #endregion
-
-        #region Serializable
-
         // https://stackoverflow.com/questions/94488/what-is-the-correct-way-to-make-a-custom-net-exception-serializable
 
         // Private for sealed, protected for open (accessed via reflection by runtime)
@@ -47,7 +41,5 @@ namespace SourceCode.Chasm
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
             => base.GetObjectData(info, context);
-
-        #endregion
     }
 }

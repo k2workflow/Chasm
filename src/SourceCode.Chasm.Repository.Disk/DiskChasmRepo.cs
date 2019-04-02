@@ -7,8 +7,8 @@ namespace SourceCode.Chasm.Repository.Disk
     public sealed partial class DiskChasmRepo : ChasmRepository
     {
         public const int PrefixLength = 2;
-        private const int _retryMax = 10;
-        private const int _retryMs = 15;
+        private const int RetryMax = 10;
+        private const int RetryMs = 15;
 
         private readonly string _refsContainer;
         private readonly string _objectsContainer;
@@ -18,8 +18,8 @@ namespace SourceCode.Chasm.Repository.Disk
         /// </summary>
         public string RootPath { get; }
 
-        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer, int maxDop = -1)
-            : base(serializer, maxDop)
+        public DiskChasmRepo(string rootFolder, IChasmSerializer serializer)
+            : base(serializer)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || rootFolder.Length < 3) throw new ArgumentNullException(nameof(rootFolder)); // "C:\" is shortest permitted path
 

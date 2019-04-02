@@ -19,13 +19,12 @@ namespace SourceCode.Chasm.Repository.Azure.Tests
         //[InlineData(new byte[2] { 0, 0 }, new byte[2] { 0, 1 }, false)]
         //[InlineData(new byte[2] { 0, 1 }, new byte[2] { 0, 1 }, true)]
         [Trait("Type", "Unit")]
-        [Fact(DisplayName = nameof(Repo_ReadCommitRef))]
+        [Fact]
         public static void Repo_ReadCommitRef() //byte[] x, byte[] y, bool isEqual)
         {
             var repo = new Mock<IChasmRepository>();
 
             repo.Setup(r => r.Serializer).Returns(new JsonChasmSerializer());
-            repo.Setup(r => r.MaxDop).Returns(-1);
 
             //repo.Setup(r => r.ReadCommitRefAsync(null, null, null, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));
             //repo.Setup(r => r.ReadCommitRefAsync(string.Empty, null, null, CancellationToken.None)).Returns(new ValueTask<CommitRef?>(CommitRef.Empty));

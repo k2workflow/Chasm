@@ -15,7 +15,7 @@ namespace SourceCode.Chasm.IO.Tests
 {
     internal sealed class TestData : IEnumerable<object[]>
     {
-        private readonly List<object[]> _data = new List<object[]>
+        private readonly IList<object[]> _data = new List<object[]>
         {
             // Json Serializer
             new object[]{ new JsonChasmSerializer() },

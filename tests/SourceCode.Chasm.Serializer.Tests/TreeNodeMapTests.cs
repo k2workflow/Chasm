@@ -15,20 +15,14 @@ namespace SourceCode.Chasm.IO.Tests
 {
     public static class TreeNodeMapTests
     {
-        #region Constants
-
         private static readonly crypt.SHA1 s_hasher = crypt.SHA1.Create();
 
         private static readonly TreeNode s_node1 = new TreeNode(nameof(s_node1), new BlobId(s_hasher.HashData(nameof(s_node1))));
         private static readonly TreeNode s_node2 = new TreeNode(nameof(s_node2), new BlobId(s_hasher.HashData(nameof(s_node2))));
         private static readonly TreeNode s_node3 = new TreeNode(nameof(s_node3), new BlobId(s_hasher.HashData(nameof(s_node3))));
 
-        #endregion
-
-        #region Methods
-
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_Default))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Default(IChasmSerializer ser)
         {
@@ -42,7 +36,7 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_Empty))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty(IChasmSerializer ser)
         {
@@ -56,7 +50,7 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_Null))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Null(IChasmSerializer ser)
         {
@@ -70,7 +64,7 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_Empty_Array))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_Empty_Array(IChasmSerializer ser)
         {
@@ -84,7 +78,7 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_1_Node))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_1_Node(IChasmSerializer ser)
         {
@@ -98,7 +92,7 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_2_Nodes))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_2_Nodes(IChasmSerializer ser)
         {
@@ -112,7 +106,7 @@ namespace SourceCode.Chasm.IO.Tests
         }
 
         [Trait("Type", "Unit")]
-        [Theory(DisplayName = nameof(ChasmSerializer_Roundtrip_TreeNodeMap_3_Nodes))]
+        [Theory]
         [ClassData(typeof(TestData))]
         public static void ChasmSerializer_Roundtrip_TreeNodeMap_3_Nodes(IChasmSerializer ser)
         {
@@ -124,7 +118,5 @@ namespace SourceCode.Chasm.IO.Tests
                 Assert.Equal(expected, actual);
             }
         }
-
-        #endregion
     }
 }

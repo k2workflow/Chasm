@@ -15,8 +15,8 @@ namespace SourceCode.Chasm.Repository.Tests
             return BuildConcurrencyException(branch, name, innerException, requestContext);
         }
 
-        public MockChasmRepository(IChasmSerializer serializer, int maxDop)
-            : base(serializer, maxDop)
+        public MockChasmRepository(IChasmSerializer serializer)
+            : base(serializer)
         { }
 
         public override Task<bool> ExistsAsync(Sha1 objectId, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
