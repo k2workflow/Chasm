@@ -1,11 +1,14 @@
 using System;
 using System.IO;
+using System.Text;
 using SourceCode.Chasm.Serializer;
 
 namespace SourceCode.Chasm.Repository.Disk
 {
     public sealed partial class DiskChasmRepo : ChasmRepository
     {
+        private static readonly Encoding s_utf8noBom = new UTF8Encoding(false);
+
         public const int PrefixLength = 2;
         private const int RetryMax = 10;
         private const int RetryMs = 15;

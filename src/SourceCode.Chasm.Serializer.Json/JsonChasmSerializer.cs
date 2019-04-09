@@ -8,6 +8,7 @@ namespace SourceCode.Chasm.Serializer.Json
 {
     public sealed partial class JsonChasmSerializer : IChasmSerializer, IDisposable
     {
+        private static readonly Encoding s_utf8noBom = new UTF8Encoding(false);
         private readonly MemoryPool<byte> _pool;
 
         public JsonChasmSerializer(MemoryPool<byte> pool = null)
@@ -19,17 +20,17 @@ namespace SourceCode.Chasm.Serializer.Json
         {
             Debug.Assert(json != null);
 
-            int length = Encoding.UTF8.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
+            int length = s_utf8noBom.GetMaxByteCount(json.Length); // Utf8 is 1-4 bpc
 
             IMemoryOwner<byte> rented = _pool.Rent(length);
 
-            length = Encoding.UTF8.GetBytes(json, rented.Memory.Span);
+            length = s_utf8noBom.GetBytes(json, rented.Memory.Span);
 
             return rented.Slice(0, length);
         }
 
         private static string GetString(ReadOnlySpan<byte> utf8)
-            => Encoding.UTF8.GetString(utf8);
+            => s_utf8noBom.GetString(utf8);
 
         private bool _disposed;
 
