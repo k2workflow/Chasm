@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Chasm.Repository.Disk;
+using SourceCode.Chasm.Repository.Internal;
 using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
 

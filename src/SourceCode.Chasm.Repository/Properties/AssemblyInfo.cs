@@ -5,11 +5,11 @@
 
 #endregion
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Repository.AzureBlob")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Repository.AzureTable")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Repository.Disk")]
+
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Repository.Bench")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Repository.Tests")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Bench")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Tests")]
-
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Repository.AzureBlob")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Repository.AzureTable")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("SourceCode.Chasm.Repository.Disk")]
