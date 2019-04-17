@@ -3,19 +3,15 @@
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <RootNamespace>SourceCode.Chasm.Repository</RootNamespace>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <AssemblyName>SourceCode.Chasm.Repository</AssemblyName>
-    <RootNamespace>SourceCode.Chasm.Repository</RootNamespace>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
-    <PackageReference Include="SourceCode.Clay.Collections" Version="5.0.0-rc1-00794" />
+    <PackageReference Include="SourceCode.Clay.Collections" Version="5.0.0-rc1-00827" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,4 +26,5 @@
     <Version>1.0.0-local</Version>
     <PackageVersion>1.0.0-local</PackageVersion>
   </PropertyGroup>
+
 </Project>

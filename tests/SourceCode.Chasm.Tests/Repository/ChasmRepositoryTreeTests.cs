@@ -129,14 +129,14 @@ namespace SourceCode.Chasm.Repository.Tests
                 .Returns(async () =>
                 {
                     await Task.Yield();
-                    return EmptyMap.Empty<Sha1, IChasmBlob>();
+                    return EmptyDictionary.Empty<Sha1, IChasmBlob>();
                 });
 
             // Action
             IReadOnlyDictionary<TreeId, TreeNodeMap> actual = await mockChasmRepository.Object.ReadTreeBatchAsync(new TreeId[] { TreeIdTestObject.Random }, TestValues.RequestContext, TestValues.ParallelOptions.CancellationToken);
 
             // Assert
-            Assert.Equal(EmptyMap.Empty<TreeId, TreeNodeMap>(), actual);
+            Assert.Equal(EmptyDictionary.Empty<TreeId, TreeNodeMap>(), actual);
         }
 
         [Trait("Type", "Unit")]
