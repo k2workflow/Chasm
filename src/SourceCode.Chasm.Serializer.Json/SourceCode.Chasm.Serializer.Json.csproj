@@ -3,7 +3,7 @@
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp2.2</TargetFrameworks>
     <RootNamespace>SourceCode.Chasm.Serializer.Json</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>

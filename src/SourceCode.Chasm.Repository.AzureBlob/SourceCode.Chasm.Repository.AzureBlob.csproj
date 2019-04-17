@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Common properties defined in Directory.Build.props -->
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp2.2</TargetFrameworks>
     <RootNamespace>SourceCode.Chasm.Repository.AzureBlob</RootNamespace>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
