@@ -2,7 +2,6 @@ using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SourceCode.Clay;
@@ -195,7 +194,7 @@ namespace SourceCode.Chasm.Repository.Disk
         {
             var dto = new JsonMetadata(metadata?.ContentType, metadata?.Filename);
             var json = dto.ToJson();
-            File.WriteAllText(path, json, Encoding.UTF8);
+            File.WriteAllText(path, json, s_utf8noBom);
         }
 
         private static ChasmMetadata ReadMetadata(string path)
@@ -203,7 +202,7 @@ namespace SourceCode.Chasm.Repository.Disk
             if (!File.Exists(path))
                 return null;
 
-            string json = File.ReadAllText(path, Encoding.UTF8);
+            string json = File.ReadAllText(path, s_utf8noBom);
             var dto = JsonMetadata.FromJson(json);
 
             return new ChasmMetadata(dto.ContentType, dto.Filename);

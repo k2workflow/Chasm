@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SourceCode.Chasm.Repository.Disk;
+using SourceCode.Chasm.Repository.Internal;
 using SourceCode.Clay;
 
 namespace SourceCode.Chasm.Repository.AzureBlob

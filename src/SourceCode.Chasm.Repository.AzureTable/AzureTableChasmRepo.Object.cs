@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using SourceCode.Chasm.Repository.Disk;
+using SourceCode.Chasm.Repository.Internal;
 using SourceCode.Clay;
 using SourceCode.Clay.Collections.Generic;
 
@@ -140,7 +141,7 @@ namespace SourceCode.Chasm.Repository.AzureTable
         public override async Task<IReadOnlyDictionary<Sha1, IChasmBlob>> ReadObjectBatchAsync(IEnumerable<Sha1> objectIds, ChasmRequestContext requestContext = default, CancellationToken cancellationToken = default)
         {
             if (objectIds == null)
-                return EmptyMap.Empty<Sha1, IChasmBlob>();
+                return EmptyDictionary.Empty<Sha1, IChasmBlob>();
 
             requestContext = ChasmRequestContext.Ensure(requestContext);
             var opContext = new OperationContext
